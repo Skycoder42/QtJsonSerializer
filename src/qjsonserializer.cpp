@@ -181,6 +181,7 @@ QVariant QJsonSerializer::deserializeProperty(int propertyType, const QJsonValue
 
 	if(propertyType != QMetaType::UnknownType) {
 		auto vType = variant.typeName();
+		qDebug() << vType;
 		if(variant.canConvert(propertyType) && variant.convert(propertyType))
 			return variant;
 		else if(_allowNull && value.isNull())

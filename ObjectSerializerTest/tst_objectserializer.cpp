@@ -133,6 +133,25 @@ void ObjectSerializerTest::testDeserialization_data()
 	QTest::addColumn<bool>("works");
 
 	generalData();
+
+	QTest::newRow("invalidType") << (TestObject*)new BrokenTestObject(this)
+								 << QJsonObject({
+													{"intProperty", 0},
+													{"boolProperty", false},
+													{"stringProperty", QString()},
+													{"doubleProperty", 0},
+													{"simpeList", QJsonArray()},
+													{"leveledList", QJsonArray()},
+													{"childObject", QJsonValue::Null},
+													{"simpleChildren", QJsonArray()},
+													{"leveledChildren", QJsonArray()},
+													{"broken", QJsonValue::Null}
+												})
+								 << false;
+
+	QTest::newRow("uncreatableType") << (TestObject*)new BrokenTestObject2(this)
+									 << QJsonObject()
+									 << false;
 }
 
 void ObjectSerializerTest::testDeserialization()
