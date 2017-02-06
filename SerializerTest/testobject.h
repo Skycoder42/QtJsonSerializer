@@ -23,6 +23,10 @@ class TestObject : public QObject
 public:
 	explicit TestObject(QObject *parent = nullptr);
 
+	static TestObject *createBasic(int intProperty, bool boolProperty, QString stringProperty, double doubleProperty, QObject *parent = nullptr);
+	static TestObject *createList(QList<int> simpeList, QList<QList<int>> leveledList, QObject *parent = nullptr);
+	static TestObject *createChild(TestObject* childObject, QList<TestObject*> simpleChildren, QList<QList<TestObject*>> leveledChildren, QObject *parent = nullptr);
+
 	static bool equals(const TestObject *left, const TestObject *right);
 	bool equals(const TestObject *other) const;
 
