@@ -125,7 +125,7 @@ QObject *QJsonSerializer::deserializeObject(QJsonObject jsonObject, const QMetaO
 	//try to construct the object
 	auto object = metaObject->newInstance(Q_ARG(QObject*, parent));
 	if(!object)
-		throw DeserializationException(QStringLiteral("Failed to construct object of type %1").arg(metaObject->className()));
+		throw DeserializationException(QStringLiteral("Failed to construct object of type %1 (Does the constructor \"Q_INVOKABLE class(QObject*);\" exist?)").arg(metaObject->className()));
 
 	//now deserialize all json properties
 	for(auto it = jsonObject.constBegin(); it != jsonObject.constEnd(); it++) {

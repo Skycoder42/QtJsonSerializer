@@ -1,3 +1,4 @@
+#include "brokentestobject.h"
 #include "testobject.h"
 
 #include <QString>
@@ -411,6 +412,10 @@ void SerializerTest::testObjectSerialization_data()
 													 })
 									  << true;
 	}
+
+	QTest::newRow("invalidType") << (TestObject*)new BrokenTestObject(this)
+								 << QJsonObject()
+								 << false;
 }
 
 void SerializerTest::testObjectSerialization()

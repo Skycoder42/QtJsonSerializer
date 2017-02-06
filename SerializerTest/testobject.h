@@ -21,7 +21,7 @@ class TestObject : public QObject
 	Q_PROPERTY(QList<QList<TestObject*>> leveledChildren MEMBER leveledChildren)
 
 public:
-	explicit TestObject(QObject *parent = nullptr);
+	Q_INVOKABLE TestObject(QObject *parent = nullptr);
 
 	static TestObject *createBasic(int intProperty, bool boolProperty, QString stringProperty, double doubleProperty, QObject *parent = nullptr);
 	static TestObject *createList(QList<int> simpeList, QList<QList<int>> leveledList, QObject *parent = nullptr);
