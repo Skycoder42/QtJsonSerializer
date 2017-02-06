@@ -27,5 +27,9 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 include(../qjsonserializer.pri)
 
-SOURCES += tst_serializer.cpp
+SOURCES += tst_serializer.cpp \
+    testobject.cpp
 DEFINES += SRCDIR=\\\"$$PWD/\\\"
+
+HEADERS += \
+    testobject.h

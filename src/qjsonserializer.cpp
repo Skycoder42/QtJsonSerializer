@@ -1,12 +1,18 @@
 #include "qjsonserializer.h"
 
-#include <QDebug>
-#include <QJsonArray>
 #include <QRegularExpression>
+#include <QCoreApplication>
+#include <QDateTime>
+#include <QUuid>
+#include <QUrl>
+
+static void qJsonSerializerStartup();
+Q_COREAPP_STARTUP_FUNCTION(qJsonSerializerStartup)
 
 QJsonSerializer::QJsonSerializer(QObject *parent) :
 	QObject(parent),
-	_allowNull(false)
+	_allowNull(false),
+	_keepObjectName(false)
 {}
 
 QJsonSerializer::~QJsonSerializer() {}
@@ -16,9 +22,19 @@ bool QJsonSerializer::allowDefaultNull() const
 	return _allowNull;
 }
 
+bool QJsonSerializer::keepObjectName() const
+{
+	return _keepObjectName;
+}
+
 void QJsonSerializer::setAllowDefaultNull(bool allowDefaultNull)
 {
 	_allowNull = allowDefaultNull;
+}
+
+void QJsonSerializer::setKeepObjectName(bool keepObjectName)
+{
+	_keepObjectName = keepObjectName;
 }
 
 QJsonObject QJsonSerializer::serializeObject(const QObject *object) const
@@ -27,7 +43,10 @@ QJsonObject QJsonSerializer::serializeObject(const QObject *object) const
 
 	QJsonObject jsonObject;
 	//go through all properties and try to serialize them
-	for(auto i = QObject::staticMetaObject.indexOfProperty("objectName") + 1; i < meta->propertyCount(); i++) {
+	auto i = QObject::staticMetaObject.indexOfProperty("objectName");
+	if(!_keepObjectName)
+	   i++;
+	for(; i < meta->propertyCount(); i++) {
 		auto property = meta->property(i);
 		if(property.isStored())
 			jsonObject[property.name()]= serializeProperty(property.userType(), property.read(object));
@@ -195,4 +214,31 @@ QVariantList QJsonSerializer::deserializeList(int listType, const QJsonArray &ar
 QVariant QJsonSerializer::deserializeValue(QJsonValue value) const
 {
 	return value.toVariant();//all json can be converted to qvariant
+}
+
+// ------------- Startup function implementation -------------
+
+static void qJsonSerializerStartup()
+{
+	QJsonSerializer::registerListConverters<bool>();
+	QJsonSerializer::registerListConverters<int>();
+	QJsonSerializer::registerListConverters<unsigned int>();
+	QJsonSerializer::registerListConverters<double>();
+	QJsonSerializer::registerListConverters<QChar>();
+	QJsonSerializer::registerListConverters<QString>();
+	QJsonSerializer::registerListConverters<long long>();
+	QJsonSerializer::registerListConverters<short>();
+	QJsonSerializer::registerListConverters<char>();
+	QJsonSerializer::registerListConverters<unsigned long>();
+	QJsonSerializer::registerListConverters<unsigned long long>();
+	QJsonSerializer::registerListConverters<unsigned short>();
+	QJsonSerializer::registerListConverters<signed char>();
+	QJsonSerializer::registerListConverters<unsigned char>();
+	QJsonSerializer::registerListConverters<float>();
+	QJsonSerializer::registerListConverters<QDate>();
+	QJsonSerializer::registerListConverters<QTime>();
+	QJsonSerializer::registerListConverters<QUrl>();
+	QJsonSerializer::registerListConverters<QDateTime>();
+	QJsonSerializer::registerListConverters<QUuid>();
+	QJsonSerializer::registerListConverters<QObject*>();
 }

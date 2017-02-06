@@ -7,6 +7,7 @@
 #include <QJsonArray>
 #include <QMetaProperty>
 #include <QObject>
+#include <QDebug>
 #include <type_traits>
 
 class QJsonSerializer : public QObject
@@ -15,21 +16,26 @@ class QJsonSerializer : public QObject
 	friend class QJsonSerializerPrivate;
 
 	Q_PROPERTY(bool allowDefaultNull READ allowDefaultNull WRITE setAllowDefaultNull)
+	Q_PROPERTY(bool keepObjectName READ keepObjectName WRITE setKeepObjectName)
 
 public:
 	explicit QJsonSerializer(QObject *parent = nullptr);
 	~QJsonSerializer();
 
+	template<typename T>
+	static bool registerListConverters();
+
 	bool allowDefaultNull() const;
+	bool keepObjectName() const;
 
 	inline QJsonValue serialize(const QVariant &value) const;
-	inline QJsonObject serialize(const QObject *object) const;
+	inline QJsonObject serializeObj(const QObject *object) const;
 	template<typename T>
-	inline QJsonObject serialize(const T &gadget) const;
+	inline QJsonObject serializeGad(const T &gadget) const;
 	template<typename T>
-	inline QJsonArray serialize(const QList<T*> &objects) const;
+	inline QJsonArray serializeObj(const QList<T*> &objects) const;
 	template<typename T>
-	inline QJsonArray serialize(const QList<T> &gadgets) const;
+	inline QJsonArray serializeGad(const QList<T> &gadgets) const;
 
 	inline QVariant deserialize(const QJsonValue &value, int metaTypeId);
 	inline QObject *deserializeObj(QJsonObject jsonObject, const QMetaObject *metaObject, QObject *parent = nullptr) const;
@@ -45,6 +51,7 @@ public:
 
 public slots:
 	void setAllowDefaultNull(bool allowDefaultNull);
+	void setKeepObjectName(bool keepObjectName);
 
 protected:
 	virtual QJsonObject serializeObject(const QObject *object) const;
@@ -61,28 +68,60 @@ protected:
 
 private:
 	bool _allowNull;
+	bool _keepObjectName;
 };
 
 // ------------- Generic Implementation -------------
+
+template<typename T>
+bool QJsonSerializer::registerListConverters() {
+	auto ok1 = QMetaType::registerConverter<QList<T>, QVariantList>([](const QList<T> &list) -> QVariantList {
+		QVariantList l;
+		foreach(auto v, list)
+			l.append(QVariant::fromValue(v));
+		return l;
+	});
+
+	auto ok2 = QMetaType::registerConverter<QVariantList, QList<T>>([](const QVariantList &list) -> QList<T> {
+		QList<T> l;
+		foreach(auto v, list) {
+			auto vt = v.type();
+			if(v.convert(qMetaTypeId<T>()))
+				l.append(v.value<T>());
+			else {
+				qWarning() << QByteArray("Conversion to")
+						   << QMetaType::typeName(qMetaTypeId<QList<T>>())
+						   << QByteArray("failed, could not convert element of type")
+						   << QMetaType::typeName(vt);
+				l.append(T());
+			}
+		}
+		return l;
+	});
+
+	auto ok3 = QMetaType::registerComparators<QList<T>>();
+
+	return ok1 && ok2 && ok3;
+}
 
 QJsonValue QJsonSerializer::serialize(const QVariant &value) const
 {
 	return serializeProperty(value.userType(), value);
 }
 
-QJsonObject QJsonSerializer::serialize(const QObject *object) const
+QJsonObject QJsonSerializer::serializeObj(const QObject *object) const
 {
 	return serializeObject(object);
 }
 
 template<typename T>
-QJsonObject QJsonSerializer::serialize(const T &gadget) const
+QJsonObject QJsonSerializer::serializeGad(const T &gadget) const
 {
 	return serializeGadget(&gadget, &T::staticMetaObject);
 }
 
 template<typename T>
-QJsonArray QJsonSerializer::serialize(const QList<T *> &objects) const
+QJsonArray QJsonSerializer::serializeObj(const QList<T *> &objects) const
 {
 	static_assert(std::is_base_of<QObject, T>::value, "T must inherit QObject!");
 	QJsonArray array;
@@ -92,7 +131,7 @@ QJsonArray QJsonSerializer::serialize(const QList<T *> &objects) const
 }
 
 template<typename T>
-QJsonArray QJsonSerializer::serialize(const QList<T> &gadgets) const
+QJsonArray QJsonSerializer::serializeGad(const QList<T> &gadgets) const
 {
 	QJsonArray array;
 	foreach(auto gadget, gadgets)
