@@ -68,7 +68,7 @@ bool TestObject::equals(const TestObject *other) const
 {
 	if(this == other)
 		return true;
-	else if(!other)
+	else if(!other || !this)
 		return false;
 	else if(metaObject()->className() != other->metaObject()->className())
 		return false;
@@ -83,7 +83,7 @@ bool TestObject::equals(const TestObject *other) const
 				  leveledChildren.size() == other->leveledChildren.size() ;
 		if(!ok)
 			return false;
-		if(!childObject->equals(other))
+		if(!childObject->equals(other->childObject))
 			return false;
 		for(auto i = 0; i < simpleChildren.size(); i++) {
 			if(!simpleChildren[i]->equals(other->simpleChildren[i]))

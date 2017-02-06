@@ -168,28 +168,28 @@ void ObjectSerializerTest::testSerialization_data()
 	}
 
 	QTest::newRow("child") << TestObject::createChild(TestObject::createBasic(42, true, "baum", 4.2), {}, {}, this)
-							 << QJsonObject({
-												{"intProperty", 0},
-												{"boolProperty", false},
-												{"stringProperty", QString()},
-												{"doubleProperty", 0},
-												{"simpeList", QJsonArray()},
-												{"leveledList", QJsonArray()},
-												{"childObject", QJsonObject({
-													 {"intProperty", 42},
-													 {"boolProperty", true},
-													 {"stringProperty", QStringLiteral("baum")},
-													 {"doubleProperty", 4.2},
-													 {"simpeList", QJsonArray()},
-													 {"leveledList", QJsonArray()},
-													 {"childObject", QJsonValue::Null},
-													 {"simpleChildren", QJsonArray()},
-													 {"leveledChildren", QJsonArray()}
-												 })},
-												{"simpleChildren", QJsonArray()},
-												{"leveledChildren", QJsonArray()}
-											})
-							 << true;
+						   << QJsonObject({
+											  {"intProperty", 0},
+											  {"boolProperty", false},
+											  {"stringProperty", QString()},
+											  {"doubleProperty", 0},
+											  {"simpeList", QJsonArray()},
+											  {"leveledList", QJsonArray()},
+											  {"childObject", QJsonObject({
+												   {"intProperty", 42},
+												   {"boolProperty", true},
+												   {"stringProperty", QStringLiteral("baum")},
+												   {"doubleProperty", 4.2},
+												   {"simpeList", QJsonArray()},
+												   {"leveledList", QJsonArray()},
+												   {"childObject", QJsonValue::Null},
+												   {"simpleChildren", QJsonArray()},
+												   {"leveledChildren", QJsonArray()}
+											   })},
+											  {"simpleChildren", QJsonArray()},
+											  {"leveledChildren", QJsonArray()}
+										  })
+						   << true;
 
 	{
 		auto c1 = TestObject::createBasic(1, false, "1", 1.1);
@@ -436,12 +436,343 @@ void ObjectSerializerTest::testSerialization()
 
 void ObjectSerializerTest::testDeserialization_data()
 {
+	QTest::addColumn<QJsonObject>("data");
+	QTest::addColumn<TestObject*>("result");
+	QTest::addColumn<bool>("works");
+
+	QTest::newRow("default") << QJsonObject({
+												{"intProperty", 0},
+												{"boolProperty", false},
+												{"stringProperty", QString()},
+												{"doubleProperty", 0},
+												{"simpeList", QJsonArray()},
+												{"leveledList", QJsonArray()},
+												{"childObject", QJsonValue::Null},
+												{"simpleChildren", QJsonArray()},
+												{"leveledChildren", QJsonArray()}
+											})
+							 << new TestObject(this)
+							 << true;
+
+	QTest::newRow("basic") << QJsonObject({
+											  {"intProperty", 42},
+											  {"boolProperty", true},
+											  {"stringProperty", QStringLiteral("baum")},
+											  {"doubleProperty", 4.2},
+											  {"simpeList", QJsonArray()},
+											  {"leveledList", QJsonArray()},
+											  {"childObject", QJsonValue::Null},
+											  {"simpleChildren", QJsonArray()},
+											  {"leveledChildren", QJsonArray()}
+										  })
+						   << TestObject::createBasic(42, true, "baum", 4.2, this)
+						   << true;
+
+	QTest::newRow("list") << QJsonObject({
+											 {"intProperty", 0},
+											 {"boolProperty", false},
+											 {"stringProperty", QString()},
+											 {"doubleProperty", 0},
+											 {"simpeList", QJsonArray({3, 7, 13})},
+											 {"leveledList", QJsonArray()},
+											 {"childObject", QJsonValue::Null},
+											 {"simpleChildren", QJsonArray()},
+											 {"leveledChildren", QJsonArray()}
+										 })
+						  << TestObject::createList({3, 7, 13}, {}, this)
+						  << true;
+
+	{
+		QList<int> l1 = {0, 1, 2};
+		QList<int> l2 = {3, 4, 5};
+		QList<int> l3 = {6, 7, 8};
+		QJsonArray j1 = {0, 1, 2};
+		QJsonArray j2 = {3, 4, 5};
+		QJsonArray j3 = {6, 7, 8};
+		QTest::newRow("list<list>") << QJsonObject({
+													   {"intProperty", 0},
+													   {"boolProperty", false},
+													   {"stringProperty", QString()},
+													   {"doubleProperty", 0},
+													   {"simpeList", QJsonArray({3, 7, 13})},
+													   {"leveledList", QJsonArray({j1, j2, j3})},
+													   {"childObject", QJsonValue::Null},
+													   {"simpleChildren", QJsonArray()},
+													   {"leveledChildren", QJsonArray()}
+												   })
+									<< TestObject::createList({3, 7, 13}, {l1, l2, l3}, this)
+									<< true;
+	}
+
+	QTest::newRow("child") << QJsonObject({
+											  {"intProperty", 0},
+											  {"boolProperty", false},
+											  {"stringProperty", QString()},
+											  {"doubleProperty", 0},
+											  {"simpeList", QJsonArray()},
+											  {"leveledList", QJsonArray()},
+											  {"childObject", QJsonObject({
+												   {"intProperty", 42},
+												   {"boolProperty", true},
+												   {"stringProperty", QStringLiteral("baum")},
+												   {"doubleProperty", 4.2},
+												   {"simpeList", QJsonArray()},
+												   {"leveledList", QJsonArray()},
+												   {"childObject", QJsonValue::Null},
+												   {"simpleChildren", QJsonArray()},
+												   {"leveledChildren", QJsonArray()}
+											   })},
+											  {"simpleChildren", QJsonArray()},
+											  {"leveledChildren", QJsonArray()}
+										  })
+						   << TestObject::createChild(TestObject::createBasic(42, true, "baum", 4.2), {}, {}, this)
+						   << true;
+
+	{
+		auto c1 = TestObject::createBasic(1, false, "1", 1.1);
+		auto c2 = TestObject::createBasic(2, true, "2", 2.2);
+		auto c3 = TestObject::createBasic(3, false, "3", 3.3);
+		QJsonObject j1({
+						   {"intProperty", 1},
+						   {"boolProperty", false},
+						   {"stringProperty", QStringLiteral("1")},
+						   {"doubleProperty", 1.1},
+						   {"simpeList", QJsonArray()},
+						   {"leveledList", QJsonArray()},
+						   {"childObject", QJsonValue::Null},
+						   {"simpleChildren", QJsonArray()},
+						   {"leveledChildren", QJsonArray()}
+					   });
+		QJsonObject j2({
+						   {"intProperty", 2},
+						   {"boolProperty", true},
+						   {"stringProperty", QStringLiteral("2")},
+						   {"doubleProperty", 2.2},
+						   {"simpeList", QJsonArray()},
+						   {"leveledList", QJsonArray()},
+						   {"childObject", QJsonValue::Null},
+						   {"simpleChildren", QJsonArray()},
+						   {"leveledChildren", QJsonArray()}
+					   });
+		QJsonObject j3({
+						   {"intProperty", 3},
+						   {"boolProperty", false},
+						   {"stringProperty", QStringLiteral("3")},
+						   {"doubleProperty", 3.3},
+						   {"simpeList", QJsonArray()},
+						   {"leveledList", QJsonArray()},
+						   {"childObject", QJsonValue::Null},
+						   {"simpleChildren", QJsonArray()},
+						   {"leveledChildren", QJsonArray()}
+					   });
+		QTest::newRow("childlist") << QJsonObject({
+													  {"intProperty", 0},
+													  {"boolProperty", false},
+													  {"stringProperty", QString()},
+													  {"doubleProperty", 0},
+													  {"simpeList", QJsonArray()},
+													  {"leveledList", QJsonArray()},
+													  {"childObject", QJsonValue::Null},
+													  {"simpleChildren", QJsonArray({j1, j2, j3})},
+													  {"leveledChildren", QJsonArray()}
+												  })
+								   << TestObject::createChild(nullptr, {c1, c2, c3}, {}, this)
+								   << true;
+	}
+
+	{
+		auto c0 = TestObject::createBasic(0, false, "0", 0.0);
+		auto c1 = TestObject::createBasic(1, true, "1", 1.1);
+		auto c2 = TestObject::createBasic(2, false, "2", 2.2);
+		auto c3 = TestObject::createBasic(3, true, "3", 3.3);
+		auto c4 = TestObject::createBasic(4, false, "4", 4.4);
+		auto c5 = TestObject::createBasic(5, true, "5", 5.5);
+		auto c6 = TestObject::createBasic(6, false, "6", 6.6);
+		auto c7 = TestObject::createBasic(7, true, "7", 7.7);
+		auto c8 = TestObject::createBasic(8, false, "8", 8.8);
+		QList<QList<TestObject*>> ccl = {
+			{c0, c1, c2},
+			{c3, c4, c5},
+			{c6, c7, c8}
+		};
+		QJsonObject j0({
+						   {"intProperty", 0},
+						   {"boolProperty", false},
+						   {"stringProperty", QStringLiteral("0")},
+						   {"doubleProperty", 0.0},
+						   {"simpeList", QJsonArray()},
+						   {"leveledList", QJsonArray()},
+						   {"childObject", QJsonValue::Null},
+						   {"simpleChildren", QJsonArray()},
+						   {"leveledChildren", QJsonArray()}
+					   });
+		QJsonObject j1({
+						   {"intProperty", 1},
+						   {"boolProperty", true},
+						   {"stringProperty", QStringLiteral("1")},
+						   {"doubleProperty", 1.1},
+						   {"simpeList", QJsonArray()},
+						   {"leveledList", QJsonArray()},
+						   {"childObject", QJsonValue::Null},
+						   {"simpleChildren", QJsonArray()},
+						   {"leveledChildren", QJsonArray()}
+					   });
+		QJsonObject j2({
+						   {"intProperty", 2},
+						   {"boolProperty", false},
+						   {"stringProperty", QStringLiteral("2")},
+						   {"doubleProperty", 2.2},
+						   {"simpeList", QJsonArray()},
+						   {"leveledList", QJsonArray()},
+						   {"childObject", QJsonValue::Null},
+						   {"simpleChildren", QJsonArray()},
+						   {"leveledChildren", QJsonArray()}
+					   });
+		QJsonObject j3({
+						   {"intProperty", 3},
+						   {"boolProperty", true},
+						   {"stringProperty", QStringLiteral("3")},
+						   {"doubleProperty", 3.3},
+						   {"simpeList", QJsonArray()},
+						   {"leveledList", QJsonArray()},
+						   {"childObject", QJsonValue::Null},
+						   {"simpleChildren", QJsonArray()},
+						   {"leveledChildren", QJsonArray()}
+					   });
+		QJsonObject j4({
+						   {"intProperty", 4},
+						   {"boolProperty", false},
+						   {"stringProperty", QStringLiteral("4")},
+						   {"doubleProperty", 4.4},
+						   {"simpeList", QJsonArray()},
+						   {"leveledList", QJsonArray()},
+						   {"childObject", QJsonValue::Null},
+						   {"simpleChildren", QJsonArray()},
+						   {"leveledChildren", QJsonArray()}
+					   });
+		QJsonObject j5({
+						   {"intProperty", 5},
+						   {"boolProperty", true},
+						   {"stringProperty", QStringLiteral("5")},
+						   {"doubleProperty", 5.5},
+						   {"simpeList", QJsonArray()},
+						   {"leveledList", QJsonArray()},
+						   {"childObject", QJsonValue::Null},
+						   {"simpleChildren", QJsonArray()},
+						   {"leveledChildren", QJsonArray()}
+					   });
+		QJsonObject j6({
+						   {"intProperty", 6},
+						   {"boolProperty", false},
+						   {"stringProperty", QStringLiteral("6")},
+						   {"doubleProperty", 6.6},
+						   {"simpeList", QJsonArray()},
+						   {"leveledList", QJsonArray()},
+						   {"childObject", QJsonValue::Null},
+						   {"simpleChildren", QJsonArray()},
+						   {"leveledChildren", QJsonArray()}
+					   });
+		QJsonObject j7({
+						   {"intProperty", 7},
+						   {"boolProperty", true},
+						   {"stringProperty", QStringLiteral("7")},
+						   {"doubleProperty", 7.7},
+						   {"simpeList", QJsonArray()},
+						   {"leveledList", QJsonArray()},
+						   {"childObject", QJsonValue::Null},
+						   {"simpleChildren", QJsonArray()},
+						   {"leveledChildren", QJsonArray()}
+					   });
+		QJsonObject j8({
+						   {"intProperty", 8},
+						   {"boolProperty", false},
+						   {"stringProperty", QStringLiteral("8")},
+						   {"doubleProperty", 8.8},
+						   {"simpeList", QJsonArray()},
+						   {"leveledList", QJsonArray()},
+						   {"childObject", QJsonValue::Null},
+						   {"simpleChildren", QJsonArray()},
+						   {"leveledChildren", QJsonArray()}
+					   });
+		QJsonArray jjl = {
+			QJsonArray({j0, j1, j2}),
+			QJsonArray({j3, j4, j5}),
+			QJsonArray({j6, j7, j8})
+		};
+		QTest::newRow("list<childlist>") << QJsonObject({
+															{"intProperty", 0},
+															{"boolProperty", false},
+															{"stringProperty", QString()},
+															{"doubleProperty", 0},
+															{"simpeList", QJsonArray()},
+															{"leveledList", QJsonArray()},
+															{"childObject", QJsonValue::Null},
+															{"simpleChildren", QJsonArray()},
+															{"leveledChildren", jjl}
+														})
+										 << TestObject::createChild(nullptr, {}, ccl, this)
+										 << true;
+	}
+
+	{
+		auto gc = TestObject::createBasic(42, true, "baum", 4.2);
+		auto c = TestObject::createChild(gc, {}, {});
+		QTest::newRow("child<child>") << QJsonObject({
+														 {"intProperty", 0},
+														 {"boolProperty", false},
+														 {"stringProperty", QString()},
+														 {"doubleProperty", 0},
+														 {"simpeList", QJsonArray()},
+														 {"leveledList", QJsonArray()},
+														 {"childObject", QJsonObject({
+															  {"intProperty", 0},
+															  {"boolProperty", false},
+															  {"stringProperty", QString()},
+															  {"doubleProperty", 0},
+															  {"simpeList", QJsonArray()},
+															  {"leveledList", QJsonArray()},
+															  {"childObject", QJsonObject({
+																   {"intProperty", 42},
+																   {"boolProperty", true},
+																   {"stringProperty", QStringLiteral("baum")},
+																   {"doubleProperty", 4.2},
+																   {"simpeList", QJsonArray()},
+																   {"leveledList", QJsonArray()},
+																   {"childObject", QJsonValue::Null},
+																   {"simpleChildren", QJsonArray()},
+																   {"leveledChildren", QJsonArray()}
+															   })},
+															  {"simpleChildren", QJsonArray()},
+															  {"leveledChildren", QJsonArray()}
+														  })},
+														 {"simpleChildren", QJsonArray()},
+														 {"leveledChildren", QJsonArray()}
+													 })
+									  << TestObject::createChild(c, {}, {}, this)
+									  << true;
+	}
+
+//	QTest::newRow("invalidType") << (TestObject*)new BrokenTestObject(this)
+//								 << QJsonObject()
+//								 << false;
 
 }
 
 void ObjectSerializerTest::testDeserialization()
 {
+	QFETCH(QJsonObject, data);
+	QFETCH(TestObject*, result);
+	QFETCH(bool, works);
 
+	if(works) {
+		auto obj = serializer->deserializeObj<TestObject>(data, this);
+		QVERIFY(obj);
+		QVERIFY(result->equals(obj));
+		obj->deleteLater();
+	} else
+		QVERIFY_EXCEPTION_THROWN(serializer->deserializeObj(data, result->metaObject(), this), SerializerException);//to allow broken type
+
+	result->deleteLater();
 }
 
 QTEST_MAIN(ObjectSerializerTest)
