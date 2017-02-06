@@ -23,10 +23,13 @@ private Q_SLOTS:
 	void testDeserialization_data();
 	void testDeserialization();
 
+	//TODO test objectName
+	//TODO test nullValues
+
 private:
 	QJsonSerializer *serializer;
 
-	void generalData();
+	void generateValidTestData();
 };
 
 ObjectSerializerTest::ObjectSerializerTest()
@@ -105,7 +108,7 @@ void ObjectSerializerTest::testSerialization_data()
 	QTest::addColumn<QJsonObject>("result");
 	QTest::addColumn<bool>("works");
 
-	generalData();
+	generateValidTestData();
 
 	QTest::newRow("invalidType") << (TestObject*)new BrokenTestObject(this)
 								 << QJsonObject()
@@ -132,7 +135,7 @@ void ObjectSerializerTest::testDeserialization_data()
 	QTest::addColumn<QJsonObject>("data");
 	QTest::addColumn<bool>("works");
 
-	generalData();
+	generateValidTestData();
 
 	QTest::newRow("invalidType") << (TestObject*)new BrokenTestObject(this)
 								 << QJsonObject({
@@ -171,7 +174,7 @@ void ObjectSerializerTest::testDeserialization()
 	result->deleteLater();
 }
 
-void ObjectSerializerTest::generalData()
+void ObjectSerializerTest::generateValidTestData()
 {
 	QTest::newRow("default") << new TestObject(this)
 							 << QJsonObject({
