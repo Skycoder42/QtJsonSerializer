@@ -8,7 +8,7 @@ QT       += testlib
 
 QT       -= gui
 
-TARGET = tst_serializer
+TARGET = tst_objectserializer
 CONFIG   += console
 CONFIG   -= app_bundle
 
@@ -27,11 +27,12 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 include(../qjsonserializer.pri)
 
-SOURCES += tst_serializer.cpp \
-    testobject.cpp \
-    brokentestobject.cpp
+SOURCES += \
+	testobject.cpp \
+	brokentestobject.cpp \
+	tst_objectserializer.cpp
 DEFINES += SRCDIR=\\\"$$PWD/\\\"
 
 HEADERS += \
-    testobject.h \
-    brokentestobject.h
+	testobject.h \
+	brokentestobject.h

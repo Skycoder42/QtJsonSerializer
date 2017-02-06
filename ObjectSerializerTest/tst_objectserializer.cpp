@@ -5,12 +5,12 @@
 #include <QtTest>
 #include <QJsonSerializer>
 
-class SerializerTest : public QObject
+class ObjectSerializerTest : public QObject
 {
 	Q_OBJECT
 
 public:
-	SerializerTest();
+	ObjectSerializerTest();
 
 private Q_SLOTS:
 	void initTestCase();
@@ -18,18 +18,20 @@ private Q_SLOTS:
 
 	void testVariantConversions_data();
 	void testVariantConversions();
-	void testObjectSerialization_data();
-	void testObjectSerialization();
+	void testSerialization_data();
+	void testSerialization();
+	void testDeserialization_data();
+	void testDeserialization();
 
 private:
 	QJsonSerializer *serializer;
 };
 
-SerializerTest::SerializerTest()
+ObjectSerializerTest::ObjectSerializerTest()
 {
 }
 
-void SerializerTest::initTestCase()
+void ObjectSerializerTest::initTestCase()
 {
 	QJsonSerializer::registerListConverters<QList<int>>();
 	QJsonSerializer::registerListConverters<TestObject*>();
@@ -37,13 +39,13 @@ void SerializerTest::initTestCase()
 	serializer = new QJsonSerializer(this);
 }
 
-void SerializerTest::cleanupTestCase()
+void ObjectSerializerTest::cleanupTestCase()
 {
 	serializer->deleteLater();
 	serializer = nullptr;
 }
 
-void SerializerTest::testVariantConversions_data()
+void ObjectSerializerTest::testVariantConversions_data()
 {
 	QTest::addColumn<QVariant>("data");
 	QTest::addColumn<int>("targetType");
@@ -83,7 +85,7 @@ void SerializerTest::testVariantConversions_data()
 											   << (int)QVariant::List;
 }
 
-void SerializerTest::testVariantConversions()
+void ObjectSerializerTest::testVariantConversions()
 {
 	QFETCH(QVariant, data);
 	QFETCH(int, targetType);
@@ -95,7 +97,7 @@ void SerializerTest::testVariantConversions()
 	QCOMPARE(convData, data);
 }
 
-void SerializerTest::testObjectSerialization_data()
+void ObjectSerializerTest::testSerialization_data()
 {
 	QTest::addColumn<TestObject*>("object");
 	QTest::addColumn<QJsonObject>("result");
@@ -418,7 +420,7 @@ void SerializerTest::testObjectSerialization_data()
 								 << false;
 }
 
-void SerializerTest::testObjectSerialization()
+void ObjectSerializerTest::testSerialization()
 {
 	QFETCH(TestObject*, object);
 	QFETCH(QJsonObject, result);
@@ -432,6 +434,16 @@ void SerializerTest::testObjectSerialization()
 	object->deleteLater();
 }
 
-QTEST_MAIN(SerializerTest)
+void ObjectSerializerTest::testDeserialization_data()
+{
 
-#include "tst_serializer.moc"
+}
+
+void ObjectSerializerTest::testDeserialization()
+{
+
+}
+
+QTEST_MAIN(ObjectSerializerTest)
+
+#include "tst_objectserializer.moc"
