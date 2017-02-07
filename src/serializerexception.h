@@ -4,7 +4,17 @@
 #include <QString>
 #include <exception>
 
-class SerializerException : public std::exception
+#ifdef QJSONSERIALIZER_AS_DLL
+#if defined(QJSONSERIALIZER_LIBRARY)
+#  define QJSONSERIALIZERSHARED_EXPORT Q_DECL_EXPORT
+#else
+#  define QJSONSERIALIZERSHARED_EXPORT Q_DECL_IMPORT
+#endif
+#else
+#define QJSONSERIALIZERSHARED_EXPORT
+#endif
+
+class QJSONSERIALIZERSHARED_EXPORT SerializerException : public std::exception
 {
 public:
 	SerializerException(const QString &what, bool deser);
@@ -19,20 +29,16 @@ private:
 	const bool _isDeser;
 };
 
-class SerializationException : public SerializerException
+class QJSONSERIALIZERSHARED_EXPORT SerializationException : public SerializerException
 {
 public:
-	inline SerializationException(const QString &what) :
-		SerializerException(what, false)
-	{}
+	SerializationException(const QString &what);
 };
 
-class DeserializationException : public SerializerException
+class QJSONSERIALIZERSHARED_EXPORT DeserializationException : public SerializerException
 {
 public:
-	inline DeserializationException(const QString &what) :
-		SerializerException(what, true)
-	{}
+	DeserializationException(const QString &what);
 };
 
 #endif // SERIALIZEREXCEPTION_H

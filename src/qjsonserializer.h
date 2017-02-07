@@ -11,7 +11,17 @@
 #include <QDebug>
 #include <type_traits>
 
-class QJsonSerializer : public QObject
+#ifdef QJSONSERIALIZER_AS_DLL
+#if defined(QJSONSERIALIZER_LIBRARY)
+#  define QJSONSERIALIZERSHARED_EXPORT Q_DECL_EXPORT
+#else
+#  define QJSONSERIALIZERSHARED_EXPORT Q_DECL_IMPORT
+#endif
+#else
+#define QJSONSERIALIZERSHARED_EXPORT
+#endif
+
+class QJSONSERIALIZERSHARED_EXPORT QJsonSerializer : public QObject
 {
 	Q_OBJECT
 	friend class QJsonSerializerPrivate;

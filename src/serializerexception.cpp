@@ -23,3 +23,11 @@ const char *SerializerException::what() const noexcept
 {
 	return _what.constData();
 }
+
+SerializationException::SerializationException(const QString &what) :
+	SerializerException(what, false)
+{}
+
+DeserializationException::DeserializationException(const QString &what) :
+	SerializerException(what, true)
+{}
