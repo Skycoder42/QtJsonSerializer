@@ -22,6 +22,9 @@ private Q_SLOTS:
 	void testDeserialization();
 	void testInvalidDeserialization();
 
+	void testNullChild();
+	void testNullDeserialization();
+
 private:
 	QJsonSerializer *serializer;
 
@@ -152,6 +155,48 @@ void GadgetSerializerTest::testInvalidDeserialization()
 					  });
 
 	QVERIFY_EXCEPTION_THROWN(serializer->deserialize<BrokenTestGadget>(broken), SerializerException);
+}
+
+void GadgetSerializerTest::testNullChild()
+{
+	auto testGad = ParentGadget();
+	auto testJson = QJsonObject({
+									{"intProperty", 0},
+									{"boolProperty", false},
+									{"stringProperty", QString()},
+									{"doubleProperty", 0},
+									{"simpeList", QJsonArray()},
+									{"leveledList", QJsonArray()},
+									{"childGadget", QJsonValue::Null},//this one is null here -> default contructed
+									{"simpleChildren", QJsonArray()},
+									{"leveledChildren", QJsonArray()}
+								});
+
+	QCOMPARE(serializer->deserialize<ParentGadget>(testJson), testGad);
+}
+
+void GadgetSerializerTest::testNullDeserialization()
+{
+	auto testGad = ParentGadget();
+	auto testJson = QJsonObject({
+									{"intProperty", QJsonValue::Null},
+									{"boolProperty", QJsonValue::Null},
+									{"stringProperty", QJsonValue::Null},
+									{"doubleProperty", QJsonValue::Null},
+									{"simpeList", QJsonValue::Null},
+									{"leveledList", QJsonValue::Null},
+									{"childGadget", QJsonValue::Null},
+									{"simpleChildren", QJsonValue::Null},
+									{"leveledChildren", QJsonValue::Null}
+								});
+
+	serializer->setAllowDefaultNull(false);
+	QVERIFY_EXCEPTION_THROWN(serializer->deserialize<ParentGadget>(testJson), SerializerException);
+
+	serializer->setAllowDefaultNull(true);
+	QCOMPARE(serializer->deserialize<ParentGadget>(testJson), testGad);
+
+	serializer->setAllowDefaultNull(false);
 }
 
 void GadgetSerializerTest::generateValidTestData()
