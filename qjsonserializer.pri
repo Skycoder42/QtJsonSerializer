@@ -8,3 +8,5 @@ SOURCES += \
 	$$PWD/src/qjsonserializer.cpp
 
 INCLUDEPATH += $$PWD/src
+
+qjs_as_lib: DEFINES += QJSONSERIALIZER_AS_DLL QJSONSERIALIZER_LIBRARY
