@@ -29,6 +29,8 @@ public:
 	BrokenTestObject2(QObject *parent = nullptr);//no Q_INVOKABLE constructor
 };
 
+Q_DECLARE_METATYPE(BrokenTestObject*)
+Q_DECLARE_METATYPE(BrokenTestObject2*)
 Q_DECLARE_METATYPE(BrokenTestObject::Broken)
 
 #endif // BROKENTESTOBJECT_H

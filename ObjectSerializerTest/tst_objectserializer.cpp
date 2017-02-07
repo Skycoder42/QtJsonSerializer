@@ -9,9 +9,6 @@ class ObjectSerializerTest : public QObject
 {
 	Q_OBJECT
 
-public:
-	ObjectSerializerTest();
-
 private Q_SLOTS:
 	void initTestCase();
 	void cleanupTestCase();
@@ -32,16 +29,14 @@ private:
 	void generateValidTestData();
 };
 
-ObjectSerializerTest::ObjectSerializerTest()
-{
-}
-
 void ObjectSerializerTest::initTestCase()
 {
 	QJsonSerializer::registerListConverters<QList<int>>();
 	QJsonSerializer::registerListConverters<TestObject*>();
 	QJsonSerializer::registerListConverters<QList<TestObject*>>();
 	serializer = new QJsonSerializer(this);
+
+	qMetaTypeId<TestObject*>();
 }
 
 void ObjectSerializerTest::cleanupTestCase()
@@ -122,9 +117,9 @@ void ObjectSerializerTest::testSerialization()
 	QFETCH(bool, works);
 
 	if(works)
-		QCOMPARE(serializer->serializeObj(object), result);
+		QCOMPARE(serializer->serialize(object), result);
 	else
-		QVERIFY_EXCEPTION_THROWN(serializer->serializeObj(object), SerializerException);
+		QVERIFY_EXCEPTION_THROWN(serializer->serialize(object), SerializerException);
 
 	object->deleteLater();
 }
@@ -164,12 +159,20 @@ void ObjectSerializerTest::testDeserialization()
 	QFETCH(bool, works);
 
 	if(works) {
-		auto obj = serializer->deserializeObj<TestObject>(data, this);
+		auto obj = serializer->deserialize<TestObject>(data, this);
 		QVERIFY(obj);
 		QVERIFY(result->equals(obj));
 		obj->deleteLater();
-	} else
-		QVERIFY_EXCEPTION_THROWN(serializer->deserializeObj(data, result->metaObject(), this), SerializerException);//to allow broken type
+	} else {
+		auto broken2 = qobject_cast<BrokenTestObject2*>(result);
+		auto broken = qobject_cast<BrokenTestObject*>(result);
+		if(broken2)
+			QVERIFY_EXCEPTION_THROWN(serializer->deserialize<BrokenTestObject2>(data, this), SerializerException);
+		else if(broken)
+			QVERIFY_EXCEPTION_THROWN(serializer->deserialize<BrokenTestObject>(data, this), SerializerException);
+		else
+			QFAIL("Expected BrokenTestObject or BrokenTestObject2!");
+	}
 
 	result->deleteLater();
 }

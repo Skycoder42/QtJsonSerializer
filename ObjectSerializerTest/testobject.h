@@ -43,4 +43,6 @@ public:
 	QList<QList<TestObject*>> leveledChildren;
 };
 
+Q_DECLARE_METATYPE(TestObject*)
+
 #endif // TESTOBJECT_H

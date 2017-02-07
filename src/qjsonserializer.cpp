@@ -37,38 +37,7 @@ void QJsonSerializer::setKeepObjectName(bool keepObjectName)
 	_keepObjectName = keepObjectName;
 }
 
-QJsonObject QJsonSerializer::serializeObject(const QObject *object) const
-{
-	auto meta = object->metaObject();
-
-	QJsonObject jsonObject;
-	//go through all properties and try to serialize them
-	auto i = QObject::staticMetaObject.indexOfProperty("objectName");
-	if(!_keepObjectName)
-	   i++;
-	for(; i < meta->propertyCount(); i++) {
-		auto property = meta->property(i);
-		if(property.isStored())
-			jsonObject[property.name()]= serializeProperty(property.userType(), property.read(object));
-	}
-
-	return jsonObject;
-}
-
-QJsonObject QJsonSerializer::serializeGadget(const void *gadget, const QMetaObject *metaObject) const
-{
-	QJsonObject jsonObject;
-	//go through all properties and try to serialize them
-	for(auto i = 0; i < metaObject->propertyCount(); i++) {
-		auto property = metaObject->property(i);
-		if(property.isStored())
-			jsonObject[property.name()]= serializeProperty(property.userType(), property.readOnGadget(gadget));
-	}
-
-	return jsonObject;
-}
-
-QJsonValue QJsonSerializer::serializeProperty(int propertyType, const QVariant &value) const
+QJsonValue QJsonSerializer::serializeVariant(int propertyType, const QVariant &value) const
 {
 	auto convertValue = value;
 	if((propertyType == QVariant::List) ||
@@ -93,6 +62,37 @@ QJsonValue QJsonSerializer::serializeProperty(int propertyType, const QVariant &
 	}
 }
 
+QJsonObject QJsonSerializer::serializeObject(const QObject *object) const
+{
+	auto meta = object->metaObject();
+
+	QJsonObject jsonObject;
+	//go through all properties and try to serialize them
+	auto i = QObject::staticMetaObject.indexOfProperty("objectName");
+	if(!_keepObjectName)
+	   i++;
+	for(; i < meta->propertyCount(); i++) {
+		auto property = meta->property(i);
+		if(property.isStored())
+			jsonObject[property.name()]= serializeVariant(property.userType(), property.read(object));
+	}
+
+	return jsonObject;
+}
+
+QJsonObject QJsonSerializer::serializeGadget(const void *gadget, const QMetaObject *metaObject) const
+{
+	QJsonObject jsonObject;
+	//go through all properties and try to serialize them
+	for(auto i = 0; i < metaObject->propertyCount(); i++) {
+		auto property = metaObject->property(i);
+		if(property.isStored())
+			jsonObject[property.name()]= serializeVariant(property.userType(), property.readOnGadget(gadget));
+	}
+
+	return jsonObject;
+}
+
 QJsonArray QJsonSerializer::serializeList(int listType, const QVariantList &value) const
 {
 	static const QRegularExpression listTypeRegex(QStringLiteral(R"__(^QList<\s*(.*)\s*>$)__"));//TODO move out
@@ -103,7 +103,7 @@ QJsonArray QJsonSerializer::serializeList(int listType, const QVariantList &valu
 
 	QJsonArray array;
 	foreach(auto element, value)
-		array.append(serializeProperty(metaType, element));
+		array.append(serializeVariant(metaType, element));
 	return array;
 }
 
@@ -120,42 +120,7 @@ QJsonValue QJsonSerializer::serializeValue(QVariant value) const
 	}
 }
 
-QObject *QJsonSerializer::deserializeObject(QJsonObject jsonObject, const QMetaObject *metaObject, QObject *parent) const
-{
-	//try to construct the object
-	auto object = metaObject->newInstance(Q_ARG(QObject*, parent));
-	if(!object)
-		throw DeserializationException(QStringLiteral("Failed to construct object of type %1 (Does the constructor \"Q_INVOKABLE class(QObject*);\" exist?)").arg(metaObject->className()));
-
-	//now deserialize all json properties
-	for(auto it = jsonObject.constBegin(); it != jsonObject.constEnd(); it++) {
-		auto propIndex = metaObject->indexOfProperty(qUtf8Printable(it.key()));
-		auto type = propIndex != -1 ?
-						metaObject->property(propIndex).userType() :
-						QMetaType::UnknownType;
-		object->setProperty(qUtf8Printable(it.key()), deserializeProperty(type, it.value(), object));
-	}
-
-	return object;
-}
-
-void QJsonSerializer::deserializeGadget(QJsonObject jsonObject, int typeId, void *gadgetPtr) const
-{
-	auto metaObject = QMetaType::metaObjectForType(typeId);
-	if(!QMetaType::construct(typeId, gadgetPtr, nullptr))
-		throw DeserializationException(QStringLiteral("Failed to construct gadget of type %1").arg(QMetaType::typeName(typeId)));
-
-	//now deserialize all json properties
-	for(auto it = jsonObject.constBegin(); it != jsonObject.constEnd(); it++) {
-		auto propIndex = metaObject->indexOfProperty(qUtf8Printable(it.key()));
-		if(propIndex != -1) {
-			auto property = metaObject->property(propIndex);
-			property.writeOnGadget(gadgetPtr, deserializeProperty(property.userType(), it.value(), nullptr));
-		}
-	}
-}
-
-QVariant QJsonSerializer::deserializeProperty(int propertyType, const QJsonValue &value, QObject *parent) const
+QVariant QJsonSerializer::deserializeVariant(int propertyType, const QJsonValue &value, QObject *parent) const
 {
 	QVariant variant;
 	if(value.isArray()) {
@@ -194,6 +159,41 @@ QVariant QJsonSerializer::deserializeProperty(int propertyType, const QJsonValue
 		return variant;
 }
 
+QObject *QJsonSerializer::deserializeObject(QJsonObject jsonObject, const QMetaObject *metaObject, QObject *parent) const
+{
+	//try to construct the object
+	auto object = metaObject->newInstance(Q_ARG(QObject*, parent));
+	if(!object)
+		throw DeserializationException(QStringLiteral("Failed to construct object of type %1 (Does the constructor \"Q_INVOKABLE class(QObject*);\" exist?)").arg(metaObject->className()));
+
+	//now deserialize all json properties
+	for(auto it = jsonObject.constBegin(); it != jsonObject.constEnd(); it++) {
+		auto propIndex = metaObject->indexOfProperty(qUtf8Printable(it.key()));
+		auto type = propIndex != -1 ?
+						metaObject->property(propIndex).userType() :
+						QMetaType::UnknownType;
+		object->setProperty(qUtf8Printable(it.key()), deserializeVariant(type, it.value(), object));
+	}
+
+	return object;
+}
+
+void QJsonSerializer::deserializeGadget(QJsonObject jsonObject, int typeId, void *gadgetPtr) const
+{
+	auto metaObject = QMetaType::metaObjectForType(typeId);
+	if(!QMetaType::construct(typeId, gadgetPtr, nullptr))
+		throw DeserializationException(QStringLiteral("Failed to construct gadget of type %1").arg(QMetaType::typeName(typeId)));
+
+	//now deserialize all json properties
+	for(auto it = jsonObject.constBegin(); it != jsonObject.constEnd(); it++) {
+		auto propIndex = metaObject->indexOfProperty(qUtf8Printable(it.key()));
+		if(propIndex != -1) {
+			auto property = metaObject->property(propIndex);
+			property.writeOnGadget(gadgetPtr, deserializeVariant(property.userType(), it.value(), nullptr));
+		}
+	}
+}
+
 QVariantList QJsonSerializer::deserializeList(int listType, const QJsonArray &array, QObject *parent) const
 {
 	int metaType = QMetaType::UnknownType;
@@ -207,7 +207,7 @@ QVariantList QJsonSerializer::deserializeList(int listType, const QJsonArray &ar
 	//generate the list
 	QVariantList list;
 	foreach(auto element, array)
-		list.append(deserializeProperty(metaType, element, parent));
+		list.append(deserializeVariant(metaType, element, parent));
 	return list;
 }
 
