@@ -41,11 +41,11 @@ public:
 
 	inline QVariant deserialize(const QJsonValue &value, int metaTypeId);
 	template<typename T>
-	inline T *deserialize(QJsonObject jsonObject, QObject *parent = nullptr) const;
+	inline T *deserialize(QJsonObject jsonObject, QObject *parent) const;
 	template <typename T>
 	inline T deserialize(QJsonObject jsonObject) const;
 	template<typename T>
-	inline QList<T*> deserialize(QJsonArray jsonArray, QObject *parent = nullptr) const;
+	inline QList<T*> deserialize(QJsonArray jsonArray, QObject *parent) const;
 	template<typename T>
 	inline QList<T> deserialize(QJsonArray jsonArray) const;
 
