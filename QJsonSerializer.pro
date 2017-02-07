@@ -2,4 +2,5 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
 	ObjectSerializerTest \
-    GadgetSerializerTest
+    GadgetSerializerTest \
+    lib
