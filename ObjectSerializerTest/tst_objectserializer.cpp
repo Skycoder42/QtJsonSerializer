@@ -20,8 +20,8 @@ private Q_SLOTS:
 	void testDeserialization_data();
 	void testDeserialization();
 
-	//TODO test objectName
-	//TODO test nullValues
+	void testObjectNameSerialization();
+	void testNullDeserialization();
 
 private:
 	QJsonSerializer *serializer;
@@ -175,6 +175,63 @@ void ObjectSerializerTest::testDeserialization()
 	}
 
 	result->deleteLater();
+}
+
+void ObjectSerializerTest::testObjectNameSerialization()
+{
+	auto testObj = new TestObject(this);
+	testObj->setObjectName("test");
+	auto testJson = QJsonObject({
+									{"intProperty", 0},
+									{"boolProperty", false},
+									{"stringProperty", QString()},
+									{"doubleProperty", 0},
+									{"simpeList", QJsonArray()},
+									{"leveledList", QJsonArray()},
+									{"childObject", QJsonValue::Null},
+									{"simpleChildren", QJsonArray()},
+									{"leveledChildren", QJsonArray()}
+								});
+
+	serializer->setKeepObjectName(false);
+	auto json = serializer->serialize(testObj);
+	QCOMPARE(json, testJson);
+
+	serializer->setKeepObjectName(true);
+	testJson["objectName"] = "test";
+	json = serializer->serialize(testObj);
+	QCOMPARE(json, testJson);
+
+	testObj->deleteLater();
+	serializer->setKeepObjectName(false);
+}
+
+void ObjectSerializerTest::testNullDeserialization()
+{
+	auto testObj = new TestObject(this);
+	auto testJson = QJsonObject({
+									{"intProperty", QJsonValue::Null},
+									{"boolProperty", QJsonValue::Null},
+									{"stringProperty", QJsonValue::Null},
+									{"doubleProperty", QJsonValue::Null},
+									{"simpeList", QJsonValue::Null},
+									{"leveledList", QJsonValue::Null},
+									{"childObject", QJsonValue::Null},
+									{"simpleChildren", QJsonValue::Null},
+									{"leveledChildren", QJsonValue::Null}
+								});
+
+	serializer->setAllowDefaultNull(false);
+	QVERIFY_EXCEPTION_THROWN(serializer->deserialize<TestObject>(testJson, this), SerializerException);
+
+	serializer->setAllowDefaultNull(true);
+	auto obj = serializer->deserialize<TestObject>(testJson, this);
+	QVERIFY(obj);
+	QVERIFY(testObj->equals(obj));
+	obj->deleteLater();
+
+	testObj->deleteLater();
+	serializer->setAllowDefaultNull(false);
 }
 
 void ObjectSerializerTest::generateValidTestData()

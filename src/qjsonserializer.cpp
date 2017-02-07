@@ -6,6 +6,8 @@
 #include <QUuid>
 #include <QUrl>
 
+static const QRegularExpression listTypeRegex(QStringLiteral(R"__(^QList<\s*(.*)\s*>$)__"));
+
 static void qJsonSerializerStartup();
 Q_COREAPP_STARTUP_FUNCTION(qJsonSerializerStartup)
 
@@ -95,7 +97,6 @@ QJsonObject QJsonSerializer::serializeGadget(const void *gadget, const QMetaObje
 
 QJsonArray QJsonSerializer::serializeList(int listType, const QVariantList &value) const
 {
-	static const QRegularExpression listTypeRegex(QStringLiteral(R"__(^QList<\s*(.*)\s*>$)__"));//TODO move out
 	auto match = listTypeRegex.match(QMetaType::typeName(listType));
 	int metaType = QMetaType::UnknownType;
 	if(match.hasMatch())
@@ -198,7 +199,6 @@ QVariantList QJsonSerializer::deserializeList(int listType, const QJsonArray &ar
 {
 	int metaType = QMetaType::UnknownType;
 	if(listType != QMetaType::UnknownType) {
-		static const QRegularExpression listTypeRegex(QStringLiteral(R"__(^QList<\s*(.*)\s*>$)__"));//TODO move out
 		auto match = listTypeRegex.match(QMetaType::typeName(listType));
 		if(match.hasMatch())
 			metaType = QMetaType::type(match.captured(1).toLatin1());
