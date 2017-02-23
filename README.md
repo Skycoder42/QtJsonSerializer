@@ -6,6 +6,7 @@ With this small library, you are able to serialize any QObject or Q_GADGET class
 ## Features
 - Serialize QObjects, Q_GADGETS, and lists of both to JSON, in a generic matter
 - ... and of course deserialize JSON back as well
+- De/serialize any QVariant - as long as it contains only basic types or one of the above
 - Serializes Q_PROPERTY elements
 - Deserialization: Additional JSON-values will be stored as dynamic properties for QObjects
 - Fully Unit-Tested
@@ -13,7 +14,7 @@ With this small library, you are able to serialize any QObject or Q_GADGET class
 - Easily extensible
 
 ## Usage
-Just copy the repository into you application (preferebly by adding it as a git submodule) and add the line `include(./QJsonSerializer/qjsonserializer.pri)` to your .pro-file. This way all files and required libraries will automatically be added. Use `#include <QJsonSerializer>` to access the class.
+Just copy the repository into you application (preferebly by adding it as a git submodule) and add the line `include(./QJsonSerializer/qjsonserializer.pri)` to your .pro-file. This way all files and required libraries will automatically be added. Use `#include <QJsonSerializer>` to access the class. If you don't want to compile the serializer into your application, but instead use it as a library, check out the `module` branch (More information following).
 
 ### Example
 Both serialization and desertialization are rather simple. Create an object, and then use the serializer as follows:
@@ -81,6 +82,7 @@ In order for the serializer to properly work, there are a few things you have to
   - classes/structs marked with `Q_GADGET` (as value types only!)
   - `QList`, of any type that is serializable as well
   - simple types, that are supported by QJsonValue (See [QJsonValue::fromVariant](https://doc.qt.io/qt-5/qjsonvalue.html#fromVariant) and [QJsonValue::toVariant](https://doc.qt.io/qt-5/qjsonvalue.html#toVariant))
+  - Any type you add yourself by extending the serializer
 4. While simple list types (i.e. `QList<int>`) are supported out of the box, for custom types (like `QList<TestObject*>`) you will have to register converters from and to `QVariantList`
   - This can be done by using [`QJsonSerializer::registerListConverters<TestObject*>()`](src/qjsonserializer.h#L27)
 5. By default, the `objectName` property of QObjects is not serialized (See [keepObjectName](src/qjsonserializer.h#L20))
