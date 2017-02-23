@@ -68,13 +68,13 @@ protected:
 	virtual QJsonObject serializeObject(const QObject *object) const;
 	virtual QJsonObject serializeGadget(const void *gadget, const QMetaObject *metaObject) const;
 	virtual QJsonArray serializeList(int listType, const QVariantList &value) const;
-	virtual QJsonValue serializeValue(QVariant value) const;
+	virtual QJsonValue serializeValue(int propertyType, QVariant value) const;
 
 	virtual QVariant deserializeVariant(int propertyType, const QJsonValue &value, QObject *parent) const;
 	virtual QObject *deserializeObject(QJsonObject jsonObject, const QMetaObject *metaObject, QObject *parent) const;
 	virtual void deserializeGadget(QJsonObject jsonObject, int typeId, void *gadgetPtr) const;
 	virtual QVariantList deserializeList(int listType, const QJsonArray &array, QObject *parent) const;
-	virtual QVariant deserializeValue(QJsonValue value) const;
+	virtual QVariant deserializeValue(int propertyType, QJsonValue value) const;
 
 private:
 	bool _allowNull;

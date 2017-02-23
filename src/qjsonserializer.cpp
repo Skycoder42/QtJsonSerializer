@@ -60,7 +60,7 @@ QJsonValue QJsonSerializer::serializeVariant(int propertyType, const QVariant &v
 			else
 				return QJsonValue::Null;
 		} else
-			return serializeValue(value);
+			return serializeValue(propertyType, value);
 	}
 }
 
@@ -108,14 +108,23 @@ QJsonArray QJsonSerializer::serializeList(int listType, const QVariantList &valu
 	return array;
 }
 
-QJsonValue QJsonSerializer::serializeValue(QVariant value) const
+QJsonValue QJsonSerializer::serializeValue(int propertyType, QVariant value) const
 {
 	if(!value.isValid())
 		return QJsonValue::Null;
 	else {
 		auto json = QJsonValue::fromVariant(value);
-		if(json.isNull())
-			throw SerializationException(QStringLiteral("Failed to convert type %1 to a JSON representation").arg(value.typeName()));
+		if(json.isNull()) {
+			if(propertyType == QMetaType::QDate ||
+			   propertyType == QMetaType::QTime ||
+			   propertyType == QMetaType::QDateTime ||
+			   value.userType() == QMetaType::QDate ||
+			   value.userType() == QMetaType::QTime ||
+			   value.userType() == QMetaType::QDateTime)
+				return QJsonValue::String;//special case date: invalid date -> empty string -> interpret as fail
+			else
+				throw SerializationException(QStringLiteral("Failed to convert type %1 to a JSON representation").arg(value.typeName()));
+		}
 		else
 			return json;
 	}
@@ -141,9 +150,9 @@ QVariant QJsonSerializer::deserializeVariant(int propertyType, const QJsonValue 
 				variant = QVariant::fromValue(object);
 			}
 		} else
-			variant = deserializeValue(value);
+			variant = deserializeValue(propertyType, value);
 	} else
-		variant = deserializeValue(value);
+		variant = deserializeValue(propertyType, value);
 
 	if(propertyType != QMetaType::UnknownType) {
 		auto vType = variant.typeName();
@@ -211,8 +220,9 @@ QVariantList QJsonSerializer::deserializeList(int listType, const QJsonArray &ar
 	return list;
 }
 
-QVariant QJsonSerializer::deserializeValue(QJsonValue value) const
+QVariant QJsonSerializer::deserializeValue(int propertyType, QJsonValue value) const
 {
+	Q_UNUSED(propertyType);
 	return value.toVariant();//all json can be converted to qvariant
 }
 
