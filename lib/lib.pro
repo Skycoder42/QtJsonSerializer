@@ -37,5 +37,5 @@ DISTFILES += \
 	qt_lib_jsonserializer.pri \
 	make_module.sh
 
-target.path = /lib
+target.path = /usr/lib
 INSTALLS += target

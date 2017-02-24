@@ -15,4 +15,3 @@ QMAKE_EXTRA_TARGETS += moduletarget
 #	qmake
 #	make
 #	make module
-#	make INSTALL_ROOT="%{CurrentProject:BuildPath}/module" install
