@@ -123,7 +123,7 @@ QJsonValue QJsonSerializer::serializeValue(int propertyType, QVariant value) con
 			   value.userType() == QMetaType::QDateTime)
 				return QJsonValue::String;//special case date: invalid date -> empty string -> interpret as fail
 			else
-				throw SerializationException(QStringLiteral("Failed to convert type %1 to a JSON representation").arg(value.typeName()));
+				throw QJsonSerializationException(QStringLiteral("Failed to convert type %1 to a JSON representation").arg(value.typeName()));
 		}
 		else
 			return json;
@@ -161,7 +161,7 @@ QVariant QJsonSerializer::deserializeVariant(int propertyType, const QJsonValue 
 		else if(_allowNull && value.isNull())
 			return QVariant();
 		else {
-			throw DeserializationException(QStringLiteral("Failed to convert deserialized variant of type %1 to property type %2")
+			throw QJsonDeserializationException(QStringLiteral("Failed to convert deserialized variant of type %1 to property type %2")
 										   .arg(vType ? vType : "<unknown>")
 										   .arg(QMetaType::typeName(propertyType)));
 		}
@@ -174,7 +174,7 @@ QObject *QJsonSerializer::deserializeObject(QJsonObject jsonObject, const QMetaO
 	//try to construct the object
 	auto object = metaObject->newInstance(Q_ARG(QObject*, parent));
 	if(!object)
-		throw DeserializationException(QStringLiteral("Failed to construct object of type %1 (Does the constructor \"Q_INVOKABLE class(QObject*);\" exist?)").arg(metaObject->className()));
+		throw QJsonDeserializationException(QStringLiteral("Failed to construct object of type %1 (Does the constructor \"Q_INVOKABLE class(QObject*);\" exist?)").arg(metaObject->className()));
 
 	//now deserialize all json properties
 	for(auto it = jsonObject.constBegin(); it != jsonObject.constEnd(); it++) {
@@ -192,7 +192,7 @@ void QJsonSerializer::deserializeGadget(QJsonObject jsonObject, int typeId, void
 {
 	auto metaObject = QMetaType::metaObjectForType(typeId);
 	if(!QMetaType::construct(typeId, gadgetPtr, nullptr))
-		throw DeserializationException(QStringLiteral("Failed to construct gadget of type %1").arg(QMetaType::typeName(typeId)));
+		throw QJsonDeserializationException(QStringLiteral("Failed to construct gadget of type %1").arg(QMetaType::typeName(typeId)));
 
 	//now deserialize all json properties
 	for(auto it = jsonObject.constBegin(); it != jsonObject.constEnd(); it++) {

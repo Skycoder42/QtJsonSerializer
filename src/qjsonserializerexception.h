@@ -1,5 +1,5 @@
-#ifndef SERIALIZEREXCEPTION_H
-#define SERIALIZEREXCEPTION_H
+#ifndef QJSONSERIALIZEREXCEPTION_H
+#define QJSONSERIALIZEREXCEPTION_H
 
 #include <QString>
 #include <QException>
@@ -14,10 +14,10 @@
 #define QJSONSERIALIZERSHARED_EXPORT
 #endif
 
-class QJSONSERIALIZERSHARED_EXPORT SerializerException : public QException
+class QJSONSERIALIZERSHARED_EXPORT QJsonSerializerException : public QException
 {
 public:
-	SerializerException(const QString &what, bool deser);
+	QJsonSerializerException(const QString &what, bool deser);
 
 	bool isDeserializationException() const;
 
@@ -27,29 +27,29 @@ public:
 	QException *clone() const override;
 
 protected:
-	SerializerException(const QByteArray &what, bool deser);
+	QJsonSerializerException(const QByteArray &what, bool deser);
 
 protected:
 	const QByteArray _what;
 	const bool _isDeser;
 };
 
-class QJSONSERIALIZERSHARED_EXPORT SerializationException : public SerializerException
+class QJSONSERIALIZERSHARED_EXPORT QJsonSerializationException : public QJsonSerializerException
 {
 public:
-	SerializationException(const QString &what);
+	QJsonSerializationException(const QString &what);
 
 	void raise() const override;
 	QException *clone() const override;
 };
 
-class QJSONSERIALIZERSHARED_EXPORT DeserializationException : public SerializerException
+class QJSONSERIALIZERSHARED_EXPORT QJsonDeserializationException : public QJsonSerializerException
 {
 public:
-	DeserializationException(const QString &what);
+	QJsonDeserializationException(const QString &what);
 
 	void raise() const override;
 	QException *clone() const override;
 };
 
-#endif // SERIALIZEREXCEPTION_H
+#endif // QJSONSERIALIZEREXCEPTION_H

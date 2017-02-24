@@ -1,11 +1,10 @@
 HEADERS += \
-	$$PWD/src/QJsonSerializer \
-	$$PWD/src/serializerexception.h \
-	$$PWD/src/qjsonserializer.h
+	$$PWD/src/qjsonserializer.h \
+	$$PWD/src/qjsonserializerexception.h
 
 SOURCES += \
-	$$PWD/src/serializerexception.cpp \
-	$$PWD/src/qjsonserializer.cpp
+	$$PWD/src/qjsonserializer.cpp \
+	$$PWD/src/qjsonserializerexception.cpp
 
 INCLUDEPATH += $$PWD/src
 

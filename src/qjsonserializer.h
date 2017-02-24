@@ -1,7 +1,7 @@
 #ifndef QJSONSERIALIZER_H
 #define QJSONSERIALIZER_H
 
-#include "serializerexception.h"
+#include "qjsonserializerexception.h"
 
 #include <QJsonObject>
 #include <QJsonArray>

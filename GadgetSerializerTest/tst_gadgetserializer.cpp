@@ -1,7 +1,7 @@
 #include "brokentestgadget.h"
 #include "testgadget.h"
 
-#include <QJsonSerializer>
+#include "qjsonserializer.h"
 #include <QString>
 #include <QtTest>
 
@@ -113,7 +113,7 @@ void GadgetSerializerTest::testSerialization()
 
 void GadgetSerializerTest::testInvalidSerialization()
 {
-	QVERIFY_EXCEPTION_THROWN(serializer->serialize(BrokenTestGadget()), SerializerException);
+	QVERIFY_EXCEPTION_THROWN(serializer->serialize(BrokenTestGadget()), QJsonSerializerException);
 }
 
 void GadgetSerializerTest::testDeserialization_data()
@@ -154,7 +154,7 @@ void GadgetSerializerTest::testInvalidDeserialization()
 						  {"broken", QJsonValue::Null}
 					  });
 
-	QVERIFY_EXCEPTION_THROWN(serializer->deserialize<BrokenTestGadget>(broken), SerializerException);
+	QVERIFY_EXCEPTION_THROWN(serializer->deserialize<BrokenTestGadget>(broken), QJsonSerializerException);
 }
 
 void GadgetSerializerTest::testNullChild()
@@ -191,7 +191,7 @@ void GadgetSerializerTest::testNullDeserialization()
 								});
 
 	serializer->setAllowDefaultNull(false);
-	QVERIFY_EXCEPTION_THROWN(serializer->deserialize<ParentGadget>(testJson), SerializerException);
+	QVERIFY_EXCEPTION_THROWN(serializer->deserialize<ParentGadget>(testJson), QJsonSerializerException);
 
 	serializer->setAllowDefaultNull(true);
 	QCOMPARE(serializer->deserialize<ParentGadget>(testJson), testGad);

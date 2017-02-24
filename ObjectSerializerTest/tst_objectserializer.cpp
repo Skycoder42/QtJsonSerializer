@@ -3,7 +3,7 @@
 
 #include <QString>
 #include <QtTest>
-#include <QJsonSerializer>
+#include "qjsonserializer.h"
 
 class ObjectSerializerTest : public QObject
 {
@@ -119,7 +119,7 @@ void ObjectSerializerTest::testSerialization()
 	if(works)
 		QCOMPARE(serializer->serialize(object), result);
 	else
-		QVERIFY_EXCEPTION_THROWN(serializer->serialize(object), SerializerException);
+		QVERIFY_EXCEPTION_THROWN(serializer->serialize(object), QJsonSerializerException);
 
 	object->deleteLater();
 }
@@ -167,9 +167,9 @@ void ObjectSerializerTest::testDeserialization()
 		auto broken2 = qobject_cast<BrokenTestObject2*>(result);
 		auto broken = qobject_cast<BrokenTestObject*>(result);
 		if(broken2)
-			QVERIFY_EXCEPTION_THROWN(serializer->deserialize<BrokenTestObject2>(data, this), SerializerException);
+			QVERIFY_EXCEPTION_THROWN(serializer->deserialize<BrokenTestObject2>(data, this), QJsonSerializerException);
 		else if(broken)
-			QVERIFY_EXCEPTION_THROWN(serializer->deserialize<BrokenTestObject>(data, this), SerializerException);
+			QVERIFY_EXCEPTION_THROWN(serializer->deserialize<BrokenTestObject>(data, this), QJsonSerializerException);
 		else
 			QFAIL("Expected BrokenTestObject or BrokenTestObject2!");
 	}
@@ -222,7 +222,7 @@ void ObjectSerializerTest::testNullDeserialization()
 								});
 
 	serializer->setAllowDefaultNull(false);
-	QVERIFY_EXCEPTION_THROWN(serializer->deserialize<TestObject>(testJson, this), SerializerException);
+	QVERIFY_EXCEPTION_THROWN(serializer->deserialize<TestObject>(testJson, this), QJsonSerializerException);
 
 	serializer->setAllowDefaultNull(true);
 	auto obj = serializer->deserialize<TestObject>(testJson, this);
