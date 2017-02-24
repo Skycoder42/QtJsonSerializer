@@ -15,7 +15,7 @@ QT.jsonserializer.qml = $$QT_MODULE_QML_BASE
 QT.jsonserializer.depends = core
 QT.jsonserializer.uses =
 QT.jsonserializer.module_config = v2
-QT.jsonserializer.DEFINES = QT_JSONSERIALIZER_LIB
+QT.jsonserializer.DEFINES = QT_JSONSERIALIZER_LIB QJSONSERIALIZER_AS_DLL
 QT_CONFIG +=
 QT_MODULES += jsonserializer
  
