@@ -1,6 +1,9 @@
 HEADERS += \
 	$$PWD/src/qjsonserializer.h \
-	$$PWD/src/qjsonserializerexception.h
+	$$PWD/src/qjsonserializerexception.h \
+    $$PWD/src/QJsonSerializer \
+    $$PWD/src/QJsonSerializerException \
+    $$PWD/src/QtJsonSerializer
 
 SOURCES += \
 	$$PWD/src/qjsonserializer.cpp \

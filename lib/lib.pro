@@ -33,7 +33,9 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += qjs_as_lib
 include(../qjsonserializer.pri)
 
-unix {
-	target.path = /usr/lib
-	INSTALLS += target
-}
+DISTFILES += \
+	qt_lib_jsonserializer.pri \
+	make_module.sh
+
+target.path = /lib
+INSTALLS += target
