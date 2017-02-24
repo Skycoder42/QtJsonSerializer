@@ -6,7 +6,7 @@
 TEMPLATE = lib
 QT       -= gui
 
-TARGET = Qt5JsonSerializer
+TARGET = $$qt5LibraryTarget(QtJsonSerializer)
 VERSION = 1.1.0
 
 win32 {
