@@ -1,7 +1,8 @@
 #ifndef QJSONSERIALIZER_H
 #define QJSONSERIALIZER_H
 
-#include "qjsonserializerexception.h"
+#include "QtJsonSerializer/qjsonserializer_global.h"
+#include "QtJsonSerializer/qjsonserializerexception.h"
 
 #include <QJsonObject>
 #include <QJsonArray>
@@ -11,17 +12,7 @@
 #include <QDebug>
 #include <type_traits>
 
-#ifdef QJSONSERIALIZER_AS_DLL
-#if defined(QJSONSERIALIZER_LIBRARY)
-#  define QJSONSERIALIZERSHARED_EXPORT Q_DECL_EXPORT
-#else
-#  define QJSONSERIALIZERSHARED_EXPORT Q_DECL_IMPORT
-#endif
-#else
-#define QJSONSERIALIZERSHARED_EXPORT
-#endif
-
-class QJSONSERIALIZERSHARED_EXPORT QJsonSerializer : public QObject
+class Q_JSONSERIALIZER_EXPORT QJsonSerializer : public QObject
 {
 	Q_OBJECT
 	friend class QJsonSerializerPrivate;
@@ -59,7 +50,7 @@ public:
 	template<typename T>
 	inline QList<T> deserialize(QJsonArray jsonArray) const;
 
-public slots:
+public Q_SLOTS:
 	void setAllowDefaultNull(bool allowDefaultNull);
 	void setKeepObjectName(bool keepObjectName);
 

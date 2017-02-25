@@ -1,20 +1,11 @@
 #ifndef QJSONSERIALIZEREXCEPTION_H
 #define QJSONSERIALIZEREXCEPTION_H
 
-#include <QString>
-#include <QException>
+#include "QtJsonSerializer/qjsonserializer_global.h"
+#include <QtCore/qexception.h>
+#include <QtCore/qstring.h>
 
-#ifdef QJSONSERIALIZER_AS_DLL
-#if defined(QJSONSERIALIZER_LIBRARY)
-#  define QJSONSERIALIZERSHARED_EXPORT Q_DECL_EXPORT
-#else
-#  define QJSONSERIALIZERSHARED_EXPORT Q_DECL_IMPORT
-#endif
-#else
-#define QJSONSERIALIZERSHARED_EXPORT
-#endif
-
-class QJSONSERIALIZERSHARED_EXPORT QJsonSerializerException : public QException
+class Q_JSONSERIALIZER_EXPORT QJsonSerializerException : public QException
 {
 public:
 	QJsonSerializerException(const QString &what, bool deser);
@@ -34,7 +25,7 @@ protected:
 	const bool _isDeser;
 };
 
-class QJSONSERIALIZERSHARED_EXPORT QJsonSerializationException : public QJsonSerializerException
+class Q_JSONSERIALIZER_EXPORT QJsonSerializationException : public QJsonSerializerException
 {
 public:
 	QJsonSerializationException(const QString &what);
@@ -43,7 +34,7 @@ public:
 	QException *clone() const override;
 };
 
-class QJSONSERIALIZERSHARED_EXPORT QJsonDeserializationException : public QJsonSerializerException
+class Q_JSONSERIALIZER_EXPORT QJsonDeserializationException : public QJsonSerializerException
 {
 public:
 	QJsonDeserializationException(const QString &what);
