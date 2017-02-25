@@ -8,7 +8,7 @@
 class Q_JSONSERIALIZER_EXPORT QJsonSerializerException : public QException
 {
 public:
-	QJsonSerializerException(const QString &what, bool deser);
+	QJsonSerializerException(const QByteArray &what, bool deser);
 
 	bool isDeserializationException() const;
 
@@ -18,17 +18,14 @@ public:
 	QException *clone() const override;
 
 protected:
-	QJsonSerializerException(const QByteArray &what, bool deser);
-
-protected:
-	const QByteArray _what;
-	const bool _isDeser;
+	QByteArray _what;
+	bool _isDeser;
 };
 
 class Q_JSONSERIALIZER_EXPORT QJsonSerializationException : public QJsonSerializerException
 {
 public:
-	QJsonSerializationException(const QString &what);
+	QJsonSerializationException(const QByteArray &what);
 
 	void raise() const override;
 	QException *clone() const override;
@@ -37,7 +34,7 @@ public:
 class Q_JSONSERIALIZER_EXPORT QJsonDeserializationException : public QJsonSerializerException
 {
 public:
-	QJsonDeserializationException(const QString &what);
+	QJsonDeserializationException(const QByteArray &what);
 
 	void raise() const override;
 	QException *clone() const override;

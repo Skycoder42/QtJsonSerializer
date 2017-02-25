@@ -4,12 +4,12 @@
 #include "QtJsonSerializer/qjsonserializer_global.h"
 #include "QtJsonSerializer/qjsonserializerexception.h"
 
-#include <QJsonObject>
-#include <QJsonArray>
-#include <QMetaProperty>
-#include <QObject>
-#include <QVariant>
-#include <QDebug>
+#include <QtCore/qjsonobject.h>
+#include <QtCore/qjsonarray.h>
+#include <QtCore/qmetaobject.h>
+#include <QtCore/qobject.h>
+#include <QtCore/qvariant.h>
+#include <QtCore/qdebug.h>
 #include <type_traits>
 
 class Q_JSONSERIALIZER_EXPORT QJsonSerializer : public QObject

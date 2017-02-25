@@ -1,15 +1,7 @@
 #include "qjsonserializerexception.h"
 
-QJsonSerializerException::QJsonSerializerException(const QString &what, bool deser) :
-	QException(),
-	_what(QStringLiteral("Failed to %1 with error: %2")
-		  .arg(deser ? "deserialize" : "serialize")
-		  .arg(what)
-		  .toUtf8()),
-	_isDeser(deser)
-{}
-
 QJsonSerializerException::QJsonSerializerException(const QByteArray &what, bool deser) :
+	QException(),
 	_what(what),
 	_isDeser(deser)
 {}
@@ -34,8 +26,8 @@ QException *QJsonSerializerException::clone() const
 	return new QJsonSerializerException(_what, _isDeser);
 }
 
-QJsonSerializationException::QJsonSerializationException(const QString &what) :
-	QJsonSerializerException(what, false)
+QJsonSerializationException::QJsonSerializationException(const QByteArray &what) :
+	QJsonSerializerException("Failed to serialize with error: " + what, false)
 {}
 
 void QJsonSerializationException::raise() const
@@ -45,11 +37,13 @@ void QJsonSerializationException::raise() const
 
 QException *QJsonSerializationException::clone() const
 {
-	return new QJsonSerializationException(_what);
+	auto exc = new QJsonSerializationException("");
+	exc->_what = _what;
+	return exc;
 }
 
-QJsonDeserializationException::QJsonDeserializationException(const QString &what) :
-	QJsonSerializerException(what, true)
+QJsonDeserializationException::QJsonDeserializationException(const QByteArray &what) :
+	QJsonSerializerException("Failed to deserialize with error: " + what, true)
 {}
 
 void QJsonDeserializationException::raise() const
@@ -59,5 +53,7 @@ void QJsonDeserializationException::raise() const
 
 QException *QJsonDeserializationException::clone() const
 {
-	return new QJsonDeserializationException(_what);
+	auto exc = new QJsonDeserializationException("");
+	exc->_what = _what;
+	return exc;
 }
