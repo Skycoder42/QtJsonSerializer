@@ -6,19 +6,20 @@
 TEMPLATE = lib
 QT       -= gui
 
-TARGET = $$qt5LibraryTarget(QtJsonSerializer)
+NAME = QtJsonSerializer
+TARGET = $$qt5LibraryTarget($$NAME)
 VERSION = 1.1.0
 
 win32 {
 	QMAKE_TARGET_COMPANY = "Skycoder42"
-	QMAKE_TARGET_PRODUCT = "QtJsonSerializer"
-	QMAKE_TARGET_DESCRIPTION = $$QMAKE_TARGET_PRODUCT
+	QMAKE_TARGET_PRODUCT = $$NAME
+	QMAKE_TARGET_DESCRIPTION = $$NAME
 	QMAKE_TARGET_COPYRIGHT = "Felix Barz"
 
 	CONFIG += skip_target_version_ext
 } else:mac {
 	QMAKE_TARGET_BUNDLE_PREFIX = "de.skycoder42."
-	QMAKE_FRAMEWORK_BUNDLE_NAME = "QtJsonSerializer"
+	QMAKE_FRAMEWORK_BUNDLE_NAME = $$NAME
 
 	CONFIG += lib_bundle
 	QMAKE_LFLAGS_SONAME = -Wl,-install_name,@rpath/
