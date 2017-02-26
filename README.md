@@ -20,7 +20,7 @@ The serializer is provided as a Qt module. Thus, all you have to do is add the m
 There are multiple ways to install the Qt module, sorted by preference:
 
 1. **Arch-Linux only:** If you are building against your system Qt, you can use my AUR-Repository: [qt5-jsonserializer](https://aur.archlinux.org/packages/qt5-jsonserializer/)
-2. Simply add my repository to your Qt MaintenanceTool (Image-based how to here: [Add custom repository](https://github.com/Skycoder42/QtModules/blob/master/README.md#add-my-repositories-to-qt-maintenancetool)):
+2. Simply add my repository to your Qt MaintenanceTool (Image-based How-To here: [Add custom repository](https://github.com/Skycoder42/QtModules/blob/master/README.md#add-my-repositories-to-qt-maintenancetool)):
   1. Open the MaintenanceTool, located in your Qt install directory (e.g. `~/Qt/MaintenanceTool`)
   2. Select `Add or remove components` and click on the `Settings` button
   3. Go to `Repositories`, scroll to the bottom, select `User defined repositories` and press `Add`
