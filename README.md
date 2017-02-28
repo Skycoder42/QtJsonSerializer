@@ -25,9 +25,9 @@ There are multiple ways to install the Qt module, sorted by preference:
   2. Select `Add or remove components` and click on the `Settings` button
   3. Go to `Repositories`, scroll to the bottom, select `User defined repositories` and press `Add`
   4. In the right column (selected by default), type:
-    - On Linux: https://install.skycoder42.de/qtmodules/linux_x64
-    - On Windows: https://install.skycoder42.de/qtmodules/windows_x86
-    - On Mac: https://install.skycoder42.de/qtmodules/mac_x64
+	- On Linux: https://install.skycoder42.de/qtmodules/linux_x64
+	- On Windows: https://install.skycoder42.de/qtmodules/windows_x86
+	- On Mac: https://install.skycoder42.de/qtmodules/mac_x64
   5. Press `Ok`, make shure `Add or remove components` is still selected, and continue the install (`Next >`)
   6. A new entry appears under all supported Qt Versions (e.g. `Qt > Qt 5.8 > Skycoder42 Qt modules`)
   7. You can install either all of my modules, or select the one you need: `Qt Json Serializer`
@@ -46,15 +46,15 @@ The following is an example for a serializable object. *Note:* The usage of `MEM
 ```cpp
 class TestObject : public QObject
 {
-    Q_OBJECT
-    
+	Q_OBJECT
+
 	Q_PROPERTY(QString stringProperty MEMBER stringProperty)
 	Q_PROPERTY(QList<int> simpeList MEMBER simpeList)
 	Q_PROPERTY(TestObject* childObject MEMBER childObject)
-	
+
 public:
-    Q_INVOKABLE TestObject(QObject *parent = nullptr);
-    
+	Q_INVOKABLE TestObject(QObject *parent = nullptr);
+
 	QString stringProperty;
 	QList<int> simpeList;
 	TestObject* childObject;
@@ -75,23 +75,23 @@ qDebug() << json;
 delete object;
 
 //deserialize
-object = serializer->deserialize<TestObject>(json, nullptr);
+object = serializer->deserialize<TestObject>(json, nullptr);//a parent is required here, to determine it's an object and not a gadget
 qDebug() << object->stringProperty
-         << object->simpeList
-         << object->childObject;
+		 << object->simpeList
+		 << object->childObject;
 delete object;
 ```
 
 For the serialization, the created json would look like this:
 ```json
 {
-    "stringProperty": "test",
-    "simpeList": [1, 2, 3],
-    "childObject": {
-        "stringProperty": "",
-        "simpeList": [],
-        "childObject": null
-    }
+	"stringProperty": "test",
+	"simpeList": [1, 2, 3],
+	"childObject": {
+		"stringProperty": "",
+		"simpeList": [],
+		"childObject": null
+	}
 }
 ```
 

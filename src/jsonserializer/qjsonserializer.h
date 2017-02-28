@@ -53,7 +53,7 @@ public:
 	inline QJsonArray serialize(const QList<T> &data) const;
 
 	//! Deserializes a QJsonValue to a QVariant value, based on the given type id
-	inline QVariant deserialize(const QJsonValue &value, int metaTypeId);
+	inline QVariant deserialize(const QJsonValue &value, int metaTypeId, QObject *parent = nullptr);
 	//! Deserializes a QJsonObject to the given QObject type
 	template<typename T>
 	inline T *deserialize(QJsonObject jsonObject, QObject *parent) const;
@@ -168,9 +168,9 @@ QJsonArray QJsonSerializer::serialize(const QList<T> &data) const
 	return serializeVariant(qMetaTypeId<QList<T>>(), QVariant::fromValue(data)).toArray();
 }
 
-QVariant QJsonSerializer::deserialize(const QJsonValue &value, int metaTypeId)
+QVariant QJsonSerializer::deserialize(const QJsonValue &value, int metaTypeId, QObject *parent)
 {
-	return deserializeVariant(metaTypeId, value, nullptr);
+	return deserializeVariant(metaTypeId, value, parent);
 }
 
 template<typename T>
