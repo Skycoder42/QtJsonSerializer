@@ -167,12 +167,12 @@ void GadgetSerializerTest::testNullChild()
 									{"doubleProperty", 0},
 									{"simpeList", QJsonArray()},
 									{"leveledList", QJsonArray()},
-									{"childGadget", QJsonValue::Null},//this one is null here -> default contructed
+									{"childGadget", QJsonValue::Null},//this one is null here -> fails for gadget
 									{"simpleChildren", QJsonArray()},
 									{"leveledChildren", QJsonArray()}
 								});
 
-	QCOMPARE(serializer->deserialize<ParentGadget>(testJson), testGad);
+	QVERIFY_EXCEPTION_THROWN(serializer->deserialize<ParentGadget>(testJson), QJsonSerializerException);
 }
 
 void GadgetSerializerTest::testNullDeserialization()

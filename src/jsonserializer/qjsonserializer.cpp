@@ -141,9 +141,11 @@ QVariant QJsonSerializer::deserializeVariant(int propertyType, const QJsonValue 
 		auto flags = QMetaType::typeFlags(propertyType);
 
 		if(flags.testFlag(QMetaType::IsGadget)) {
-			QVariant gadget(propertyType, nullptr);
-			deserializeGadget(value.toObject(), propertyType, gadget.data());
-			variant = gadget;
+			if(!value.isNull()) {
+				QVariant gadget(propertyType, nullptr);
+				deserializeGadget(value.toObject(), propertyType, gadget.data());
+				variant = gadget;
+			}
 		} else if(flags.testFlag(QMetaType::PointerToQObject)) {
 			if(value.isNull())
 				variant = QVariant::fromValue<QObject*>(nullptr);

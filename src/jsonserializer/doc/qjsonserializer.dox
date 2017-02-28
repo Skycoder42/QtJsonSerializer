@@ -1,0 +1,63 @@
+/*!
+@class QJsonSerializer
+
+This class is the modules core component. It performs the de/serialization. Normally, you will
+only use the public members of this class. However, in some cases, you may have to add custom
+code to properly serialize special classes. In order to modify the general serialization
+behavior, have a look at the properties.
+
+@section extending Extending the serializer
+To extend the serializers functionality, the protected functions are the place to look. For
+both serialization and deserialization, there are 5 methods each, with the following functionality:
+- <b>...Variant:</b> Decides, where to go next, by analysing the given type and data. Calls one of
+the other functions to perform the actual de/serialization, and verifies the resulted data meets
+the expectations
+- <b>...Object:</b> Performs `QObject <--> QJsonObject` conversions. Calls the variant method for
+each of it's properties
+- <b>...Gadget:</b> Performs `Q_GADGET <--> QJsonObject` conversions. Calls the variant method for
+each of it's properties. Basically the same as the object one, but for gadet types
+- <b>...List:</b> Performs `QList<T> <--> QJsonArray` conversions. Calls the variant method for
+each element in the list
+- <b>...Value:</b> Called for any other type, that does not match one of the three above. Tries to
+convert whatever comes by using the build-in `QVariant <--> QJsonValue` conversions. See QJsonValue::fromVariant
+and QJsonValue::toVariant for more details on the supported types
+*/
+
+/*!
+@property QJsonSerializer::allowDefaultNull
+
+@default{`false`}
+
+Applies to deserialization only.<br/>
+If set to `false`, a `null` json value can only be converted to a QObject (`nullptr`)! For value
+types (including Q_GADGETs!), the conversion will fail instead. This is a strict mode, since for
+value types, there is no null value.<br/>
+If set to `true`, `null` is allowed for all types. If it's not a QObject, a default
+constructed value will be used.
+
+@note If you are deserializing json from external sources, it's possible they don't follow this
+approach, and in order to get a working deserialization, you will have to enable this property.
+
+@accessors{
+	@readAc{allowDefaultNull()}
+	@writeAc{setAllowDefaultNull()}
+}
+*/
+
+/*!
+@property QJsonSerializer::keepObjectName
+
+@default{`false`}
+
+Applies to serialization only.<br/>
+By default, the QObject::objectName property will not be serialized for QObjects! If you need to
+keep this information, set the property to `true`
+
+@note If the `objectName` is contained in json, a deserialization will use that value, independent
+of this property.
+
+@accessors{
+	@readAc{keepObjectName()}
+	@writeAc{setKeepObjectName()}
+}
+*/

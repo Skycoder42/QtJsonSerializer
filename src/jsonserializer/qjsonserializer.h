@@ -12,59 +12,89 @@
 #include <QtCore/qdebug.h>
 #include <type_traits>
 
+//! A class to serializer and deserializer QObjects and Q_GADGETS to and from JSON
 class Q_JSONSERIALIZER_EXPORT QJsonSerializer : public QObject
 {
 	Q_OBJECT
 	friend class QJsonSerializerPrivate;
 
+	//! Specifies, whether null for value types is allowed or not
 	Q_PROPERTY(bool allowDefaultNull READ allowDefaultNull WRITE setAllowDefaultNull)
+	//! Specifies, whether the `objectName` property of QObjects should be serialized
 	Q_PROPERTY(bool keepObjectName READ keepObjectName WRITE setKeepObjectName)
 
 public:
+	//! Constructor
 	explicit QJsonSerializer(QObject *parent = nullptr);
+	//! Destructor
 	~QJsonSerializer();
 
+	//! Registers a custom type for list converisons
 	template<typename T>
 	static bool registerListConverters();
 
+	//! @readAcFn{QJsonSerializer::allowDefaultNull}
 	bool allowDefaultNull() const;
+	//! @readAcFn{QJsonSerializer::keepObjectName}
 	bool keepObjectName() const;
 
+	//! Serializers a QVariant value to a QJsonValue
 	inline QJsonValue serialize(const QVariant &value) const;
+	//! Serializers a QObject to a QJsonObject
 	template <typename T>
 	inline QJsonObject serialize(T *data) const;
+	//! Serializers a Q_GADGET to a QJsonObject
 	template <typename T>
 	inline QJsonObject serialize(const T &data) const;
+	//! Serializers a list of QObjects to a QJsonArray
 	template <typename T>
 	inline QJsonArray serialize(const QList<T*> &data) const;
+	//! Serializers a list of Q_GADGETs to a QJsonArray
 	template <typename T>
 	inline QJsonArray serialize(const QList<T> &data) const;
 
+	//! Deserializes a QJsonValue to a QVariant value, based on the given type id
 	inline QVariant deserialize(const QJsonValue &value, int metaTypeId);
+	//! Deserializes a QJsonObject to the given QObject type
 	template<typename T>
 	inline T *deserialize(QJsonObject jsonObject, QObject *parent) const;
+	//! Deserializes a QJsonObject to the given Q_GADGET type
 	template <typename T>
 	inline T deserialize(QJsonObject jsonObject) const;
+	//! Deserializes a QJsonArray to a list of the given QObject type
 	template<typename T>
 	inline QList<T*> deserialize(QJsonArray jsonArray, QObject *parent) const;
+	//! Deserializes a QJsonArray to a list of the given Q_GADGET type
 	template<typename T>
 	inline QList<T> deserialize(QJsonArray jsonArray) const;
 
 public Q_SLOTS:
+	//! @writeAcFn{QJsonSerializer::allowDefaultNull}
 	void setAllowDefaultNull(bool allowDefaultNull);
+	//! @writeAcFn{QJsonSerializer::keepObjectName}
 	void setKeepObjectName(bool keepObjectName);
 
 protected:
+	//! Performs the serialization of any QVariant to a json representation
 	virtual QJsonValue serializeVariant(int propertyType, const QVariant &value) const;
+	//! Performs the serialization of a QObject class to a json object
 	virtual QJsonObject serializeObject(const QObject *object) const;
+	//! Performs the serialization of a Q_GADGET class to a json object
 	virtual QJsonObject serializeGadget(const void *gadget, const QMetaObject *metaObject) const;
+	//! Performs the serialization of any QList to a json array
 	virtual QJsonArray serializeList(int listType, const QVariantList &value) const;
+	//! Performs the serialization of a value type QVariant to a json representation
 	virtual QJsonValue serializeValue(int propertyType, QVariant value) const;
 
+	//! Performs the deserialization of any json to a QVariant of the given type
 	virtual QVariant deserializeVariant(int propertyType, const QJsonValue &value, QObject *parent) const;
+	//! Performs the deserialization of a json object to the given QObject type
 	virtual QObject *deserializeObject(QJsonObject jsonObject, const QMetaObject *metaObject, QObject *parent) const;
+	//! Performs the deserialization of a json object to the given Q_GADGET type
 	virtual void deserializeGadget(QJsonObject jsonObject, int typeId, void *gadgetPtr) const;
+	//! Performs the deserialization of any json array to a list
 	virtual QVariantList deserializeList(int listType, const QJsonArray &array, QObject *parent) const;
+	//! Performs the deserialization of a json value to a variant value type
 	virtual QVariant deserializeValue(int propertyType, QJsonValue value) const;
 
 private:

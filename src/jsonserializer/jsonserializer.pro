@@ -32,5 +32,7 @@ win32 {
 
 docTarget.target = doxygen
 docTarget.commands = chmod u+x $$PWD/doc/makedoc.sh && $$PWD/doc/makedoc.sh "$$PWD" "$$VERSION" "$$[QT_INSTALL_BINS]" "$$[QT_INSTALL_HEADERS]" "$$[QT_INSTALL_DOCS]"
-message($$docTarget.commands)
 QMAKE_EXTRA_TARGETS += docTarget
+
+DISTFILES += \
+    doc/qjsonserializer.dox

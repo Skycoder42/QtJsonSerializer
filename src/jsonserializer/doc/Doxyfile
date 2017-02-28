@@ -238,24 +238,28 @@ TAB_SIZE               = 4
 # "Side Effects:". You can put \n's in the value part of an alias to insert
 # newlines.
 
-ALIASES                = "accessors{1}=<table><tr><th colspan= 2>Accessors</th></tr>1</table>" \
-                         readAc{1}=<tr><td><b>READ</b></td><td>1</td></tr> \
-                         writeAc{1}=<tr><td><b>WRITE</b></td><td>1</td></tr> \
-                         notifyAc{1}=<tr><td><b>NOTIFY</b></td><td>1</td></tr> \
-                         memberAc{1}=<tr><td><b>MEMBER</b></td><td>1</td></tr> \
-                         resetAc{1}=<tr><td><b>RESET</b></td><td>1</td></tr> \
-                         revisionAc{1}=<tr><td><b>REVISION</b></td><td>1</td></tr> \
-                         designableAc{1}=<tr><td><b>DESIGNABLE</b></td><td>1</td></tr> \
-                         scriptableAc{1}=<tr><td><b>SCRIPTABLE</b></td><td>1</td></tr> \
-                         storedAc{1}=<tr><td><b>STORED</b></td><td>1</td></tr> \
-                         userAc{1}=<tr><td><b>USER</b></td><td>1</td></tr> \
+ALIASES                = "accessors{1}=<table><tr><th colspan= 2>Accessors</th></tr>\1</table>" \
+                         readAc{1}=<tr><td><b>READ</b></td><td>\1</td></tr> \
+                         writeAc{1}=<tr><td><b>WRITE</b></td><td>\1</td></tr> \
+                         notifyAc{1}=<tr><td><b>NOTIFY</b></td><td>\1</td></tr> \
+                         memberAc{1}=<tr><td><b>MEMBER</b></td><td>\1</td></tr> \
+                         resetAc{1}=<tr><td><b>RESET</b></td><td>\1</td></tr> \
+                         revisionAc{1}=<tr><td><b>REVISION</b></td><td>\1</td></tr> \
+                         designableAc{1}=<tr><td><b>DESIGNABLE</b></td><td>\1</td></tr> \
+                         scriptableAc{1}=<tr><td><b>SCRIPTABLE</b></td><td>\1</td></tr> \
+                         storedAc{1}=<tr><td><b>STORED</b></td><td>\1</td></tr> \
+                         userAc{1}=<tr><td><b>USER</b></td><td>\1</td></tr> \
                          "constantAc=<tr><td colspan= 2><b>CONSTANT</b></td></tr>" \
                          "finalAc=<tr><td colspan= 2><b>FINAL</b></td></tr>" \
-                         "default{1}=<b>Default:</b> 1 <br>" \
-                         overloads{1}=<b>Overloads:</b><ul>1</ul> \
-                         ovElem{1}=<li>1</li> \
+                         "default{1}=<b>Default:</b> \1 <br>" \
+                         overloads{1}=<b>Overloads:</b><ul>\1</ul> \
+                         ovElem{1}=<li>\1</li> \
                          "overload=<i>This is an overloaded function.</i>" \
-                         "povElem{1}=<li>1 <i>(primary, check for more details)</i></li>"
+                         "povElem{1}=<li>\1<i> (primary, check for more details)</i></li>" \
+                         "readAcFn{1}=READ accessor for \1" \
+                         "writeAcFn{1}=WRITE accessor for \1" \
+                         "notifyAcFn{1}=NOTIFY accessor for \1" \
+                         "memberAcFn{1}=MEMBER accessor for \1"
 
 # This tag can be used to specify a number of word-keyword mappings (TCL only).
 # A mapping has the form "name=value". For example adding "class=itcl::class"
@@ -518,7 +522,7 @@ HIDE_UNDOC_CLASSES     = NO
 # included in the documentation.
 # The default value is: NO.
 
-HIDE_FRIEND_COMPOUNDS  = NO
+HIDE_FRIEND_COMPOUNDS  = YES
 
 # If the HIDE_IN_BODY_DOCS tag is set to YES, doxygen will hide any
 # documentation blocks found inside the body of a function. If set to NO, these
