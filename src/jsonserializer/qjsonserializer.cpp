@@ -108,7 +108,7 @@ QJsonArray QJsonSerializer::serializeList(int listType, const QVariantList &valu
 	return array;
 }
 
-QJsonValue QJsonSerializer::serializeValue(int propertyType, QVariant value) const
+QJsonValue QJsonSerializer::serializeValue(int propertyType, const QVariant &value) const
 {
 	if(!value.isValid())
 		return QJsonValue::Null;
@@ -174,7 +174,7 @@ QVariant QJsonSerializer::deserializeVariant(int propertyType, const QJsonValue 
 		return variant;
 }
 
-QObject *QJsonSerializer::deserializeObject(QJsonObject jsonObject, const QMetaObject *metaObject, QObject *parent) const
+QObject *QJsonSerializer::deserializeObject(const QJsonObject &jsonObject, const QMetaObject *metaObject, QObject *parent) const
 {
 	//try to construct the object
 	auto object = metaObject->newInstance(Q_ARG(QObject*, parent));
@@ -195,7 +195,7 @@ QObject *QJsonSerializer::deserializeObject(QJsonObject jsonObject, const QMetaO
 	return object;
 }
 
-void QJsonSerializer::deserializeGadget(QJsonObject jsonObject, int typeId, void *gadgetPtr) const
+void QJsonSerializer::deserializeGadget(const QJsonObject &jsonObject, int typeId, void *gadgetPtr) const
 {
 	auto metaObject = QMetaType::metaObjectForType(typeId);
 	if(!QMetaType::construct(typeId, gadgetPtr, nullptr))
@@ -227,7 +227,7 @@ QVariantList QJsonSerializer::deserializeList(int listType, const QJsonArray &ar
 	return list;
 }
 
-QVariant QJsonSerializer::deserializeValue(int propertyType, QJsonValue value) const
+QVariant QJsonSerializer::deserializeValue(int propertyType, const QJsonValue &value) const
 {
 	Q_UNUSED(propertyType);
 	return value.toVariant();//all json can be converted to qvariant

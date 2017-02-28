@@ -92,7 +92,7 @@ There are multiple ways to install the Qt module, sorted by preference:
 4. Build it yourself! **Note:** This requires perl to be installed. If you don't have/need cmake, you can ignore the related warnings. To automatically build and install to your Qt installation, run:
   - `qmake`
   - `make qmake_all`
-  - `make all`
+  - `make`
   - `make install`
 
 ### Important Usage Hints

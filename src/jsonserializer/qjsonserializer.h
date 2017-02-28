@@ -38,7 +38,7 @@ public:
 	bool keepObjectName() const;
 
 	//! Serializers a QVariant value to a QJsonValue
-	inline QJsonValue serialize(const QVariant &value) const;
+	inline QJsonValue serialize(const QVariant &data) const;
 	//! Serializers a QObject or Q_GADGET to a QJsonObject
 	template <typename T>
 	inline QJsonObject serialize(const T &data) const;
@@ -47,13 +47,13 @@ public:
 	inline QJsonArray serialize(const QList<T> &data) const;
 
 	//! Deserializes a QJsonValue to a QVariant value, based on the given type id
-	inline QVariant deserialize(const QJsonValue &value, int metaTypeId, QObject *parent = nullptr);
+	inline QVariant deserialize(const QJsonValue &json, int metaTypeId, QObject *parent = nullptr) const;
 	//! Deserializes a QJsonObject to the given QObject or Q_GADGET type
 	template <typename T>
-	inline T deserialize(QJsonObject jsonObject, QObject *parent = nullptr) const;
+	inline T deserialize(const QJsonObject &json, QObject *parent = nullptr) const;
 	//! Deserializes a QJsonArray to a list of the given QObject or Q_GADGET type
 	template<typename T>
-	inline QList<T> deserialize(QJsonArray jsonArray, QObject *parent = nullptr) const;
+	inline QList<T> deserialize(const QJsonArray &json, QObject *parent = nullptr) const;
 
 public Q_SLOTS:
 	//! @writeAcFn{QJsonSerializer::allowDefaultNull}
@@ -71,18 +71,18 @@ protected:
 	//! Performs the serialization of any QList to a json array
 	virtual QJsonArray serializeList(int listType, const QVariantList &value) const;
 	//! Performs the serialization of a value type QVariant to a json representation
-	virtual QJsonValue serializeValue(int propertyType, QVariant value) const;
+	virtual QJsonValue serializeValue(int propertyType, const QVariant &value) const;
 
 	//! Performs the deserialization of any json to a QVariant of the given type
 	virtual QVariant deserializeVariant(int propertyType, const QJsonValue &value, QObject *parent) const;
 	//! Performs the deserialization of a json object to the given QObject type
-	virtual QObject *deserializeObject(QJsonObject jsonObject, const QMetaObject *metaObject, QObject *parent) const;
+	virtual QObject *deserializeObject(const QJsonObject &jsonObject, const QMetaObject *metaObject, QObject *parent) const;
 	//! Performs the deserialization of a json object to the given Q_GADGET type
-	virtual void deserializeGadget(QJsonObject jsonObject, int typeId, void *gadgetPtr) const;
+	virtual void deserializeGadget(const QJsonObject &jsonObject, int typeId, void *gadgetPtr) const;
 	//! Performs the deserialization of any json array to a list
 	virtual QVariantList deserializeList(int listType, const QJsonArray &array, QObject *parent) const;
 	//! Performs the deserialization of a json value to a variant value type
-	virtual QVariant deserializeValue(int propertyType, QJsonValue value) const;
+	virtual QVariant deserializeValue(int propertyType, const QJsonValue &value) const;
 
 private:
 	template <typename T>
@@ -126,9 +126,9 @@ bool QJsonSerializer::registerListConverters() {
 	return ok1 && ok2 && ok3;
 }
 
-QJsonValue QJsonSerializer::serialize(const QVariant &value) const
+QJsonValue QJsonSerializer::serialize(const QVariant &data) const
 {
-	return serializeVariant(value.userType(), value);
+	return serializeVariant(data.userType(), data);
 }
 
 template<typename T>
@@ -145,23 +145,23 @@ QJsonArray QJsonSerializer::serialize(const QList<T> &data) const
 	return serializeVariant(qMetaTypeId<QList<T>>(), QVariant::fromValue(data)).toArray();
 }
 
-QVariant QJsonSerializer::deserialize(const QJsonValue &value, int metaTypeId, QObject *parent)
+QVariant QJsonSerializer::deserialize(const QJsonValue &json, int metaTypeId, QObject *parent) const
 {
-	return deserializeVariant(metaTypeId, value, parent);
+	return deserializeVariant(metaTypeId, json, parent);
 }
 
 template<typename T>
-T QJsonSerializer::deserialize(QJsonObject jsonObject, QObject *parent) const
+T QJsonSerializer::deserialize(const QJsonObject &json, QObject *parent) const
 {
 	static_assert(_assert_has_metaobject<T>::value, "T must either be a pointer and inherit QObject or be a value type and have the Q_GADGET macro");
-	return deserializeVariant(qMetaTypeId<T>(), jsonObject, parent).template value<T>();
+	return deserializeVariant(qMetaTypeId<T>(), json, parent).template value<T>();
 }
 
 template<typename T>
-QList<T> QJsonSerializer::deserialize(QJsonArray jsonArray, QObject *parent) const
+QList<T> QJsonSerializer::deserialize(const QJsonArray &json, QObject *parent) const
 {
 	static_assert(_assert_has_metaobject<T>::value, "T must either be a pointer and inherit QObject or be a value type and have the Q_GADGET macro");
-	return deserializeVariant(qMetaTypeId<QList<T>>(), jsonArray, parent).template value<QList<T>>();
+	return deserializeVariant(qMetaTypeId<QList<T>>(), json, parent).template value<QList<T>>();
 }
 
 #endif // QJSONSERIALIZER_H

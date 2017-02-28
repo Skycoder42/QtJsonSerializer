@@ -108,21 +108,48 @@ The following types are already registered by default:
 */
 
 /*!
-@fn QJsonSerializer::deserialize(QJsonObject, QObject*) const
+@fn QJsonSerializer::serialize(const QVariant &) const
 
-@attention You always have to pass a parent to this function, because thats the only way to make
-generics work for both gadgets and objects. If you don't have a parent, simply use `nullptr`
+@param data The data to be serialized
+@returns The serialized value
+@throws QJsonSerializationException Thrown if the serialization fails
+*/
 
-```cpp
-auto obj = serializer->deserialize<MyClass>(jsonObject, nullptr);
-```
+/*!
+@fn QJsonSerializer::serialize(const T &) const
 
-@fn QJsonSerializer::deserialize(QJsonArray, QObject*) const
+@tparam T The type of the data to be serialized
+@copydetails QJsonSerializer::serialize(const QVariant &) const
+*/
 
-@attention You always have to pass a parent to this function, because thats the only way to make
-generics work for both gadgets and objects. If you don't have a parent, simply use `nullptr`
+/*!
+@fn QJsonSerializer::serialize(const QList<T> &) const
 
-```cpp
-auto obj = serializer->deserialize<MyClass>(jsonArray, nullptr);
-```
+@copydetails QJsonSerializer::serialize(const T &) const
+*/
+
+/*!
+@fn QJsonSerializer::deserialize(const QJsonValue &, int, QObject*) const
+
+@param json The data to be deserialized
+@param metaTypeId The target type of the deserialization
+@param parent The parent object of the result. Only used if the returend value is a QObject*
+@returns The deserialized value, wrapped in QVariant
+@throws QJsonDeserializationException Thrown if the deserialization fails
+*/
+
+/*!
+@fn QJsonSerializer::deserialize(const QJsonObject &, QObject*) const
+
+@tparam T The type of the data to be deserialized
+@param json The data to be deserialized
+@param parent The parent object of the result. Only used if the returend value is a QObject*
+@returns The deserialized value
+@throws QJsonDeserializationException Thrown if the deserialization fails
+*/
+
+/*!
+@fn QJsonSerializer::deserialize(const QJsonArray &, QObject*) const
+
+@copydetails QJsonSerializer::deserialize(const QJsonObject &, QObject*) const
 */
