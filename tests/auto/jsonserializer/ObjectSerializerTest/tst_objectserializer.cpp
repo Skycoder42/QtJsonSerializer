@@ -159,7 +159,7 @@ void ObjectSerializerTest::testDeserialization()
 	QFETCH(bool, works);
 
 	if(works) {
-		auto obj = serializer->deserialize<TestObject>(data, this);
+		auto obj = serializer->deserialize<TestObject*>(data, this);
 		QVERIFY(obj);
 		QVERIFY(result->equals(obj));
 		obj->deleteLater();
@@ -167,9 +167,9 @@ void ObjectSerializerTest::testDeserialization()
 		auto broken2 = qobject_cast<BrokenTestObject2*>(result);
 		auto broken = qobject_cast<BrokenTestObject*>(result);
 		if(broken2)
-			QVERIFY_EXCEPTION_THROWN(serializer->deserialize<BrokenTestObject2>(data, this), QJsonSerializerException);
+			QVERIFY_EXCEPTION_THROWN(serializer->deserialize<BrokenTestObject2*>(data, this), QJsonSerializerException);
 		else if(broken)
-			QVERIFY_EXCEPTION_THROWN(serializer->deserialize<BrokenTestObject>(data, this), QJsonSerializerException);
+			QVERIFY_EXCEPTION_THROWN(serializer->deserialize<BrokenTestObject*>(data, this), QJsonSerializerException);
 		else
 			QFAIL("Expected BrokenTestObject or BrokenTestObject2!");
 	}
@@ -222,10 +222,10 @@ void ObjectSerializerTest::testNullDeserialization()
 								});
 
 	serializer->setAllowDefaultNull(false);
-	QVERIFY_EXCEPTION_THROWN(serializer->deserialize<TestObject>(testJson, this), QJsonSerializerException);
+	QVERIFY_EXCEPTION_THROWN(serializer->deserialize<TestObject*>(testJson, this), QJsonSerializerException);
 
 	serializer->setAllowDefaultNull(true);
-	auto obj = serializer->deserialize<TestObject>(testJson, this);
+	auto obj = serializer->deserialize<TestObject*>(testJson, this);
 	QVERIFY(obj);
 	QVERIFY(testObj->equals(obj));
 	obj->deleteLater();

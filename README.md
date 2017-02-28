@@ -16,29 +16,6 @@ With this small library, you are able to serialize any QObject or Q_GADGET class
 ## Usage
 The serializer is provided as a Qt module. Thus, all you have to do is add the module, and then, in your project, add `QT += jsonserializer` to your `.pro` file!
 
-### Install
-There are multiple ways to install the Qt module, sorted by preference:
-
-1. **Arch-Linux only:** If you are building against your system Qt, you can use my AUR-Repository: [qt5-jsonserializer](https://aur.archlinux.org/packages/qt5-jsonserializer/)
-2. Simply add my repository to your Qt MaintenanceTool (Image-based How-To here: [Add custom repository](https://github.com/Skycoder42/QtModules/blob/master/README.md#add-my-repositories-to-qt-maintenancetool)):
-  1. Open the MaintenanceTool, located in your Qt install directory (e.g. `~/Qt/MaintenanceTool`)
-  2. Select `Add or remove components` and click on the `Settings` button
-  3. Go to `Repositories`, scroll to the bottom, select `User defined repositories` and press `Add`
-  4. In the right column (selected by default), type:
-	- On Linux: https://install.skycoder42.de/qtmodules/linux_x64
-	- On Windows: https://install.skycoder42.de/qtmodules/windows_x86
-	- On Mac: https://install.skycoder42.de/qtmodules/mac_x64
-  5. Press `Ok`, make shure `Add or remove components` is still selected, and continue the install (`Next >`)
-  6. A new entry appears under all supported Qt Versions (e.g. `Qt > Qt 5.8 > Skycoder42 Qt modules`)
-  7. You can install either all of my modules, or select the one you need: `Qt Json Serializer`
-  8. Continue the setup and thats it! you can now use the module for all of your installed Kits for that Qt Version
-3. Download the compiled modules from the release page. **Note:** You will have to add the correct ones yourself and may need to adjust some paths to fit your installation!
-4. Build it yourself! **Note:** This requires perl to be installed. If you don't have/need cmake, you can ignore the related warnings. To automatically build and install to your Qt installation, run:
-  - `qmake`
-  - `make qmake_all`
-  - `make all`
-  - `make install`
-
 ### Example
 Both serialization and desertialization are rather simple. Create an object, and then use the serializer as follows:
 
@@ -75,7 +52,7 @@ qDebug() << json;
 delete object;
 
 //deserialize
-object = serializer->deserialize<TestObject>(json, nullptr);//a parent is required here, to determine it's an object and not a gadget
+object = serializer->deserialize<TestObject>(json);//optional: specify the parent
 qDebug() << object->stringProperty
 		 << object->simpeList
 		 << object->childObject;
@@ -94,6 +71,29 @@ For the serialization, the created json would look like this:
 	}
 }
 ```
+
+### Install
+There are multiple ways to install the Qt module, sorted by preference:
+
+1. **Arch-Linux only:** If you are building against your system Qt, you can use my AUR-Repository: [qt5-jsonserializer](https://aur.archlinux.org/packages/qt5-jsonserializer/)
+2. Simply add my repository to your Qt MaintenanceTool (Image-based How-To here: [Add custom repository](https://github.com/Skycoder42/QtModules/blob/master/README.md#add-my-repositories-to-qt-maintenancetool)):
+  1. Open the MaintenanceTool, located in your Qt install directory (e.g. `~/Qt/MaintenanceTool`)
+  2. Select `Add or remove components` and click on the `Settings` button
+  3. Go to `Repositories`, scroll to the bottom, select `User defined repositories` and press `Add`
+  4. In the right column (selected by default), type:
+	- On Linux: https://install.skycoder42.de/qtmodules/linux_x64
+	- On Windows: https://install.skycoder42.de/qtmodules/windows_x86
+	- On Mac: https://install.skycoder42.de/qtmodules/mac_x64
+  5. Press `Ok`, make shure `Add or remove components` is still selected, and continue the install (`Next >`)
+  6. A new entry appears under all supported Qt Versions (e.g. `Qt > Qt 5.8 > Skycoder42 Qt modules`)
+  7. You can install either all of my modules, or select the one you need: `Qt Json Serializer`
+  8. Continue the setup and thats it! you can now use the module for all of your installed Kits for that Qt Version
+3. Download the compiled modules from the release page. **Note:** You will have to add the correct ones yourself and may need to adjust some paths to fit your installation!
+4. Build it yourself! **Note:** This requires perl to be installed. If you don't have/need cmake, you can ignore the related warnings. To automatically build and install to your Qt installation, run:
+  - `qmake`
+  - `make qmake_all`
+  - `make all`
+  - `make install`
 
 ### Important Usage Hints
 In order for the serializer to properly work, there are a few things you have to know and do:
