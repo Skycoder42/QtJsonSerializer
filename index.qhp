@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <QtHelpProject version="1.0">
-  <namespace>de.skycoder42.QtJsonSerializer.121</namespace>
+  <namespace>de.skycoder42.qtjsonserializer.121</namespace>
   <virtualFolder>doc_qtjsonserializer</virtualFolder>
   <customFilter name="JsonSerializer 1.2.1">
     <filterAttribute>qtjsonserializer</filterAttribute>
