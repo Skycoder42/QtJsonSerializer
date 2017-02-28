@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QtHelpProject version="1.0">
+  <namespace>de.skycoder42.QtJsonSerializer.121</namespace>
+  <virtualFolder>doc_qtjsonserializer</virtualFolder>
+  <customFilter name="JsonSerializer 1.2.1">
+    <filterAttribute>qtjsonserializer</filterAttribute>
+    <filterAttribute>1.2.1</filterAttribute>
+  </customFilter>
+  <filterSection>
+    <filterAttribute>doxygen</filterAttribute>
+    <toc>
+      <section title="QtJsonSerializer 1.2.1" ref="index.html">
+        <section title="QJsonSerializer" ref="index.html" />
+        <section title="Classes" ref="annotated.html">
+          <section title="Class List" ref="annotated.html">
+            <section title="QJsonDeserializationException" ref="class_q_json_deserialization_exception.html">
+              <section title="QJsonDeserializationException" ref="class_q_json_deserialization_exception.html#ad37e36ebc35f0812018106e1a65895b1" />
+              <section title="clone" ref="class_q_json_deserialization_exception.html#ad4196cb826c8770beab48325bc3cbddf" />
+              <section title="raise" ref="class_q_json_deserialization_exception.html#a48291abca66222ed578833a1c1c169c0" />
+            </section>
+            <section title="QJsonSerializationException" ref="class_q_json_serialization_exception.html">
+              <section title="QJsonSerializationException" ref="class_q_json_serialization_exception.html#aebbceb6fd83077b2b7aa2413d326e994" />
+              <section title="clone" ref="class_q_json_serialization_exception.html#ad3e5187ba5a37ba5f171dc1472325779" />
+              <section title="raise" ref="class_q_json_serialization_exception.html#a1f2c5dc5b525da2d02c51fbb093fad2c" />
+            </section>
+            <section title="QJsonSerializer" ref="class_q_json_serializer.html">
+              <section title="QJsonSerializer" ref="class_q_json_serializer.html#ae0d46bea68e7abc4f0a7444a40c03017" />
+              <section title="~QJsonSerializer" ref="class_q_json_serializer.html#aa6a590f7c89c651ca77555a1fec9c5bc" />
+              <section title="allowDefaultNull" ref="class_q_json_serializer.html#a194c09466f37e35a189c3e67df74f0b9" />
+              <section title="deserialize" ref="class_q_json_serializer.html#ad1fd9845078ef750273bad7b903313b7" />
+              <section title="deserialize" ref="class_q_json_serializer.html#a879ba2c02316b17c66dccc4816c7d62d" />
+              <section title="deserialize" ref="class_q_json_serializer.html#a4b1ef56223a6afeda8aa248f8876c012" />
+              <section title="deserializeGadget" ref="class_q_json_serializer.html#a2764651e0a8236814d83f704f5f89751" />
+              <section title="deserializeList" ref="class_q_json_serializer.html#a16beee8729c68dcfaeebf56fdc16c924" />
+              <section title="deserializeObject" ref="class_q_json_serializer.html#a708c1375a8776cc38a94997b6b879d99" />
+              <section title="deserializeValue" ref="class_q_json_serializer.html#ae767df019ead6232fc8c24a107f682f5" />
+              <section title="deserializeVariant" ref="class_q_json_serializer.html#a26a9ab6826e95f9902f9b5f7daa12c4f" />
+              <section title="keepObjectName" ref="class_q_json_serializer.html#afd4632ae8b3725d2c3d1568edd08a8f5" />
+              <section title="serialize" ref="class_q_json_serializer.html#a78e8751d19af62b9b6e592775771f627" />
+              <section title="serialize" ref="class_q_json_serializer.html#ac3232843eee195c2567b9fbfc6168c43" />
+              <section title="serialize" ref="class_q_json_serializer.html#a917ee5425515d91c56617d7d61812a64" />
+              <section title="serializeGadget" ref="class_q_json_serializer.html#ab247470405a303068400e77f1804666c" />
+              <section title="serializeList" ref="class_q_json_serializer.html#a21c6c7088e7992207f40bd0d8b1a3f51" />
+              <section title="serializeObject" ref="class_q_json_serializer.html#aa23c9ff8064d76e9a02ee6f685a73ce3" />
+              <section title="serializeValue" ref="class_q_json_serializer.html#a87cb2307625b39c10f46306b4aa585e7" />
+              <section title="serializeVariant" ref="class_q_json_serializer.html#a125f14a7499788d9c7c7215e65268b1f" />
+              <section title="setAllowDefaultNull" ref="class_q_json_serializer.html#ad807b89a053e8aac9930b2b6d8cf8cc4" />
+              <section title="setKeepObjectName" ref="class_q_json_serializer.html#af4d083e88a88bec52b4951b2d8395767" />
+              <section title="allowDefaultNull" ref="class_q_json_serializer.html#a72ca87a883112b254b0094713a38fd8e" />
+              <section title="keepObjectName" ref="class_q_json_serializer.html#a558f4f3c1a6765727cbd277e09a58e75" />
+            </section>
+            <section title="QJsonSerializerException" ref="class_q_json_serializer_exception.html">
+              <section title="QJsonSerializerException" ref="class_q_json_serializer_exception.html#ab1746396d417b43bf2228dc62c706b1b" />
+              <section title="clone" ref="class_q_json_serializer_exception.html#aedc8fa4385bbbb0d34c6ad6c11e37378" />
+              <section title="isDeserializationException" ref="class_q_json_serializer_exception.html#a363cc20cd7aaaf56f389a18be5836e63" />
+              <section title="raise" ref="class_q_json_serializer_exception.html#a89e25e81483b7f0712a99a11c2fe1f9e" />
+              <section title="what" ref="class_q_json_serializer_exception.html#a96fb501023ca0a13b43ee11182080c74" />
+              <section title="_isDeser" ref="class_q_json_serializer_exception.html#a42915bf5a162ff58498302dcbfd25af0" />
+              <section title="_what" ref="class_q_json_serializer_exception.html#ac259c8dd25c565b9da8104c811052e61" />
+            </section>
+          </section>
+          <section title="Class Index" ref="classes.html" />
+          <section title="Class Hierarchy" ref="hierarchy.html">
+            <section title="QException" ref="qexception.html">
+              <section title="QJsonSerializerException" ref="class_q_json_serializer_exception.html">
+                <section title="QJsonDeserializationException" ref="class_q_json_deserialization_exception.html" />
+                <section title="QJsonSerializationException" ref="class_q_json_serialization_exception.html" />
+              </section>
+            </section>
+            <section title="QObject" ref="qobject.html">
+              <section title="QJsonSerializer" ref="class_q_json_serializer.html" />
+            </section>
+          </section>
+          <section title="Class Members" ref="functions.html">
+            <section title="All" ref="functions.html" />
+            <section title="Functions" ref="functions_func.html" />
+            <section title="Variables" ref="functions_vars.html" />
+            <section title="Properties" ref="functions_prop.html" />
+          </section>
+        </section>
+        <section title="Files">
+          <section title="File List" ref="files.html">
+            <section title="qjsonserializer.cpp" ref="qjsonserializer_8cpp_source.html" />
+            <section title="qjsonserializer.h" ref="qjsonserializer_8h_source.html" />
+            <section title="qjsonserializer_global.h" ref="qjsonserializer__global_8h_source.html" />
+            <section title="qjsonserializerexception.cpp" ref="qjsonserializerexception_8cpp_source.html" />
+            <section title="qjsonserializerexception.h" ref="qjsonserializerexception_8h_source.html" />
+          </section>
+        </section>
+      </section>
+    </toc>
+    <keywords>
+      <keyword name="QJsonDeserializationException" id="QJsonDeserializationException" ref="class_q_json_deserialization_exception.html" />
+      <keyword name="QJsonDeserializationException" id="QJsonDeserializationException::QJsonDeserializationException" ref="class_q_json_deserialization_exception.html#ad37e36ebc35f0812018106e1a65895b1" />
+      <keyword name="raise" id="QJsonDeserializationException::raise" ref="class_q_json_deserialization_exception.html#a48291abca66222ed578833a1c1c169c0" />
+      <keyword name="clone" id="QJsonDeserializationException::clone" ref="class_q_json_deserialization_exception.html#ad4196cb826c8770beab48325bc3cbddf" />
+      <keyword name="QJsonSerializerException" id="QJsonSerializerException::QJsonSerializerException" ref="class_q_json_serializer_exception.html#ab1746396d417b43bf2228dc62c706b1b" />
+      <keyword name="isDeserializationException" id="QJsonSerializerException::isDeserializationException" ref="class_q_json_serializer_exception.html#a363cc20cd7aaaf56f389a18be5836e63" />
+      <keyword name="what" id="QJsonSerializerException::what" ref="class_q_json_serializer_exception.html#a96fb501023ca0a13b43ee11182080c74" />
+      <keyword name="_what" id="QJsonSerializerException::_what" ref="class_q_json_serializer_exception.html#ac259c8dd25c565b9da8104c811052e61" />
+      <keyword name="_isDeser" id="QJsonSerializerException::_isDeser" ref="class_q_json_serializer_exception.html#a42915bf5a162ff58498302dcbfd25af0" />
+      <keyword name="QJsonSerializationException" id="QJsonSerializationException" ref="class_q_json_serialization_exception.html" />
+      <keyword name="QJsonSerializationException" id="QJsonSerializationException::QJsonSerializationException" ref="class_q_json_serialization_exception.html#aebbceb6fd83077b2b7aa2413d326e994" />
+      <keyword name="raise" id="QJsonSerializationException::raise" ref="class_q_json_serialization_exception.html#a1f2c5dc5b525da2d02c51fbb093fad2c" />
+      <keyword name="clone" id="QJsonSerializationException::clone" ref="class_q_json_serialization_exception.html#ad3e5187ba5a37ba5f171dc1472325779" />
+      <keyword name="QJsonSerializerException" id="QJsonSerializerException::QJsonSerializerException" ref="class_q_json_serializer_exception.html#ab1746396d417b43bf2228dc62c706b1b" />
+      <keyword name="isDeserializationException" id="QJsonSerializerException::isDeserializationException" ref="class_q_json_serializer_exception.html#a363cc20cd7aaaf56f389a18be5836e63" />
+      <keyword name="what" id="QJsonSerializerException::what" ref="class_q_json_serializer_exception.html#a96fb501023ca0a13b43ee11182080c74" />
+      <keyword name="_what" id="QJsonSerializerException::_what" ref="class_q_json_serializer_exception.html#ac259c8dd25c565b9da8104c811052e61" />
+      <keyword name="_isDeser" id="QJsonSerializerException::_isDeser" ref="class_q_json_serializer_exception.html#a42915bf5a162ff58498302dcbfd25af0" />
+      <keyword name="QJsonSerializer" id="QJsonSerializer" ref="class_q_json_serializer.html" />
+      <keyword name="setAllowDefaultNull" id="QJsonSerializer::setAllowDefaultNull" ref="class_q_json_serializer.html#ad807b89a053e8aac9930b2b6d8cf8cc4" />
+      <keyword name="setKeepObjectName" id="QJsonSerializer::setKeepObjectName" ref="class_q_json_serializer.html#af4d083e88a88bec52b4951b2d8395767" />
+      <keyword name="QJsonSerializer" id="QJsonSerializer::QJsonSerializer" ref="class_q_json_serializer.html#ae0d46bea68e7abc4f0a7444a40c03017" />
+      <keyword name="~QJsonSerializer" id="QJsonSerializer::~QJsonSerializer" ref="class_q_json_serializer.html#aa6a590f7c89c651ca77555a1fec9c5bc" />
+      <keyword name="allowDefaultNull" id="QJsonSerializer::allowDefaultNull" ref="class_q_json_serializer.html#a194c09466f37e35a189c3e67df74f0b9" />
+      <keyword name="keepObjectName" id="QJsonSerializer::keepObjectName" ref="class_q_json_serializer.html#afd4632ae8b3725d2c3d1568edd08a8f5" />
+      <keyword name="serialize" id="QJsonSerializer::serialize" ref="class_q_json_serializer.html#a78e8751d19af62b9b6e592775771f627" />
+      <keyword name="serialize" id="QJsonSerializer::serialize" ref="class_q_json_serializer.html#ac3232843eee195c2567b9fbfc6168c43" />
+      <keyword name="serialize" id="QJsonSerializer::serialize" ref="class_q_json_serializer.html#a917ee5425515d91c56617d7d61812a64" />
+      <keyword name="deserialize" id="QJsonSerializer::deserialize" ref="class_q_json_serializer.html#ad1fd9845078ef750273bad7b903313b7" />
+      <keyword name="deserialize" id="QJsonSerializer::deserialize" ref="class_q_json_serializer.html#a879ba2c02316b17c66dccc4816c7d62d" />
+      <keyword name="deserialize" id="QJsonSerializer::deserialize" ref="class_q_json_serializer.html#a4b1ef56223a6afeda8aa248f8876c012" />
+      <keyword name="QObject" id="QObject::QObject" ref="qobject.html#QObject" />
+      <keyword name="event" id="QObject::event" ref="qobject.html#event" />
+      <keyword name="eventFilter" id="QObject::eventFilter" ref="qobject.html#eventFilter" />
+      <keyword name="metaObject" id="QObject::metaObject" ref="qobject.html#metaObject" />
+      <keyword name="objectName" id="QObject::objectName" ref="qobject.html#objectName-prop" />
+      <keyword name="setObjectName" id="QObject::setObjectName" ref="qobject.html#objectName-prop" />
+      <keyword name="isWidgetType" id="QObject::isWidgetType" ref="qobject.html#isWidgetType" />
+      <keyword name="isWindowType" id="QObject::isWindowType" ref="qobject.html#isWindowType" />
+      <keyword name="signalsBlocked" id="QObject::signalsBlocked" ref="qobject.html#signalsBlocked" />
+      <keyword name="blockSignals" id="QObject::blockSignals" ref="qobject.html#blockSignals" />
+      <keyword name="thread" id="QObject::thread" ref="qobject.html#thread" />
+      <keyword name="moveToThread" id="QObject::moveToThread" ref="qobject.html#moveToThread" />
+      <keyword name="startTimer" id="QObject::startTimer" ref="qobject.html#startTimer" />
+      <keyword name="killTimer" id="QObject::killTimer" ref="qobject.html#killTimer" />
+      <keyword name="findChild" id="QObject::findChild" ref="qobject.html#findChild" />
+      <keyword name="findChildren" id="QObject::findChildren" ref="qobject.html#findChildren" />
+      <keyword name="findChildren" id="QObject::findChildren" ref="qobject.html#findChildren-1" />
+      <keyword name="findChildren" id="QObject::findChildren" ref="qobject.html#findChildren-2" />
+      <keyword name="children" id="QObject::children" ref="qobject.html#children" />
+      <keyword name="setParent" id="QObject::setParent" ref="qobject.html#setParent" />
+      <keyword name="installEventFilter" id="QObject::installEventFilter" ref="qobject.html#installEventFilter" />
+      <keyword name="removeEventFilter" id="QObject::removeEventFilter" ref="qobject.html#removeEventFilter" />
+      <keyword name="connect" id="QObject::connect" ref="qobject.html#connect-2" />
+      <keyword name="disconnect" id="QObject::disconnect" ref="qobject.html#disconnect-2" />
+      <keyword name="disconnect" id="QObject::disconnect" ref="qobject.html#disconnect-3" />
+      <keyword name="dumpObjectTree" id="QObject::dumpObjectTree" ref="qobject.html#dumpObjectTree" />
+      <keyword name="dumpObjectInfo" id="QObject::dumpObjectInfo" ref="qobject.html#dumpObjectInfo" />
+      <keyword name="setProperty" id="QObject::setProperty" ref="qobject.html#setProperty" />
+      <keyword name="property" id="QObject::property" ref="qobject.html#property" />
+      <keyword name="dynamicPropertyNames" id="QObject::dynamicPropertyNames" ref="qobject.html#dynamicPropertyNames" />
+      <keyword name="destroyed" id="QObject::destroyed" ref="qobject.html#destroyed" />
+      <keyword name="objectNameChanged" id="QObject::objectNameChanged" ref="qobject.html#objectNameChanged" />
+      <keyword name="parent" id="QObject::parent" ref="qobject.html#parent" />
+      <keyword name="inherits" id="QObject::inherits" ref="qobject.html#inherits" />
+      <keyword name="deleteLater" id="QObject::deleteLater" ref="qobject.html#deleteLater" />
+      <keyword name="registerListConverters" id="QJsonSerializer::registerListConverters" ref="class_q_json_serializer.html#a03673ad82a01fd456679bffa30416c00" />
+      <keyword name="tr" id="QObject::tr" ref="qobject.html#tr" />
+      <keyword name="trUtf8" id="QObject::trUtf8" ref="qobject.html#trUtf8" />
+      <keyword name="connect" id="QObject::connect" ref="qobject.html#connect" />
+      <keyword name="connect" id="QObject::connect" ref="qobject.html#connect-1" />
+      <keyword name="connect" id="QObject::connect" ref="qobject.html#connect-3" />
+      <keyword name="connect" id="QObject::connect" ref="qobject.html#connect-4" />
+      <keyword name="connect" id="QObject::connect" ref="qobject.html#connect-5" />
+      <keyword name="disconnect" id="QObject::disconnect" ref="qobject.html#disconnect" />
+      <keyword name="disconnect" id="QObject::disconnect" ref="qobject.html#disconnect-1" />
+      <keyword name="disconnect" id="QObject::disconnect" ref="qobject.html#disconnect-4" />
+      <keyword name="disconnect" id="QObject::disconnect" ref="qobject.html#disconnect-5" />
+      <keyword name="serializeVariant" id="QJsonSerializer::serializeVariant" ref="class_q_json_serializer.html#a125f14a7499788d9c7c7215e65268b1f" />
+      <keyword name="serializeObject" id="QJsonSerializer::serializeObject" ref="class_q_json_serializer.html#aa23c9ff8064d76e9a02ee6f685a73ce3" />
+      <keyword name="serializeGadget" id="QJsonSerializer::serializeGadget" ref="class_q_json_serializer.html#ab247470405a303068400e77f1804666c" />
+      <keyword name="serializeList" id="QJsonSerializer::serializeList" ref="class_q_json_serializer.html#a21c6c7088e7992207f40bd0d8b1a3f51" />
+      <keyword name="serializeValue" id="QJsonSerializer::serializeValue" ref="class_q_json_serializer.html#a87cb2307625b39c10f46306b4aa585e7" />
+      <keyword name="deserializeVariant" id="QJsonSerializer::deserializeVariant" ref="class_q_json_serializer.html#a26a9ab6826e95f9902f9b5f7daa12c4f" />
+      <keyword name="deserializeObject" id="QJsonSerializer::deserializeObject" ref="class_q_json_serializer.html#a708c1375a8776cc38a94997b6b879d99" />
+      <keyword name="deserializeGadget" id="QJsonSerializer::deserializeGadget" ref="class_q_json_serializer.html#a2764651e0a8236814d83f704f5f89751" />
+      <keyword name="deserializeList" id="QJsonSerializer::deserializeList" ref="class_q_json_serializer.html#a16beee8729c68dcfaeebf56fdc16c924" />
+      <keyword name="deserializeValue" id="QJsonSerializer::deserializeValue" ref="class_q_json_serializer.html#ae767df019ead6232fc8c24a107f682f5" />
+      <keyword name="sender" id="QObject::sender" ref="qobject.html#sender" />
+      <keyword name="senderSignalIndex" id="QObject::senderSignalIndex" ref="qobject.html#senderSignalIndex" />
+      <keyword name="receivers" id="QObject::receivers" ref="qobject.html#receivers" />
+      <keyword name="isSignalConnected" id="QObject::isSignalConnected" ref="qobject.html#isSignalConnected" />
+      <keyword name="timerEvent" id="QObject::timerEvent" ref="qobject.html#timerEvent" />
+      <keyword name="childEvent" id="QObject::childEvent" ref="qobject.html#childEvent" />
+      <keyword name="customEvent" id="QObject::customEvent" ref="qobject.html#customEvent" />
+      <keyword name="connectNotify" id="QObject::connectNotify" ref="qobject.html#connectNotify" />
+      <keyword name="disconnectNotify" id="QObject::disconnectNotify" ref="qobject.html#disconnectNotify" />
+      <keyword name="allowDefaultNull" id="QJsonSerializer::allowDefaultNull" ref="class_q_json_serializer.html#a72ca87a883112b254b0094713a38fd8e" />
+      <keyword name="keepObjectName" id="QJsonSerializer::keepObjectName" ref="class_q_json_serializer.html#a558f4f3c1a6765727cbd277e09a58e75" />
+      <keyword name="objectName" id="QObject::objectName" ref="qobject.html#objectName-prop" />
+      <keyword name="QJsonSerializerException" id="QJsonSerializerException" ref="class_q_json_serializer_exception.html" />
+      <keyword name="QJsonSerializerException" id="QJsonSerializerException::QJsonSerializerException" ref="class_q_json_serializer_exception.html#ab1746396d417b43bf2228dc62c706b1b" />
+      <keyword name="isDeserializationException" id="QJsonSerializerException::isDeserializationException" ref="class_q_json_serializer_exception.html#a363cc20cd7aaaf56f389a18be5836e63" />
+      <keyword name="what" id="QJsonSerializerException::what" ref="class_q_json_serializer_exception.html#a96fb501023ca0a13b43ee11182080c74" />
+      <keyword name="raise" id="QJsonSerializerException::raise" ref="class_q_json_serializer_exception.html#a89e25e81483b7f0712a99a11c2fe1f9e" />
+      <keyword name="clone" id="QJsonSerializerException::clone" ref="class_q_json_serializer_exception.html#aedc8fa4385bbbb0d34c6ad6c11e37378" />
+      <keyword name="_what" id="QJsonSerializerException::_what" ref="class_q_json_serializer_exception.html#ac259c8dd25c565b9da8104c811052e61" />
+      <keyword name="_isDeser" id="QJsonSerializerException::_isDeser" ref="class_q_json_serializer_exception.html#a42915bf5a162ff58498302dcbfd25af0" />
+    </keywords>
+    <files>
+      <file>tabs.css</file>
+      <file>tab_a.png</file>
+      <file>tab_b.png</file>
+      <file>tab_h.png</file>
+      <file>tab_s.png</file>
+      <file>nav_h.png</file>
+      <file>nav_f.png</file>
+      <file>bc_s.png</file>
+      <file>doxygen.png</file>
+      <file>closed.png</file>
+      <file>open.png</file>
+      <file>bdwn.png</file>
+      <file>sync_on.png</file>
+      <file>sync_off.png</file>
+      <file>doxygen.css</file>
+      <file>jquery.js</file>
+      <file>dynsections.js</file>
+      <file>search/search_l.png</file>
+      <file>search/search_m.png</file>
+      <file>search/search_r.png</file>
+      <file>search/close.png</file>
+      <file>search/mag_sel.png</file>
+      <file>search/search.css</file>
+      <file>search/search.js</file>
+      <file>qjsonserializer_8cpp_source.html</file>
+      <file>qjsonserializer_8h_source.html</file>
+      <file>qjsonserializer__global_8h_source.html</file>
+      <file>qjsonserializerexception_8cpp_source.html</file>
+      <file>qjsonserializerexception_8h_source.html</file>
+      <file>_r_e_a_d_m_e_8md_source.html</file>
+      <file>class_q_json_deserialization_exception.html</file>
+      <file>class_q_json_deserialization_exception.png</file>
+      <file>class_q_json_deserialization_exception-members.html</file>
+      <file>class_q_json_serialization_exception.html</file>
+      <file>class_q_json_serialization_exception.png</file>
+      <file>class_q_json_serialization_exception-members.html</file>
+      <file>class_q_json_serializer.html</file>
+      <file>class_q_json_serializer.png</file>
+      <file>class_q_json_serializer-members.html</file>
+      <file>class_q_json_serializer_exception.html</file>
+      <file>class_q_json_serializer_exception.png</file>
+      <file>class_q_json_serializer_exception-members.html</file>
+      <file>index.html</file>
+      <file>annotated.html</file>
+      <file>classes.html</file>
+      <file>hierarchy.html</file>
+      <file>functions.html</file>
+      <file>functions.html</file>
+      <file>functions.html</file>
+      <file>functions.html</file>
+      <file>functions.html</file>
+      <file>functions.html</file>
+      <file>functions.html</file>
+      <file>functions.html</file>
+      <file>functions.html</file>
+      <file>functions.html</file>
+      <file>functions.html</file>
+      <file>functions_func.html</file>
+      <file>functions_func.html</file>
+      <file>functions_func.html</file>
+      <file>functions_func.html</file>
+      <file>functions_func.html</file>
+      <file>functions_func.html</file>
+      <file>functions_func.html</file>
+      <file>functions_func.html</file>
+      <file>functions_func.html</file>
+      <file>functions_func.html</file>
+      <file>functions_vars.html</file>
+      <file>functions_prop.html</file>
+      <file>functions_prop.html</file>
+      <file>files.html</file>
+    </files>
+  </filterSection>
+</QtHelpProject>
