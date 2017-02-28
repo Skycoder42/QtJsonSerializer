@@ -23,6 +23,12 @@ echo "OUTPUT_DIRECTORY = \"$destDir\"" >> "$doxyTmp"
 echo "QHG_LOCATION = \"$qtBins/qhelpgenerator\"" >> "$doxyTmp"
 echo "INCLUDE_PATH += \"$qtHeaders\"" >> "$doxyTmp"
 echo "GENERATE_TAGFILE = \"$destDir/QtJsonSerializer.tag\"" >> "$doxyTmp"
+if [ "$DOXY_STYLE" ]; then
+	echo "HTML_STYLESHEET = \"$DOXY_STYLE\"" >> "$doxyTmp"
+fi
+if [ "$DOXY_STYLE_EXTRA" ]; then
+	echo "HTML_EXTRA_STYLESHEET = \"$DOXY_STYLE_EXTRA\"" >> "$doxyTmp"
+fi
 
 for tagFile in $(find "$qtDocs" -name *.tags); do
 	echo "TAGFILES += \"$tagFile=http://doc.qt.io/qt-5\"" >> "$doxyTmp"

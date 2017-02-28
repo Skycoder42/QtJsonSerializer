@@ -116,4 +116,5 @@ There are multiple ways to install the Qt module, sorted by preference:
   - `make install`
 
 ## Documentation
-The documentation is available as release and on [github pages](https://skycoder42.github.io/QJsonSerializer/). It was created using [doxygen](http://www.doxygen.org/).
+The documentation is available on [github pages](https://skycoder42.github.io/QJsonSerializer/). It was created using [doxygen](http://www.doxygen.org/). The HTML-documentation and Qt-Help files are shipped
+together with the module for both the custom repository and the package on the release page. Please note that doxygen docs do not perfectly integrate with QtCreator/QtAssistant.
