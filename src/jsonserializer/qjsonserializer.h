@@ -16,7 +16,6 @@
 class Q_JSONSERIALIZER_EXPORT QJsonSerializer : public QObject
 {
 	Q_OBJECT
-	friend class QJsonSerializerPrivate;
 
 	//! Specifies, whether null for value types is allowed or not
 	Q_PROPERTY(bool allowDefaultNull READ allowDefaultNull WRITE setAllowDefaultNull)

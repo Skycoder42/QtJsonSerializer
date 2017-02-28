@@ -6,6 +6,10 @@ only use the public members of this class. However, in some cases, you may have 
 code to properly serialize special classes. In order to modify the general serialization
 behavior, have a look at the properties.
 
+@section supported Supported types
+The serializer supports a bunch of types by default, but there are limitations. Check the main
+page Usage Hints for details about what is possible and what is not.
+
 @section extending Extending the serializer
 To extend the serializers functionality, the protected functions are the place to look. For
 both serialization and deserialization, there are 5 methods each, with the following functionality:
@@ -60,4 +64,65 @@ of this property.
 	@readAc{keepObjectName()}
 	@writeAc{setKeepObjectName()}
 }
+*/
+
+/*!
+@fn QJsonSerializer::registerListConverters
+
+@tparam T The type to register converters for
+
+Performs the registration of converters for `QList<T> <--> QVariantList`. This conversion is a
+requirement for the serializer, if you want to be able to serialize lists of a type. The function
+calls the following methods for the given type:
+- `QMetaType::registerConverter<QList<T>, QVariantList>()`
+- `QMetaType::registerConverter<QVariantList, QList<T>>()`
+- `QMetaType::registerComparators<QList<T>>()`
+
+with a generic conversion using QVariant.
+
+The following types are already registered by default:
+<table>
+<tr><th>Default list converters</th></tr>
+<tr><td>bool</td></tr>
+<tr><td>int</td></tr>
+<tr><td>unsigned int</td></tr>
+<tr><td>double</td></tr>
+<tr><td>QChar</td></tr>
+<tr><td>QString</td></tr>
+<tr><td>long long</td></tr>
+<tr><td>short</td></tr>
+<tr><td>char</td></tr>
+<tr><td>unsigned long</td></tr>
+<tr><td>unsigned long long</td></tr>
+<tr><td>unsigned short</td></tr>
+<tr><td>signed char</td></tr>
+<tr><td>unsigned char</td></tr>
+<tr><td>float</td></tr>
+<tr><td>QDate</td></tr>
+<tr><td>QTime</td></tr>
+<tr><td>QUrl</td></tr>
+<tr><td>QDateTime</td></tr>
+<tr><td>QUuid</td></tr>
+<tr><td>QObject *</td></tr>
+</table>
+*/
+
+/*!
+@fn QJsonSerializer::deserialize(QJsonObject, QObject*) const
+
+@attention You always have to pass a parent to this function, because thats the only way to make
+generics work for both gadgets and objects. If you don't have a parent, simply use `nullptr`
+
+```cpp
+auto obj = serializer->deserialize<MyClass>(jsonObject, nullptr);
+```
+
+@fn QJsonSerializer::deserialize(QJsonArray, QObject*) const
+
+@attention You always have to pass a parent to this function, because thats the only way to make
+generics work for both gadgets and objects. If you don't have a parent, simply use `nullptr`
+
+```cpp
+auto obj = serializer->deserialize<MyClass>(jsonArray, nullptr);
+```
 */
