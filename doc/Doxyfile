@@ -38,13 +38,13 @@ PROJECT_NAME           = QtJsonSerializer
 # could be handy for archiving the generated documentation or if some version
 # control system is used.
 
-PROJECT_NUMBER         = 
+PROJECT_NUMBER         = 1.0.0
 
 # Using the PROJECT_BRIEF tag one can provide an optional one line description
 # for a project that appears at the top of each page and should give viewer a
 # quick idea about the purpose of the project. Keep the description short.
 
-PROJECT_BRIEF          = "A library to perform generic seralization and deserialization of QObjects"
+PROJECT_BRIEF          = "Project desciption here"
 
 # With the PROJECT_LOGO tag one can specify a logo or an icon that is included
 # in the documentation. The maximum height of the logo should not exceed 55
@@ -252,15 +252,11 @@ ALIASES                = "accessors{1}=<table><tr><th colspan= 2>Accessors</th><
                          "constantAc=<tr><td colspan= 2><b>CONSTANT</b></td></tr>" \
                          "finalAc=<tr><td colspan= 2><b>FINAL</b></td></tr>" \
                          "default{1}=<b>Default:</b> \1 <br>" \
-                         overloads{1}=<b>Overloads:</b><ul>\1</ul> \
-                         ovElem{1}=<li>\1</li> \
-                         "overload=<i>This is an overloaded function.</i>" \
-                         "povElem{1}=<li>\1<i> (primary, check for more details)</i></li>" \
                          "readAcFn{1}=READ accessor for \1" \
                          "writeAcFn{1}=WRITE accessor for \1" \
                          "notifyAcFn{1}=NOTIFY accessor for \1" \
                          "memberAcFn{1}=MEMBER accessor for \1" \
-                         "inherit{1}=Inherits \1"
+                         "inherit{1}=Inherits 1"
 
 # This tag can be used to specify a number of word-keyword mappings (TCL only).
 # A mapping has the form "name=value". For example adding "class=itcl::class"
@@ -812,8 +808,9 @@ WARN_LOGFILE           =
 # spaces. See also FILE_PATTERNS and EXTENSION_MAPPING
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = .. \
-                         ../../../README.md
+INPUT                  = ../README.md \
+                         ../src \
+                         .
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -945,7 +942,7 @@ EXCLUDE_SYMBOLS        = QAbstractAspect \
 # that contain example code fragments that are included (see the \include
 # command).
 
-EXAMPLE_PATH           = ../../../examples \
+EXAMPLE_PATH           = ../examples \
                          ./snippets
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the
@@ -1022,7 +1019,7 @@ FILTER_SOURCE_PATTERNS =
 # (index.html). This can be useful if you have a project on for instance GitHub
 # and want to reuse the introduction page also for the doxygen output.
 
-USE_MDFILE_AS_MAINPAGE = ../../../README.md
+USE_MDFILE_AS_MAINPAGE = ../README.md
 
 #---------------------------------------------------------------------------
 # Configuration options related to source browsing
@@ -1412,7 +1409,7 @@ QCH_FILE               = ../qtjsonserializer.qch
 # The default value is: org.doxygen.Project.
 # This tag requires that the tag GENERATE_QHP is set to YES.
 
-QHP_NAMESPACE          = de.skycoder42.qtjsonserializer.121
+QHP_NAMESPACE          = de.skycoder42.qtjsonserializer.100
 
 # The QHP_VIRTUAL_FOLDER tag specifies the namespace to use when generating Qt
 # Help Project output. For more information please see Qt Help Project / Virtual
@@ -1429,7 +1426,7 @@ QHP_VIRTUAL_FOLDER     = doc_qtjsonserializer
 # filters).
 # This tag requires that the tag GENERATE_QHP is set to YES.
 
-QHP_CUST_FILTER_NAME   = "JsonSerializer 1.2.1"
+QHP_CUST_FILTER_NAME   = "JsonSerializer 1.0.0"
 
 # The QHP_CUST_FILTER_ATTRS tag specifies the list of the attributes of the
 # custom filter to add. For more information please see Qt Help Project / Custom
@@ -1437,7 +1434,7 @@ QHP_CUST_FILTER_NAME   = "JsonSerializer 1.2.1"
 # filters).
 # This tag requires that the tag GENERATE_QHP is set to YES.
 
-QHP_CUST_FILTER_ATTRS  = "qtjsonserializer 1.2.1"
+QHP_CUST_FILTER_ATTRS  = "qtjsonserializer 1.0.0"
 
 # The QHP_SECT_FILTER_ATTRS tag specifies the list of the attributes this
 # project's filter section matches. Qt Help Project / Filter Attributes (see:

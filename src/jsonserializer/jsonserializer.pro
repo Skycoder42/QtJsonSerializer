@@ -2,12 +2,6 @@ TARGET = QtJsonSerializer
 
 QT = core
 
-OTHER_FILES += doc/Doxyfile \
-	doc/makedoc.sh \
-	../../README.md
-OTHER_FILES += doc/*.dox
-OTHER_FILES += doc/snippets/*.cpp
-
 PUBLIC_HEADERS += \
 	$$PWD/qjsonserializer_global.h \
 	$$PWD/qjsonserializerexception.h \
@@ -30,7 +24,3 @@ win32 {
 } else:mac {
 		QMAKE_TARGET_BUNDLE_PREFIX = "de.skycoder42."
 }
-
-docTarget.target = doxygen
-docTarget.commands = chmod u+x $$PWD/doc/makedoc.sh && $$PWD/doc/makedoc.sh "$$PWD" "$$VERSION" "$$[QT_INSTALL_BINS]" "$$[QT_INSTALL_HEADERS]" "$$[QT_INSTALL_DOCS]"
-QMAKE_EXTRA_TARGETS += docTarget
