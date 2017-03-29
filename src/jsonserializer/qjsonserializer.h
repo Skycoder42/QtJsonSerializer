@@ -12,6 +12,7 @@
 #include <QtCore/qdebug.h>
 #include <type_traits>
 
+class QJsonSerializerPrivate;
 //! A class to serializer and deserializer QObjects and Q_GADGETS to and from JSON
 class Q_JSONSERIALIZER_EXPORT QJsonSerializer : public QObject
 {
@@ -89,9 +90,7 @@ private:
 	class _assert_has_metaobject : public std::is_void<typename T::QtGadgetHelper> {};
 	template <typename T>
 	class _assert_has_metaobject<T*> : public std::is_base_of<QObject, T> {};
-
-	bool _allowNull;
-	bool _keepObjectName;
+	QScopedPointer<QJsonSerializerPrivate> d;
 };
 // ------------- Generic Implementation -------------
 
@@ -121,9 +120,7 @@ bool QJsonSerializer::registerListConverters() {
 		return l;
 	});
 
-	auto ok3 = QMetaType::registerComparators<QList<T>>();
-
-	return ok1 && ok2 && ok3;
+	return ok1 && ok2;
 }
 
 QJsonValue QJsonSerializer::serialize(const QVariant &data) const

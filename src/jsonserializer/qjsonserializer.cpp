@@ -1,4 +1,5 @@
 #include "qjsonserializer.h"
+#include "qjsonserializer_p.h"
 
 #include <QtCore/QRegularExpression>
 #include <QtCore/QCoreApplication>
@@ -13,30 +14,29 @@ Q_COREAPP_STARTUP_FUNCTION(qJsonSerializerStartup)
 
 QJsonSerializer::QJsonSerializer(QObject *parent) :
 	QObject(parent),
-	_allowNull(false),
-	_keepObjectName(false)
+	d(new QJsonSerializerPrivate())
 {}
 
 QJsonSerializer::~QJsonSerializer() {}
 
 bool QJsonSerializer::allowDefaultNull() const
 {
-	return _allowNull;
+	return d->allowNull;
 }
 
 bool QJsonSerializer::keepObjectName() const
 {
-	return _keepObjectName;
+	return d->keepObjectName;
 }
 
 void QJsonSerializer::setAllowDefaultNull(bool allowDefaultNull)
 {
-	_allowNull = allowDefaultNull;
+	d->allowNull = allowDefaultNull;
 }
 
 void QJsonSerializer::setKeepObjectName(bool keepObjectName)
 {
-	_keepObjectName = keepObjectName;
+	d->keepObjectName = keepObjectName;
 }
 
 QJsonValue QJsonSerializer::serializeVariant(int propertyType, const QVariant &value) const
@@ -71,7 +71,7 @@ QJsonObject QJsonSerializer::serializeObject(const QObject *object) const
 	QJsonObject jsonObject;
 	//go through all properties and try to serialize them
 	auto i = QObject::staticMetaObject.indexOfProperty("objectName");
-	if(!_keepObjectName)
+	if(!d->keepObjectName)
 	   i++;
 	for(; i < meta->propertyCount(); i++) {
 		auto property = meta->property(i);
@@ -162,7 +162,7 @@ QVariant QJsonSerializer::deserializeVariant(int propertyType, const QJsonValue 
 		auto vType = variant.typeName();
 		if(variant.canConvert(propertyType) && variant.convert(propertyType))
 			return variant;
-		else if(_allowNull && value.isNull())
+		else if(d->allowNull && value.isNull())
 			return QVariant();
 		else {
 			throw QJsonDeserializationException(QByteArray("Failed to convert deserialized variant of type ") +
@@ -232,6 +232,13 @@ QVariant QJsonSerializer::deserializeValue(int propertyType, const QJsonValue &v
 	Q_UNUSED(propertyType);
 	return value.toVariant();//all json can be converted to qvariant
 }
+
+
+
+QJsonSerializerPrivate::QJsonSerializerPrivate() :
+	allowNull(false),
+	keepObjectName(false)
+{}
 
 // ------------- Startup function implementation -------------
 

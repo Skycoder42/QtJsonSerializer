@@ -2,25 +2,22 @@ TARGET = QtJsonSerializer
 
 QT = core
 
-PUBLIC_HEADERS += \
-	$$PWD/qjsonserializer_global.h \
-	$$PWD/qjsonserializerexception.h \
-	$$PWD/qjsonserializer.h
-
-PRIVATE_HEADERS +=
-
 SOURCES += \
-	$$PWD/qjsonserializerexception.cpp \
-	$$PWD/qjsonserializer.cpp
+	qjsonserializerexception.cpp \
+	qjsonserializer.cpp
 
-HEADERS += $$PUBLIC_HEADERS $$PRIVATE_HEADERS
+HEADERS += \
+	qjsonserializer_global.h \
+	qjsonserializerexception.h \
+	qjsonserializer.h \
+    qjsonserializer_p.h
 
 load(qt_module)
 
 win32 {
-		QMAKE_TARGET_COMPANY = "Skycoder42"
-		QMAKE_TARGET_PRODUCT = "QtJsonSerializer"
-		QMAKE_TARGET_COPYRIGHT = "Felix Barz"
+	QMAKE_TARGET_COMPANY = "Skycoder42"
+	QMAKE_TARGET_PRODUCT = "QtJsonSerializer"
+	QMAKE_TARGET_COPYRIGHT = "Felix Barz"
 } else:mac {
-		QMAKE_TARGET_BUNDLE_PREFIX = "de.skycoder42."
+	QMAKE_TARGET_BUNDLE_PREFIX = "de.skycoder42."
 }

@@ -31,9 +31,17 @@ private:
 
 void ObjectSerializerTest::initTestCase()
 {
+#ifdef Q_OS_UNIX
+	Q_ASSERT(qgetenv("LD_PRELOAD").contains("Qt5JsonSerializer"));
+#endif
 	QJsonSerializer::registerListConverters<QList<int>>();
 	QJsonSerializer::registerListConverters<TestObject*>();
 	QJsonSerializer::registerListConverters<QList<TestObject*>>();
+	//register list comparators, needed for test only!
+	QMetaType::registerComparators<QList<int>>();
+	QMetaType::registerComparators<QList<QList<int>>>();
+	QMetaType::registerComparators<QList<TestObject*>>();
+	QMetaType::registerComparators<QList<QList<TestObject*>>>();
 	serializer = new QJsonSerializer(this);
 
 	qMetaTypeId<TestObject*>();
