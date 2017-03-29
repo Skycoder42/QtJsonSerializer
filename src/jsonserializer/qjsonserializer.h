@@ -22,6 +22,8 @@ class Q_JSONSERIALIZER_EXPORT QJsonSerializer : public QObject
 	Q_PROPERTY(bool allowDefaultNull READ allowDefaultNull WRITE setAllowDefaultNull)
 	//! Specifies, whether the `objectName` property of QObjects should be serialized
 	Q_PROPERTY(bool keepObjectName READ keepObjectName WRITE setKeepObjectName)
+	//! Specifies, whether enums should be serialized as integer or as string
+	Q_PROPERTY(bool enumAsString READ enumAsString WRITE setEnumAsString)
 
 public:
 	//! Constructor
@@ -37,6 +39,8 @@ public:
 	bool allowDefaultNull() const;
 	//! @readAcFn{QJsonSerializer::keepObjectName}
 	bool keepObjectName() const;
+	//! @readAcFn{QJsonSerializer::enumAsString}
+	bool enumAsString() const;
 
 	//! Serializers a QVariant value to a QJsonValue
 	inline QJsonValue serialize(const QVariant &data) const;
@@ -61,6 +65,8 @@ public Q_SLOTS:
 	void setAllowDefaultNull(bool allowDefaultNull);
 	//! @writeAcFn{QJsonSerializer::keepObjectName}
 	void setKeepObjectName(bool keepObjectName);
+	//! @writeAcFn{QJsonSerializer::enumAsString}
+	void setEnumAsString(bool enumAsString);
 
 protected:
 	//! Performs the serialization of any QVariant to a json representation
@@ -71,6 +77,8 @@ protected:
 	virtual QJsonObject serializeGadget(const void *gadget, const QMetaObject *metaObject) const;
 	//! Performs the serialization of any QList to a json array
 	virtual QJsonArray serializeList(int listType, const QVariantList &value) const;
+	//! Performs the serialization of an enum type QVariant to a json representation
+	virtual QJsonValue serializeEnum(const QMetaEnum &metaEnum, const QVariant &value) const;
 	//! Performs the serialization of a value type QVariant to a json representation
 	virtual QJsonValue serializeValue(int propertyType, const QVariant &value) const;
 

@@ -9,6 +9,7 @@ class Q_JSONSERIALIZER_EXPORT QJsonSerializerPrivate
 public:
 	bool allowNull;
 	bool keepObjectName;
+	bool enumAsString;
 
 	QJsonSerializerPrivate();
 };

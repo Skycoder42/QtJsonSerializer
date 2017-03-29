@@ -29,6 +29,11 @@ bool QJsonSerializer::keepObjectName() const
 	return d->keepObjectName;
 }
 
+bool QJsonSerializer::enumAsString() const
+{
+	return d->enumAsString;
+}
+
 void QJsonSerializer::setAllowDefaultNull(bool allowDefaultNull)
 {
 	d->allowNull = allowDefaultNull;
@@ -37,6 +42,11 @@ void QJsonSerializer::setAllowDefaultNull(bool allowDefaultNull)
 void QJsonSerializer::setKeepObjectName(bool keepObjectName)
 {
 	d->keepObjectName = keepObjectName;
+}
+
+void QJsonSerializer::setEnumAsString(bool enumAsString)
+{
+	d->enumAsString = enumAsString;
 }
 
 QJsonValue QJsonSerializer::serializeVariant(int propertyType, const QVariant &value) const
@@ -59,6 +69,13 @@ QJsonValue QJsonSerializer::serializeVariant(int propertyType, const QVariant &v
 				return serializeObject(object);
 			else
 				return QJsonValue::Null;
+		} else if(flags.testFlag(QMetaType::IsEnumeration)) {
+			auto metaObject = QMetaType::metaObjectForType(propertyType);
+			auto enumIndex = metaObject->indexOfEnumerator(QMetaType::typeName(propertyType));//TODO ugly
+			if(enumIndex != -1)
+				return serializeEnum(metaObject->enumerator(enumIndex), value);
+			else
+				return serializeValue(propertyType, value);
 		} else
 			return serializeValue(propertyType, value);
 	}
@@ -75,8 +92,14 @@ QJsonObject QJsonSerializer::serializeObject(const QObject *object) const
 	   i++;
 	for(; i < meta->propertyCount(); i++) {
 		auto property = meta->property(i);
-		if(property.isStored())
-			jsonObject[QString::fromUtf8(property.name())]= serializeVariant(property.userType(), property.read(object));
+		if(property.isStored()) {
+			QJsonValue value;
+			if(property.isEnumType())
+				value = serializeEnum(property.enumerator(), property.read(object));
+			else
+				value = serializeVariant(property.userType(), property.read(object));
+			jsonObject[QString::fromUtf8(property.name())] = value;
+		}
 	}
 
 	return jsonObject;
@@ -106,6 +129,17 @@ QJsonArray QJsonSerializer::serializeList(int listType, const QVariantList &valu
 	foreach(auto element, value)
 		array.append(serializeVariant(metaType, element));
 	return array;
+}
+
+QJsonValue QJsonSerializer::serializeEnum(const QMetaEnum &metaEnum, const QVariant &value) const
+{
+	if(d->enumAsString) {
+		if(metaEnum.isFlag())
+			return QString::fromUtf8(metaEnum.valueToKeys(value.toInt()));
+		else
+			return QString::fromUtf8(metaEnum.valueToKey(value.toInt()));
+	} else
+		return value.toInt();
 }
 
 QJsonValue QJsonSerializer::serializeValue(int propertyType, const QVariant &value) const
@@ -237,7 +271,8 @@ QVariant QJsonSerializer::deserializeValue(int propertyType, const QJsonValue &v
 
 QJsonSerializerPrivate::QJsonSerializerPrivate() :
 	allowNull(false),
-	keepObjectName(false)
+	keepObjectName(false),
+	enumAsString(false)
 {}
 
 // ------------- Startup function implementation -------------
