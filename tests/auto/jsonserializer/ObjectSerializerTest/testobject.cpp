@@ -8,6 +8,8 @@ TestObject::TestObject(QObject *parent) :
 	boolProperty(false),
 	stringProperty(),
 	doubleProperty(0.0),
+	normalEnumProperty(Normal0),
+	enumFlagsProperty(0x00),
 	simpeList(),
 	leveledList(),
 	childObject(nullptr),
@@ -22,6 +24,14 @@ TestObject *TestObject::createBasic(int intProperty, bool boolProperty, QString 
 	t->boolProperty = boolProperty;
 	t->stringProperty = stringProperty;
 	t->doubleProperty = doubleProperty;
+	return t;
+}
+
+TestObject *TestObject::createEnum(TestObject::NormalEnum normalEnumProperty, EnumFlags enumFlagsProperty, QObject *parent)
+{
+	auto t = new TestObject(parent);
+	t->normalEnumProperty = normalEnumProperty;
+	t->enumFlagsProperty = enumFlagsProperty;
 	return t;
 }
 
@@ -77,6 +87,8 @@ bool TestObject::equals(const TestObject *other) const
 				  boolProperty == other->boolProperty &&
 				  stringProperty == other->stringProperty &&
 				  doubleProperty == other->doubleProperty &&
+				  normalEnumProperty == other->normalEnumProperty &&
+				  enumFlagsProperty == other->enumFlagsProperty &&
 				  simpeList == other->simpeList &&
 				  leveledList == other->leveledList &&
 				  simpleChildren.size() == other->simpleChildren.size() &&
@@ -100,4 +112,14 @@ bool TestObject::equals(const TestObject *other) const
 
 		return true;
 	}
+}
+
+TestObject::EnumFlags TestObject::getEnumFlagsProperty() const
+{
+	return enumFlagsProperty;
+}
+
+void TestObject::setEnumFlagsProperty(const EnumFlags &value)
+{
+	enumFlagsProperty = value;
 }

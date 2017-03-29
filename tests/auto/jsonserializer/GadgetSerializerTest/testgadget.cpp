@@ -7,6 +7,8 @@ TestGadget::TestGadget() :
 	boolProperty(false),
 	stringProperty(),
 	doubleProperty(0.0),
+	normalEnumProperty(Normal0),
+	enumFlagsProperty(0),
 	simpeList(),
 	leveledList()
 {}
@@ -17,6 +19,8 @@ bool TestGadget::operator==(const TestGadget &other) const
 			boolProperty == other.boolProperty &&
 			stringProperty == other.stringProperty &&
 			doubleProperty == other.doubleProperty &&
+			normalEnumProperty == other.normalEnumProperty &&
+			enumFlagsProperty == other.enumFlagsProperty &&
 			simpeList == other.simpeList &&
 			leveledList == other.leveledList;
 }
@@ -27,6 +31,8 @@ bool TestGadget::operator!=(const TestGadget &other) const
 			boolProperty != other.boolProperty ||
 			stringProperty != other.stringProperty ||
 			doubleProperty != other.doubleProperty ||
+			normalEnumProperty != other.normalEnumProperty ||
+			enumFlagsProperty != other.enumFlagsProperty ||
 			simpeList != other.simpeList ||
 						 leveledList != other.leveledList;
 }
@@ -34,6 +40,16 @@ bool TestGadget::operator!=(const TestGadget &other) const
 bool TestGadget::operator<(const TestGadget &) const
 {
 	return false;
+}
+
+TestGadget::EnumFlags TestGadget::getEnumFlagsProperty() const
+{
+	return enumFlagsProperty;
+}
+
+void TestGadget::setEnumFlagsProperty(const EnumFlags &value)
+{
+	enumFlagsProperty = value;
 }
 
 ParentGadget::ParentGadget() :
@@ -76,6 +92,14 @@ ParentGadget ParentGadget::createBasic(int intProperty, bool boolProperty, QStri
 	t.boolProperty = boolProperty;
 	t.stringProperty = stringProperty;
 	t.doubleProperty = doubleProperty;
+	return t;
+}
+
+ParentGadget ParentGadget::createEnum(TestGadget::NormalEnum normalEnumProperty, EnumFlags enumFlagsProperty)
+{
+	ParentGadget t;
+	t.normalEnumProperty = normalEnumProperty;
+	t.enumFlagsProperty = enumFlagsProperty;
 	return t;
 }
 
