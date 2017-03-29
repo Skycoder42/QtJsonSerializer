@@ -69,13 +69,6 @@ QJsonValue QJsonSerializer::serializeVariant(int propertyType, const QVariant &v
 				return serializeObject(object);
 			else
 				return QJsonValue::Null;
-		} else if(flags.testFlag(QMetaType::IsEnumeration)) {
-			auto metaObject = QMetaType::metaObjectForType(propertyType);
-			auto enumIndex = metaObject->indexOfEnumerator(QMetaType::typeName(propertyType));//TODO ugly
-			if(enumIndex != -1)
-				return serializeEnum(metaObject->enumerator(enumIndex), value);
-			else
-				return serializeValue(propertyType, value);
 		} else
 			return serializeValue(propertyType, value);
 	}
@@ -111,8 +104,14 @@ QJsonObject QJsonSerializer::serializeGadget(const void *gadget, const QMetaObje
 	//go through all properties and try to serialize them
 	for(auto i = 0; i < metaObject->propertyCount(); i++) {
 		auto property = metaObject->property(i);
-		if(property.isStored())
-			jsonObject[QString::fromUtf8(property.name())]= serializeVariant(property.userType(), property.readOnGadget(gadget));
+		if(property.isStored()) {
+			QJsonValue value;
+			if(property.isEnumType())
+				value = serializeEnum(property.enumerator(), property.readOnGadget(gadget));
+			else
+				value = serializeVariant(property.userType(), property.readOnGadget(gadget));
+			jsonObject[QString::fromUtf8(property.name())] = value;
+		}
 	}
 
 	return jsonObject;
@@ -220,10 +219,16 @@ QObject *QJsonSerializer::deserializeObject(const QJsonObject &jsonObject, const
 	//now deserialize all json properties
 	for(auto it = jsonObject.constBegin(); it != jsonObject.constEnd(); it++) {
 		auto propIndex = metaObject->indexOfProperty(qUtf8Printable(it.key()));
-		auto type = propIndex != -1 ?
-						metaObject->property(propIndex).userType() :
-						QMetaType::UnknownType;
-		object->setProperty(qUtf8Printable(it.key()), deserializeVariant(type, it.value(), object));
+		QVariant value;
+		if(propIndex != -1) {
+			auto property = metaObject->property(propIndex);
+			if(property.isEnumType())
+				value = deserializeEnum(property.enumerator(), it.value());
+			else
+				value = deserializeVariant(property.userType(), it.value(), object);
+		} else
+			deserializeVariant(QMetaType::UnknownType, it.value(), object);
+		object->setProperty(qUtf8Printable(it.key()), value);
 	}
 
 	return object;
@@ -240,7 +245,12 @@ void QJsonSerializer::deserializeGadget(const QJsonObject &jsonObject, int typeI
 		auto propIndex = metaObject->indexOfProperty(qUtf8Printable(it.key()));
 		if(propIndex != -1) {
 			auto property = metaObject->property(propIndex);
-			property.writeOnGadget(gadgetPtr, deserializeVariant(property.userType(), it.value(), nullptr));
+			QVariant value;
+			if(property.isEnumType())
+				value = deserializeEnum(property.enumerator(), it.value());
+			else
+				value = deserializeVariant(property.userType(), it.value(), nullptr);
+			property.writeOnGadget(gadgetPtr, value);
 		}
 	}
 }
@@ -259,6 +269,23 @@ QVariantList QJsonSerializer::deserializeList(int listType, const QJsonArray &ar
 	foreach(auto element, array)
 		list.append(deserializeVariant(metaType, element, parent));
 	return list;
+}
+
+QVariant QJsonSerializer::deserializeEnum(const QMetaEnum &metaEnum, const QJsonValue &value) const
+{
+	if(value.isString()) {
+		auto result = -1;
+		auto ok = false;
+		if(metaEnum.isFlag())
+			result = metaEnum.keysToValue(value.toString().toUtf8().constData(), &ok);
+		else
+			result = metaEnum.keyToValue(value.toString().toUtf8().constData(), &ok);
+		if(ok)
+			return result;
+		else
+			return QVariant();
+	} else
+		return value.toInt();
 }
 
 QVariant QJsonSerializer::deserializeValue(int propertyType, const QJsonValue &value) const

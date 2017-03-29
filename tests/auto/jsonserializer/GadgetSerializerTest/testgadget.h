@@ -29,6 +29,7 @@ public:
 	enum EnumFlag {
 		Flag1 = 0x02,
 		Flag2 = 0x04,
+		Flag3 = 0x08,
 
 		FlagX = Flag1 | Flag2
 	};

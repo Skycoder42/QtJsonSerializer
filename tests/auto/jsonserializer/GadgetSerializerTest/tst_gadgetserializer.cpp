@@ -25,6 +25,11 @@ private Q_SLOTS:
 	void testNullChild();
 	void testNullDeserialization();
 
+	void testEnumSpecialSerialization_data();
+	void testEnumSpecialSerialization();
+	void testEnumSpecialDeserialization_data();
+	void testEnumSpecialDeserialization();
+
 private:
 	QJsonSerializer *serializer;
 
@@ -213,6 +218,142 @@ void GadgetSerializerTest::testNullDeserialization()
 	QCOMPARE(serializer->deserialize<ParentGadget>(testJson), testGad);
 
 	serializer->setAllowDefaultNull(false);
+}
+
+void GadgetSerializerTest::testEnumSpecialSerialization_data()
+{
+	QTest::addColumn<TestGadget>("gadget");
+	QTest::addColumn<QJsonObject>("result");
+	QTest::addColumn<bool>("asString");
+
+	QTest::newRow("normal") << (TestGadget)ParentGadget::createEnum(TestGadget::Normal1, 0)
+							<< QJsonObject({
+											   {"intProperty", 0},
+											   {"boolProperty", false},
+											   {"stringProperty", QString()},
+											   {"doubleProperty", 0},
+											   {"normalEnumProperty", TestGadget::Normal1},
+											   {"enumFlagsProperty", 0},
+											   {"simpeList", QJsonArray()},
+											   {"leveledList", QJsonArray()}
+										   })
+							<< false;
+
+	QTest::newRow("stringEnum") << (TestGadget)ParentGadget::createEnum(TestGadget::Normal1, 0)
+								<< QJsonObject({
+												   {"intProperty", 0},
+												   {"boolProperty", false},
+												   {"stringProperty", QString()},
+												   {"doubleProperty", 0},
+												   {"normalEnumProperty", "Normal1"},
+												   {"enumFlagsProperty", QString()},
+												   {"simpeList", QJsonArray()},
+												   {"leveledList", QJsonArray()}
+											   })
+								<< true;
+
+	QTest::newRow("stringFlags") << (TestGadget)ParentGadget::createEnum(TestGadget::Normal0, TestGadget::FlagX)
+								<< QJsonObject({
+												   {"intProperty", 0},
+												   {"boolProperty", false},
+												   {"stringProperty", QString()},
+												   {"doubleProperty", 0},
+												   {"normalEnumProperty", "Normal0"},
+												   {"enumFlagsProperty", "FlagX"},
+												   {"simpeList", QJsonArray()},
+												   {"leveledList", QJsonArray()}
+											   })
+								<< true;
+
+	QTest::newRow("stringMultiFlags") << (TestGadget)ParentGadget::createEnum(TestGadget::Normal2, TestGadget::Flag1 | TestGadget::Flag3)
+									  << QJsonObject({
+														 {"intProperty", 0},
+														 {"boolProperty", false},
+														 {"stringProperty", QString()},
+														 {"doubleProperty", 0},
+														 {"normalEnumProperty", "Normal2"},
+														 {"enumFlagsProperty", "Flag1|Flag3"},
+														 {"simpeList", QJsonArray()},
+														 {"leveledList", QJsonArray()}
+													 })
+									  << true;
+}
+
+void GadgetSerializerTest::testEnumSpecialSerialization()
+{
+	QFETCH(TestGadget, gadget);
+	QFETCH(QJsonObject, result);
+	QFETCH(bool, asString);
+
+	serializer->setEnumAsString(asString);
+	QCOMPARE(serializer->serialize(gadget), result);
+}
+
+void GadgetSerializerTest::testEnumSpecialDeserialization_data()
+{
+	QTest::addColumn<TestGadget>("result");
+	QTest::addColumn<QJsonObject>("data");
+
+	QTest::newRow("normal") << (TestGadget)ParentGadget::createEnum(TestGadget::Normal1, 0)
+							<< QJsonObject({
+											   {"intProperty", 0},
+											   {"boolProperty", false},
+											   {"stringProperty", QString()},
+											   {"doubleProperty", 0},
+											   {"normalEnumProperty", TestGadget::Normal1},
+											   {"enumFlagsProperty", 0},
+											   {"simpeList", QJsonArray()},
+											   {"leveledList", QJsonArray()}
+										   });
+
+	QTest::newRow("stringEnum") << (TestGadget)ParentGadget::createEnum(TestGadget::Normal1, 0)
+								<< QJsonObject({
+												   {"intProperty", 0},
+												   {"boolProperty", false},
+												   {"stringProperty", QString()},
+												   {"doubleProperty", 0},
+												   {"normalEnumProperty", "Normal1"},
+												   {"enumFlagsProperty", QString()},
+												   {"simpeList", QJsonArray()},
+												   {"leveledList", QJsonArray()}
+											   });
+
+	QTest::newRow("stringFlags") << (TestGadget)ParentGadget::createEnum(TestGadget::Normal0, TestGadget::FlagX)
+								<< QJsonObject({
+												   {"intProperty", 0},
+												   {"boolProperty", false},
+												   {"stringProperty", QString()},
+												   {"doubleProperty", 0},
+												   {"normalEnumProperty", "Normal0"},
+												   {"enumFlagsProperty", "FlagX"},
+												   {"simpeList", QJsonArray()},
+												   {"leveledList", QJsonArray()}
+											   });
+
+	QTest::newRow("stringMultiFlags") << (TestGadget)ParentGadget::createEnum(TestGadget::Normal2, TestGadget::Flag1 | TestGadget::Flag3)
+									  << QJsonObject({
+														 {"intProperty", 0},
+														 {"boolProperty", false},
+														 {"stringProperty", QString()},
+														 {"doubleProperty", 0},
+														 {"normalEnumProperty", "Normal2"},
+														 {"enumFlagsProperty", "Flag1|Flag3"},
+														 {"simpeList", QJsonArray()},
+														 {"leveledList", QJsonArray()}
+													 });
+}
+
+void GadgetSerializerTest::testEnumSpecialDeserialization()
+{
+	QFETCH(QJsonObject, data);
+	QFETCH(TestGadget, result);
+
+	try {
+		auto obj = serializer->deserialize<TestGadget>(data, this);
+		QCOMPARE(obj, result);
+	} catch(QException &e) {
+		QFAIL(e.what());
+	}
 }
 
 void GadgetSerializerTest::generateValidTestData()

@@ -90,6 +90,8 @@ protected:
 	virtual void deserializeGadget(const QJsonObject &jsonObject, int typeId, void *gadgetPtr) const;
 	//! Performs the deserialization of any json array to a list
 	virtual QVariantList deserializeList(int listType, const QJsonArray &array, QObject *parent) const;
+	//! Performs the deserialization of an enum value to a variant value type
+	virtual QVariant deserializeEnum(const QMetaEnum &metaEnum, const QJsonValue &value) const;
 	//! Performs the deserialization of a json value to a variant value type
 	virtual QVariant deserializeValue(int propertyType, const QJsonValue &value) const;
 
