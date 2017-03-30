@@ -125,12 +125,20 @@ void GadgetSerializerTest::testSerialization()
 	QFETCH(ParentGadget, gadget);
 	QFETCH(QJsonObject, result);
 
-	QCOMPARE(serializer->serialize(gadget), result);
+	try {
+		QCOMPARE(serializer->serialize(gadget), result);
+	} catch(QException &e) {
+		QFAIL(e.what());
+	}
 }
 
 void GadgetSerializerTest::testInvalidSerialization()
 {
-	QVERIFY_EXCEPTION_THROWN(serializer->serialize(BrokenTestGadget()), QJsonSerializerException);
+	try {
+		QVERIFY_EXCEPTION_THROWN(serializer->serialize(BrokenTestGadget()), QJsonSerializerException);
+	} catch(QException &e) {
+		QFAIL(e.what());
+	}
 }
 
 void GadgetSerializerTest::testDeserialization_data()
@@ -146,7 +154,11 @@ void GadgetSerializerTest::testDeserialization()
 	QFETCH(QJsonObject, data);
 	QFETCH(ParentGadget, gadget);
 
-	QCOMPARE(serializer->deserialize<ParentGadget>(data), gadget);
+	try {
+		QCOMPARE(serializer->deserialize<ParentGadget>(data), gadget);
+	} catch(QException &e) {
+		QFAIL(e.what());
+	}
 }
 
 void GadgetSerializerTest::testInvalidDeserialization()
@@ -175,7 +187,11 @@ void GadgetSerializerTest::testInvalidDeserialization()
 						  {"broken", QJsonValue::Null}
 					  });
 
-	QVERIFY_EXCEPTION_THROWN(serializer->deserialize<BrokenTestGadget>(broken), QJsonSerializerException);
+	try {
+		QVERIFY_EXCEPTION_THROWN(serializer->deserialize<BrokenTestGadget>(broken), QJsonSerializerException);
+	} catch(QException &e) {
+		QFAIL(e.what());
+	}
 }
 
 void GadgetSerializerTest::testNullChild()
@@ -195,7 +211,11 @@ void GadgetSerializerTest::testNullChild()
 									{"leveledChildren", QJsonArray()}
 								});
 
-	QVERIFY_EXCEPTION_THROWN(serializer->deserialize<ParentGadget>(testJson), QJsonSerializerException);
+	try {
+		QVERIFY_EXCEPTION_THROWN(serializer->deserialize<ParentGadget>(testJson), QJsonSerializerException);
+	} catch(QException &e) {
+		QFAIL(e.what());
+	}
 }
 
 void GadgetSerializerTest::testNullDeserialization()
@@ -215,11 +235,15 @@ void GadgetSerializerTest::testNullDeserialization()
 									{"leveledChildren", QJsonValue::Null}
 								});
 
-	serializer->setAllowDefaultNull(false);
-	QVERIFY_EXCEPTION_THROWN(serializer->deserialize<ParentGadget>(testJson), QJsonSerializerException);
+	try {
+		serializer->setAllowDefaultNull(false);
+		QVERIFY_EXCEPTION_THROWN(serializer->deserialize<ParentGadget>(testJson), QJsonSerializerException);
 
-	serializer->setAllowDefaultNull(true);
-	QCOMPARE(serializer->deserialize<ParentGadget>(testJson), testGad);
+		serializer->setAllowDefaultNull(true);
+		QCOMPARE(serializer->deserialize<ParentGadget>(testJson), testGad);
+	} catch(QException &e) {
+		QFAIL(e.what());
+	}
 
 	serializer->setAllowDefaultNull(false);
 }
@@ -289,8 +313,12 @@ void GadgetSerializerTest::testEnumSpecialSerialization()
 	QFETCH(QJsonObject, result);
 	QFETCH(bool, asString);
 
-	serializer->setEnumAsString(asString);
-	QCOMPARE(serializer->serialize(gadget), result);
+	try {
+		serializer->setEnumAsString(asString);
+		QCOMPARE(serializer->serialize(gadget), result);
+	} catch(QException &e) {
+		QFAIL(e.what());
+	}
 }
 
 void GadgetSerializerTest::testEnumSpecialDeserialization_data()

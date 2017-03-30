@@ -132,10 +132,14 @@ void ObjectSerializerTest::testSerialization()
 	QFETCH(QJsonObject, result);
 	QFETCH(bool, works);
 
-	if(works)
-		QCOMPARE(serializer->serialize(object), result);
-	else
-		QVERIFY_EXCEPTION_THROWN(serializer->serialize(object), QJsonSerializerException);
+	try {
+		if(works)
+			QCOMPARE(serializer->serialize(object), result);
+		else
+			QVERIFY_EXCEPTION_THROWN(serializer->serialize(object), QJsonSerializerException);
+	} catch(QException &e) {
+		QFAIL(e.what());
+	}
 
 	object->deleteLater();
 }
@@ -176,20 +180,24 @@ void ObjectSerializerTest::testDeserialization()
 	QFETCH(TestObject*, result);
 	QFETCH(bool, works);
 
-	if(works) {
-		auto obj = serializer->deserialize<TestObject*>(data, this);
-		QVERIFY(obj);
-		QVERIFY(result->equals(obj));
-		obj->deleteLater();
-	} else {
-		auto broken2 = qobject_cast<BrokenTestObject2*>(result);
-		auto broken = qobject_cast<BrokenTestObject*>(result);
-		if(broken2)
-			QVERIFY_EXCEPTION_THROWN(serializer->deserialize<BrokenTestObject2*>(data, this), QJsonSerializerException);
-		else if(broken)
-			QVERIFY_EXCEPTION_THROWN(serializer->deserialize<BrokenTestObject*>(data, this), QJsonSerializerException);
-		else
-			QFAIL("Expected BrokenTestObject or BrokenTestObject2!");
+	try {
+		if(works) {
+			auto obj = serializer->deserialize<TestObject*>(data, this);
+			QVERIFY(obj);
+			QVERIFY(result->equals(obj));
+			obj->deleteLater();
+		} else {
+			auto broken2 = qobject_cast<BrokenTestObject2*>(result);
+			auto broken = qobject_cast<BrokenTestObject*>(result);
+			if(broken2)
+				QVERIFY_EXCEPTION_THROWN(serializer->deserialize<BrokenTestObject2*>(data, this), QJsonSerializerException);
+			else if(broken)
+				QVERIFY_EXCEPTION_THROWN(serializer->deserialize<BrokenTestObject*>(data, this), QJsonSerializerException);
+			else
+				QFAIL("Expected BrokenTestObject or BrokenTestObject2!");
+		}
+	} catch(QException &e) {
+		QFAIL(e.what());
 	}
 
 	result->deleteLater();
@@ -213,14 +221,18 @@ void ObjectSerializerTest::testObjectNameSerialization()
 									{"leveledChildren", QJsonArray()}
 								});
 
-	serializer->setKeepObjectName(false);
-	auto json = serializer->serialize(testObj);
-	QCOMPARE(json, testJson);
+	try {
+		serializer->setKeepObjectName(false);
+		auto json = serializer->serialize(testObj);
+		QCOMPARE(json, testJson);
 
-	serializer->setKeepObjectName(true);
-	testJson["objectName"] = "test";
-	json = serializer->serialize(testObj);
-	QCOMPARE(json, testJson);
+		serializer->setKeepObjectName(true);
+		testJson["objectName"] = "test";
+		json = serializer->serialize(testObj);
+		QCOMPARE(json, testJson);
+	} catch(QException &e) {
+		QFAIL(e.what());
+	}
 
 	testObj->deleteLater();
 	serializer->setKeepObjectName(false);
@@ -243,14 +255,18 @@ void ObjectSerializerTest::testNullDeserialization()
 									{"leveledChildren", QJsonValue::Null}
 								});
 
-	serializer->setAllowDefaultNull(false);
-	QVERIFY_EXCEPTION_THROWN(serializer->deserialize<TestObject*>(testJson, this), QJsonSerializerException);
+	try {
+		serializer->setAllowDefaultNull(false);
+		QVERIFY_EXCEPTION_THROWN(serializer->deserialize<TestObject*>(testJson, this), QJsonSerializerException);
 
-	serializer->setAllowDefaultNull(true);
-	auto obj = serializer->deserialize<TestObject*>(testJson, this);
-	QVERIFY(obj);
-	QVERIFY(testObj->equals(obj));
-	obj->deleteLater();
+		serializer->setAllowDefaultNull(true);
+		auto obj = serializer->deserialize<TestObject*>(testJson, this);
+		QVERIFY(obj);
+		QVERIFY(testObj->equals(obj));
+		obj->deleteLater();
+	} catch(QException &e) {
+		QFAIL(e.what());
+	}
 
 	testObj->deleteLater();
 	serializer->setAllowDefaultNull(false);
@@ -333,8 +349,12 @@ void ObjectSerializerTest::testEnumSpecialSerialization()
 	QFETCH(QJsonObject, result);
 	QFETCH(bool, asString);
 
-	serializer->setEnumAsString(asString);
-	QCOMPARE(serializer->serialize(object), result);
+	try {
+		serializer->setEnumAsString(asString);
+		QCOMPARE(serializer->serialize(object), result);
+	} catch(QException &e) {
+		QFAIL(e.what());
+	}
 
 	object->deleteLater();
 }
