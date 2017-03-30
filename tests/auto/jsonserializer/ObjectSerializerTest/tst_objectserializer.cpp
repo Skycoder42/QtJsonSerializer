@@ -28,6 +28,9 @@ private Q_SLOTS:
 	void testEnumSpecialDeserialization_data();
 	void testEnumSpecialDeserialization();
 
+	void testDeviceSerialization_data();
+	void testDeviceSerialization();
+
 private:
 	QJsonSerializer *serializer;
 
@@ -417,6 +420,68 @@ void ObjectSerializerTest::testEnumSpecialDeserialization()
 	}
 
 	result->deleteLater();
+}
+
+void ObjectSerializerTest::testDeviceSerialization_data()
+{
+	QTest::addColumn<QVariant>("data");
+	QTest::addColumn<QByteArray>("fakeDevice");
+	QTest::addColumn<bool>("works");
+
+	QTest::newRow("object") << QVariant::fromValue(TestObject::createBasic(42, true, "baum", 4.2, this))
+							<< QByteArray()
+							<< true;
+
+	QTest::newRow("list") << QVariant::fromValue(QList<TestObject*>({TestObject::createBasic(42, true, "baum", 4.2, this), new TestObject(this)}))
+						  << QByteArray()
+						  << true;
+
+	QTest::newRow("data") << QVariant(42)
+						  << QByteArray()
+						  << false;
+
+	QTest::newRow("object") << QVariant::fromValue(new TestObject(this))
+							<< QByteArray("invalid stuff")
+							<< true;
+
+}
+
+void ObjectSerializerTest::testDeviceSerialization()
+{
+	QFETCH(QVariant, data);
+	QFETCH(QByteArray, fakeDevice);
+	QFETCH(bool, works);
+
+	try {
+		QTemporaryFile tFile;
+		QVERIFY(tFile.open());
+		if(works)
+			serializer->serializeTo(&tFile, data);
+		else {
+			QVERIFY_EXCEPTION_THROWN(serializer->serializeTo(&tFile, data), QJsonSerializerException);
+			return;
+		}
+
+		tFile.close();
+		if(!fakeDevice.isEmpty()){
+			QBuffer buffer(&fakeDevice);
+			buffer.open(QIODevice::ReadOnly);
+			QVERIFY_EXCEPTION_THROWN(serializer->deserializeFrom(&buffer, data.userType(), this), QJsonSerializerException);
+		} else {
+			QVERIFY(tFile.open());
+			auto res = serializer->deserializeFrom(&tFile, data.userType(), this);
+			if(data.userType() == qMetaTypeId<TestObject*>())
+				QVERIFY(res.value<TestObject*>()->equals(data.value<TestObject*>()));
+			else if(data.userType() == qMetaTypeId<QList<TestObject*>>())
+				QCOMPARE(res.value<QList<TestObject*>>().size(), data.value<QList<TestObject*>>().size());
+			else
+				QCOMPARE(res, data);
+		}
+
+		tFile.close();
+	} catch(QException &e) {
+		QFAIL(e.what());
+	}
 }
 
 void ObjectSerializerTest::generateValidTestData()

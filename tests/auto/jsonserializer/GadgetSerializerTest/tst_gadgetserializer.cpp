@@ -30,6 +30,9 @@ private Q_SLOTS:
 	void testEnumSpecialDeserialization_data();
 	void testEnumSpecialDeserialization();
 
+	void testDeviceSerialization_data();
+	void testDeviceSerialization();
+
 private:
 	QJsonSerializer *serializer;
 
@@ -45,6 +48,7 @@ void GadgetSerializerTest::initTestCase()
 	QJsonSerializer::registerListConverters<TestGadget>();
 	QJsonSerializer::registerListConverters<QList<TestGadget>>();
 	//register list comparators, needed for test only!
+	QMetaType::registerComparators<TestGadget>();
 	QMetaType::registerComparators<QList<int>>();
 	QMetaType::registerComparators<QList<QList<int>>>();
 	QMetaType::registerComparators<QList<TestGadget>>();
@@ -351,6 +355,62 @@ void GadgetSerializerTest::testEnumSpecialDeserialization()
 	try {
 		auto obj = serializer->deserialize<TestGadget>(data, this);
 		QCOMPARE(obj, result);
+	} catch(QException &e) {
+		QFAIL(e.what());
+	}
+}
+
+void GadgetSerializerTest::testDeviceSerialization_data()
+{
+	QTest::addColumn<QVariant>("data");
+	QTest::addColumn<QByteArray>("fakeDevice");
+	QTest::addColumn<bool>("works");
+
+	QTest::newRow("object") << QVariant::fromValue((TestGadget)ParentGadget::createBasic(42, true, "baum", 4.2))
+							<< QByteArray()
+							<< true;
+
+	QTest::newRow("list") << QVariant::fromValue(QList<TestGadget>({ParentGadget::createBasic(42, true, "baum", 4.2), ParentGadget()}))
+						  << QByteArray()
+						  << true;
+
+	QTest::newRow("data") << QVariant(42)
+						  << QByteArray()
+						  << false;
+
+	QTest::newRow("object") << QVariant::fromValue(ParentGadget())
+							<< QByteArray("invalid stuff")
+							<< true;
+}
+
+void GadgetSerializerTest::testDeviceSerialization()
+{
+	QFETCH(QVariant, data);
+	QFETCH(QByteArray, fakeDevice);
+	QFETCH(bool, works);
+
+	try {
+		QTemporaryFile tFile;
+		QVERIFY(tFile.open());
+		if(works)
+			serializer->serializeTo(&tFile, data);
+		else {
+			QVERIFY_EXCEPTION_THROWN(serializer->serializeTo(&tFile, data), QJsonSerializerException);
+			return;
+		}
+
+		tFile.close();
+		if(!fakeDevice.isEmpty()){
+			QBuffer buffer(&fakeDevice);
+			buffer.open(QIODevice::ReadOnly);
+			QVERIFY_EXCEPTION_THROWN(serializer->deserializeFrom(&buffer, data.userType(), this), QJsonSerializerException);
+		} else {
+			QVERIFY(tFile.open());
+			auto res = serializer->deserializeFrom(&tFile, data.userType(), this);
+			QCOMPARE(res, data);
+		}
+
+		tFile.close();
 	} catch(QException &e) {
 		QFAIL(e.what());
 	}
