@@ -6,6 +6,7 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QUuid>
 #include <QtCore/QUrl>
+#include <QtCore/QJsonDocument>
 
 static const QRegularExpression listTypeRegex(QStringLiteral(R"__(^QList<\s*(.*)\s*>$)__"));
 
@@ -32,6 +33,26 @@ bool QJsonSerializer::keepObjectName() const
 bool QJsonSerializer::enumAsString() const
 {
 	return d->enumAsString;
+}
+
+QJsonValue QJsonSerializer::serialize(const QVariant &data) const
+{
+	return serializeVariant(data.userType(), data);
+}
+
+void QJsonSerializer::serializeTo(QIODevice *device, const QVariant &data) const
+{
+	writeToDevice(serializeVariant(data.userType(), data), device);
+}
+
+QVariant QJsonSerializer::deserialize(const QJsonValue &json, int metaTypeId, QObject *parent) const
+{
+	return deserializeVariant(metaTypeId, json, parent);
+}
+
+QVariant QJsonSerializer::deserializeFrom(QIODevice *device, int metaTypeId, QObject *parent) const
+{
+	return deserializeVariant(metaTypeId, readFromDevice(device), parent);
 }
 
 void QJsonSerializer::setAllowDefaultNull(bool allowDefaultNull)
@@ -292,6 +313,34 @@ QVariant QJsonSerializer::deserializeValue(int propertyType, const QJsonValue &v
 {
 	Q_UNUSED(propertyType);
 	return value.toVariant();//all json can be converted to qvariant
+}
+
+void QJsonSerializer::writeToDevice(const QJsonValue &data, QIODevice *device) const
+{
+	QJsonDocument doc;
+	if(data.isArray())
+		doc = QJsonDocument(data.toArray());
+	else if(data.isObject())
+		doc = QJsonDocument(data.toObject());
+	else
+		throw QJsonSerializationException("Only objects or arrays can be written to a device!");
+#ifndef QT_NO_DEBUG
+	device->write(doc.toJson(QJsonDocument::Indented));
+#else
+	device->write(doc.toJson(QJsonDocument::Compact));
+#endif
+}
+
+QJsonValue QJsonSerializer::readFromDevice(QIODevice *device) const
+{
+	QJsonParseError error;
+	auto doc = QJsonDocument::fromJson(device->readAll(), &error);
+	if(error.error != QJsonParseError::NoError)
+		throw QJsonDeserializationException("Failed to read file as JSON with error: " + error.errorString().toUtf8());
+	if(doc.isArray())
+		return doc.array();
+	else
+		return doc.object();
 }
 
 
