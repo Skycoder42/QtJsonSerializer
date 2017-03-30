@@ -167,6 +167,9 @@ QJsonValue QJsonSerializer::serializeValue(int propertyType, const QVariant &val
 	if(!value.isValid())
 		return QJsonValue::Null;
 	else {
+		if(value.userType() == QMetaType::QJsonValue)//value needs special treatment
+			return value.value<QJsonValue>();
+
 		auto json = QJsonValue::fromVariant(value);
 		if(json.isNull()) {
 			if(propertyType == QMetaType::QDate ||
@@ -189,12 +192,19 @@ QJsonValue QJsonSerializer::serializeValue(int propertyType, const QVariant &val
 QVariant QJsonSerializer::deserializeVariant(int propertyType, const QJsonValue &value, QObject *parent) const
 {
 	QVariant variant;
-	if(value.isArray()) {
-		variant = deserializeList(propertyType, value.toArray(), parent);
+	if(propertyType == QMetaType::QJsonValue)//special case: target type is a json value!
+		variant = QVariant::fromValue(value);
+	else if(value.isArray()) {
+		if(propertyType == QMetaType::QJsonArray)//special case: target type is a json array!
+			variant = QVariant::fromValue(value.toArray());
+		else
+			variant = deserializeList(propertyType, value.toArray(), parent);
 	} else if(value.isObject() || value.isNull()) {
 		auto flags = QMetaType::typeFlags(propertyType);
 
-		if(flags.testFlag(QMetaType::IsGadget)) {
+		if(propertyType == QMetaType::QJsonObject)//special case: target type is a json object!
+			variant = QVariant::fromValue(value.toObject());
+		else if(flags.testFlag(QMetaType::IsGadget)) {
 			if(!value.isNull()) {
 				QVariant gadget(propertyType, nullptr);
 				deserializeGadget(value.toObject(), propertyType, gadget.data());
