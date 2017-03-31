@@ -72,7 +72,8 @@ public:
 	//! Deserializes a QJsonArray to a list of the given QObject or Q_GADGET type
 	template<typename T>
 	QList<T> deserialize(const QJsonArray &json, QObject *parent = nullptr) const;
-	//! Deserializes data from a device to a list of the given QObject or Q_GADGET type
+	//! @brief Deserializes data from a device to a list of the given QObject or Q_GADGET type
+	//! @copydetails QJsonSerializer::deserializeFrom(QIODevice *, QObject*) const
 	template <typename T>
 	QList<T> deserializeFrom(QIODevice *device, QObject *parent = nullptr) const;
 

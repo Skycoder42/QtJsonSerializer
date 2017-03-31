@@ -22,6 +22,8 @@ each of it's properties
 each of it's properties. Basically the same as the object one, but for gadet types
 - <b>...List:</b> Performs `QList<T> <--> QJsonArray` conversions. Calls the variant method for
 each element in the list
+- <b>...Enum:</b> Performs `enum/flags <--> int/string` conversions. Depending on QJsonSerializer::enumAsString,
+enums are serialized as int or string. The other way around is always enabled for both
 - <b>...Value:</b> Called for any other type, that does not match one of the three above. Tries to
 convert whatever comes by using the build-in `QVariant <--> QJsonValue` conversions. See QJsonValue::fromVariant
 and QJsonValue::toVariant for more details on the supported types
@@ -63,6 +65,23 @@ of this property.
 @accessors{
 	@readAc{keepObjectName()}
 	@writeAc{setKeepObjectName()}
+}
+*/
+
+/*!
+@property QJsonSerializer::enumAsString
+
+@default{`false`}
+
+Applies to serialization only.<br/>
+By default, enums and flags are serialized as an integer, representing their value. If you want
+to serialize them as a string, the "name" of each value, enable this propterty.
+
+@note For deserialization, both int and string are always correctly deserialized.
+
+@accessors{
+	@readAc{enumAsString()}
+	@writeAc{setEnumAsString()}
 }
 */
 
@@ -113,6 +132,8 @@ The following types are already registered by default:
 @param data The data to be serialized
 @returns The serialized value
 @throws QJsonSerializationException Thrown if the serialization fails
+
+@sa QJsonSerializer::deserialize, QJsonSerializer::serializeTo
 */
 
 /*!
@@ -129,6 +150,29 @@ The following types are already registered by default:
 */
 
 /*!
+@fn QJsonSerializer::serializeTo(QIODevice *, const QVariant &) const
+
+@param device The device to write the json to
+@param data The data to be serialized
+@throws QJsonSerializationException Thrown if the serialization fails
+
+@sa QJsonSerializer::deserializeFrom, QJsonSerializer::serialize
+*/
+
+/*!
+@fn QJsonSerializer::serializeTo(QIODevice *, const T &) const
+
+@tparam T The type of the data to be serialized
+@copydetails QJsonSerializer::serializeTo(QIODevice *, const QVariant &) const
+*/
+
+/*!
+@fn QJsonSerializer::serializeTo(QIODevice *, const QList<T> &) const
+
+@copydetails QJsonSerializer::serializeTo(QIODevice *, const T &) const
+*/
+
+/*!
 @fn QJsonSerializer::deserialize(const QJsonValue &, int, QObject*) const
 
 @param json The data to be deserialized
@@ -136,6 +180,8 @@ The following types are already registered by default:
 @param parent The parent object of the result. Only used if the returend value is a QObject*
 @returns The deserialized value, wrapped in QVariant
 @throws QJsonDeserializationException Thrown if the deserialization fails
+
+@sa QJsonSerializer::serialize, QJsonSerializer::deserializeFrom
 */
 
 /*!
@@ -146,10 +192,36 @@ The following types are already registered by default:
 @param parent The parent object of the result. Only used if the returend value is a QObject*
 @returns The deserialized value
 @throws QJsonDeserializationException Thrown if the deserialization fails
+
+@sa QJsonSerializer::serialize, QJsonSerializer::deserializeFrom
 */
 
 /*!
 @fn QJsonSerializer::deserialize(const QJsonArray &, QObject*) const
 
 @copydetails QJsonSerializer::deserialize(const QJsonObject &, QObject*) const
+*/
+
+/*!
+@fn QJsonSerializer::deserializeFrom(QIODevice *, int, QObject*) const
+
+@param device The device to read the json to be deserialized from
+@param metaTypeId The target type of the deserialization
+@param parent The parent object of the result. Only used if the returend value is a QObject*
+@returns The deserialized value, wrapped in QVariant
+@throws QJsonDeserializationException Thrown if the deserialization fails
+
+@sa QJsonSerializer::serializeTo, QJsonSerializer::deserialize
+*/
+
+/*!
+@fn QJsonSerializer::deserializeFrom(QIODevice *, QObject*) const
+
+@tparam T The type of the data to be deserialized
+@param device The device to read the json to be deserialized from
+@param parent The parent object of the result. Only used if the returend value is a QObject*
+@returns The deserialized value
+@throws QJsonDeserializationException Thrown if the deserialization fails
+
+@sa QJsonSerializer::serializeTo, QJsonSerializer::deserialize
 */
