@@ -7,10 +7,10 @@ SOURCES += \
 	qjsonserializer.cpp
 
 HEADERS += \
-	qjsonserializer_global.h \
 	qjsonserializerexception.h \
 	qjsonserializer.h \
-    qjsonserializer_p.h
+    qjsonserializer_p.h \
+    qtjsonserializer_global.h
 
 load(qt_module)
 

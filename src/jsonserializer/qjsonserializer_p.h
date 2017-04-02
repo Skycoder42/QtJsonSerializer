@@ -1,7 +1,7 @@
 #ifndef QJSONSERIALIZER_P_H
 #define QJSONSERIALIZER_P_H
 
-#include "qjsonserializer_global.h"
+#include "qtjsonserializer_global.h"
 #include "qjsonserializer.h"
 
 class Q_JSONSERIALIZER_EXPORT QJsonSerializerPrivate
