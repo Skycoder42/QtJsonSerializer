@@ -1,7 +1,11 @@
 var searchData=
 [
-  ['uicomponents_2eprogressbar',['UIComponents.ProgressBar',['http://doc.qt.io/qt-5/qml-uicomponents-progressbar.html',0,'']]],
-  ['uicomponents_2eswitch',['UIComponents.Switch',['http://doc.qt.io/qt-5/qml-uicomponents-switch.html',0,'']]],
-  ['uicomponents_2etabwidget',['UIComponents.TabWidget',['http://doc.qt.io/qt-5/qml-uicomponents-tabwidget.html',0,'']]],
-  ['updatepaintnodedata',['UpdatePaintNodeData',['http://doc.qt.io/qt-5/qquickitem-updatepaintnodedata.html',0,'QQuickItem']]]
+  ['tab',['Tab',['https://doc.qt.io/qt-5/qtextoption-tab.html',0,'QTextOption']]],
+  ['takerowresult',['TakeRowResult',['https://doc.qt.io/qt-5/qformlayout-takerowresult.html',0,'QFormLayout']]],
+  ['task',['Task',['https://doc.qt.io/qt-5/class_qt_data_sync_1_1_task.html',0,'QtDataSync']]],
+  ['terminal',['Terminal',['https://doc.qt.io/qt-5/class_qt_background_process_1_1_terminal.html',0,'QtBackgroundProcess']]],
+  ['texturedpoint2d',['TexturedPoint2D',['https://doc.qt.io/qt-5/qsggeometry-texturedpoint2d.html',0,'QSGGeometry']]],
+  ['timerinfo',['TimerInfo',['https://doc.qt.io/qt-5/qabstracteventdispatcher-timerinfo.html',0,'QAbstractEventDispatcher']]],
+  ['timestamp',['TimeStamp',['https://doc.qt.io/qt-5/qcanbusframe-timestamp.html',0,'QCanBusFrame']]],
+  ['touchpoint',['TouchPoint',['https://doc.qt.io/qt-5/qtouchevent-touchpoint.html',0,'QTouchEvent']]]
 ];

@@ -1,7 +1,15 @@
 var searchData=
 [
-  ['selection',['Selection',['http://doc.qt.io/qt-5/qabstracttextdocumentlayout-selection.html',0,'QAbstractTextDocumentLayout']]],
-  ['sequence',['Sequence',['http://doc.qt.io/qt-5/qbluetoothserviceinfo-sequence.html',0,'QBluetoothServiceInfo']]],
-  ['signalevent',['SignalEvent',['http://doc.qt.io/qt-5/qstatemachine-signalevent.html',0,'QStateMachine']]],
-  ['state',['State',['http://doc.qt.io/qt-5/qaccessible-state.html',0,'QAccessible']]]
+  ['record',['Record',['https://doc.qt.io/qt-5/qndeffilter-record.html',0,'QNdefFilter']]],
+  ['remoteconnector',['RemoteConnector',['https://doc.qt.io/qt-5/class_qt_data_sync_1_1_remote_connector.html',0,'QtDataSync']]],
+  ['renderer',['Renderer',['https://doc.qt.io/qt-5/qquickframebufferobject-renderer.html',0,'QQuickFramebufferObject']]],
+  ['renderstate',['RenderState',['https://doc.qt.io/qt-5/qml-renderstate.html',0,'RenderState'],['https://doc.qt.io/qt-5/qsgrendernode-renderstate.html',0,'QSGRenderNode::RenderState'],['https://doc.qt.io/qt-5/qsgmaterialshader-renderstate.html',0,'QSGMaterialShader::RenderState']]],
+  ['rendertarget',['RenderTarget',['https://doc.qt.io/qt-5/qml-rendertarget.html',0,'']]],
+  ['rendertargetoutput',['RenderTargetOutput',['https://doc.qt.io/qt-5/qml-rendertargetoutput.html',0,'']]],
+  ['requestbuilder',['RequestBuilder',['https://doc.qt.io/qt-5/class_qt_rest_client_1_1_request_builder.html',0,'QtRestClient']]],
+  ['requestid',['RequestId',['https://doc.qt.io/qt-5/qnearfieldtarget-requestid.html',0,'QNearFieldTarget']]],
+  ['requestidprivate',['RequestIdPrivate',['https://doc.qt.io/qt-5/qnearfieldtarget-requestidprivate.html',0,'QNearFieldTarget']]],
+  ['restclass',['RestClass',['https://doc.qt.io/qt-5/class_qt_rest_client_1_1_rest_class.html',0,'QtRestClient']]],
+  ['restclient',['RestClient',['https://doc.qt.io/qt-5/class_qt_rest_client_1_1_rest_client.html',0,'QtRestClient']]],
+  ['restreply',['RestReply',['https://doc.qt.io/qt-5/class_qt_rest_client_1_1_rest_reply.html',0,'QtRestClient']]]
 ];

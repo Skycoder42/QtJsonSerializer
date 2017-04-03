@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['element',['Element',['http://doc.qt.io/qt-5/qpainterpath-element.html',0,'QPainterPath']]],
-  ['evaluatorinfo',['EvaluatorInfo',['http://doc.qt.io/qt-5/qscxmlexecutablecontent-evaluatorinfo.html',0,'QScxmlExecutableContent']]],
-  ['extraselection',['ExtraSelection',['http://doc.qt.io/qt-5/qtextedit-extraselection.html',0,'QTextEdit']]]
+  ['datamerger',['DataMerger',['https://doc.qt.io/qt-5/class_qt_data_sync_1_1_data_merger.html',0,'QtDataSync']]],
+  ['datasyncexception',['DataSyncException',['https://doc.qt.io/qt-5/class_qt_data_sync_1_1_data_sync_exception.html',0,'QtDataSync']]],
+  ['defaults',['Defaults',['https://doc.qt.io/qt-5/class_qt_data_sync_1_1_defaults.html',0,'QtDataSync']]]
 ];

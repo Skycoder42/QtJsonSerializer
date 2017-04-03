@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>QtJsonSerializer: QJsonSerializer</title>
+<title>QtJsonSerializer: Main Page</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">QtJsonSerializer
-   &#160;<span id="projectnumber">1.2.1</span>
+   &#160;<span id="projectnumber">2.0.0</span>
    </div>
    <div id="projectbrief">A library to perform generic seralization and deserialization of QObjects</div>
   </td>
@@ -65,52 +65,44 @@ $(function() {
 
 <div class="header">
   <div class="headertitle">
-<div class="title"><a class="el" href="class_q_json_serializer.html" title="A class to serializer and deserializer QObjects and Q_GADGETS to and from JSON. ">QJsonSerializer</a> </div>  </div>
+<div class="title">QtJsonSerializer Documentation</div>  </div>
 </div><!--header-->
 <div class="contents">
+<div class="toc"><h3>Table of Contents</h3>
+<ul><li class="level1"><a href="#qtjsonserializer_readme_label_0">Features</a></li>
+<li class="level1"><a href="#qtjsonserializer_readme_label_1">Download/Installation</a></li>
+<li class="level1"><a href="#qtjsonserializer_readme_label_2">Usage</a><ul><li class="level2"><a href="#qtjsonserializer_readme_label_3">Example</a></li>
+<li class="level2"><a href="#qtjsonserializer_readme_label_4">Important Usage Hints</a></li>
+</ul>
+</li>
+<li class="level1"><a href="#qtjsonserializer_readme_label_5">Documentation</a></li>
+</ul>
+</div>
 <div class="textblock"><p>A library to perform generic seralization and deserialization of QObjects.</p>
-<p>With this small library, you are able to serialize any <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:http://doc.qt.io/qt-5/" href="http://doc.qt.io/qt-5/qobject.html">QObject</a> or Q_GADGET class to JSON and back. This is done with help of <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:http://doc.qt.io/qt-5/" href="http://doc.qt.io/qt-5/qt.html">Qt</a>'s meta system.</p>
-<h2>Features</h2>
+<p>With this small library, you are able to serialize any <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qobject.html">QObject</a> or Q_GADGET class to JSON and back. This is done with help of <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qt.html">Qt</a>'s meta system.</p>
+<h1><a class="anchor" id="qtjsonserializer_readme_label_0"></a>
+Features</h1>
 <ul>
 <li>Serialize QObjects, Q_GADGETS, and lists of both to JSON, in a generic matter</li>
 <li>... and of course deserialize JSON back as well</li>
-<li>De/serialize any <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:http://doc.qt.io/qt-5/" href="http://doc.qt.io/qt-5/qvariant.html">QVariant</a> - as long as it contains only basic types or one of the above</li>
+<li>De/serialize any <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qvariant.html">QVariant</a> - as long as it contains only basic types or one of the above<ul>
+<li>Works even with QJsonValue/Array/Object as propteries</li>
+</ul>
+</li>
 <li>Serializes Q_PROPERTY elements</li>
+<li>Enum de/serialization as integer or as string</li>
 <li>Deserialization: Additional JSON-values will be stored as dynamic properties for QObjects</li>
 <li>Fully Unit-Tested</li>
 <li>Thread-Safe</li>
 <li>Easily extensible</li>
 </ul>
-<h2>Usage</h2>
-<p>The serializer is provided as a <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:http://doc.qt.io/qt-5/" href="http://doc.qt.io/qt-5/qt.html">Qt</a> module. Thus, all you have to do is add the module, and then, in your project, add <code>QT += jsonserializer</code> to your <code>.pro</code> file!</p>
-<h3>Example</h3>
-<p>Both serialization and desertialization are rather simple. Create an object, and then use the serializer as follows:</p>
-<p>The following is an example for a serializable object. <em>Note:</em> The usage of <code>MEMBER</code> Properties is not required, and simply done to make this example more readable. </p><div class="fragment"><div class="line"><span class="keyword">class </span>TestObject : <span class="keyword">public</span> <a class="codeRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:http://doc.qt.io/qt-5/" href="http://doc.qt.io/qt-5/qobject.html">QObject</a></div><div class="line">{</div><div class="line">    Q_OBJECT</div><div class="line"></div><div class="line">    Q_PROPERTY(<a class="codeRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:http://doc.qt.io/qt-5/" href="http://doc.qt.io/qt-5/qstring.html">QString</a> stringProperty MEMBER stringProperty)</div><div class="line">    Q_PROPERTY(<a class="codeRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:http://doc.qt.io/qt-5/" href="http://doc.qt.io/qt-5/qlist.html">QList&lt;int&gt;</a> simpeList MEMBER simpeList)</div><div class="line">    Q_PROPERTY(TestObject* childObject MEMBER childObject)</div><div class="line"></div><div class="line"><span class="keyword">public</span>:</div><div class="line">    Q_INVOKABLE TestObject(<a class="codeRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:http://doc.qt.io/qt-5/" href="http://doc.qt.io/qt-5/qobject.html">QObject</a> *parent = <span class="keyword">nullptr</span>);</div><div class="line"></div><div class="line">    <a class="codeRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:http://doc.qt.io/qt-5/" href="http://doc.qt.io/qt-5/qstring.html">QString</a> stringProperty;</div><div class="line">    <a class="codeRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:http://doc.qt.io/qt-5/" href="http://doc.qt.io/qt-5/qlist.html">QList&lt;int&gt;</a> simpeList;</div><div class="line">    TestObject* childObject;</div><div class="line">}</div></div><!-- fragment --><p>You can serialize (and deserialize) the object with: </p><div class="fragment"><div class="line"><span class="keyword">auto</span> serializer = <span class="keyword">new</span> <a class="code" href="class_q_json_serializer.html">QJsonSerializer</a>(<span class="keyword">this</span>);</div><div class="line"></div><div class="line"><span class="keywordflow">try</span> {</div><div class="line">    <span class="comment">//serialize</span></div><div class="line">    <span class="keyword">auto</span> <span class="keywordtype">object</span> = <span class="keyword">new</span> TestObject();</div><div class="line">    <span class="keywordtype">object</span>-&gt;stringProperty = <span class="stringliteral">&quot;test&quot;</span>;</div><div class="line">    <span class="keywordtype">object</span>-&gt;simpeList = {1, 2, 3};</div><div class="line">    <span class="keywordtype">object</span>-&gt;childObject = <span class="keyword">new</span> TestObject(<span class="keywordtype">object</span>);</div><div class="line">    <span class="keyword">auto</span> json = serializer-&gt;serialize(<span class="keywordtype">object</span>);</div><div class="line">    qDebug() &lt;&lt; json;</div><div class="line">    <span class="keyword">delete</span> object;</div><div class="line"></div><div class="line">    <span class="comment">//deserialize</span></div><div class="line">    <span class="keywordtype">object</span> = serializer-&gt;deserialize&lt;TestObject&gt;(json);<span class="comment">//optional: specify the parent</span></div><div class="line">    qDebug() &lt;&lt; <span class="keywordtype">object</span>-&gt;stringProperty</div><div class="line">             &lt;&lt; <span class="keywordtype">object</span>-&gt;simpeList</div><div class="line">             &lt;&lt; <span class="keywordtype">object</span>-&gt;childObject;</div><div class="line">    <span class="keyword">delete</span> object;</div><div class="line">} <span class="keywordflow">catch</span>(<a class="code" href="class_q_json_serializer_exception.html">QJsonSerializerException</a> &amp;e) {</div><div class="line">    qDebug() &lt;&lt; e.<a class="code" href="class_q_json_serializer_exception.html#a96fb501023ca0a13b43ee11182080c74">what</a>();</div><div class="line">}</div></div><!-- fragment --><p>For the serialization, the created json would look like this: </p><div class="fragment"><div class="line">{</div><div class="line">    &quot;stringProperty&quot;: &quot;test&quot;,</div><div class="line">    &quot;simpeList&quot;: [1, 2, 3],</div><div class="line">    &quot;childObject&quot;: {</div><div class="line">        &quot;stringProperty&quot;: &quot;&quot;,</div><div class="line">        &quot;simpeList&quot;: [],</div><div class="line">        &quot;childObject&quot;: null</div><div class="line">    }</div><div class="line">}</div></div><!-- fragment --><h3>Important Usage Hints</h3>
-<p>In order for the serializer to properly work, there are a few things you have to know and do:</p>
+<h1><a class="anchor" id="qtjsonserializer_readme_label_1"></a>
+Download/Installation</h1>
+<p>There are multiple ways to install the <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qt.html">Qt</a> module, sorted by preference:</p>
 <ol type="1">
-<li>Only Q_PROPERTY properties will be serialized, and of those only properties that are marked to be stored (see <a href="https://doc.qt.io/qt-5/properties.html#requirements-for-declaring-properties">The Property System</a>, STORED attribute)</li>
-<li>For deserialization of QObjects, they need an invokable constructor, that takes only a parent: <code>Q_INVOKABLE MyClass(QObject*);</code></li>
-<li>Only properties with the following types can be serialized:<ul>
-<li><code>QObject*</code> and deriving classes</li>
-<li>Classes/structs marked with <code>Q_GADGET</code> (as value types only!)</li>
-<li><code><a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:http://doc.qt.io/qt-5/" href="http://doc.qt.io/qt-5/qlist.html">QList</a></code>, of any type that is serializable as well</li>
-<li>Simple types, that are supported by <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:http://doc.qt.io/qt-5/" href="http://doc.qt.io/qt-5/qjsonvalue.html">QJsonValue</a> (See <a href="https://doc.qt.io/qt-5/qjsonvalue.html#fromVariant">QJsonValue::fromVariant</a> and <a href="https://doc.qt.io/qt-5/qjsonvalue.html#toVariant">QJsonValue::toVariant</a>)</li>
-<li>Any type you add yourself by extending the serializer</li>
-</ul>
-</li>
-<li>While simple list types (i.e. <code><a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:http://doc.qt.io/qt-5/" href="http://doc.qt.io/qt-5/qlist.html">QList</a>&lt;int&gt;</code>) are supported out of the box, for custom types (like <code><a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:http://doc.qt.io/qt-5/" href="http://doc.qt.io/qt-5/qlist.html">QList</a>&lt;TestObject*&gt;</code>) you will have to register converters from and to <code>QVariantList</code><ul>
-<li>This can be done by using <a href="src/qjsonserializer.h#L27"><code>QJsonSerializer::registerListConverters&lt;TestObject*&gt;()</code></a></li>
-</ul>
-</li>
-<li>By default, the <code>objectName</code> property of QObjects is not serialized (See <a href="src/qjsonserializer.h#L20">keepObjectName</a>)</li>
-<li>By default, the JSON <code>null</code> can only be converted to QObjects/G_GADGETs. For other types the conversion fails (See <a href="src/qjsonserializer.h#L19">allowDefaultNull</a>)</li>
-</ol>
-<h2>Download/Installation</h2>
-<p>There are multiple ways to install the <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:http://doc.qt.io/qt-5/" href="http://doc.qt.io/qt-5/qt.html">Qt</a> module, sorted by preference:</p>
-<ol type="1">
-<li><b>Arch-Linux only:</b> If you are building against your system <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:http://doc.qt.io/qt-5/" href="http://doc.qt.io/qt-5/qt.html">Qt</a>, you can use my AUR-Repository: <a href="https://aur.archlinux.org/packages/qt5-jsonserializer/">qt5-jsonserializer</a></li>
-<li>Simply add my repository to your <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:http://doc.qt.io/qt-5/" href="http://doc.qt.io/qt-5/qt.html">Qt</a> MaintenanceTool (Image-based How-To here: <a href="https://github.com/Skycoder42/QtModules/blob/master/README.md#add-my-repositories-to-qt-maintenancetool">Add custom repository</a>):<ol type="a">
-<li>Open the MaintenanceTool, located in your <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:http://doc.qt.io/qt-5/" href="http://doc.qt.io/qt-5/qt.html">Qt</a> install directory (e.g. <code>~/Qt/MaintenanceTool</code>)</li>
+<li><b>Arch-Linux only:</b> If you are building against your system <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qt.html">Qt</a>, you can use my AUR-Repository: <a href="https://aur.archlinux.org/packages/qt5-jsonserializer/">qt5-jsonserializer</a></li>
+<li>Simply add my repository to your <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qt.html">Qt</a> MaintenanceTool (Image-based How-To here: <a href="https://github.com/Skycoder42/QtModules/blob/master/README.md#add-my-repositories-to-qt-maintenancetool">Add custom repository</a>):<ol type="a">
+<li>Open the MaintenanceTool, located in your <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qt.html">Qt</a> install directory (e.g. <code>~/Qt/MaintenanceTool</code>)</li>
 <li>Select <code>Add or remove components</code> and click on the <code>Settings</code> button</li>
 <li>Go to <code>Repositories</code>, scroll to the bottom, select <code>User defined repositories</code> and press <code>Add</code></li>
 <li>In the right column (selected by default), type:<ul>
@@ -120,13 +112,13 @@ $(function() {
 </ul>
 </li>
 <li>Press <code>Ok</code>, make shure <code>Add or remove components</code> is still selected, and continue the install (<code>Next &gt;</code>)</li>
-<li>A new entry appears under all supported <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:http://doc.qt.io/qt-5/" href="http://doc.qt.io/qt-5/qt.html">Qt</a> Versions (e.g. <code><a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:http://doc.qt.io/qt-5/" href="http://doc.qt.io/qt-5/qt.html">Qt</a> &gt; <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:http://doc.qt.io/qt-5/" href="http://doc.qt.io/qt-5/qt.html">Qt</a> 5.8 &gt; Skycoder42 <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:http://doc.qt.io/qt-5/" href="http://doc.qt.io/qt-5/qt.html">Qt</a> modules</code>)</li>
-<li>You can install either all of my modules, or select the one you need: <code><a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:http://doc.qt.io/qt-5/" href="http://doc.qt.io/qt-5/qt.html">Qt</a> Json Serializer</code></li>
-<li>Continue the setup and thats it! you can now use the module for all of your installed Kits for that <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:http://doc.qt.io/qt-5/" href="http://doc.qt.io/qt-5/qt.html">Qt</a> Version</li>
+<li>A new entry appears under all supported <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qt.html">Qt</a> Versions (e.g. <code><a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qt.html">Qt</a> &gt; <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qt.html">Qt</a> 5.8 &gt; Skycoder42 <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qt.html">Qt</a> modules</code>)</li>
+<li>You can install either all of my modules, or select the one you need: <code><a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qt.html">Qt</a> Json Serializer</code></li>
+<li>Continue the setup and thats it! you can now use the module for all of your installed Kits for that <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qt.html">Qt</a> Version</li>
 </ol>
 </li>
 <li>Download the compiled modules from the release page. <b>Note:</b> You will have to add the correct ones yourself and may need to adjust some paths to fit your installation!</li>
-<li>Build it yourself! <b>Note:</b> This requires perl to be installed. If you don't have/need cmake, you can ignore the related warnings. To automatically build and install to your <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:http://doc.qt.io/qt-5/" href="http://doc.qt.io/qt-5/qt.html">Qt</a> installation, run:<ul>
+<li>Build it yourself! <b>Note:</b> This requires perl to be installed. If you don't have/need cmake, you can ignore the related warnings. To automatically build and install to your <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qt.html">Qt</a> installation, run:<ul>
 <li><code>qmake</code></li>
 <li><code>make qmake_all</code></li>
 <li><code>make</code></li>
@@ -134,12 +126,45 @@ $(function() {
 </ul>
 </li>
 </ol>
-<h2>Documentation</h2>
+<h1><a class="anchor" id="qtjsonserializer_readme_label_2"></a>
+Usage</h1>
+<p>The serializer is provided as a <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qt.html">Qt</a> module. Thus, all you have to do is add the module, and then, in your project, add <code>QT += jsonserializer</code> to your <code>.pro</code> file!</p>
+<h2><a class="anchor" id="qtjsonserializer_readme_label_3"></a>
+Example</h2>
+<p>Both serialization and desertialization are rather simple. Create an object, and then use the serializer as follows:</p>
+<p>The following is an example for a serializable object. <em>Note:</em> The usage of <code>MEMBER</code> Properties is not required, and simply done to make this example more readable. </p><div class="fragment"><div class="line"><span class="keyword">class </span>TestObject : <span class="keyword">public</span> <a class="codeRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qobject.html">QObject</a></div><div class="line">{</div><div class="line">    Q_OBJECT</div><div class="line"></div><div class="line">    Q_PROPERTY(<a class="codeRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qstring.html">QString</a> stringProperty MEMBER stringProperty)</div><div class="line">    Q_PROPERTY(<a class="codeRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qlist.html">QList&lt;int&gt;</a> simpeList MEMBER simpeList)</div><div class="line">    Q_PROPERTY(TestObject* childObject MEMBER childObject)</div><div class="line"></div><div class="line"><span class="keyword">public</span>:</div><div class="line">    Q_INVOKABLE TestObject(<a class="codeRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qobject.html">QObject</a> *parent = <span class="keyword">nullptr</span>);</div><div class="line"></div><div class="line">    <a class="codeRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qstring.html">QString</a> stringProperty;</div><div class="line">    <a class="codeRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qlist.html">QList&lt;int&gt;</a> simpeList;</div><div class="line">    TestObject* childObject;</div><div class="line">}</div></div><!-- fragment --><p>You can serialize (and deserialize) the object with: </p><div class="fragment"><div class="line"><span class="keyword">auto</span> serializer = <span class="keyword">new</span> <a class="code" href="class_q_json_serializer.html">QJsonSerializer</a>(<span class="keyword">this</span>);</div><div class="line"></div><div class="line"><span class="keywordflow">try</span> {</div><div class="line">    <span class="comment">//serialize</span></div><div class="line">    <span class="keyword">auto</span> <span class="keywordtype">object</span> = <span class="keyword">new</span> TestObject();</div><div class="line">    <span class="keywordtype">object</span>-&gt;stringProperty = <span class="stringliteral">&quot;test&quot;</span>;</div><div class="line">    <span class="keywordtype">object</span>-&gt;simpeList = {1, 2, 3};</div><div class="line">    <span class="keywordtype">object</span>-&gt;childObject = <span class="keyword">new</span> TestObject(<span class="keywordtype">object</span>);</div><div class="line">    <span class="keyword">auto</span> json = serializer-&gt;serialize(<span class="keywordtype">object</span>);</div><div class="line">    qDebug() &lt;&lt; json;</div><div class="line">    <span class="keyword">delete</span> object;</div><div class="line"></div><div class="line">    <span class="comment">//deserialize</span></div><div class="line">    <span class="keywordtype">object</span> = serializer-&gt;deserialize&lt;TestObject&gt;(json);<span class="comment">//optional: specify the parent</span></div><div class="line">    qDebug() &lt;&lt; <span class="keywordtype">object</span>-&gt;stringProperty</div><div class="line">             &lt;&lt; <span class="keywordtype">object</span>-&gt;simpeList</div><div class="line">             &lt;&lt; <span class="keywordtype">object</span>-&gt;childObject;</div><div class="line">    <span class="keyword">delete</span> object;</div><div class="line">} <span class="keywordflow">catch</span>(<a class="code" href="class_q_json_serializer_exception.html">QJsonSerializerException</a> &amp;e) {</div><div class="line">    qDebug() &lt;&lt; e.<a class="code" href="class_q_json_serializer_exception.html#a96fb501023ca0a13b43ee11182080c74">what</a>();</div><div class="line">}</div></div><!-- fragment --><p>For the serialization, the created json would look like this: </p><div class="fragment"><div class="line">{</div><div class="line">    &quot;stringProperty&quot;: &quot;test&quot;,</div><div class="line">    &quot;simpeList&quot;: [1, 2, 3],</div><div class="line">    &quot;childObject&quot;: {</div><div class="line">        &quot;stringProperty&quot;: &quot;&quot;,</div><div class="line">        &quot;simpeList&quot;: [],</div><div class="line">        &quot;childObject&quot;: null</div><div class="line">    }</div><div class="line">}</div></div><!-- fragment --><h2><a class="anchor" id="qtjsonserializer_readme_label_4"></a>
+Important Usage Hints</h2>
+<p>In order for the serializer to properly work, there are a few things you have to know and do:</p>
+<ol type="1">
+<li>Only Q_PROPERTY properties will be serialized, and of those only properties that are marked to be stored (see <a href="https://doc.qt.io/qt-5/properties.html#requirements-for-declaring-properties">The Property System</a>, STORED attribute)</li>
+<li>For deserialization of QObjects, they need an invokable constructor, that takes only a parent: <code>Q_INVOKABLE MyClass(QObject*);</code></li>
+<li>Only properties with the following types can be serialized:<ul>
+<li><code>QObject*</code> and deriving classes</li>
+<li>Classes/structs marked with <code>Q_GADGET</code> (as value types only!)</li>
+<li><code><a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qlist.html">QList</a></code>, of any type that is serializable as well</li>
+<li>Simple types, that are supported by <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qjsonvalue.html">QJsonValue</a> (See <a href="https://doc.qt.io/qt-5/qjsonvalue.html#fromVariant">QJsonValue::fromVariant</a> and <a href="https://doc.qt.io/qt-5/qjsonvalue.html#toVariant">QJsonValue::toVariant</a>)</li>
+<li><code>Q_ENUM</code> and <code>Q_FLAG</code> types, as integer or as string<ul>
+<li>The string de/serialization of Q_ENUM and Q_FLAG types only works if used as a Q_PROPERTY. Integer will always work.</li>
+</ul>
+</li>
+<li><code>QJson...</code> types</li>
+<li>Any type you add yourself by extending the serializer</li>
+</ul>
+</li>
+<li>While simple list types (i.e. <code><a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qlist.html">QList</a>&lt;int&gt;</code>) are supported out of the box, for custom types (like <code><a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.8/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qlist.html">QList</a>&lt;TestObject*&gt;</code>) you will have to register converters from and to <code>QVariantList</code><ul>
+<li>This can be done by using <a href="src/qjsonserializer.h#L27"><code>QJsonSerializer::registerListConverters&lt;TestObject*&gt;()</code></a></li>
+</ul>
+</li>
+<li>By default, the <code>objectName</code> property of QObjects is not serialized (See <a href="src/qjsonserializer.h#L20">keepObjectName</a>)</li>
+<li>By default, the JSON <code>null</code> can only be converted to QObjects/G_GADGETs. For other types the conversion fails (See <a href="src/qjsonserializer.h#L19">allowDefaultNull</a>)</li>
+</ol>
+<h1><a class="anchor" id="qtjsonserializer_readme_label_5"></a>
+Documentation</h1>
 <p>The documentation is available on <a href="https://skycoder42.github.io/QJsonSerializer/">github pages</a>. It was created using <a href="http://www.doxygen.org/">doxygen</a>. The HTML-documentation and Qt-Help files are shipped together with the module for both the custom repository and the package on the release page. Please note that doxygen docs do not perfectly integrate with QtCreator/QtAssistant. </p>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Feb 28 2017 22:28:49 for QtJsonSerializer by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Apr 3 2017 18:27:22 for QtJsonSerializer by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.13
 </small></address>

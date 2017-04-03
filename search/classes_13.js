@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['workerscript',['WorkerScript',['http://doc.qt.io/qt-5/qml-workerscript.html',0,'']]],
-  ['wrappedevent',['WrappedEvent',['http://doc.qt.io/qt-5/qstatemachine-wrappedevent.html',0,'QStateMachine']]]
+  ['visualdatagroup',['VisualDataGroup',['https://doc.qt.io/qt-5/qml-visualdatagroup.html',0,'']]],
+  ['visualdatamodel',['VisualDataModel',['https://doc.qt.io/qt-5/qml-visualdatamodel.html',0,'']]],
+  ['visualitemmodel',['VisualItemModel',['https://doc.qt.io/qt-5/qml-visualitemmodel.html',0,'']]]
 ];

@@ -1,5 +1,6 @@
 var menudata={children:[
 {text:"Main Page",url:"index.html"},
+{text:"Related Pages",url:"pages.html"},
 {text:"Classes",url:"annotated.html",children:[
 {text:"Class List",url:"annotated.html"},
 {text:"Class Index",url:"classes.html"},
@@ -10,6 +11,7 @@ var menudata={children:[
 {text:"a",url:"functions.html#index_a"},
 {text:"c",url:"functions.html#index_c"},
 {text:"d",url:"functions.html#index_d"},
+{text:"e",url:"functions.html#index_e"},
 {text:"i",url:"functions.html#index_i"},
 {text:"k",url:"functions.html#index_k"},
 {text:"q",url:"functions.html#index_q"},
@@ -21,6 +23,7 @@ var menudata={children:[
 {text:"a",url:"functions_func.html#index_a"},
 {text:"c",url:"functions_func.html#index_c"},
 {text:"d",url:"functions_func.html#index_d"},
+{text:"e",url:"functions_func.html#index_e"},
 {text:"i",url:"functions_func.html#index_i"},
 {text:"k",url:"functions_func.html#index_k"},
 {text:"q",url:"functions_func.html#index_q"},

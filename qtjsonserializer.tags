@@ -1,0 +1,379 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+<tagfile>
+  <compound kind="class">
+    <name>QJsonDeserializationException</name>
+    <filename>class_q_json_deserialization_exception.html</filename>
+    <base>QJsonSerializerException</base>
+    <member kind="function">
+      <type></type>
+      <name>QJsonDeserializationException</name>
+      <anchorfile>class_q_json_deserialization_exception.html</anchorfile>
+      <anchor>ad37e36ebc35f0812018106e1a65895b1</anchor>
+      <arglist>(const QByteArray &amp;what)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>raise</name>
+      <anchorfile>class_q_json_deserialization_exception.html</anchorfile>
+      <anchor>a48291abca66222ed578833a1c1c169c0</anchor>
+      <arglist>() const override</arglist>
+    </member>
+    <member kind="function">
+      <type>QException *</type>
+      <name>clone</name>
+      <anchorfile>class_q_json_deserialization_exception.html</anchorfile>
+      <anchor>ad4196cb826c8770beab48325bc3cbddf</anchor>
+      <arglist>() const override</arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>QJsonSerializationException</name>
+    <filename>class_q_json_serialization_exception.html</filename>
+    <base>QJsonSerializerException</base>
+    <member kind="function">
+      <type></type>
+      <name>QJsonSerializationException</name>
+      <anchorfile>class_q_json_serialization_exception.html</anchorfile>
+      <anchor>aebbceb6fd83077b2b7aa2413d326e994</anchor>
+      <arglist>(const QByteArray &amp;what)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>raise</name>
+      <anchorfile>class_q_json_serialization_exception.html</anchorfile>
+      <anchor>a1f2c5dc5b525da2d02c51fbb093fad2c</anchor>
+      <arglist>() const override</arglist>
+    </member>
+    <member kind="function">
+      <type>QException *</type>
+      <name>clone</name>
+      <anchorfile>class_q_json_serialization_exception.html</anchorfile>
+      <anchor>ad3e5187ba5a37ba5f171dc1472325779</anchor>
+      <arglist>() const override</arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>QJsonSerializer</name>
+    <filename>class_q_json_serializer.html</filename>
+    <base>QObject</base>
+    <member kind="slot">
+      <type>void</type>
+      <name>setAllowDefaultNull</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>ad807b89a053e8aac9930b2b6d8cf8cc4</anchor>
+      <arglist>(bool allowDefaultNull)</arglist>
+    </member>
+    <member kind="slot">
+      <type>void</type>
+      <name>setKeepObjectName</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>af4d083e88a88bec52b4951b2d8395767</anchor>
+      <arglist>(bool keepObjectName)</arglist>
+    </member>
+    <member kind="slot">
+      <type>void</type>
+      <name>setEnumAsString</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>a46a707a369bfd1beb45e7506cb36b783</anchor>
+      <arglist>(bool enumAsString)</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>QJsonSerializer</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>ae0d46bea68e7abc4f0a7444a40c03017</anchor>
+      <arglist>(QObject *parent=nullptr)</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>~QJsonSerializer</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>aa6a590f7c89c651ca77555a1fec9c5bc</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>allowDefaultNull</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>a194c09466f37e35a189c3e67df74f0b9</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>keepObjectName</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>afd4632ae8b3725d2c3d1568edd08a8f5</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>enumAsString</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>a3c26e7a387e04a367813e10cb6b716f2</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function">
+      <type>QJsonValue</type>
+      <name>serialize</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>ab68cf3a3dc0b5d8fecf85b729d0be0a9</anchor>
+      <arglist>(const QVariant &amp;data) const</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>serializeTo</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>a163d6f5b77e0b8b874d49a2cd546c88d</anchor>
+      <arglist>(QIODevice *device, const QVariant &amp;data) const</arglist>
+    </member>
+    <member kind="function">
+      <type>QJsonObject</type>
+      <name>serialize</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>a36711cc64a6398add8d1d490f8e07cba</anchor>
+      <arglist>(const T &amp;data) const</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>serializeTo</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>a52fd1f06b32abf7b1e9eeffd61d1db0d</anchor>
+      <arglist>(QIODevice *device, const T &amp;data) const</arglist>
+    </member>
+    <member kind="function">
+      <type>QJsonArray</type>
+      <name>serialize</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>a3039e873f0fffb67d6c5f141ed9aed72</anchor>
+      <arglist>(const QList&lt; T &gt; &amp;data) const</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>serializeTo</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>a458429765e0b9d842764fdcdc323418c</anchor>
+      <arglist>(QIODevice *device, const QList&lt; T &gt; &amp;data) const</arglist>
+    </member>
+    <member kind="function">
+      <type>QVariant</type>
+      <name>deserialize</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>ac2abe7502e5082e9e77ddc08e224840a</anchor>
+      <arglist>(const QJsonValue &amp;json, int metaTypeId, QObject *parent=nullptr) const</arglist>
+    </member>
+    <member kind="function">
+      <type>QVariant</type>
+      <name>deserializeFrom</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>aafa3d1873bf297dca6a60ccc380415cc</anchor>
+      <arglist>(QIODevice *device, int metaTypeId, QObject *parent=nullptr) const</arglist>
+    </member>
+    <member kind="function">
+      <type>T</type>
+      <name>deserialize</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>a57b25fd8c7976c99be05f89925ba0b0d</anchor>
+      <arglist>(const QJsonObject &amp;json, QObject *parent=nullptr) const</arglist>
+    </member>
+    <member kind="function">
+      <type>T</type>
+      <name>deserializeFrom</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>a34800d922f12b1af0a016a5b06ecfb1b</anchor>
+      <arglist>(QIODevice *device, QObject *parent=nullptr) const</arglist>
+    </member>
+    <member kind="function">
+      <type>QList&lt; T &gt;</type>
+      <name>deserialize</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>a23015dab50da1608ac6e6f6e47a29a49</anchor>
+      <arglist>(const QJsonArray &amp;json, QObject *parent=nullptr) const</arglist>
+    </member>
+    <member kind="function">
+      <type>QList&lt; T &gt;</type>
+      <name>deserializeFrom</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>ade2c70ab549a8e164fd2eed06cccd561</anchor>
+      <arglist>(QIODevice *device, QObject *parent=nullptr) const</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static bool</type>
+      <name>registerListConverters</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>a98b3e1ea1e844e2f3806dbf3566d9972</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function" protection="protected" virtualness="virtual">
+      <type>virtual QJsonValue</type>
+      <name>serializeVariant</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>a125f14a7499788d9c7c7215e65268b1f</anchor>
+      <arglist>(int propertyType, const QVariant &amp;value) const</arglist>
+    </member>
+    <member kind="function" protection="protected" virtualness="virtual">
+      <type>virtual QJsonObject</type>
+      <name>serializeObject</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>aa23c9ff8064d76e9a02ee6f685a73ce3</anchor>
+      <arglist>(const QObject *object) const</arglist>
+    </member>
+    <member kind="function" protection="protected" virtualness="virtual">
+      <type>virtual QJsonObject</type>
+      <name>serializeGadget</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>ab247470405a303068400e77f1804666c</anchor>
+      <arglist>(const void *gadget, const QMetaObject *metaObject) const</arglist>
+    </member>
+    <member kind="function" protection="protected" virtualness="virtual">
+      <type>virtual QJsonArray</type>
+      <name>serializeList</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>a21c6c7088e7992207f40bd0d8b1a3f51</anchor>
+      <arglist>(int listType, const QVariantList &amp;value) const</arglist>
+    </member>
+    <member kind="function" protection="protected" virtualness="virtual">
+      <type>virtual QJsonValue</type>
+      <name>serializeEnum</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>af0db653b58dd5269fc3bf4dbd5d096a8</anchor>
+      <arglist>(const QMetaEnum &amp;metaEnum, const QVariant &amp;value) const</arglist>
+    </member>
+    <member kind="function" protection="protected" virtualness="virtual">
+      <type>virtual QJsonValue</type>
+      <name>serializeValue</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>a87cb2307625b39c10f46306b4aa585e7</anchor>
+      <arglist>(int propertyType, const QVariant &amp;value) const</arglist>
+    </member>
+    <member kind="function" protection="protected" virtualness="virtual">
+      <type>virtual QVariant</type>
+      <name>deserializeVariant</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>a26a9ab6826e95f9902f9b5f7daa12c4f</anchor>
+      <arglist>(int propertyType, const QJsonValue &amp;value, QObject *parent) const</arglist>
+    </member>
+    <member kind="function" protection="protected" virtualness="virtual">
+      <type>virtual QObject *</type>
+      <name>deserializeObject</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>a708c1375a8776cc38a94997b6b879d99</anchor>
+      <arglist>(const QJsonObject &amp;jsonObject, const QMetaObject *metaObject, QObject *parent) const</arglist>
+    </member>
+    <member kind="function" protection="protected" virtualness="virtual">
+      <type>virtual void</type>
+      <name>deserializeGadget</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>a2764651e0a8236814d83f704f5f89751</anchor>
+      <arglist>(const QJsonObject &amp;jsonObject, int typeId, void *gadgetPtr) const</arglist>
+    </member>
+    <member kind="function" protection="protected" virtualness="virtual">
+      <type>virtual QVariantList</type>
+      <name>deserializeList</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>a16beee8729c68dcfaeebf56fdc16c924</anchor>
+      <arglist>(int listType, const QJsonArray &amp;array, QObject *parent) const</arglist>
+    </member>
+    <member kind="function" protection="protected" virtualness="virtual">
+      <type>virtual QVariant</type>
+      <name>deserializeEnum</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>ab372af0004be21357bfd81139d241f4f</anchor>
+      <arglist>(const QMetaEnum &amp;metaEnum, const QJsonValue &amp;value) const</arglist>
+    </member>
+    <member kind="function" protection="protected" virtualness="virtual">
+      <type>virtual QVariant</type>
+      <name>deserializeValue</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>ae767df019ead6232fc8c24a107f682f5</anchor>
+      <arglist>(int propertyType, const QJsonValue &amp;value) const</arglist>
+    </member>
+    <member kind="property">
+      <type>bool</type>
+      <name>allowDefaultNull</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>acc7b17076756d1acd0d95e955614b289</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="property">
+      <type>bool</type>
+      <name>keepObjectName</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>a6c0d933bd43f30870c9379fb04f65f00</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="property">
+      <type>bool</type>
+      <name>enumAsString</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>ac430c1962106cc1d0efcbef4a11b03f3</anchor>
+      <arglist></arglist>
+    </member>
+    <docanchor file="class_q_json_serializer" title="Supported types">supported</docanchor>
+    <docanchor file="class_q_json_serializer" title="Extending the serializer">extending</docanchor>
+  </compound>
+  <compound kind="class">
+    <name>QJsonSerializerException</name>
+    <filename>class_q_json_serializer_exception.html</filename>
+    <base>QException</base>
+    <member kind="function">
+      <type></type>
+      <name>QJsonSerializerException</name>
+      <anchorfile>class_q_json_serializer_exception.html</anchorfile>
+      <anchor>ab1746396d417b43bf2228dc62c706b1b</anchor>
+      <arglist>(const QByteArray &amp;what, bool deser)</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>isDeserializationException</name>
+      <anchorfile>class_q_json_serializer_exception.html</anchorfile>
+      <anchor>a363cc20cd7aaaf56f389a18be5836e63</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function">
+      <type>const char *</type>
+      <name>what</name>
+      <anchorfile>class_q_json_serializer_exception.html</anchorfile>
+      <anchor>a96fb501023ca0a13b43ee11182080c74</anchor>
+      <arglist>() const noexcept final</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>raise</name>
+      <anchorfile>class_q_json_serializer_exception.html</anchorfile>
+      <anchor>a89e25e81483b7f0712a99a11c2fe1f9e</anchor>
+      <arglist>() const override</arglist>
+    </member>
+    <member kind="function">
+      <type>QException *</type>
+      <name>clone</name>
+      <anchorfile>class_q_json_serializer_exception.html</anchorfile>
+      <anchor>aedc8fa4385bbbb0d34c6ad6c11e37378</anchor>
+      <arglist>() const override</arglist>
+    </member>
+    <member kind="variable" protection="protected">
+      <type>QByteArray</type>
+      <name>_what</name>
+      <anchorfile>class_q_json_serializer_exception.html</anchorfile>
+      <anchor>ac259c8dd25c565b9da8104c811052e61</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" protection="protected">
+      <type>bool</type>
+      <name>_isDeser</name>
+      <anchorfile>class_q_json_serializer_exception.html</anchorfile>
+      <anchor>a42915bf5a162ff58498302dcbfd25af0</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="page">
+    <name>index</name>
+    <title></title>
+    <filename>index</filename>
+    <docanchor file="index" title="Features">qtjsonserializer_readme_label_0</docanchor>
+    <docanchor file="index" title="Download/Installation">qtjsonserializer_readme_label_1</docanchor>
+    <docanchor file="index" title="Usage">qtjsonserializer_readme_label_2</docanchor>
+    <docanchor file="index" title="Example">qtjsonserializer_readme_label_3</docanchor>
+    <docanchor file="index" title="Important Usage Hints">qtjsonserializer_readme_label_4</docanchor>
+    <docanchor file="index" title="Documentation">qtjsonserializer_readme_label_5</docanchor>
+  </compound>
+</tagfile>
