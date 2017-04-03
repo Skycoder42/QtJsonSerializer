@@ -1,7 +1,7 @@
 #ifndef QJSONSERIALIZER_H
 #define QJSONSERIALIZER_H
 
-#include "QtJsonSerializer/qjsonserializer_global.h"
+#include "QtJsonSerializer/qtjsonserializer_global.h"
 #include "QtJsonSerializer/qjsonserializerexception.h"
 
 #include <QtCore/qjsonobject.h>
