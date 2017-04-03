@@ -23,3 +23,5 @@ DEFINES += SRCDIR=\\\"$$PWD/\\\"
 
 HEADERS += \
     jsongadget.h
+
+mac: QMAKE_LFLAGS += '-Wl,-rpath,\'$$OUT_PWD/../../../../lib\''

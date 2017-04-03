@@ -14,3 +14,5 @@ SOURCES += \
 HEADERS += \
 	testobject.h \
 	brokentestobject.h
+
+mac: QMAKE_LFLAGS += '-Wl,-rpath,\'$$OUT_PWD/../../../../lib\''

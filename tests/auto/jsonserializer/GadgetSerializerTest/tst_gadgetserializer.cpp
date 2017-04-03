@@ -41,7 +41,7 @@ private:
 
 void GadgetSerializerTest::initTestCase()
 {
-#ifdef Q_OS_UNIX
+#ifdef Q_OS_LINUX
 	Q_ASSERT(qgetenv("LD_PRELOAD").contains("Qt5JsonSerializer"));
 #endif
 	QJsonSerializer::registerListConverters<QList<int>>();

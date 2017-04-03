@@ -13,3 +13,5 @@ SOURCES += tst_gadgetserializer.cpp \
 HEADERS += \
 	testgadget.h \
 	brokentestgadget.h
+
+mac: QMAKE_LFLAGS += '-Wl,-rpath,\'$$OUT_PWD/../../../../lib\''
