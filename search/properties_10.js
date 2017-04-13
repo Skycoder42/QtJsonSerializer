@@ -14,6 +14,7 @@ var searchData=
   ['regexp',['regExp',['https://doc.qt.io/qt-5/qregexpvalidator.html#regExp-prop',0,'QRegExpValidator']]],
   ['regularexpression',['regularExpression',['https://doc.qt.io/qt-5/qregularexpressionvalidator.html#regularExpression-prop',0,'QRegularExpressionValidator']]],
   ['remainingtime',['remainingTime',['https://doc.qt.io/qt-5/qtimer.html#remainingTime-prop',0,'QTimer']]],
+  ['remoteenabled',['remoteEnabled',['https://doc.qt.io/qt-5/class_qt_data_sync_1_1_ws_authenticator.html#ac722009048eba930588437b41e0ff2af',0,'QtDataSync::WsAuthenticator']]],
   ['remoteurl',['remoteUrl',['https://doc.qt.io/qt-5/class_qt_data_sync_1_1_ws_authenticator.html#af042685cc0e56efcb7514ad9f5bf1578',0,'QtDataSync::WsAuthenticator']]],
   ['renderhints',['renderHints',['https://doc.qt.io/qt-5/qgraphicsview.html#renderHints-prop',0,'QGraphicsView']]],
   ['renderpolicy',['renderPolicy',['https://doc.qt.io/qt-5/qt3drender-qrendersettings.html#renderPolicy-prop',0,'Qt3DRender::QRenderSettings']]],

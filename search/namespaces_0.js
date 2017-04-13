@@ -14,7 +14,7 @@ var searchData=
   ['qt3dlogic',['Qt3DLogic',['https://doc.qt.io/qt-5/qt3dlogic.html',0,'']]],
   ['qt3drender',['Qt3DRender',['https://doc.qt.io/qt-5/qt3drender.html',0,'']]],
   ['qtautoupdater',['QtAutoUpdater',['https://doc.qt.io/qt-5/namespace_qt_auto_updater.html',0,'']]],
-  ['qtbackgroundprocess',['QtBackgroundProcess',['https://doc.qt.io/qt-5/class_qt_background_process_1_1_app.html',0,'']]],
+  ['qtbackgroundprocess',['QtBackgroundProcess',['https://doc.qt.io/qt-5/namespace_qt_background_process.html',0,'']]],
   ['qtconcurrent',['QtConcurrent',['https://doc.qt.io/qt-5/qtconcurrent.html',0,'']]],
   ['qtdatasync',['QtDataSync',['https://doc.qt.io/qt-5/namespace_qt_data_sync.html',0,'']]],
   ['qtest',['QTest',['https://doc.qt.io/qt-5/qtest.html',0,'']]],

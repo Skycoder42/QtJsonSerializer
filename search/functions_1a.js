@@ -794,6 +794,7 @@ var searchData=
   ['_7erestclient',['~RestClient',['https://doc.qt.io/qt-5/class_qt_rest_client_1_1_rest_client.html#a9a6d211b09653ee470c320769edde80d',0,'QtRestClient::RestClient']]],
   ['_7esetup',['~Setup',['https://doc.qt.io/qt-5/class_qt_data_sync_1_1_setup.html#a89f03a5baa81da62c886e8c887b2d7b2',0,'QtDataSync::Setup']]],
   ['_7esignalevent',['~SignalEvent',['https://doc.qt.io/qt-5/qstatemachine-signalevent.html#dtor.SignalEvent',0,'QStateMachine::SignalEvent']]],
+  ['_7esimple',['~Simple',['https://doc.qt.io/qt-5/class_qt_rest_client_1_1_simple_3_01_t_00_01typename_01std_1_1enable__if_3_01std_1_1is__void_3_0e3917a0d7780becccdeb92e5e53ff1ab.html#a7d365d02989e98e81a389ac0d3423bb2',0,'QtRestClient::Simple&lt; T, typename std::enable_if&lt; std::is_void&lt; typename T::QtGadgetHelper &gt;::value &gt;::type &gt;']]],
   ['_7esynccontroller',['~SyncController',['https://doc.qt.io/qt-5/class_qt_data_sync_1_1_sync_controller.html#a58e5aad6e00749326c2e4a34866b7df0',0,'QtDataSync::SyncController']]],
   ['_7eterminal',['~Terminal',['https://doc.qt.io/qt-5/class_qt_background_process_1_1_terminal.html#add5a7d4dd45b68af9a0afb1cc845af2f',0,'QtBackgroundProcess::Terminal']]],
   ['_7eupdatebutton',['~UpdateButton',['https://doc.qt.io/qt-5/class_qt_auto_updater_1_1_update_button.html#a84cd7e0899cc5926d78cbe4fbd079579',0,'QtAutoUpdater::UpdateButton']]],

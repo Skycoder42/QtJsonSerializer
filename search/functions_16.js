@@ -131,6 +131,7 @@ var searchData=
   ['writeendelement',['writeEndElement',['https://doc.qt.io/qt-5/qxmlstreamwriter.html#writeEndElement',0,'QXmlStreamWriter']]],
   ['writeentityreference',['writeEntityReference',['https://doc.qt.io/qt-5/qxmlstreamwriter.html#writeEntityReference',0,'QXmlStreamWriter']]],
   ['writeframe',['writeFrame',['https://doc.qt.io/qt-5/qcanbusdevice.html#writeFrame',0,'QCanBusDevice']]],
+  ['writeline',['writeLine',['https://doc.qt.io/qt-5/class_qt_background_process_1_1_global_terminal.html#a4145f421608696e79cceaa0b74a6676b',0,'QtBackgroundProcess::GlobalTerminal::writeLine()'],['https://doc.qt.io/qt-5/class_qt_background_process_1_1_terminal.html#aed92af28b4b46a07b290e0e584bb55f0',0,'QtBackgroundProcess::Terminal::writeLine()']]],
   ['writenamespace',['writeNamespace',['https://doc.qt.io/qt-5/qxmlstreamwriter.html#writeNamespace',0,'QXmlStreamWriter']]],
   ['writendefmessages',['writeNdefMessages',['https://doc.qt.io/qt-5/qnearfieldtarget.html#writeNdefMessages',0,'QNearFieldTarget']]],
   ['writeongadget',['writeOnGadget',['https://doc.qt.io/qt-5/qmetaproperty.html#writeOnGadget',0,'QMetaProperty']]],
