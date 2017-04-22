@@ -144,12 +144,6 @@ The following types are already registered by default:
 */
 
 /*!
-@fn QJsonSerializer::serialize(const QList<T> &) const
-
-@copydetails QJsonSerializer::serialize(const T &) const
-*/
-
-/*!
 @fn QJsonSerializer::serializeTo(QIODevice *, const QVariant &) const
 
 @param device The device to write the json to
@@ -167,9 +161,20 @@ The following types are already registered by default:
 */
 
 /*!
-@fn QJsonSerializer::serializeTo(QIODevice *, const QList<T> &) const
+@fn QJsonSerializer::serializeTo(const QVariant &) const
 
-@copydetails QJsonSerializer::serializeTo(QIODevice *, const T &) const
+@param data The data to be serialized
+@returns The serialized data as byte array
+@throws QJsonSerializationException Thrown if the serialization fails
+
+@sa QJsonSerializer::deserializeFrom, QJsonSerializer::serialize
+*/
+
+/*!
+@fn QJsonSerializer::serializeTo(const T &) const
+
+@tparam T The type of the data to be serialized
+@copydetails QJsonSerializer::serializeTo(const QVariant &) const
 */
 
 /*!
@@ -185,7 +190,7 @@ The following types are already registered by default:
 */
 
 /*!
-@fn QJsonSerializer::deserialize(const QJsonObject &, QObject*) const
+@fn QJsonSerializer::deserialize(const typename _qjsonserializer_helpertypes::type_helper<T>::JsonType &, QObject*) const
 
 @tparam T The type of the data to be deserialized
 @param json The data to be deserialized
@@ -194,12 +199,6 @@ The following types are already registered by default:
 @throws QJsonDeserializationException Thrown if the deserialization fails
 
 @sa QJsonSerializer::serialize, QJsonSerializer::deserializeFrom
-*/
-
-/*!
-@fn QJsonSerializer::deserialize(const QJsonArray &, QObject*) const
-
-@copydetails QJsonSerializer::deserialize(const QJsonObject &, QObject*) const
 */
 
 /*!
@@ -219,6 +218,30 @@ The following types are already registered by default:
 
 @tparam T The type of the data to be deserialized
 @param device The device to read the json to be deserialized from
+@param parent The parent object of the result. Only used if the returend value is a QObject*
+@returns The deserialized value
+@throws QJsonDeserializationException Thrown if the deserialization fails
+
+@sa QJsonSerializer::serializeTo, QJsonSerializer::deserialize
+*/
+
+/*!
+@fn QJsonSerializer::deserializeFrom(const QByteArray &, int, QObject*) const
+
+@param data The data to read the json to be deserialized from
+@param metaTypeId The target type of the deserialization
+@param parent The parent object of the result. Only used if the returend value is a QObject*
+@returns The deserialized value, wrapped in QVariant
+@throws QJsonDeserializationException Thrown if the deserialization fails
+
+@sa QJsonSerializer::serializeTo, QJsonSerializer::deserialize
+*/
+
+/*!
+@fn QJsonSerializer::deserializeFrom(const QByteArray &, QObject*) const
+
+@tparam T The type of the data to be deserialized
+@param data The data to read the json to be deserialized from
 @param parent The parent object of the result. Only used if the returend value is a QObject*
 @returns The deserialized value
 @throws QJsonDeserializationException Thrown if the deserialization fails

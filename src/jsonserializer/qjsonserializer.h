@@ -49,13 +49,13 @@ public:
 	//! Serializers a QVariant value to a byte array
 	QByteArray serializeTo(const QVariant &data) const;
 
-	//! Serializers a QObject or Q_GADGET to a QJsonObject
+	//! Serializers a QObject, Q_GADGET or a list of one of those to json
 	template <typename T>
 	typename _qjsonserializer_helpertypes::type_helper<T>::JsonType serialize(const T &data) const;
-	//! Serializers a QObject or Q_GADGET to a device
+	//! Serializers a QObject, Q_GADGET or a list of one of those to a device
 	template <typename T>
 	void serializeTo(QIODevice *device, const T &data) const;
-	//! Serializers a QObject or Q_GADGET to a byte array
+	//! Serializers a QQObject, Q_GADGET or a list of one of those to a byte array
 	template <typename T>
 	QByteArray serializeTo(const T &data) const;
 
@@ -66,13 +66,13 @@ public:
 	//! Deserializes data from a device to a QVariant value, based on the given type id
 	QVariant deserializeFrom(const QByteArray &data, int metaTypeId, QObject *parent = nullptr) const;
 
-	//! Deserializes a QJsonObject to the given QObject or Q_GADGET type
+	//! Deserializes a json to the given QObject type, Q_GADGET type or a list of one of those types
 	template <typename T>
 	T deserialize(const typename _qjsonserializer_helpertypes::type_helper<T>::JsonType &json, QObject *parent = nullptr) const;
-	//! Deserializes data from a device to the given QObject or Q_GADGET type
+	//! Deserializes data from a device to the given QObject type, Q_GADGET type or a list of one of those types
 	template <typename T>
 	T deserializeFrom(QIODevice *device, QObject *parent = nullptr) const;
-	//! Deserializes data from a byte array to the given QObject or Q_GADGET type
+	//! Deserializes data from a byte array to the given QObject type, Q_GADGET type or a list of one of those types
 	template <typename T>
 	T deserializeFrom(const QByteArray &data, QObject *parent = nullptr) const;
 
