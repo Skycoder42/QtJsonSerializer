@@ -68,14 +68,14 @@ public:
 	T deserialize(const QJsonObject &json, QObject *parent = nullptr) const;
 	//! Deserializes data from a device to the given QObject or Q_GADGET type
 	template <typename T>
-	T deserializeFrom(QIODevice *device, QObject *parent = nullptr) const;
+	T deserializeObjectFrom(QIODevice *device, QObject *parent = nullptr) const;
 	//! Deserializes a QJsonArray to a list of the given QObject or Q_GADGET type
 	template<typename T>
 	QList<T> deserialize(const QJsonArray &json, QObject *parent = nullptr) const;
 	//! @brief Deserializes data from a device to a list of the given QObject or Q_GADGET type
 	//! @copydetails QJsonSerializer::deserializeFrom(QIODevice *, QObject*) const
 	template <typename T>
-	QList<T> deserializeFrom(QIODevice *device, QObject *parent = nullptr) const;
+	QList<T> deserializeListFrom(QIODevice *device, QObject *parent = nullptr) const;
 
 public Q_SLOTS:
 	//! @writeAcFn{QJsonSerializer::allowDefaultNull}
@@ -188,9 +188,9 @@ T QJsonSerializer::deserialize(const QJsonObject &json, QObject *parent) const
 }
 
 template<typename T>
-T QJsonSerializer::deserializeFrom(QIODevice *device, QObject *parent) const
+T QJsonSerializer::deserializeObjectFrom(QIODevice *device, QObject *parent) const
 {
-	return deserialize<T>(readFromDevice(device), parent);
+	return deserialize<T>(readFromDevice(device).toObject(), parent);
 }
 
 template<typename T>
@@ -201,9 +201,9 @@ QList<T> QJsonSerializer::deserialize(const QJsonArray &json, QObject *parent) c
 }
 
 template<typename T>
-QList<T> QJsonSerializer::deserializeFrom(QIODevice *device, QObject *parent) const
+QList<T> QJsonSerializer::deserializeListFrom(QIODevice *device, QObject *parent) const
 {
-	return deserialize<T>(readFromDevice(device), parent);
+	return deserialize<T>(readFromDevice(device).toArray(), parent);
 }
 
 #endif // QJSONSERIALIZER_H

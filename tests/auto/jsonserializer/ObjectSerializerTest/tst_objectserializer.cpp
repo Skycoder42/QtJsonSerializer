@@ -896,6 +896,41 @@ void ObjectSerializerTest::generateValidTestData()
 	}
 }
 
+static void compile_test()
+{
+	QJsonSerializer s;
+	QVariant v;
+	TestObject *t;
+	QList<TestObject*> l;
+	QIODevice *d = nullptr;
+	QJsonValue jv;
+	QJsonObject jo;
+	QJsonArray ja;
+	QObject *p = nullptr;
+
+	s.serialize(v);
+	s.serialize(t);
+	s.serialize(l);
+
+	s.serializeTo(d, v);
+	s.serializeTo(d, t);
+	s.serializeTo(d, l);
+
+	s.deserialize(jv, qMetaTypeId<TestObject*>());
+	s.deserialize(jv, qMetaTypeId<TestObject*>(), p);
+	s.deserialize<TestObject*>(jo);
+	s.deserialize<TestObject*>(jo, p);
+	s.deserialize<TestObject*>(ja);
+	s.deserialize<TestObject*>(ja, p);
+
+	s.deserializeFrom(d, qMetaTypeId<TestObject*>());
+	s.deserializeFrom(d, qMetaTypeId<TestObject*>(), p);
+	s.deserializeObjectFrom<TestObject*>(d);
+	s.deserializeObjectFrom<TestObject*>(d, p);
+	s.deserializeListFrom<TestObject*>(d);
+	s.deserializeListFrom<TestObject*>(d, p);
+}
+
 QTEST_MAIN(ObjectSerializerTest)
 
 #include "tst_objectserializer.moc"
