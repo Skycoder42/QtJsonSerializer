@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <QtHelpProject version="1.0">
-  <namespace>de.skycoder42.qtjsonserializer.201</namespace>
+  <namespace>de.skycoder42.qtjsonserializer.210</namespace>
   <virtualFolder>doc_qtjsonserializer</virtualFolder>
-  <customFilter name="JsonSerializer 2.0.1">
+  <customFilter name="JsonSerializer 2.1.0">
     <filterAttribute>qtjsonserializer</filterAttribute>
-    <filterAttribute>2.0.1</filterAttribute>
+    <filterAttribute>2.1.0</filterAttribute>
   </customFilter>
   <filterSection>
     <filterAttribute>doxygen</filterAttribute>
     <toc>
-      <section title="QtJsonSerializer 2.0.1" ref="index.html">
+      <section title="QtJsonSerializer 2.1.0" ref="index.html">
         <section title="Features" ref="index.html#qtjsonserializer_readme_label_0" />
         <section title="Download/Installation" ref="index.html#qtjsonserializer_readme_label_1" />
         <section title="Usage" ref="index.html#qtjsonserializer_readme_label_2">
@@ -17,8 +17,33 @@
           <section title="Important Usage Hints" ref="index.html#qtjsonserializer_readme_label_4" />
         </section>
         <section title="Documentation" ref="index.html#qtjsonserializer_readme_label_5" />
+        <section title="Namespaces">
+          <section title="Namespace List" ref="namespaces.html">
+            <section title="_qjsonserializer_helpertypes" ref="namespace__qjsonserializer__helpertypes.html" />
+          </section>
+        </section>
         <section title="Classes" ref="annotated.html">
           <section title="Class List" ref="annotated.html">
+            <section title="_qjsonserializer_helpertypes" ref="namespace__qjsonserializer__helpertypes.html">
+              <section title="has_metaobject" ref="struct__qjsonserializer__helpertypes_1_1has__metaobject.html" />
+              <section title="has_metaobject&lt; QVariant &gt;" ref="struct__qjsonserializer__helpertypes_1_1has__metaobject_3_01_q_variant_01_4.html" />
+              <section title="has_metaobject&lt; T * &gt;" ref="struct__qjsonserializer__helpertypes_1_1has__metaobject_3_01_t_01_5_01_4.html" />
+              <section title="type_helper" ref="struct__qjsonserializer__helpertypes_1_1type__helper.html">
+                <section title="JsonType" ref="struct__qjsonserializer__helpertypes_1_1type__helper.html#a4b12f815d7ea7af56801088fefcc67e9" />
+                <section title="ObjectType" ref="struct__qjsonserializer__helpertypes_1_1type__helper.html#acf5ab5da1d7ac57b9601adabaad1216e" />
+                <section title="Type" ref="struct__qjsonserializer__helpertypes_1_1type__helper.html#aaf407ddc64babfc5fd442e9563fe8b9d" />
+              </section>
+              <section title="type_helper&lt; QList&lt; T &gt; &gt;" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_list_3_01_t_01_4_01_4.html">
+                <section title="JsonType" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_list_3_01_t_01_4_01_4.html#a91921e7acacb02943b492804eb387ffb" />
+                <section title="ObjectType" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_list_3_01_t_01_4_01_4.html#a69ed8cac9ffd22669e6804089822ae60" />
+                <section title="Type" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_list_3_01_t_01_4_01_4.html#a2442fafc9940ca5445096507bdde28af" />
+              </section>
+              <section title="type_helper&lt; QVariant &gt;" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_variant_01_4.html">
+                <section title="JsonType" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_variant_01_4.html#a647d88720963f090836d04ee5b75a367" />
+                <section title="ObjectType" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_variant_01_4.html#a4df3f194269a9ac48a9d6795e5c5f761" />
+                <section title="Type" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_variant_01_4.html#a69c8f01a33021f62907969b8f892650b" />
+              </section>
+            </section>
             <section title="QJsonDeserializationException" ref="class_q_json_deserialization_exception.html">
               <section title="QJsonDeserializationException" ref="class_q_json_deserialization_exception.html#ad37e36ebc35f0812018106e1a65895b1" />
               <section title="clone" ref="class_q_json_deserialization_exception.html#ad4196cb826c8770beab48325bc3cbddf" />
@@ -34,12 +59,12 @@
               <section title="~QJsonSerializer" ref="class_q_json_serializer.html#aa6a590f7c89c651ca77555a1fec9c5bc" />
               <section title="allowDefaultNull" ref="class_q_json_serializer.html#a194c09466f37e35a189c3e67df74f0b9" />
               <section title="deserialize" ref="class_q_json_serializer.html#ac2abe7502e5082e9e77ddc08e224840a" />
-              <section title="deserialize" ref="class_q_json_serializer.html#a57b25fd8c7976c99be05f89925ba0b0d" />
-              <section title="deserialize" ref="class_q_json_serializer.html#a23015dab50da1608ac6e6f6e47a29a49" />
+              <section title="deserialize" ref="class_q_json_serializer.html#acd01984d849ccbc5f0bb247901de800f" />
               <section title="deserializeEnum" ref="class_q_json_serializer.html#ab372af0004be21357bfd81139d241f4f" />
               <section title="deserializeFrom" ref="class_q_json_serializer.html#aafa3d1873bf297dca6a60ccc380415cc" />
+              <section title="deserializeFrom" ref="class_q_json_serializer.html#a9a7ef54e33560eeb3dccb3054cb4d872" />
               <section title="deserializeFrom" ref="class_q_json_serializer.html#a34800d922f12b1af0a016a5b06ecfb1b" />
-              <section title="deserializeFrom" ref="class_q_json_serializer.html#ade2c70ab549a8e164fd2eed06cccd561" />
+              <section title="deserializeFrom" ref="class_q_json_serializer.html#afbca1b7d26866f48db10656e0284bbd6" />
               <section title="deserializeGadget" ref="class_q_json_serializer.html#a2764651e0a8236814d83f704f5f89751" />
               <section title="deserializeList" ref="class_q_json_serializer.html#a16beee8729c68dcfaeebf56fdc16c924" />
               <section title="deserializeObject" ref="class_q_json_serializer.html#a708c1375a8776cc38a94997b6b879d99" />
@@ -49,14 +74,14 @@
               <section title="keepObjectName" ref="class_q_json_serializer.html#afd4632ae8b3725d2c3d1568edd08a8f5" />
               <section title="serialize" ref="class_q_json_serializer.html#ab68cf3a3dc0b5d8fecf85b729d0be0a9" />
               <section title="serialize" ref="class_q_json_serializer.html#a36711cc64a6398add8d1d490f8e07cba" />
-              <section title="serialize" ref="class_q_json_serializer.html#a3039e873f0fffb67d6c5f141ed9aed72" />
               <section title="serializeEnum" ref="class_q_json_serializer.html#af0db653b58dd5269fc3bf4dbd5d096a8" />
               <section title="serializeGadget" ref="class_q_json_serializer.html#ab247470405a303068400e77f1804666c" />
               <section title="serializeList" ref="class_q_json_serializer.html#a21c6c7088e7992207f40bd0d8b1a3f51" />
               <section title="serializeObject" ref="class_q_json_serializer.html#aa23c9ff8064d76e9a02ee6f685a73ce3" />
               <section title="serializeTo" ref="class_q_json_serializer.html#a163d6f5b77e0b8b874d49a2cd546c88d" />
+              <section title="serializeTo" ref="class_q_json_serializer.html#a1a7c606d60801923008752f43a16e0aa" />
               <section title="serializeTo" ref="class_q_json_serializer.html#a52fd1f06b32abf7b1e9eeffd61d1db0d" />
-              <section title="serializeTo" ref="class_q_json_serializer.html#a458429765e0b9d842764fdcdc323418c" />
+              <section title="serializeTo" ref="class_q_json_serializer.html#a33fc0f752ad3b0d1cac08251a53bc5a8" />
               <section title="serializeValue" ref="class_q_json_serializer.html#a87cb2307625b39c10f46306b4aa585e7" />
               <section title="serializeVariant" ref="class_q_json_serializer.html#a125f14a7499788d9c7c7215e65268b1f" />
               <section title="setAllowDefaultNull" ref="class_q_json_serializer.html#ad807b89a053e8aac9930b2b6d8cf8cc4" />
@@ -78,6 +103,15 @@
           </section>
           <section title="Class Index" ref="classes.html" />
           <section title="Class Hierarchy" ref="hierarchy.html">
+            <section title="is_base_of">
+              <section title="_qjsonserializer_helpertypes::has_metaobject&lt; T * &gt;" ref="struct__qjsonserializer__helpertypes_1_1has__metaobject_3_01_t_01_5_01_4.html" />
+            </section>
+            <section title="is_void">
+              <section title="_qjsonserializer_helpertypes::has_metaobject&lt; T &gt;" ref="struct__qjsonserializer__helpertypes_1_1has__metaobject.html">
+                <section title="_qjsonserializer_helpertypes::type_helper&lt; T &gt;" ref="struct__qjsonserializer__helpertypes_1_1type__helper.html" />
+                <section title="_qjsonserializer_helpertypes::type_helper&lt; QList&lt; T &gt; &gt;" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_list_3_01_t_01_4_01_4.html" />
+              </section>
+            </section>
             <section title="QException" ref="qexception.html">
               <section title="QJsonSerializerException" ref="class_q_json_serializer_exception.html">
                 <section title="QJsonDeserializationException" ref="class_q_json_deserialization_exception.html" />
@@ -87,12 +121,18 @@
             <section title="QObject" ref="qobject.html">
               <section title="QJsonSerializer" ref="class_q_json_serializer.html" />
             </section>
+            <section title="true_type">
+              <section title="_qjsonserializer_helpertypes::has_metaobject&lt; QVariant &gt;" ref="struct__qjsonserializer__helpertypes_1_1has__metaobject_3_01_q_variant_01_4.html">
+                <section title="_qjsonserializer_helpertypes::type_helper&lt; QVariant &gt;" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_variant_01_4.html" />
+              </section>
+            </section>
             <section title="typedef" ref="classtypedef.html" />
           </section>
           <section title="Class Members" ref="functions.html">
             <section title="All" ref="functions.html" />
             <section title="Functions" ref="functions_func.html" />
             <section title="Variables" ref="functions_vars.html" />
+            <section title="Typedefs" ref="functions_type.html" />
             <section title="Properties" ref="functions_prop.html" />
           </section>
         </section>
@@ -101,6 +141,7 @@
             <section title="doxme.py" ref="doxme_8py_source.html" />
             <section title="qjsonserializer.cpp" ref="qjsonserializer_8cpp_source.html" />
             <section title="qjsonserializer.h" ref="qjsonserializer_8h_source.html" />
+            <section title="qjsonserializer_helpertypes.h" ref="qjsonserializer__helpertypes_8h_source.html" />
             <section title="qjsonserializerexception.cpp" ref="qjsonserializerexception_8cpp_source.html" />
             <section title="qjsonserializerexception.h" ref="qjsonserializerexception_8h_source.html" />
             <section title="qtjsonserializer_global.h" ref="qtjsonserializer__global_8h_source.html" />
@@ -138,16 +179,16 @@
       <keyword name="enumAsString" id="QJsonSerializer::enumAsString" ref="class_q_json_serializer.html#a3c26e7a387e04a367813e10cb6b716f2" />
       <keyword name="serialize" id="QJsonSerializer::serialize" ref="class_q_json_serializer.html#ab68cf3a3dc0b5d8fecf85b729d0be0a9" />
       <keyword name="serializeTo" id="QJsonSerializer::serializeTo" ref="class_q_json_serializer.html#a163d6f5b77e0b8b874d49a2cd546c88d" />
+      <keyword name="serializeTo" id="QJsonSerializer::serializeTo" ref="class_q_json_serializer.html#a1a7c606d60801923008752f43a16e0aa" />
       <keyword name="serialize" id="QJsonSerializer::serialize" ref="class_q_json_serializer.html#a36711cc64a6398add8d1d490f8e07cba" />
       <keyword name="serializeTo" id="QJsonSerializer::serializeTo" ref="class_q_json_serializer.html#a52fd1f06b32abf7b1e9eeffd61d1db0d" />
-      <keyword name="serialize" id="QJsonSerializer::serialize" ref="class_q_json_serializer.html#a3039e873f0fffb67d6c5f141ed9aed72" />
-      <keyword name="serializeTo" id="QJsonSerializer::serializeTo" ref="class_q_json_serializer.html#a458429765e0b9d842764fdcdc323418c" />
+      <keyword name="serializeTo" id="QJsonSerializer::serializeTo" ref="class_q_json_serializer.html#a33fc0f752ad3b0d1cac08251a53bc5a8" />
       <keyword name="deserialize" id="QJsonSerializer::deserialize" ref="class_q_json_serializer.html#ac2abe7502e5082e9e77ddc08e224840a" />
       <keyword name="deserializeFrom" id="QJsonSerializer::deserializeFrom" ref="class_q_json_serializer.html#aafa3d1873bf297dca6a60ccc380415cc" />
-      <keyword name="deserialize" id="QJsonSerializer::deserialize" ref="class_q_json_serializer.html#a57b25fd8c7976c99be05f89925ba0b0d" />
+      <keyword name="deserializeFrom" id="QJsonSerializer::deserializeFrom" ref="class_q_json_serializer.html#a9a7ef54e33560eeb3dccb3054cb4d872" />
+      <keyword name="deserialize" id="QJsonSerializer::deserialize" ref="class_q_json_serializer.html#acd01984d849ccbc5f0bb247901de800f" />
       <keyword name="deserializeFrom" id="QJsonSerializer::deserializeFrom" ref="class_q_json_serializer.html#a34800d922f12b1af0a016a5b06ecfb1b" />
-      <keyword name="deserialize" id="QJsonSerializer::deserialize" ref="class_q_json_serializer.html#a23015dab50da1608ac6e6f6e47a29a49" />
-      <keyword name="deserializeFrom" id="QJsonSerializer::deserializeFrom" ref="class_q_json_serializer.html#ade2c70ab549a8e164fd2eed06cccd561" />
+      <keyword name="deserializeFrom" id="QJsonSerializer::deserializeFrom" ref="class_q_json_serializer.html#afbca1b7d26866f48db10656e0284bbd6" />
       <keyword name="QObject" id="QObject::QObject" ref="qobject.html#QObject" />
       <keyword name="event" id="QObject::event" ref="qobject.html#event" />
       <keyword name="eventFilter" id="QObject::eventFilter" ref="qobject.html#eventFilter" />
@@ -229,6 +270,28 @@
       <keyword name="_what" id="QJsonSerializerException::_what" ref="class_q_json_serializer_exception.html#ac259c8dd25c565b9da8104c811052e61" />
       <keyword name="_isDeser" id="QJsonSerializerException::_isDeser" ref="class_q_json_serializer_exception.html#a42915bf5a162ff58498302dcbfd25af0" />
       <keyword name="typedef" id="typedef" ref="classtypedef.html" />
+      <keyword name="_qjsonserializer_helpertypes" id="_qjsonserializer_helpertypes" ref="namespace__qjsonserializer__helpertypes.html" />
+      <keyword name="_qjsonserializer_helpertypes::has_metaobject" id="_qjsonserializer_helpertypes::has_metaobject" ref="struct__qjsonserializer__helpertypes_1_1has__metaobject.html" />
+      <keyword name="_qjsonserializer_helpertypes::has_metaobject&lt; QVariant &gt;" id="_qjsonserializer_helpertypes::has_metaobject&lt; QVariant &gt;" ref="struct__qjsonserializer__helpertypes_1_1has__metaobject_3_01_q_variant_01_4.html" />
+      <keyword name="_qjsonserializer_helpertypes::has_metaobject&lt; T * &gt;" id="_qjsonserializer_helpertypes::has_metaobject&lt; T * &gt;" ref="struct__qjsonserializer__helpertypes_1_1has__metaobject_3_01_t_01_5_01_4.html" />
+      <keyword name="_qjsonserializer_helpertypes::type_helper" id="_qjsonserializer_helpertypes::type_helper" ref="struct__qjsonserializer__helpertypes_1_1type__helper.html" />
+      <keyword name="Type" id="_qjsonserializer_helpertypes::type_helper::Type" ref="struct__qjsonserializer__helpertypes_1_1type__helper.html#aaf407ddc64babfc5fd442e9563fe8b9d" />
+      <keyword name="ObjectType" id="_qjsonserializer_helpertypes::type_helper::ObjectType" ref="struct__qjsonserializer__helpertypes_1_1type__helper.html#acf5ab5da1d7ac57b9601adabaad1216e" />
+      <keyword name="JsonType" id="_qjsonserializer_helpertypes::type_helper::JsonType" ref="struct__qjsonserializer__helpertypes_1_1type__helper.html#a4b12f815d7ea7af56801088fefcc67e9" />
+      <keyword name="convert" id="_qjsonserializer_helpertypes::type_helper::convert" ref="struct__qjsonserializer__helpertypes_1_1type__helper.html#a4cb0fdb2171c0384a8489726dbe03768" />
+      <keyword name="variant" id="_qjsonserializer_helpertypes::type_helper::variant" ref="struct__qjsonserializer__helpertypes_1_1type__helper.html#abe922153f145b6bd5cfad51ce35a4bd6" />
+      <keyword name="_qjsonserializer_helpertypes::type_helper&lt; QList&lt; T &gt; &gt;" id="_qjsonserializer_helpertypes::type_helper&lt; QList&lt; T &gt; &gt;" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_list_3_01_t_01_4_01_4.html" />
+      <keyword name="Type" id="_qjsonserializer_helpertypes::type_helper&lt; QList&lt; T &gt; &gt;::Type" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_list_3_01_t_01_4_01_4.html#a2442fafc9940ca5445096507bdde28af" />
+      <keyword name="ObjectType" id="_qjsonserializer_helpertypes::type_helper&lt; QList&lt; T &gt; &gt;::ObjectType" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_list_3_01_t_01_4_01_4.html#a69ed8cac9ffd22669e6804089822ae60" />
+      <keyword name="JsonType" id="_qjsonserializer_helpertypes::type_helper&lt; QList&lt; T &gt; &gt;::JsonType" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_list_3_01_t_01_4_01_4.html#a91921e7acacb02943b492804eb387ffb" />
+      <keyword name="convert" id="_qjsonserializer_helpertypes::type_helper&lt; QList&lt; T &gt; &gt;::convert" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_list_3_01_t_01_4_01_4.html#a58aa32cbb0611a557057e2679929e0e4" />
+      <keyword name="variant" id="_qjsonserializer_helpertypes::type_helper&lt; QList&lt; T &gt; &gt;::variant" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_list_3_01_t_01_4_01_4.html#a51a090c599415eb18eb5bf99d17201f7" />
+      <keyword name="_qjsonserializer_helpertypes::type_helper&lt; QVariant &gt;" id="_qjsonserializer_helpertypes::type_helper&lt; QVariant &gt;" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_variant_01_4.html" />
+      <keyword name="Type" id="_qjsonserializer_helpertypes::type_helper&lt; QVariant &gt;::Type" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_variant_01_4.html#a69c8f01a33021f62907969b8f892650b" />
+      <keyword name="ObjectType" id="_qjsonserializer_helpertypes::type_helper&lt; QVariant &gt;::ObjectType" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_variant_01_4.html#a4df3f194269a9ac48a9d6795e5c5f761" />
+      <keyword name="JsonType" id="_qjsonserializer_helpertypes::type_helper&lt; QVariant &gt;::JsonType" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_variant_01_4.html#a647d88720963f090836d04ee5b75a367" />
+      <keyword name="convert" id="_qjsonserializer_helpertypes::type_helper&lt; QVariant &gt;::convert" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_variant_01_4.html#aae46b4e451ed1f77350bcd84f6634e09" />
+      <keyword name="variant" id="_qjsonserializer_helpertypes::type_helper&lt; QVariant &gt;::variant" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_variant_01_4.html#ae1f00f15a217cedf2f191537555f55a9" />
     </keywords>
     <files>
       <file>tabs.css</file>
@@ -258,6 +321,7 @@
       <file>doxme_8py_source.html</file>
       <file>qjsonserializer_8cpp_source.html</file>
       <file>qjsonserializer_8h_source.html</file>
+      <file>qjsonserializer__helpertypes_8h_source.html</file>
       <file>qjsonserializerexception_8cpp_source.html</file>
       <file>qjsonserializerexception_8h_source.html</file>
       <file>qtjsonserializer__global_8h_source.html</file>
@@ -275,10 +339,27 @@
       <file>class_q_json_serializer_exception.png</file>
       <file>class_q_json_serializer_exception-members.html</file>
       <file>classtypedef.html</file>
+      <file>namespace__qjsonserializer__helpertypes.html</file>
+      <file>struct__qjsonserializer__helpertypes_1_1has__metaobject.html</file>
+      <file>struct__qjsonserializer__helpertypes_1_1has__metaobject.png</file>
+      <file>struct__qjsonserializer__helpertypes_1_1has__metaobject_3_01_q_variant_01_4.html</file>
+      <file>struct__qjsonserializer__helpertypes_1_1has__metaobject_3_01_q_variant_01_4.png</file>
+      <file>struct__qjsonserializer__helpertypes_1_1has__metaobject_3_01_t_01_5_01_4.html</file>
+      <file>struct__qjsonserializer__helpertypes_1_1has__metaobject_3_01_t_01_5_01_4.png</file>
+      <file>struct__qjsonserializer__helpertypes_1_1type__helper.html</file>
+      <file>struct__qjsonserializer__helpertypes_1_1type__helper.png</file>
+      <file>struct__qjsonserializer__helpertypes_1_1type__helper-members.html</file>
+      <file>struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_list_3_01_t_01_4_01_4.html</file>
+      <file>struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_list_3_01_t_01_4_01_4.png</file>
+      <file>struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_list_3_01_t_01_4_01_4-members.html</file>
+      <file>struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_variant_01_4.html</file>
+      <file>struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_variant_01_4.png</file>
+      <file>struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_variant_01_4-members.html</file>
       <file>dir_e6be44ad11e6f84d257d285665f94458.html</file>
       <file>dir_68267d1309a1af8e8297ef4c3efbcdba.html</file>
       <file>index.html</file>
       <file>pages.html</file>
+      <file>namespaces.html</file>
       <file>annotated.html</file>
       <file>classes.html</file>
       <file>hierarchy.html</file>
@@ -294,6 +375,11 @@
       <file>functions.html</file>
       <file>functions.html</file>
       <file>functions.html</file>
+      <file>functions.html</file>
+      <file>functions.html</file>
+      <file>functions.html</file>
+      <file>functions.html</file>
+      <file>functions_func.html</file>
       <file>functions_func.html</file>
       <file>functions_func.html</file>
       <file>functions_func.html</file>
@@ -306,6 +392,9 @@
       <file>functions_func.html</file>
       <file>functions_func.html</file>
       <file>functions_vars.html</file>
+      <file>functions_type.html</file>
+      <file>functions_type.html</file>
+      <file>functions_type.html</file>
       <file>functions_prop.html</file>
       <file>functions_prop.html</file>
       <file>functions_prop.html</file>
