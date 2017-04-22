@@ -823,6 +823,7 @@ static void compile_test()
 	TestGadget t;
 	QList<TestGadget> l;
 	QIODevice *d = nullptr;
+	QByteArray b;
 	QJsonValue jv;
 	QJsonObject jo;
 	QJsonArray ja;
@@ -835,6 +836,10 @@ static void compile_test()
 	s.serializeTo(d, v);
 	s.serializeTo(d, t);
 	s.serializeTo(d, l);
+
+	s.serializeTo(v);
+	s.serializeTo(t);
+	s.serializeTo(l);
 
 	s.deserialize(jv, qMetaTypeId<TestGadget>());
 	s.deserialize(jv, qMetaTypeId<TestGadget>(), p);
@@ -849,6 +854,13 @@ static void compile_test()
 	s.deserializeObjectFrom<TestGadget>(d, p);
 	s.deserializeListFrom<TestGadget>(d);
 	s.deserializeListFrom<TestGadget>(d, p);
+
+	s.deserializeFrom(b, qMetaTypeId<TestGadget>());
+	s.deserializeFrom(b, qMetaTypeId<TestGadget>(), p);
+	s.deserializeObjectFrom<TestGadget>(b);
+	s.deserializeObjectFrom<TestGadget>(b, p);
+	s.deserializeListFrom<TestGadget>(b);
+	s.deserializeListFrom<TestGadget>(b, p);
 }
 
 QTEST_MAIN(GadgetSerializerTest)

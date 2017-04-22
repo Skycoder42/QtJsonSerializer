@@ -903,6 +903,7 @@ static void compile_test()
 	TestObject *t;
 	QList<TestObject*> l;
 	QIODevice *d = nullptr;
+	QByteArray b;
 	QJsonValue jv;
 	QJsonObject jo;
 	QJsonArray ja;
@@ -915,6 +916,10 @@ static void compile_test()
 	s.serializeTo(d, v);
 	s.serializeTo(d, t);
 	s.serializeTo(d, l);
+
+	s.serializeTo(v);
+	s.serializeTo(t);
+	s.serializeTo(l);
 
 	s.deserialize(jv, qMetaTypeId<TestObject*>());
 	s.deserialize(jv, qMetaTypeId<TestObject*>(), p);
@@ -929,6 +934,13 @@ static void compile_test()
 	s.deserializeObjectFrom<TestObject*>(d, p);
 	s.deserializeListFrom<TestObject*>(d);
 	s.deserializeListFrom<TestObject*>(d, p);
+
+	s.deserializeFrom(b, qMetaTypeId<TestObject*>());
+	s.deserializeFrom(b, qMetaTypeId<TestObject*>(), p);
+	s.deserializeObjectFrom<TestObject*>(b);
+	s.deserializeObjectFrom<TestObject*>(b, p);
+	s.deserializeListFrom<TestObject*>(b);
+	s.deserializeListFrom<TestObject*>(b, p);
 }
 
 QTEST_MAIN(ObjectSerializerTest)

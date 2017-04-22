@@ -7,6 +7,7 @@
 #include <QtCore/QUuid>
 #include <QtCore/QUrl>
 #include <QtCore/QJsonDocument>
+#include <QtCore/QBuffer>
 
 static const QRegularExpression listTypeRegex(QStringLiteral(R"__(^QList<\s*(.*)\s*>$)__"));
 
@@ -45,6 +46,15 @@ void QJsonSerializer::serializeTo(QIODevice *device, const QVariant &data) const
 	writeToDevice(serializeVariant(data.userType(), data), device);
 }
 
+QByteArray QJsonSerializer::serializeTo(const QVariant &data) const
+{
+	QBuffer buffer;
+	buffer.open(QIODevice::WriteOnly);
+	serializeTo(&buffer, data);
+	buffer.close();
+	return buffer.data();
+}
+
 QVariant QJsonSerializer::deserialize(const QJsonValue &json, int metaTypeId, QObject *parent) const
 {
 	return deserializeVariant(metaTypeId, json, parent);
@@ -53,6 +63,15 @@ QVariant QJsonSerializer::deserialize(const QJsonValue &json, int metaTypeId, QO
 QVariant QJsonSerializer::deserializeFrom(QIODevice *device, int metaTypeId, QObject *parent) const
 {
 	return deserializeVariant(metaTypeId, readFromDevice(device), parent);
+}
+
+QVariant QJsonSerializer::deserializeFrom(const QByteArray &data, int metaTypeId, QObject *parent) const
+{
+	QBuffer buffer(const_cast<QByteArray*>(&data));
+	buffer.open(QIODevice::ReadOnly);
+	auto res = deserializeFrom(&buffer, metaTypeId, parent);
+	buffer.close();
+	return res;
 }
 
 void QJsonSerializer::setAllowDefaultNull(bool allowDefaultNull)
