@@ -816,6 +816,41 @@ void GadgetSerializerTest::generateValidTestData()
 	}
 }
 
+static void compile_test()
+{
+	QJsonSerializer s;
+	QVariant v;
+	TestGadget t;
+	QList<TestGadget> l;
+	QIODevice *d = nullptr;
+	QJsonValue jv;
+	QJsonObject jo;
+	QJsonArray ja;
+	QObject *p = nullptr;
+
+	s.serialize(v);
+	s.serialize(t);
+	s.serialize(l);
+
+	s.serializeTo(d, v);
+	s.serializeTo(d, t);
+	s.serializeTo(d, l);
+
+	s.deserialize(jv, qMetaTypeId<TestGadget>());
+	s.deserialize(jv, qMetaTypeId<TestGadget>(), p);
+	s.deserialize<TestGadget>(jo);
+	s.deserialize<TestGadget>(jo, p);
+	s.deserialize<TestGadget>(ja);
+	s.deserialize<TestGadget>(ja, p);
+
+	s.deserializeFrom(d, qMetaTypeId<TestGadget>());
+	s.deserializeFrom(d, qMetaTypeId<TestGadget>(), p);
+	s.deserializeObjectFrom<TestGadget>(d);
+	s.deserializeObjectFrom<TestGadget>(d, p);
+	s.deserializeListFrom<TestGadget>(d);
+	s.deserializeListFrom<TestGadget>(d, p);
+}
+
 QTEST_MAIN(GadgetSerializerTest)
 
 #include "tst_gadgetserializer.moc"
