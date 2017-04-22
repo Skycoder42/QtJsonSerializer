@@ -909,38 +909,38 @@ static void compile_test()
 	QJsonArray ja;
 	QObject *p = nullptr;
 
-	s.serialize(v);
-	s.serialize(t);
-	s.serialize(l);
+	jv = s.serialize(v);
+	jo = s.serialize(t);
+	ja = s.serialize(l);
 
 	s.serializeTo(d, v);
 	s.serializeTo(d, t);
 	s.serializeTo(d, l);
 
-	s.serializeTo(v);
-	s.serializeTo(t);
-	s.serializeTo(l);
+	b = s.serializeTo(v);
+	b = s.serializeTo(t);
+	b = s.serializeTo(l);
 
-	s.deserialize(jv, qMetaTypeId<TestObject*>());
-	s.deserialize(jv, qMetaTypeId<TestObject*>(), p);
-	s.deserialize<TestObject*>(jo);
-	s.deserialize<TestObject*>(jo, p);
-	s.deserialize<TestObject*>(ja);
-	s.deserialize<TestObject*>(ja, p);
+	v = s.deserialize(jv, qMetaTypeId<TestObject*>());
+	v = s.deserialize(jv, qMetaTypeId<TestObject*>(), p);
+	t = s.deserialize<TestObject*>(jo);
+	t = s.deserialize<TestObject*>(jo, p);
+	l = s.deserialize<QList<TestObject*>>(ja);
+	l = s.deserialize<QList<TestObject*>>(ja, p);
 
-	s.deserializeFrom(d, qMetaTypeId<TestObject*>());
-	s.deserializeFrom(d, qMetaTypeId<TestObject*>(), p);
-	s.deserializeObjectFrom<TestObject*>(d);
-	s.deserializeObjectFrom<TestObject*>(d, p);
-	s.deserializeListFrom<TestObject*>(d);
-	s.deserializeListFrom<TestObject*>(d, p);
+	v = s.deserializeFrom(d, qMetaTypeId<TestObject*>());
+	v = s.deserializeFrom(d, qMetaTypeId<TestObject*>(), p);
+	t = s.deserializeFrom<TestObject*>(d);
+	t = s.deserializeFrom<TestObject*>(d, p);
+	l = s.deserializeFrom<QList<TestObject*>>(d);
+	l = s.deserializeFrom<QList<TestObject*>>(d, p);
 
-	s.deserializeFrom(b, qMetaTypeId<TestObject*>());
-	s.deserializeFrom(b, qMetaTypeId<TestObject*>(), p);
-	s.deserializeObjectFrom<TestObject*>(b);
-	s.deserializeObjectFrom<TestObject*>(b, p);
-	s.deserializeListFrom<TestObject*>(b);
-	s.deserializeListFrom<TestObject*>(b, p);
+	v = s.deserializeFrom(b, qMetaTypeId<TestObject*>());
+	v = s.deserializeFrom(b, qMetaTypeId<TestObject*>(), p);
+	t = s.deserializeFrom<TestObject*>(b);
+	t = s.deserializeFrom<TestObject*>(b, p);
+	l = s.deserializeFrom<QList<TestObject*>>(b);
+	l = s.deserializeFrom<QList<TestObject*>>(b, p);
 }
 
 QTEST_MAIN(ObjectSerializerTest)

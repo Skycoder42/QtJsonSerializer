@@ -38,21 +38,17 @@ bool QJsonSerializer::enumAsString() const
 
 QJsonValue QJsonSerializer::serialize(const QVariant &data) const
 {
-	return serializeVariant(data.userType(), data);
+	return serializeImpl(data);
 }
 
 void QJsonSerializer::serializeTo(QIODevice *device, const QVariant &data) const
 {
-	writeToDevice(serializeVariant(data.userType(), data), device);
+	serializeToImpl(device, data);
 }
 
 QByteArray QJsonSerializer::serializeTo(const QVariant &data) const
 {
-	QBuffer buffer;
-	buffer.open(QIODevice::WriteOnly);
-	serializeTo(&buffer, data);
-	buffer.close();
-	return buffer.data();
+	return serializeToImpl(data);
 }
 
 QVariant QJsonSerializer::deserialize(const QJsonValue &json, int metaTypeId, QObject *parent) const
@@ -370,6 +366,25 @@ QJsonValue QJsonSerializer::readFromDevice(QIODevice *device) const
 		return doc.array();
 	else
 		return doc.object();
+}
+
+QJsonValue QJsonSerializer::serializeImpl(const QVariant &data) const
+{
+	return serializeVariant(data.userType(), data);
+}
+
+void QJsonSerializer::serializeToImpl(QIODevice *device, const QVariant &data) const
+{
+	writeToDevice(serializeVariant(data.userType(), data), device);
+}
+
+QByteArray QJsonSerializer::serializeToImpl(const QVariant &data) const
+{
+	QBuffer buffer;
+	buffer.open(QIODevice::WriteOnly);
+	serializeToImpl(&buffer, data);
+	buffer.close();
+	return buffer.data();
 }
 
 

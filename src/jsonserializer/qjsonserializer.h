@@ -3,6 +3,7 @@
 
 #include "QtJsonSerializer/qtjsonserializer_global.h"
 #include "QtJsonSerializer/qjsonserializerexception.h"
+#include "QtJsonSerializer/qjsonserializer_helpertypes.h"
 
 #include <QtCore/qjsonobject.h>
 #include <QtCore/qjsonarray.h>
@@ -10,7 +11,6 @@
 #include <QtCore/qobject.h>
 #include <QtCore/qvariant.h>
 #include <QtCore/qdebug.h>
-#include <type_traits>
 
 class QJsonSerializerPrivate;
 //! A class to serializer and deserializer QObjects and Q_GADGETS to and from JSON
@@ -48,24 +48,16 @@ public:
 	void serializeTo(QIODevice *device, const QVariant &data) const;
 	//! Serializers a QVariant value to a byte array
 	QByteArray serializeTo(const QVariant &data) const;
+
 	//! Serializers a QObject or Q_GADGET to a QJsonObject
 	template <typename T>
-	QJsonObject serialize(const T &data) const;
+	typename _qjsonserializer_helpertypes::type_helper<T>::JsonType serialize(const T &data) const;
 	//! Serializers a QObject or Q_GADGET to a device
 	template <typename T>
 	void serializeTo(QIODevice *device, const T &data) const;
 	//! Serializers a QObject or Q_GADGET to a byte array
 	template <typename T>
 	QByteArray serializeTo(const T &data) const;
-	//! Serializers a list of QObjects or Q_GADGETs to a QJsonArray
-	template <typename T>
-	QJsonArray serialize(const QList<T> &data) const;
-	//! Serializers a list of QObjects or Q_GADGETs to a device
-	template <typename T>
-	void serializeTo(QIODevice *device, const QList<T> &data) const;
-	//! Serializers a list of QObjects or Q_GADGETs to a byte array
-	template <typename T>
-	QByteArray serializeTo(const QList<T> &data) const;
 
 	//! Deserializes a QJsonValue to a QVariant value, based on the given type id
 	QVariant deserialize(const QJsonValue &json, int metaTypeId, QObject *parent = nullptr) const;
@@ -73,26 +65,16 @@ public:
 	QVariant deserializeFrom(QIODevice *device, int metaTypeId, QObject *parent = nullptr) const;
 	//! Deserializes data from a device to a QVariant value, based on the given type id
 	QVariant deserializeFrom(const QByteArray &data, int metaTypeId, QObject *parent = nullptr) const;
+
 	//! Deserializes a QJsonObject to the given QObject or Q_GADGET type
 	template <typename T>
-	T deserialize(const QJsonObject &json, QObject *parent = nullptr) const;
+	T deserialize(const typename _qjsonserializer_helpertypes::type_helper<T>::JsonType &json, QObject *parent = nullptr) const;
 	//! Deserializes data from a device to the given QObject or Q_GADGET type
 	template <typename T>
-	T deserializeObjectFrom(QIODevice *device, QObject *parent = nullptr) const;
+	T deserializeFrom(QIODevice *device, QObject *parent = nullptr) const;
 	//! Deserializes data from a byte array to the given QObject or Q_GADGET type
 	template <typename T>
-	T deserializeObjectFrom(const QByteArray &data, QObject *parent = nullptr) const;
-	//! Deserializes a QJsonArray to a list of the given QObject or Q_GADGET type
-	template<typename T>
-	QList<T> deserialize(const QJsonArray &json, QObject *parent = nullptr) const;
-	//! @brief Deserializes data from a device to a list of the given QObject or Q_GADGET type
-	//! @copydetails QJsonSerializer::deserializeObjectFrom(QIODevice *, QObject*) const
-	template <typename T>
-	QList<T> deserializeListFrom(QIODevice *device, QObject *parent = nullptr) const;
-	//! @brief Deserializes data from a device to a byte array of the given QObject or Q_GADGET type
-	//! @copydetails QJsonSerializer::deserializeObjectFrom(const QByteArray &, QObject*) const
-	template <typename T>
-	QList<T> deserializeListFrom(const QByteArray &data, QObject *parent = nullptr) const;
+	T deserializeFrom(const QByteArray &data, QObject *parent = nullptr) const;
 
 public Q_SLOTS:
 	//! @writeAcFn{QJsonSerializer::allowDefaultNull}
@@ -130,14 +112,14 @@ protected:
 	virtual QVariant deserializeValue(int propertyType, const QJsonValue &value) const;
 
 private:
-	template <typename T>
-	class _assert_has_metaobject : public std::is_void<typename T::QtGadgetHelper> {};
-	template <typename T>
-	class _assert_has_metaobject<T*> : public std::is_base_of<QObject, T> {};
 	QScopedPointer<QJsonSerializerPrivate> d;
 
 	void writeToDevice(const QJsonValue &data, QIODevice *device) const;
 	QJsonValue readFromDevice(QIODevice *device) const;
+
+	QJsonValue serializeImpl(const QVariant &data) const;
+	void serializeToImpl(QIODevice *device, const QVariant &data) const;
+	QByteArray serializeToImpl(const QVariant &data) const;
 };
 
 // ------------- Generic Implementation -------------
@@ -172,87 +154,45 @@ bool QJsonSerializer::registerListConverters() {
 }
 
 template<typename T>
-QJsonObject QJsonSerializer::serialize(const T &data) const
+typename _qjsonserializer_helpertypes::type_helper<T>::JsonType QJsonSerializer::serialize(const T &data) const
 {
-	static_assert(_assert_has_metaobject<T>::value, "T must either be a pointer and inherit QObject or be a value type and have the Q_GADGET macro");
-	return serialize(QVariant::fromValue(data)).toObject();
+	static_assert(_qjsonserializer_helpertypes::type_helper<T>::value, "T must either be a pointer and inherit QObject or be a value type and have the Q_GADGET macro");
+	return _qjsonserializer_helpertypes::type_helper<T>::convert(serializeImpl(_qjsonserializer_helpertypes::type_helper<T>::variant(data)));
 }
 
 template<typename T>
 void QJsonSerializer::serializeTo(QIODevice *device, const T &data) const
 {
-	static_assert(_assert_has_metaobject<T>::value, "T must either be a pointer and inherit QObject or be a value type and have the Q_GADGET macro");
-	serializeTo(device, QVariant::fromValue(data));
+	static_assert(_qjsonserializer_helpertypes::type_helper<T>::value, "T must either be a pointer and inherit QObject or be a value type and have the Q_GADGET macro");
+	serializeToImpl(device, _qjsonserializer_helpertypes::type_helper<T>::variant(data));
 }
 
 template<typename T>
 QByteArray QJsonSerializer::serializeTo(const T &data) const
 {
-	static_assert(_assert_has_metaobject<T>::value, "T must either be a pointer and inherit QObject or be a value type and have the Q_GADGET macro");
-	return serializeTo(QVariant::fromValue(data));
+	static_assert(_qjsonserializer_helpertypes::type_helper<T>::value, "T must either be a pointer and inherit QObject or be a value type and have the Q_GADGET macro");
+	return serializeToImpl(_qjsonserializer_helpertypes::type_helper<T>::variant(data));
 }
 
 template<typename T>
-QJsonArray QJsonSerializer::serialize(const QList<T> &data) const
+T QJsonSerializer::deserialize(const typename _qjsonserializer_helpertypes::type_helper<T>::JsonType &json, QObject *parent) const
 {
-	static_assert(_assert_has_metaobject<T>::value, "T must either be a pointer and inherit QObject or be a value type and have the Q_GADGET macro");
-	return serialize(QVariant::fromValue(data)).toArray();
-}
-
-template<typename T>
-void QJsonSerializer::serializeTo(QIODevice *device, const QList<T> &data) const
-{
-	static_assert(_assert_has_metaobject<T>::value, "T must either be a pointer and inherit QObject or be a value type and have the Q_GADGET macro");
-	serializeTo(device, QVariant::fromValue(data));
-}
-
-template<typename T>
-QByteArray QJsonSerializer::serializeTo(const QList<T> &data) const
-{
-	static_assert(_assert_has_metaobject<T>::value, "T must either be a pointer and inherit QObject or be a value type and have the Q_GADGET macro");
-	return serializeTo(QVariant::fromValue(data));
-}
-
-template<typename T>
-T QJsonSerializer::deserialize(const QJsonObject &json, QObject *parent) const
-{
-	static_assert(_assert_has_metaobject<T>::value, "T must either be a pointer and inherit QObject or be a value type and have the Q_GADGET macro");
+	static_assert(_qjsonserializer_helpertypes::type_helper<T>::value, "T must either be a pointer and inherit QObject or be a value type and have the Q_GADGET macro");
 	return deserialize(json, qMetaTypeId<T>(), parent).template value<T>();
 }
 
 template<typename T>
-T QJsonSerializer::deserializeObjectFrom(QIODevice *device, QObject *parent) const
+T QJsonSerializer::deserializeFrom(QIODevice *device, QObject *parent) const
 {
-	static_assert(_assert_has_metaobject<T>::value, "T must either be a pointer and inherit QObject or be a value type and have the Q_GADGET macro");
+	static_assert(_qjsonserializer_helpertypes::type_helper<T>::value, "T must either be a pointer and inherit QObject or be a value type and have the Q_GADGET macro");
 	return deserializeFrom(device, qMetaTypeId<T>(), parent).template value<T>();
 }
 
 template<typename T>
-T QJsonSerializer::deserializeObjectFrom(const QByteArray &data, QObject *parent) const
+T QJsonSerializer::deserializeFrom(const QByteArray &data, QObject *parent) const
 {
-	static_assert(_assert_has_metaobject<T>::value, "T must either be a pointer and inherit QObject or be a value type and have the Q_GADGET macro");
+	static_assert(_qjsonserializer_helpertypes::type_helper<T>::value, "T must either be a pointer and inherit QObject or be a value type and have the Q_GADGET macro");
 	return deserializeFrom(data, qMetaTypeId<T>(), parent).template value<T>();
-}
-
-template<typename T>
-QList<T> QJsonSerializer::deserialize(const QJsonArray &json, QObject *parent) const
-{
-	static_assert(_assert_has_metaobject<T>::value, "T must either be a pointer and inherit QObject or be a value type and have the Q_GADGET macro");
-	return deserialize(json, qMetaTypeId<QList<T>>(), parent).template value<QList<T>>();
-}
-
-template<typename T>
-QList<T> QJsonSerializer::deserializeListFrom(QIODevice *device, QObject *parent) const
-{
-	static_assert(_assert_has_metaobject<T>::value, "T must either be a pointer and inherit QObject or be a value type and have the Q_GADGET macro");
-	return deserializeFrom(device, qMetaTypeId<QList<T>>(), parent).template value<QList<T>>();
-}
-
-template<typename T>
-QList<T> QJsonSerializer::deserializeListFrom(const QByteArray &data, QObject *parent) const
-{
-	static_assert(_assert_has_metaobject<T>::value, "T must either be a pointer and inherit QObject or be a value type and have the Q_GADGET macro");
-	return deserializeFrom(data, qMetaTypeId<QList<T>>(), parent).template value<QList<T>>();
 }
 
 #endif // QJSONSERIALIZER_H

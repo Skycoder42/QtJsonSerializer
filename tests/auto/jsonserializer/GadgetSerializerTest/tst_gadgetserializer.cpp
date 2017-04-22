@@ -829,38 +829,38 @@ static void compile_test()
 	QJsonArray ja;
 	QObject *p = nullptr;
 
-	s.serialize(v);
-	s.serialize(t);
-	s.serialize(l);
+	jv = s.serialize(v);
+	jo = s.serialize(t);
+	ja = s.serialize(l);
 
 	s.serializeTo(d, v);
 	s.serializeTo(d, t);
 	s.serializeTo(d, l);
 
-	s.serializeTo(v);
-	s.serializeTo(t);
-	s.serializeTo(l);
+	b = s.serializeTo(v);
+	b = s.serializeTo(t);
+	b = s.serializeTo(l);
 
-	s.deserialize(jv, qMetaTypeId<TestGadget>());
-	s.deserialize(jv, qMetaTypeId<TestGadget>(), p);
-	s.deserialize<TestGadget>(jo);
-	s.deserialize<TestGadget>(jo, p);
-	s.deserialize<TestGadget>(ja);
-	s.deserialize<TestGadget>(ja, p);
+	v = s.deserialize(jv, qMetaTypeId<TestGadget>());
+	v = s.deserialize(jv, qMetaTypeId<TestGadget>(), p);
+	t = s.deserialize<TestGadget>(jo);
+	t = s.deserialize<TestGadget>(jo, p);
+	l = s.deserialize<QList<TestGadget>>(ja);
+	l = s.deserialize<QList<TestGadget>>(ja, p);
 
-	s.deserializeFrom(d, qMetaTypeId<TestGadget>());
-	s.deserializeFrom(d, qMetaTypeId<TestGadget>(), p);
-	s.deserializeObjectFrom<TestGadget>(d);
-	s.deserializeObjectFrom<TestGadget>(d, p);
-	s.deserializeListFrom<TestGadget>(d);
-	s.deserializeListFrom<TestGadget>(d, p);
+	v = s.deserializeFrom(d, qMetaTypeId<TestGadget>());
+	v = s.deserializeFrom(d, qMetaTypeId<TestGadget>(), p);
+	t = s.deserializeFrom<TestGadget>(d);
+	t = s.deserializeFrom<TestGadget>(d, p);
+	l = s.deserializeFrom<QList<TestGadget>>(d);
+	l = s.deserializeFrom<QList<TestGadget>>(d, p);
 
-	s.deserializeFrom(b, qMetaTypeId<TestGadget>());
-	s.deserializeFrom(b, qMetaTypeId<TestGadget>(), p);
-	s.deserializeObjectFrom<TestGadget>(b);
-	s.deserializeObjectFrom<TestGadget>(b, p);
-	s.deserializeListFrom<TestGadget>(b);
-	s.deserializeListFrom<TestGadget>(b, p);
+	v = s.deserializeFrom(b, qMetaTypeId<TestGadget>());
+	v = s.deserializeFrom(b, qMetaTypeId<TestGadget>(), p);
+	t = s.deserializeFrom<TestGadget>(b);
+	t = s.deserializeFrom<TestGadget>(b, p);
+	l = s.deserializeFrom<QList<TestGadget>>(b);
+	l = s.deserializeFrom<QList<TestGadget>>(b, p);
 }
 
 QTEST_MAIN(GadgetSerializerTest)

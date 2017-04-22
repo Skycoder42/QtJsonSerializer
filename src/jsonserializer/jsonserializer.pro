@@ -10,7 +10,8 @@ HEADERS += \
 	qjsonserializerexception.h \
 	qjsonserializer.h \
     qjsonserializer_p.h \
-    qtjsonserializer_global.h
+    qtjsonserializer_global.h \
+    qjsonserializer_helpertypes.h
 
 load(qt_module)
 
