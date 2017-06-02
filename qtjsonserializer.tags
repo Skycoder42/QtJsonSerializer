@@ -15,6 +15,10 @@
     <templarg></templarg>
   </compound>
   <compound kind="class">
+    <name>QBasicMutex</name>
+    <filename>class_q_basic_mutex.html</filename>
+  </compound>
+  <compound kind="class">
     <name>QJsonDeserializationException</name>
     <filename>class_q_json_deserialization_exception.html</filename>
     <base>QJsonSerializerException</base>

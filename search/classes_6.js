@@ -1,11 +1,6 @@
 var searchData=
 [
-  ['genericrestreply',['GenericRestReply',['https://doc.qt.io/qt-5/class_qt_rest_client_1_1_generic_rest_reply.html',0,'QtRestClient']]],
-  ['genericrestreply_3c_20paging_3c_20dataclasstype_20_3e_2c_20errorclasstype_20_3e',['GenericRestReply&lt; Paging&lt; DataClassType &gt;, ErrorClassType &gt;',['https://doc.qt.io/qt-5/class_qt_rest_client_1_1_generic_rest_reply_3_01_paging_3_01_data_class_type_01_4_00_01_error_class_type_01_4.html',0,'QtRestClient']]],
-  ['genericrestreply_3c_20qlist_3c_20dataclasstype_20_3e_2c_20errorclasstype_20_3e',['GenericRestReply&lt; QList&lt; DataClassType &gt;, ErrorClassType &gt;',['https://doc.qt.io/qt-5/class_qt_rest_client_1_1_generic_rest_reply_3_01_q_list_3_01_data_class_type_01_4_00_01_error_class_type_01_4.html',0,'QtRestClient']]],
-  ['genericrestreply_3c_20void_2c_20errorclasstype_20_3e',['GenericRestReply&lt; void, ErrorClassType &gt;',['https://doc.qt.io/qt-5/class_qt_rest_client_1_1_generic_rest_reply_3_01void_00_01_error_class_type_01_4.html',0,'QtRestClient']]],
-  ['generictask',['GenericTask',['https://doc.qt.io/qt-5/class_qt_data_sync_1_1_generic_task.html',0,'QtDataSync']]],
-  ['generictask_3c_20void_20_3e',['GenericTask&lt; void &gt;',['https://doc.qt.io/qt-5/class_qt_data_sync_1_1_generic_task_3_01void_01_4.html',0,'QtDataSync']]],
-  ['globalterminal',['GlobalTerminal',['https://doc.qt.io/qt-5/class_qt_background_process_1_1_global_terminal.html',0,'QtBackgroundProcess']]],
-  ['gltfio',['GLTFIO',['https://doc.qt.io/qt-5/qt3drender-gltfio.html',0,'Qt3DRender']]]
+  ['has_5fmetaobject',['has_metaobject',['../struct__qjsonserializer__helpertypes_1_1has__metaobject.html',1,'_qjsonserializer_helpertypes']]],
+  ['has_5fmetaobject_3c_20qvariant_20_3e',['has_metaobject&lt; QVariant &gt;',['../struct__qjsonserializer__helpertypes_1_1has__metaobject_3_01_q_variant_01_4.html',1,'_qjsonserializer_helpertypes']]],
+  ['has_5fmetaobject_3c_20t_20_2a_20_3e',['has_metaobject&lt; T * &gt;',['../struct__qjsonserializer__helpertypes_1_1has__metaobject_3_01_t_01_5_01_4.html',1,'_qjsonserializer_helpertypes']]]
 ];

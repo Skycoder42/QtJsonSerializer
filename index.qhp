@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <QtHelpProject version="1.0">
-  <namespace>de.skycoder42.qtjsonserializer.210</namespace>
+  <namespace>de.skycoder42.qtjsonserializer.211</namespace>
   <virtualFolder>doc_qtjsonserializer</virtualFolder>
-  <customFilter name="JsonSerializer 2.1.0">
+  <customFilter name="JsonSerializer 2.1.1">
     <filterAttribute>qtjsonserializer</filterAttribute>
-    <filterAttribute>2.1.0</filterAttribute>
+    <filterAttribute>2.1.1</filterAttribute>
   </customFilter>
   <filterSection>
     <filterAttribute>doxygen</filterAttribute>
     <toc>
-      <section title="QtJsonSerializer 2.1.0" ref="index.html">
+      <section title="QtJsonSerializer 2.1.1" ref="index.html">
         <section title="Features" ref="index.html#qtjsonserializer_readme_label_0" />
         <section title="Download/Installation" ref="index.html#qtjsonserializer_readme_label_1" />
         <section title="Usage" ref="index.html#qtjsonserializer_readme_label_2">
@@ -44,6 +44,7 @@
                 <section title="Type" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_variant_01_4.html#a69c8f01a33021f62907969b8f892650b" />
               </section>
             </section>
+            <section title="QBasicMutex" ref="class_q_basic_mutex.html" />
             <section title="QJsonDeserializationException" ref="class_q_json_deserialization_exception.html">
               <section title="QJsonDeserializationException" ref="class_q_json_deserialization_exception.html#ad37e36ebc35f0812018106e1a65895b1" />
               <section title="clone" ref="class_q_json_deserialization_exception.html#ad4196cb826c8770beab48325bc3cbddf" />
@@ -112,6 +113,7 @@
                 <section title="_qjsonserializer_helpertypes::type_helper&lt; QList&lt; T &gt; &gt;" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_list_3_01_t_01_4_01_4.html" />
               </section>
             </section>
+            <section title="QBasicMutex" ref="class_q_basic_mutex.html" />
             <section title="QException" ref="qexception.html">
               <section title="QJsonSerializerException" ref="class_q_json_serializer_exception.html">
                 <section title="QJsonDeserializationException" ref="class_q_json_deserialization_exception.html" />
@@ -126,7 +128,6 @@
                 <section title="_qjsonserializer_helpertypes::type_helper&lt; QVariant &gt;" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_variant_01_4.html" />
               </section>
             </section>
-            <section title="typedef" ref="classtypedef.html" />
           </section>
           <section title="Class Members" ref="functions.html">
             <section title="All" ref="functions.html" />
@@ -150,6 +151,7 @@
       </section>
     </toc>
     <keywords>
+      <keyword name="QBasicMutex" id="QBasicMutex" ref="class_q_basic_mutex.html" />
       <keyword name="QJsonDeserializationException" id="QJsonDeserializationException" ref="class_q_json_deserialization_exception.html" />
       <keyword name="QJsonDeserializationException" id="QJsonDeserializationException::QJsonDeserializationException" ref="class_q_json_deserialization_exception.html#ad37e36ebc35f0812018106e1a65895b1" />
       <keyword name="raise" id="QJsonDeserializationException::raise" ref="class_q_json_deserialization_exception.html#a48291abca66222ed578833a1c1c169c0" />
@@ -202,6 +204,7 @@
       <keyword name="thread" id="QObject::thread" ref="qobject.html#thread" />
       <keyword name="moveToThread" id="QObject::moveToThread" ref="qobject.html#moveToThread" />
       <keyword name="startTimer" id="QObject::startTimer" ref="qobject.html#startTimer" />
+      <keyword name="startTimer" id="QObject::startTimer" ref="qobject.html#startTimer-1" />
       <keyword name="killTimer" id="QObject::killTimer" ref="qobject.html#killTimer" />
       <keyword name="findChild" id="QObject::findChild" ref="qobject.html#findChild" />
       <keyword name="findChildren" id="QObject::findChildren" ref="qobject.html#findChildren" />
@@ -214,6 +217,8 @@
       <keyword name="connect" id="QObject::connect" ref="qobject.html#connect-2" />
       <keyword name="disconnect" id="QObject::disconnect" ref="qobject.html#disconnect-2" />
       <keyword name="disconnect" id="QObject::disconnect" ref="qobject.html#disconnect-3" />
+      <keyword name="dumpObjectTree" id="QObject::dumpObjectTree" ref="qobject.html#dumpObjectTree-1" />
+      <keyword name="dumpObjectInfo" id="QObject::dumpObjectInfo" ref="qobject.html#dumpObjectInfo-1" />
       <keyword name="dumpObjectTree" id="QObject::dumpObjectTree" ref="qobject.html#dumpObjectTree" />
       <keyword name="dumpObjectInfo" id="QObject::dumpObjectInfo" ref="qobject.html#dumpObjectInfo" />
       <keyword name="setProperty" id="QObject::setProperty" ref="qobject.html#setProperty" />
@@ -269,7 +274,6 @@
       <keyword name="clone" id="QJsonSerializerException::clone" ref="class_q_json_serializer_exception.html#aedc8fa4385bbbb0d34c6ad6c11e37378" />
       <keyword name="_what" id="QJsonSerializerException::_what" ref="class_q_json_serializer_exception.html#ac259c8dd25c565b9da8104c811052e61" />
       <keyword name="_isDeser" id="QJsonSerializerException::_isDeser" ref="class_q_json_serializer_exception.html#a42915bf5a162ff58498302dcbfd25af0" />
-      <keyword name="typedef" id="typedef" ref="classtypedef.html" />
       <keyword name="_qjsonserializer_helpertypes" id="_qjsonserializer_helpertypes" ref="namespace__qjsonserializer__helpertypes.html" />
       <keyword name="_qjsonserializer_helpertypes::has_metaobject" id="_qjsonserializer_helpertypes::has_metaobject" ref="struct__qjsonserializer__helpertypes_1_1has__metaobject.html" />
       <keyword name="_qjsonserializer_helpertypes::has_metaobject&lt; QVariant &gt;" id="_qjsonserializer_helpertypes::has_metaobject&lt; QVariant &gt;" ref="struct__qjsonserializer__helpertypes_1_1has__metaobject_3_01_q_variant_01_4.html" />
@@ -326,6 +330,7 @@
       <file>qjsonserializerexception_8h_source.html</file>
       <file>qtjsonserializer__global_8h_source.html</file>
       <file>_r_e_a_d_m_e_8md_source.html</file>
+      <file>class_q_basic_mutex.html</file>
       <file>class_q_json_deserialization_exception.html</file>
       <file>class_q_json_deserialization_exception.png</file>
       <file>class_q_json_deserialization_exception-members.html</file>
@@ -338,7 +343,6 @@
       <file>class_q_json_serializer_exception.html</file>
       <file>class_q_json_serializer_exception.png</file>
       <file>class_q_json_serializer_exception-members.html</file>
-      <file>classtypedef.html</file>
       <file>namespace__qjsonserializer__helpertypes.html</file>
       <file>struct__qjsonserializer__helpertypes_1_1has__metaobject.html</file>
       <file>struct__qjsonserializer__helpertypes_1_1has__metaobject.png</file>
@@ -358,7 +362,6 @@
       <file>dir_e6be44ad11e6f84d257d285665f94458.html</file>
       <file>dir_68267d1309a1af8e8297ef4c3efbcdba.html</file>
       <file>index.html</file>
-      <file>pages.html</file>
       <file>namespaces.html</file>
       <file>annotated.html</file>
       <file>classes.html</file>

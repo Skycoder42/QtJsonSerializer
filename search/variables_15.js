@@ -1,7 +1,6 @@
 var searchData=
 [
-  ['unchanged',['Unchanged',['https://doc.qt.io/qt-5/class_qt_data_sync_1_1_state_holder.html#a3ac1a05a93bb0c3b88bb3f2e04df4b11aad712bda2454a5b0692c3479cce6a04a',0,'QtDataSync::StateHolder']]],
-  ['unhandledexception',['UnhandledException',['https://doc.qt.io/qt-5/qtconcurrent-obsolete.html#UnhandledException-typedef',0,'QtConcurrent']]],
-  ['usagepolicies',['UsagePolicies',['https://doc.qt.io/qt-5/qnetworksession.html#UsagePolicy-enum',0,'QNetworkSession']]],
-  ['userinputresolutionoptions',['UserInputResolutionOptions',['https://doc.qt.io/qt-5/qurl.html#UserInputResolutionOption-enum',0,'QUrl']]]
+  ['value_5ftype',['value_type',['https://doc.qt.io/qt-5/qjsonarray.html#value_type-typedef',0,'QJsonArray::value_type()'],['https://doc.qt.io/qt-5/qfuture-const-iterator.html#value_type-typedef',0,'QFuture::const_iterator::value_type()'],['https://doc.qt.io/qt-5/qlinkedlist.html#value_type-typedef',0,'QLinkedList::value_type()'],['https://doc.qt.io/qt-5/qlist.html#value_type-typedef',0,'QList::value_type()'],['https://doc.qt.io/qt-5/qset.html#value_type-typedef',0,'QSet::value_type()'],['https://doc.qt.io/qt-5/qstring.html#value_type-typedef',0,'QString::value_type()'],['https://doc.qt.io/qt-5/qvarlengtharray.html#value_type-typedef',0,'QVarLengthArray::value_type()'],['https://doc.qt.io/qt-5/qvector.html#value_type-typedef',0,'QVector::value_type()']]],
+  ['viewitemfeatures',['ViewItemFeatures',['https://doc.qt.io/qt-5/qstyleoptionviewitem.html#ViewItemFeature-enum',0,'QStyleOptionViewItem']]],
+  ['visibilityscope',['VisibilityScope',['https://doc.qt.io/qt-5/qlocation.html#Visibility-enum',0,'QLocation']]]
 ];
