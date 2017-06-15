@@ -9,7 +9,7 @@ TestGadget::TestGadget() :
 	doubleProperty(0.0),
 	normalEnumProperty(Normal0),
 	enumFlagsProperty(0),
-	simpeList(),
+	simpleList(),
 	leveledList()
 {}
 
@@ -21,7 +21,7 @@ bool TestGadget::operator==(const TestGadget &other) const
 			doubleProperty == other.doubleProperty &&
 			normalEnumProperty == other.normalEnumProperty &&
 			enumFlagsProperty == other.enumFlagsProperty &&
-			simpeList == other.simpeList &&
+			simpleList == other.simpleList &&
 			leveledList == other.leveledList;
 }
 
@@ -33,7 +33,7 @@ bool TestGadget::operator!=(const TestGadget &other) const
 			doubleProperty != other.doubleProperty ||
 			normalEnumProperty != other.normalEnumProperty ||
 			enumFlagsProperty != other.enumFlagsProperty ||
-			simpeList != other.simpeList ||
+			simpleList != other.simpleList ||
 						 leveledList != other.leveledList;
 }
 
@@ -65,7 +65,7 @@ bool ParentGadget::operator==(const ParentGadget &other) const
 			boolProperty == other.boolProperty &&
 			stringProperty == other.stringProperty &&
 			doubleProperty == other.doubleProperty &&
-			simpeList == other.simpeList &&
+			simpleList == other.simpleList &&
 			leveledList == other.leveledList &&
 			childGadget == other.childGadget &&
 			simpleChildren == other.simpleChildren &&
@@ -78,7 +78,7 @@ bool ParentGadget::operator!=(const ParentGadget &other) const
 			boolProperty != other.boolProperty ||
 			stringProperty != other.stringProperty ||
 			doubleProperty != other.doubleProperty ||
-			simpeList != other.simpeList ||
+			simpleList != other.simpleList ||
 			leveledList != other.leveledList ||
 			childGadget != other.childGadget ||
 			simpleChildren != other.simpleChildren ||
@@ -103,10 +103,10 @@ ParentGadget ParentGadget::createEnum(TestGadget::NormalEnum normalEnumProperty,
 	return t;
 }
 
-ParentGadget ParentGadget::createList(QList<int> simpeList, QList<QList<int> > leveledList)
+ParentGadget ParentGadget::createList(QList<int> simpleList, QList<QList<int> > leveledList)
 {
 	ParentGadget t;
-	t.simpeList = simpeList;
+	t.simpleList = simpleList;
 	t.leveledList = leveledList;
 	return t;
 }

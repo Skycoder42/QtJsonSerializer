@@ -17,7 +17,7 @@ struct TestGadget
 	Q_PROPERTY(NormalEnum normalEnumProperty MEMBER normalEnumProperty)
 	Q_PROPERTY(EnumFlags enumFlagsProperty READ getEnumFlagsProperty WRITE setEnumFlagsProperty)
 
-	Q_PROPERTY(QList<int> simpeList MEMBER simpeList)
+	Q_PROPERTY(QList<int> simpleList MEMBER simpleList)
 	Q_PROPERTY(QList<QList<int>> leveledList MEMBER leveledList)
 
 	Q_PROPERTY(QMap<QString, int> simpleMap MEMBER simpleMap)
@@ -54,7 +54,7 @@ public:
 	NormalEnum normalEnumProperty;
 	EnumFlags enumFlagsProperty;
 
-	QList<int> simpeList;
+	QList<int> simpleList;
 	QList<QList<int>> leveledList;
 
 	QMap<QString, int> simpleMap;
@@ -84,7 +84,7 @@ public:
 
 	static ParentGadget createBasic(int intProperty, bool boolProperty, QString stringProperty, double doubleProperty);
 	static ParentGadget createEnum(NormalEnum normalEnumProperty, EnumFlags enumFlagsProperty);
-	static ParentGadget createList(QList<int> simpeList, QList<QList<int>> leveledList);
+	static ParentGadget createList(QList<int> simpleList, QList<QList<int>> leveledList);
 	static ParentGadget createChild(TestGadget childGadget, QList<TestGadget> simpleChildren, QList<QList<TestGadget>> leveledChildren);
 
 	TestGadget childGadget;
