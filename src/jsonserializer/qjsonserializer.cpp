@@ -10,6 +10,7 @@
 #include <QtCore/QBuffer>
 
 static const QRegularExpression listTypeRegex(QStringLiteral(R"__(^QList<\s*(.*)\s*>$)__"));
+static const QRegularExpression mapTypeRegex(QStringLiteral(R"__(^QMap<\s*QString\s*,\s*(.*)\s*>$)__"));
 
 static void qJsonSerializerStartup();
 Q_COREAPP_STARTUP_FUNCTION(qJsonSerializerStartup)
@@ -91,7 +92,10 @@ QJsonValue QJsonSerializer::serializeVariant(int propertyType, const QVariant &v
 	if((propertyType == QVariant::List) ||
 	   (convertValue.canConvert(QVariant::List) && convertValue.convert(QVariant::List))) {
 		return serializeList(propertyType, value.toList());
-	} else {
+	} else if((propertyType == QVariant::Map) ||
+			  (convertValue.canConvert(QVariant::Map) && convertValue.convert(QVariant::Map))) {
+		return serializeMap(propertyType, value.toMap());
+	} else{
 		convertValue = value;
 		auto flags = QMetaType::typeFlags(propertyType);
 
@@ -158,12 +162,25 @@ QJsonArray QJsonSerializer::serializeList(int listType, const QVariantList &valu
 	auto match = listTypeRegex.match(QString::fromUtf8(QMetaType::typeName(listType)));
 	int metaType = QMetaType::UnknownType;
 	if(match.hasMatch())
-		metaType = QMetaType::type(match.captured(1).toLatin1());
+		metaType = QMetaType::type(match.captured(1).toLatin1().trimmed());
 
 	QJsonArray array;
 	foreach(auto element, value)
 		array.append(serializeVariant(metaType, element));
 	return array;
+}
+
+QJsonObject QJsonSerializer::serializeMap(int mapType, const QVariantMap &value) const
+{
+	auto match = mapTypeRegex.match(QString::fromUtf8(QMetaType::typeName(mapType)));
+	int metaType = QMetaType::UnknownType;
+	if(match.hasMatch())
+		metaType = QMetaType::type(match.captured(1).toLatin1().trimmed());
+
+	QJsonObject object;
+	for(auto it = value.constBegin(); it != value.constEnd(); ++it)
+		object.insert(it.key(), serializeVariant(metaType, it.value()));
+	return object;
 }
 
 QJsonValue QJsonSerializer::serializeEnum(const QMetaEnum &metaEnum, const QVariant &value) const
@@ -219,6 +236,8 @@ QVariant QJsonSerializer::deserializeVariant(int propertyType, const QJsonValue 
 
 		if(propertyType == QMetaType::QJsonObject)//special case: target type is a json object!
 			variant = QVariant::fromValue(value.toObject());
+		else if(propertyType == QMetaType::QVariantMap)
+			variant = deserializeMap(propertyType, value.toObject(), parent);
 		else if(flags.testFlag(QMetaType::IsGadget)) {
 			if(!value.isNull()) {
 				QVariant gadget(propertyType, nullptr);
@@ -307,7 +326,7 @@ QVariantList QJsonSerializer::deserializeList(int listType, const QJsonArray &ar
 	if(listType != QMetaType::UnknownType) {
 		auto match = listTypeRegex.match(QString::fromUtf8(QMetaType::typeName(listType)));
 		if(match.hasMatch())
-			metaType = QMetaType::type(match.captured(1).toLatin1());
+			metaType = QMetaType::type(match.captured(1).toLatin1().trimmed());
 	}
 
 	//generate the list
@@ -315,6 +334,22 @@ QVariantList QJsonSerializer::deserializeList(int listType, const QJsonArray &ar
 	foreach(auto element, array)
 		list.append(deserializeVariant(metaType, element, parent));
 	return list;
+}
+
+QVariantMap QJsonSerializer::deserializeMap(int mapType, const QJsonObject &object, QObject *parent) const
+{
+	int metaType = QMetaType::UnknownType;
+	if(mapType != QMetaType::UnknownType) {
+		auto match = mapTypeRegex.match(QString::fromUtf8(QMetaType::typeName(mapType)));
+		if(match.hasMatch())
+			metaType = QMetaType::type(match.captured(1).toLatin1().trimmed());
+	}
+
+	//generate the list
+	QVariantMap map;
+	for(auto it = object.constBegin(); it != object.constEnd(); ++it)
+		map.insert(it.key(), deserializeVariant(metaType, it.value(), parent));
+	return map;
 }
 
 QVariant QJsonSerializer::deserializeEnum(const QMetaEnum &metaEnum, const QJsonValue &value) const

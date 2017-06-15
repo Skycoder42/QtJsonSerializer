@@ -93,6 +93,8 @@ protected:
 	virtual QJsonObject serializeGadget(const void *gadget, const QMetaObject *metaObject) const;
 	//! Performs the serialization of any QList to a json array
 	virtual QJsonArray serializeList(int listType, const QVariantList &value) const;
+	//! Performs the serialization of any QMap to a json object
+	virtual QJsonObject serializeMap(int mapType, const QVariantMap &value) const;
 	//! Performs the serialization of an enum type QVariant to a json representation
 	virtual QJsonValue serializeEnum(const QMetaEnum &metaEnum, const QVariant &value) const;
 	//! Performs the serialization of a value type QVariant to a json representation
@@ -106,6 +108,7 @@ protected:
 	virtual void deserializeGadget(const QJsonObject &jsonObject, int typeId, void *gadgetPtr) const;
 	//! Performs the deserialization of any json array to a list
 	virtual QVariantList deserializeList(int listType, const QJsonArray &array, QObject *parent) const;
+	virtual QVariantMap deserializeMap(int mapType, const QJsonObject &object, QObject *parent) const;
 	//! Performs the deserialization of an enum value to a variant value type
 	virtual QVariant deserializeEnum(const QMetaEnum &metaEnum, const QJsonValue &value) const;
 	//! Performs the deserialization of a json value to a variant value type
