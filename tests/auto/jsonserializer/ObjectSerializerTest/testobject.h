@@ -17,7 +17,7 @@ class TestObject : public QObject
 	Q_PROPERTY(NormalEnum normalEnumProperty MEMBER normalEnumProperty)
 	Q_PROPERTY(EnumFlags enumFlagsProperty READ getEnumFlagsProperty WRITE setEnumFlagsProperty)
 
-	Q_PROPERTY(QList<int> simpeList MEMBER simpeList)
+	Q_PROPERTY(QList<int> simpleList MEMBER simpleList)
 	Q_PROPERTY(QList<QList<int>> leveledList MEMBER leveledList)
 
 	Q_PROPERTY(TestObject* childObject MEMBER childObject)
@@ -45,7 +45,7 @@ public:
 
 	static TestObject *createBasic(int intProperty, bool boolProperty, QString stringProperty, double doubleProperty, QObject *parent = nullptr);
 	static TestObject *createEnum(NormalEnum normalEnumProperty, EnumFlags enumFlagsProperty, QObject *parent = nullptr);
-	static TestObject *createList(QList<int> simpeList, QList<QList<int>> leveledList, QObject *parent = nullptr);
+	static TestObject *createList(QList<int> simpleList, QList<QList<int>> leveledList, QObject *parent = nullptr);
 	static TestObject *createChild(TestObject* childObject, QList<TestObject*> simpleChildren, QList<QList<TestObject*>> leveledChildren, QObject *parent = nullptr);
 
 	static bool equals(const TestObject *left, const TestObject *right);
@@ -59,7 +59,7 @@ public:
 	NormalEnum normalEnumProperty;
 	EnumFlags enumFlagsProperty;
 
-	QList<int> simpeList;
+	QList<int> simpleList;
 	QList<QList<int>> leveledList;
 
 	TestObject* childObject;

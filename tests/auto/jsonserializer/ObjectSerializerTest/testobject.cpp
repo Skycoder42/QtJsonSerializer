@@ -10,7 +10,7 @@ TestObject::TestObject(QObject *parent) :
 	doubleProperty(0.0),
 	normalEnumProperty(Normal0),
 	enumFlagsProperty(0x00),
-	simpeList(),
+	simpleList(),
 	leveledList(),
 	childObject(nullptr),
 	simpleChildren(),
@@ -35,10 +35,10 @@ TestObject *TestObject::createEnum(TestObject::NormalEnum normalEnumProperty, En
 	return t;
 }
 
-TestObject *TestObject::createList(QList<int> simpeList, QList<QList<int> > leveledList, QObject *parent)
+TestObject *TestObject::createList(QList<int> simpleList, QList<QList<int> > leveledList, QObject *parent)
 {
 	auto t = new TestObject(parent);
-	t->simpeList = simpeList;
+	t->simpleList = simpleList;
 	t->leveledList = leveledList;
 	return t;
 }
@@ -89,7 +89,7 @@ bool TestObject::equals(const TestObject *other) const
 				  doubleProperty == other->doubleProperty &&
 				  normalEnumProperty == other->normalEnumProperty &&
 				  enumFlagsProperty == other->enumFlagsProperty &&
-				  simpeList == other->simpeList &&
+				  simpleList == other->simpleList &&
 				  leveledList == other->leveledList &&
 				  simpleChildren.size() == other->simpleChildren.size() &&
 				  leveledChildren.size() == other->leveledChildren.size() ;
