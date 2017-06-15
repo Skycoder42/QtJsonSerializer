@@ -280,8 +280,8 @@ void ObjectSerializerTest::testNullDeserialization()
 									{"enumFlagsProperty", QJsonValue::Null},
 									{"simpleList", QJsonValue::Null},
 									{"leveledList", QJsonValue::Null},
-									{"simpleMap", QJsonObject()},
-									{"leveledMap", QJsonObject()},
+									{"simpleMap", QJsonValue::Null},
+									{"leveledMap", QJsonValue::Null},
 									{"childObject", QJsonValue::Null},
 									{"simpleChildren", QJsonValue::Null},
 									{"leveledChildren", QJsonValue::Null}
@@ -667,6 +667,62 @@ void ObjectSerializerTest::generateValidTestData()
 													   {"leveledChildren", QJsonArray()}
 												   })
 									<< true;
+	}
+
+	QTest::newRow("map") << TestObject::createMap({{"v3", 3}, {"v7", 7}, {"v13", 13}}, {}, this)
+						 << QJsonObject({
+											{"intProperty", 0},
+											{"boolProperty", false},
+											{"stringProperty", QString()},
+											{"doubleProperty", 0},
+											{"normalEnumProperty", TestObject::Normal0},
+											{"enumFlagsProperty", 0},
+											{"simpleList", QJsonArray()},
+											{"leveledList", QJsonArray()},
+											{"simpleMap", QJsonObject({
+												 {"v3", 3},
+												 {"v7", 7},
+												 {"v13", 13}
+											 })},
+											{"leveledMap", QJsonObject()},
+											{"childObject", QJsonValue::Null},
+											{"simpleChildren", QJsonArray()},
+											{"leveledChildren", QJsonArray()}
+										})
+						 << true;
+
+	{
+		QMap<QString, int> m1 = {{"v0", 0}, {"v1", 1}, {"v2", 2}};
+		QMap<QString, int> m2 = {{"v3", 3}, {"v4", 4}, {"v5", 5}};
+		QMap<QString, int> m3 = {{"v6", 6}, {"v7", 7}, {"v8", 8}};
+		QJsonObject j1 = {{"v0", 0}, {"v1", 1}, {"v2", 2}};
+		QJsonObject j2 = {{"v3", 3}, {"v4", 4}, {"v5", 5}};
+		QJsonObject j3 = {{"v6", 6}, {"v7", 7}, {"v8", 8}};
+		QTest::newRow("map<map>") << TestObject::createMap({{"v3", 3}, {"v7", 7}, {"v13", 13}}, {{"m1", m1}, {"m2", m2}, {"m3", m3}}, this)
+								  << QJsonObject({
+													 {"intProperty", 0},
+													 {"boolProperty", false},
+													 {"stringProperty", QString()},
+													 {"doubleProperty", 0},
+													 {"normalEnumProperty", TestObject::Normal0},
+													 {"enumFlagsProperty", 0},
+													 {"simpleList", QJsonArray()},
+													 {"leveledList", QJsonArray()},
+													 {"simpleMap", QJsonObject({
+														  {"v3", 3},
+														  {"v7", 7},
+														  {"v13", 13}
+													  })},
+													 {"leveledMap", QJsonObject({
+														  {"m1", j1},
+														  {"m2", j2},
+														  {"m3", j3}
+													  })},
+													 {"childObject", QJsonValue::Null},
+													 {"simpleChildren", QJsonArray()},
+													 {"leveledChildren", QJsonArray()}
+												 })
+								  << true;
 	}
 
 	QTest::newRow("child") << TestObject::createChild(TestObject::createBasic(42, true, "baum", 4.2), {}, {}, this)

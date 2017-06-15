@@ -43,6 +43,14 @@ TestObject *TestObject::createList(QList<int> simpleList, QList<QList<int> > lev
 	return t;
 }
 
+TestObject *TestObject::createMap(QMap<QString, int> simpleMap, QMap<QString, QMap<QString, int> > leveledMap, QObject *parent)
+{
+	auto t = new TestObject(parent);
+	t->simpleMap = simpleMap;
+	t->leveledMap = leveledMap;
+	return t;
+}
+
 TestObject *TestObject::createChild(TestObject *childObject, QList<TestObject *> simpleChildren, QList<QList<TestObject *> > leveledChildren, QObject *parent)
 {
 	auto t = new TestObject(parent);

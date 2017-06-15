@@ -50,6 +50,7 @@ public:
 	static TestObject *createBasic(int intProperty, bool boolProperty, QString stringProperty, double doubleProperty, QObject *parent = nullptr);
 	static TestObject *createEnum(NormalEnum normalEnumProperty, EnumFlags enumFlagsProperty, QObject *parent = nullptr);
 	static TestObject *createList(QList<int> simpleList, QList<QList<int>> leveledList, QObject *parent = nullptr);
+	static TestObject *createMap(QMap<QString, int> simpleMap, QMap<QString, QMap<QString, int>> leveledMap, QObject *parent = nullptr);
 	static TestObject *createChild(TestObject* childObject, QList<TestObject*> simpleChildren, QList<QList<TestObject*>> leveledChildren, QObject *parent = nullptr);
 
 	static bool equals(const TestObject *left, const TestObject *right);
