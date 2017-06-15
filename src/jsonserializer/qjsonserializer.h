@@ -34,6 +34,12 @@ public:
 	//! Registers a custom type for list converisons
 	template<typename T>
 	static bool registerListConverters();
+	//! Registers a custom type for map converisons
+	template<typename T>
+	static bool registerMapConverters();
+	//! Registers a custom type for list and map converisons
+	template<typename T>
+	static bool registerAllConverters();
 
 	//! @readAcFn{QJsonSerializer::allowDefaultNull}
 	bool allowDefaultNull() const;
@@ -108,6 +114,7 @@ protected:
 	virtual void deserializeGadget(const QJsonObject &jsonObject, int typeId, void *gadgetPtr) const;
 	//! Performs the deserialization of any json array to a list
 	virtual QVariantList deserializeList(int listType, const QJsonArray &array, QObject *parent) const;
+	//! Performs the deserialization of any json object to a map
 	virtual QVariantMap deserializeMap(int mapType, const QJsonObject &object, QObject *parent) const;
 	//! Performs the deserialization of an enum value to a variant value type
 	virtual QVariant deserializeEnum(const QMetaEnum &metaEnum, const QJsonValue &value) const;
@@ -153,6 +160,45 @@ bool QJsonSerializer::registerListConverters() {
 		return l;
 	});
 
+	return ok1 && ok2;
+}
+
+template<typename T>
+bool QJsonSerializer::registerMapConverters()
+{
+	auto ok1 = QMetaType::registerConverter<QMap<QString, T>, QVariantMap>([](const QMap<QString, T> &map) -> QVariantMap {
+		QVariantMap m;
+		for(auto it = map.constBegin(); it != map.constEnd(); ++it)
+			m.insert(it.key(), QVariant::fromValue(it.value()));
+		return m;
+	});
+
+	auto ok2 = QMetaType::registerConverter<QVariantMap, QMap<QString, T>>([](const QVariantMap &map) -> QMap<QString, T> {
+		QMap<QString, T> m;
+		for(auto it = map.constBegin(); it != map.constEnd(); ++it) {
+			auto v = it.value();
+			auto vt = v.type();
+			if(v.convert(qMetaTypeId<T>()))
+				m.insert(it.key(), v.value<T>());
+			else {
+				qWarning() << QByteArray("Conversion to")
+						   << QMetaType::typeName(qMetaTypeId<QList<T>>())
+						   << QByteArray("failed, could not convert element of type")
+						   << QMetaType::typeName(vt);
+				m.insert(it.key(), T());
+			}
+		}
+		return m;
+	});
+
+	return ok1 && ok2;
+}
+
+template<typename T>
+bool QJsonSerializer::registerAllConverters()
+{
+	auto ok1 = registerListConverters<T>();
+	auto ok2 = registerMapConverters<T>();
 	return ok1 && ok2;
 }
 

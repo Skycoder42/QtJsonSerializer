@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QList>
+#include <QMap>
 
 struct TestGadget
 {
@@ -18,6 +19,9 @@ struct TestGadget
 
 	Q_PROPERTY(QList<int> simpeList MEMBER simpeList)
 	Q_PROPERTY(QList<QList<int>> leveledList MEMBER leveledList)
+
+	Q_PROPERTY(QMap<QString, int> simpleMap MEMBER simpleMap)
+	Q_PROPERTY(QMap<QString, QMap<QString, int>> leveledMap MEMBER leveledMap)
 
 public:
 	enum NormalEnum {
@@ -52,6 +56,9 @@ public:
 
 	QList<int> simpeList;
 	QList<QList<int>> leveledList;
+
+	QMap<QString, int> simpleMap;
+	QMap<QString, QMap<QString, int>> leveledMap;
 
 	EnumFlags getEnumFlagsProperty() const;
 	void setEnumFlagsProperty(const EnumFlags &value);

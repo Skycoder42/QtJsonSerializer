@@ -5,6 +5,13 @@
 #include <QString>
 #include <QtTest>
 
+template <typename T>
+bool operator <(const QMap<QString, T> &m1, const QMap<QString, T> &m2)
+{
+	return m1.keys() < m2.keys() &&
+			m1.values() < m2.values();
+}
+
 class GadgetSerializerTest : public QObject
 {
 	Q_OBJECT
@@ -47,10 +54,13 @@ void GadgetSerializerTest::initTestCase()
 	QJsonSerializer::registerListConverters<QList<int>>();
 	QJsonSerializer::registerListConverters<TestGadget>();
 	QJsonSerializer::registerListConverters<QList<TestGadget>>();
+	QJsonSerializer::registerMapConverters<QMap<QString, int>>();
 	//register list comparators, needed for test only!
 	QMetaType::registerComparators<TestGadget>();
 	QMetaType::registerComparators<QList<int>>();
 	QMetaType::registerComparators<QList<QList<int>>>();
+	QMetaType::registerComparators<QMap<QString, int>>();
+	QMetaType::registerComparators<QMap<QString, QMap<QString, int>>>();
 	QMetaType::registerComparators<QList<TestGadget>>();
 	QMetaType::registerComparators<QList<QList<TestGadget>>>();
 	serializer = new QJsonSerializer(this);
@@ -74,6 +84,22 @@ void GadgetSerializerTest::testVariantConversions_data()
 	QList<int> l3 = {6, 7, 8};
 	QTest::newRow("QList<QList<int>>") << QVariant::fromValue<QList<QList<int>>>({l1, l2, l3})
 									   << (int)QVariant::List;
+
+	QTest::newRow("QMap<QString, int>") << QVariant::fromValue<QMap<QString, int>>({
+																					   {"baum", 42},
+																					   {"devil", 666},
+																					   {"fun", 0}
+																				   })
+										<< (int)QVariant::Map;
+	QMap<QString, int> m1 = {{"v0", 0}, {"v1", 1}, {"v2", 2}};
+	QMap<QString, int> m2 = {{"v3", 3}, {"v4", 4}, {"v5", 5}};
+	QMap<QString, int> m3 = {{"v6", 6}, {"v7", 7}, {"v8", 8}};
+	QTest::newRow("QMap<QString, QMap<QString, int>>") << QVariant::fromValue<QMap<QString, QMap<QString, int>>>({
+																													 {"m1", m1},
+																													 {"m2", m2},
+																													 {"m3", m3}
+																												 })
+									   << (int)QVariant::Map;
 
 	QTest::newRow("QList<TestGadget>") << QVariant::fromValue<QList<TestGadget>>({
 																					   TestGadget(),
@@ -164,27 +190,29 @@ void GadgetSerializerTest::testDeserialization()
 void GadgetSerializerTest::testInvalidDeserialization()
 {
 	QJsonObject broken({
-						  {"intProperty", 0},
-						  {"boolProperty", false},
-						  {"stringProperty", QString()},
-						  {"doubleProperty", 0},
-						  {"normalEnumProperty", TestGadget::Normal0},
-						  {"enumFlagsProperty", 0},
-						  {"simpeList", QJsonArray()},
-						  {"leveledList", QJsonArray()},
-						  {"childGadget", QJsonObject({
-							   {"intProperty", 0},
-							   {"boolProperty", false},
-							   {"stringProperty", QString()},
-							   {"doubleProperty", 0},
-							   {"normalEnumProperty", TestGadget::Normal0},
-							   {"enumFlagsProperty", 0},
-							   {"simpeList", QJsonArray()},
-							   {"leveledList", QJsonArray()}
-						   })},
-						  {"simpleChildren", QJsonArray()},
-						  {"leveledChildren", QJsonArray()},
-						  {"broken", QJsonValue::Null}
+						   {"intProperty", 0},
+						   {"boolProperty", false},
+						   {"stringProperty", QString()},
+						   {"doubleProperty", 0},
+						   {"normalEnumProperty", TestGadget::Normal0},
+						   {"enumFlagsProperty", 0},
+						   {"simpeList", QJsonArray()},
+						   {"leveledList", QJsonArray()},
+						   {"simpleMap", QJsonObject()},
+						   {"leveledMap", QJsonObject()},
+						   {"childGadget", QJsonObject({
+								{"intProperty", 0},
+								{"boolProperty", false},
+								{"stringProperty", QString()},
+								{"doubleProperty", 0},
+								{"normalEnumProperty", TestGadget::Normal0},
+								{"enumFlagsProperty", 0},
+								{"simpeList", QJsonArray()},
+								{"leveledList", QJsonArray()}
+							})},
+						   {"simpleChildren", QJsonArray()},
+						   {"leveledChildren", QJsonArray()},
+						   {"broken", QJsonValue::Null}
 					  });
 
 	try {
@@ -206,6 +234,8 @@ void GadgetSerializerTest::testNullChild()
 									{"enumFlagsProperty", 0},
 									{"simpeList", QJsonArray()},
 									{"leveledList", QJsonArray()},
+									{"simpleMap", QJsonObject()},
+									{"leveledMap", QJsonObject()},
 									{"childGadget", QJsonValue::Null},//this one is null here -> fails for gadget
 									{"simpleChildren", QJsonArray()},
 									{"leveledChildren", QJsonArray()}
@@ -230,6 +260,8 @@ void GadgetSerializerTest::testNullDeserialization()
 									{"enumFlagsProperty", QJsonValue::Null},
 									{"simpeList", QJsonValue::Null},
 									{"leveledList", QJsonValue::Null},
+									{"simpleMap", QJsonValue::Null},
+									{"leveledMap", QJsonValue::Null},
 									{"childGadget", QJsonValue::Null},
 									{"simpleChildren", QJsonValue::Null},
 									{"leveledChildren", QJsonValue::Null}
@@ -263,7 +295,9 @@ void GadgetSerializerTest::testEnumSpecialSerialization_data()
 											   {"normalEnumProperty", TestGadget::Normal1},
 											   {"enumFlagsProperty", 0},
 											   {"simpeList", QJsonArray()},
-											   {"leveledList", QJsonArray()}
+											   {"leveledList", QJsonArray()},
+											   {"simpleMap", QJsonObject()},
+											   {"leveledMap", QJsonObject()}
 										   })
 							<< false;
 
@@ -276,7 +310,9 @@ void GadgetSerializerTest::testEnumSpecialSerialization_data()
 												   {"normalEnumProperty", "Normal1"},
 												   {"enumFlagsProperty", QString()},
 												   {"simpeList", QJsonArray()},
-												   {"leveledList", QJsonArray()}
+												   {"leveledList", QJsonArray()},
+												   {"simpleMap", QJsonObject()},
+												   {"leveledMap", QJsonObject()}
 											   })
 								<< true;
 
@@ -289,7 +325,9 @@ void GadgetSerializerTest::testEnumSpecialSerialization_data()
 												   {"normalEnumProperty", "Normal0"},
 												   {"enumFlagsProperty", "FlagX"},
 												   {"simpeList", QJsonArray()},
-												   {"leveledList", QJsonArray()}
+												   {"leveledList", QJsonArray()},
+												   {"simpleMap", QJsonObject()},
+												   {"leveledMap", QJsonObject()}
 											   })
 								<< true;
 
@@ -302,7 +340,9 @@ void GadgetSerializerTest::testEnumSpecialSerialization_data()
 														 {"normalEnumProperty", "Normal2"},
 														 {"enumFlagsProperty", "Flag1|Flag3"},
 														 {"simpeList", QJsonArray()},
-														 {"leveledList", QJsonArray()}
+														 {"leveledList", QJsonArray()},
+														 {"simpleMap", QJsonObject()},
+														 {"leveledMap", QJsonObject()}
 													 })
 									  << true;
 }
@@ -335,7 +375,9 @@ void GadgetSerializerTest::testEnumSpecialDeserialization_data()
 											   {"normalEnumProperty", TestGadget::Normal1},
 											   {"enumFlagsProperty", 0},
 											   {"simpeList", QJsonArray()},
-											   {"leveledList", QJsonArray()}
+											   {"leveledList", QJsonArray()},
+											   {"simpleMap", QJsonObject()},
+											   {"leveledMap", QJsonObject()}
 										   });
 
 	QTest::newRow("stringEnum") << (TestGadget)ParentGadget::createEnum(TestGadget::Normal1, 0)
@@ -347,7 +389,9 @@ void GadgetSerializerTest::testEnumSpecialDeserialization_data()
 												   {"normalEnumProperty", "Normal1"},
 												   {"enumFlagsProperty", QString()},
 												   {"simpeList", QJsonArray()},
-												   {"leveledList", QJsonArray()}
+												   {"leveledList", QJsonArray()},
+												   {"simpleMap", QJsonObject()},
+												   {"leveledMap", QJsonObject()}
 											   });
 
 	QTest::newRow("stringFlags") << (TestGadget)ParentGadget::createEnum(TestGadget::Normal0, TestGadget::FlagX)
@@ -359,7 +403,9 @@ void GadgetSerializerTest::testEnumSpecialDeserialization_data()
 												   {"normalEnumProperty", "Normal0"},
 												   {"enumFlagsProperty", "FlagX"},
 												   {"simpeList", QJsonArray()},
-												   {"leveledList", QJsonArray()}
+												   {"leveledList", QJsonArray()},
+												   {"simpleMap", QJsonObject()},
+												   {"leveledMap", QJsonObject()}
 											   });
 
 	QTest::newRow("stringMultiFlags") << (TestGadget)ParentGadget::createEnum(TestGadget::Normal2, TestGadget::Flag1 | TestGadget::Flag3)
@@ -371,7 +417,9 @@ void GadgetSerializerTest::testEnumSpecialDeserialization_data()
 														 {"normalEnumProperty", "Normal2"},
 														 {"enumFlagsProperty", "Flag1|Flag3"},
 														 {"simpeList", QJsonArray()},
-														 {"leveledList", QJsonArray()}
+														 {"leveledList", QJsonArray()},
+														 {"simpleMap", QJsonObject()},
+														 {"leveledMap", QJsonObject()}
 													 });
 }
 
@@ -456,6 +504,8 @@ void GadgetSerializerTest::generateValidTestData()
 												{"enumFlagsProperty", 0},
 												{"simpeList", QJsonArray()},
 												{"leveledList", QJsonArray()},
+												{"simpleMap", QJsonObject()},
+												{"leveledMap", QJsonObject()},
 												{"childGadget", QJsonObject({
 													 {"intProperty", 0},
 													 {"boolProperty", false},
@@ -464,7 +514,9 @@ void GadgetSerializerTest::generateValidTestData()
 													 {"normalEnumProperty", TestGadget::Normal0},
 													 {"enumFlagsProperty", 0},
 													 {"simpeList", QJsonArray()},
-													 {"leveledList", QJsonArray()}
+													 {"leveledList", QJsonArray()},
+													 {"simpleMap", QJsonObject()},
+													 {"leveledMap", QJsonObject()}
 												 })},
 												{"simpleChildren", QJsonArray()},
 												{"leveledChildren", QJsonArray()}
@@ -480,6 +532,8 @@ void GadgetSerializerTest::generateValidTestData()
 											  {"enumFlagsProperty", 0},
 											  {"simpeList", QJsonArray()},
 											  {"leveledList", QJsonArray()},
+											  {"simpleMap", QJsonObject()},
+											  {"leveledMap", QJsonObject()},
 											  {"childGadget", QJsonObject({
 												   {"intProperty", 0},
 												   {"boolProperty", false},
@@ -488,7 +542,9 @@ void GadgetSerializerTest::generateValidTestData()
 												   {"normalEnumProperty", TestGadget::Normal0},
 												   {"enumFlagsProperty", 0},
 												   {"simpeList", QJsonArray()},
-												   {"leveledList", QJsonArray()}
+												   {"leveledList", QJsonArray()},
+												   {"simpleMap", QJsonObject()},
+												   {"leveledMap", QJsonObject()}
 											   })},
 											  {"simpleChildren", QJsonArray()},
 											  {"leveledChildren", QJsonArray()}
@@ -504,6 +560,8 @@ void GadgetSerializerTest::generateValidTestData()
 											 {"enumFlagsProperty", 0},
 											 {"simpeList", QJsonArray()},
 											 {"leveledList", QJsonArray()},
+											 {"simpleMap", QJsonObject()},
+											 {"leveledMap", QJsonObject()},
 											 {"childGadget", QJsonObject({
 												  {"intProperty", 0},
 												  {"boolProperty", false},
@@ -512,7 +570,9 @@ void GadgetSerializerTest::generateValidTestData()
 												  {"normalEnumProperty", TestGadget::Normal0},
 												  {"enumFlagsProperty", 0},
 												  {"simpeList", QJsonArray()},
-												  {"leveledList", QJsonArray()}
+												  {"leveledList", QJsonArray()},
+												  {"simpleMap", QJsonObject()},
+												  {"leveledMap", QJsonObject()}
 											  })},
 											 {"simpleChildren", QJsonArray()},
 											 {"leveledChildren", QJsonArray()}
@@ -527,6 +587,8 @@ void GadgetSerializerTest::generateValidTestData()
 											  {"enumFlagsProperty", TestGadget::FlagX},
 											  {"simpeList", QJsonArray()},
 											  {"leveledList", QJsonArray()},
+											  {"simpleMap", QJsonObject()},
+											  {"leveledMap", QJsonObject()},
 											  {"childGadget", QJsonObject({
 												   {"intProperty", 0},
 												   {"boolProperty", false},
@@ -535,7 +597,9 @@ void GadgetSerializerTest::generateValidTestData()
 												   {"normalEnumProperty", TestGadget::Normal0},
 												   {"enumFlagsProperty", 0},
 												   {"simpeList", QJsonArray()},
-												   {"leveledList", QJsonArray()}
+												   {"leveledList", QJsonArray()},
+												   {"simpleMap", QJsonObject()},
+												   {"leveledMap", QJsonObject()}
 											   })},
 											  {"simpleChildren", QJsonArray()},
 											  {"leveledChildren", QJsonArray()}
@@ -551,6 +615,8 @@ void GadgetSerializerTest::generateValidTestData()
 											 {"enumFlagsProperty", 0},
 											 {"simpeList", QJsonArray({3, 7, 13})},
 											 {"leveledList", QJsonArray()},
+											 {"simpleMap", QJsonObject()},
+											 {"leveledMap", QJsonObject()},
 											 {"childGadget", QJsonObject({
 												  {"intProperty", 0},
 												  {"boolProperty", false},
@@ -559,7 +625,9 @@ void GadgetSerializerTest::generateValidTestData()
 												  {"normalEnumProperty", TestGadget::Normal0},
 												  {"enumFlagsProperty", 0},
 												  {"simpeList", QJsonArray()},
-												  {"leveledList", QJsonArray()}
+												  {"leveledList", QJsonArray()},
+												  {"simpleMap", QJsonObject()},
+												  {"leveledMap", QJsonObject()}
 											  })},
 											 {"simpleChildren", QJsonArray()},
 											 {"leveledChildren", QJsonArray()}
@@ -582,6 +650,8 @@ void GadgetSerializerTest::generateValidTestData()
 													   {"enumFlagsProperty", 0},
 													   {"simpeList", QJsonArray({3, 7, 13})},
 													   {"leveledList", QJsonArray({j1, j2, j3})},
+													   {"simpleMap", QJsonObject()},
+													   {"leveledMap", QJsonObject()},
 													   {"childGadget", QJsonObject({
 															{"intProperty", 0},
 															{"boolProperty", false},
@@ -590,7 +660,9 @@ void GadgetSerializerTest::generateValidTestData()
 															{"normalEnumProperty", TestGadget::Normal0},
 															{"enumFlagsProperty", 0},
 															{"simpeList", QJsonArray()},
-															{"leveledList", QJsonArray()}
+															{"leveledList", QJsonArray()},
+															{"simpleMap", QJsonObject()},
+															{"leveledMap", QJsonObject()}
 														})},
 													   {"simpleChildren", QJsonArray()},
 													   {"leveledChildren", QJsonArray()}
@@ -607,6 +679,8 @@ void GadgetSerializerTest::generateValidTestData()
 											  {"enumFlagsProperty", 0},
 											  {"simpeList", QJsonArray()},
 											  {"leveledList", QJsonArray()},
+											  {"simpleMap", QJsonObject()},
+											  {"leveledMap", QJsonObject()},
 											  {"childGadget", QJsonObject({
 												   {"intProperty", 42},
 												   {"boolProperty", true},
@@ -616,6 +690,8 @@ void GadgetSerializerTest::generateValidTestData()
 												   {"enumFlagsProperty", 0},
 												   {"simpeList", QJsonArray()},
 												   {"leveledList", QJsonArray()},
+												   {"simpleMap", QJsonObject()},
+												   {"leveledMap", QJsonObject()}
 											   })},
 											  {"simpleChildren", QJsonArray()},
 											  {"leveledChildren", QJsonArray()}
@@ -633,7 +709,9 @@ void GadgetSerializerTest::generateValidTestData()
 						   {"normalEnumProperty", TestGadget::Normal0},
 						   {"enumFlagsProperty", 0},
 						   {"simpeList", QJsonArray()},
-						   {"leveledList", QJsonArray()}
+						   {"leveledList", QJsonArray()},
+						   {"simpleMap", QJsonObject()},
+						   {"leveledMap", QJsonObject()}
 					   });
 		QJsonObject j2({
 						   {"intProperty", 2},
@@ -643,7 +721,9 @@ void GadgetSerializerTest::generateValidTestData()
 						   {"normalEnumProperty", TestGadget::Normal0},
 						   {"enumFlagsProperty", 0},
 						   {"simpeList", QJsonArray()},
-						   {"leveledList", QJsonArray()}
+						   {"leveledList", QJsonArray()},
+						   {"simpleMap", QJsonObject()},
+						   {"leveledMap", QJsonObject()}
 					   });
 		QJsonObject j3({
 						   {"intProperty", 3},
@@ -653,7 +733,9 @@ void GadgetSerializerTest::generateValidTestData()
 						   {"normalEnumProperty", TestGadget::Normal0},
 						   {"enumFlagsProperty", 0},
 						   {"simpeList", QJsonArray()},
-						   {"leveledList", QJsonArray()}
+						   {"leveledList", QJsonArray()},
+						   {"simpleMap", QJsonObject()},
+						   {"leveledMap", QJsonObject()}
 					   });
 		QTest::newRow("childlist") << ParentGadget::createChild(TestGadget(), {c1, c2, c3}, {})
 								   << QJsonObject({
@@ -665,6 +747,8 @@ void GadgetSerializerTest::generateValidTestData()
 													  {"enumFlagsProperty", 0},
 													  {"simpeList", QJsonArray()},
 													  {"leveledList", QJsonArray()},
+													  {"simpleMap", QJsonObject()},
+													  {"leveledMap", QJsonObject()},
 													  {"childGadget", QJsonObject({
 														   {"intProperty", 0},
 														   {"boolProperty", false},
@@ -673,7 +757,9 @@ void GadgetSerializerTest::generateValidTestData()
 														   {"normalEnumProperty", TestGadget::Normal0},
 														   {"enumFlagsProperty", 0},
 														   {"simpeList", QJsonArray()},
-														   {"leveledList", QJsonArray()}
+														   {"leveledList", QJsonArray()},
+														   {"simpleMap", QJsonObject()},
+														   {"leveledMap", QJsonObject()}
 													   })},
 													  {"simpleChildren", QJsonArray({j1, j2, j3})},
 													  {"leveledChildren", QJsonArray()}
@@ -703,7 +789,9 @@ void GadgetSerializerTest::generateValidTestData()
 						   {"normalEnumProperty", TestGadget::Normal0},
 						   {"enumFlagsProperty", 0},
 						   {"simpeList", QJsonArray()},
-						   {"leveledList", QJsonArray()}
+						   {"leveledList", QJsonArray()},
+						   {"simpleMap", QJsonObject()},
+						   {"leveledMap", QJsonObject()}
 					   });
 		QJsonObject j1({
 						   {"intProperty", 1},
@@ -713,7 +801,9 @@ void GadgetSerializerTest::generateValidTestData()
 						   {"normalEnumProperty", TestGadget::Normal0},
 						   {"enumFlagsProperty", 0},
 						   {"simpeList", QJsonArray()},
-						   {"leveledList", QJsonArray()}
+						   {"leveledList", QJsonArray()},
+						   {"simpleMap", QJsonObject()},
+						   {"leveledMap", QJsonObject()}
 					   });
 		QJsonObject j2({
 						   {"intProperty", 2},
@@ -723,7 +813,9 @@ void GadgetSerializerTest::generateValidTestData()
 						   {"normalEnumProperty", TestGadget::Normal0},
 						   {"enumFlagsProperty", 0},
 						   {"simpeList", QJsonArray()},
-						   {"leveledList", QJsonArray()}
+						   {"leveledList", QJsonArray()},
+						   {"simpleMap", QJsonObject()},
+						   {"leveledMap", QJsonObject()}
 					   });
 		QJsonObject j3({
 						   {"intProperty", 3},
@@ -733,7 +825,9 @@ void GadgetSerializerTest::generateValidTestData()
 						   {"normalEnumProperty", TestGadget::Normal0},
 						   {"enumFlagsProperty", 0},
 						   {"simpeList", QJsonArray()},
-						   {"leveledList", QJsonArray()}
+						   {"leveledList", QJsonArray()},
+						   {"simpleMap", QJsonObject()},
+						   {"leveledMap", QJsonObject()}
 					   });
 		QJsonObject j4({
 						   {"intProperty", 4},
@@ -743,7 +837,9 @@ void GadgetSerializerTest::generateValidTestData()
 						   {"normalEnumProperty", TestGadget::Normal0},
 						   {"enumFlagsProperty", 0},
 						   {"simpeList", QJsonArray()},
-						   {"leveledList", QJsonArray()}
+						   {"leveledList", QJsonArray()},
+						   {"simpleMap", QJsonObject()},
+						   {"leveledMap", QJsonObject()}
 					   });
 		QJsonObject j5({
 						   {"intProperty", 5},
@@ -753,7 +849,9 @@ void GadgetSerializerTest::generateValidTestData()
 						   {"normalEnumProperty", TestGadget::Normal0},
 						   {"enumFlagsProperty", 0},
 						   {"simpeList", QJsonArray()},
-						   {"leveledList", QJsonArray()}
+						   {"leveledList", QJsonArray()},
+						   {"simpleMap", QJsonObject()},
+						   {"leveledMap", QJsonObject()}
 					   });
 		QJsonObject j6({
 						   {"intProperty", 6},
@@ -763,7 +861,9 @@ void GadgetSerializerTest::generateValidTestData()
 						   {"normalEnumProperty", TestGadget::Normal0},
 						   {"enumFlagsProperty", 0},
 						   {"simpeList", QJsonArray()},
-						   {"leveledList", QJsonArray()}
+						   {"leveledList", QJsonArray()},
+						   {"simpleMap", QJsonObject()},
+						   {"leveledMap", QJsonObject()}
 					   });
 		QJsonObject j7({
 						   {"intProperty", 7},
@@ -773,7 +873,9 @@ void GadgetSerializerTest::generateValidTestData()
 						   {"normalEnumProperty", TestGadget::Normal0},
 						   {"enumFlagsProperty", 0},
 						   {"simpeList", QJsonArray()},
-						   {"leveledList", QJsonArray()}
+						   {"leveledList", QJsonArray()},
+						   {"simpleMap", QJsonObject()},
+						   {"leveledMap", QJsonObject()}
 					   });
 		QJsonObject j8({
 						   {"intProperty", 8},
@@ -783,7 +885,9 @@ void GadgetSerializerTest::generateValidTestData()
 						   {"normalEnumProperty", TestGadget::Normal0},
 						   {"enumFlagsProperty", 0},
 						   {"simpeList", QJsonArray()},
-						   {"leveledList", QJsonArray()}
+						   {"leveledList", QJsonArray()},
+						   {"simpleMap", QJsonObject()},
+						   {"leveledMap", QJsonObject()}
 					   });
 		QJsonArray jjl = {
 			QJsonArray({j0, j1, j2}),
@@ -800,6 +904,8 @@ void GadgetSerializerTest::generateValidTestData()
 															{"enumFlagsProperty", 0},
 															{"simpeList", QJsonArray()},
 															{"leveledList", QJsonArray()},
+															{"simpleMap", QJsonObject()},
+															{"leveledMap", QJsonObject()},
 															{"childGadget", QJsonObject({
 																 {"intProperty", 0},
 																 {"boolProperty", false},
@@ -808,7 +914,9 @@ void GadgetSerializerTest::generateValidTestData()
 																 {"normalEnumProperty", TestGadget::Normal0},
 																 {"enumFlagsProperty", 0},
 																 {"simpeList", QJsonArray()},
-																 {"leveledList", QJsonArray()}
+																 {"leveledList", QJsonArray()},
+																 {"simpleMap", QJsonObject()},
+																 {"leveledMap", QJsonObject()}
 															 })},
 															{"simpleChildren", QJsonArray()},
 															{"leveledChildren", jjl}
