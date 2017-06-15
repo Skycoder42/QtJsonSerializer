@@ -85,6 +85,7 @@ public:
 	static ParentGadget createBasic(int intProperty, bool boolProperty, QString stringProperty, double doubleProperty);
 	static ParentGadget createEnum(NormalEnum normalEnumProperty, EnumFlags enumFlagsProperty);
 	static ParentGadget createList(QList<int> simpleList, QList<QList<int>> leveledList);
+	static ParentGadget createMap(QMap<QString, int> simpleMap, QMap<QString, QMap<QString, int>> leveledMap);
 	static ParentGadget createChild(TestGadget childGadget, QList<TestGadget> simpleChildren, QList<QList<TestGadget>> leveledChildren);
 
 	TestGadget childGadget;

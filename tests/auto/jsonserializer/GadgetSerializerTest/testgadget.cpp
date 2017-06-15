@@ -111,6 +111,14 @@ ParentGadget ParentGadget::createList(QList<int> simpleList, QList<QList<int> > 
 	return t;
 }
 
+ParentGadget ParentGadget::createMap(QMap<QString, int> simpleMap, QMap<QString, QMap<QString, int> > leveledMap)
+{
+	ParentGadget t;
+	t.simpleMap = simpleMap;
+	t.leveledMap = leveledMap;
+	return t;
+}
+
 ParentGadget ParentGadget::createChild(TestGadget childGadget, QList<TestGadget> simpleChildren, QList<QList<TestGadget> > leveledChildren)
 {
 	ParentGadget t;

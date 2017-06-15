@@ -152,6 +152,7 @@ void GadgetSerializerTest::testSerialization()
 	QFETCH(QJsonObject, result);
 
 	try {
+		qDebug() << result;
 		QCOMPARE(serializer->serialize(gadget), result);
 	} catch(QException &e) {
 		QFAIL(e.what());
@@ -667,6 +668,82 @@ void GadgetSerializerTest::generateValidTestData()
 													   {"simpleChildren", QJsonArray()},
 													   {"leveledChildren", QJsonArray()}
 												   });
+	}
+
+	QTest::newRow("map") << ParentGadget::createMap({{"v3", 3}, {"v7", 7}, {"v13", 13}}, {})
+						 << QJsonObject({
+											{"intProperty", 0},
+											{"boolProperty", false},
+											{"stringProperty", QString()},
+											{"doubleProperty", 0},
+											{"normalEnumProperty", TestGadget::Normal0},
+											{"enumFlagsProperty", 0},
+											{"simpleList", QJsonArray()},
+											{"leveledList", QJsonArray()},
+											{"simpleMap", QJsonObject({
+												 {"v3", 3},
+												 {"v7", 7},
+												 {"v13", 13}
+											 })},
+											{"leveledMap", QJsonObject()},
+											{"childGadget", QJsonObject({
+												 {"intProperty", 0},
+												 {"boolProperty", false},
+												 {"stringProperty", QString()},
+												 {"doubleProperty", 0},
+												 {"normalEnumProperty", TestGadget::Normal0},
+												 {"enumFlagsProperty", 0},
+												 {"simpleList", QJsonArray()},
+												 {"leveledList", QJsonArray()},
+												 {"simpleMap", QJsonObject()},
+												 {"leveledMap", QJsonObject()}
+											 })},
+											{"simpleChildren", QJsonArray()},
+											{"leveledChildren", QJsonArray()}
+										});
+
+	{
+		QMap<QString, int> m1 = {{"v0", 0}, {"v1", 1}, {"v2", 2}};
+		QMap<QString, int> m2 = {{"v3", 3}, {"v4", 4}, {"v5", 5}};
+		QMap<QString, int> m3 = {{"v6", 6}, {"v7", 7}, {"v8", 8}};
+		QJsonObject j1 = {{"v0", 0}, {"v1", 1}, {"v2", 2}};
+		QJsonObject j2 = {{"v3", 3}, {"v4", 4}, {"v5", 5}};
+		QJsonObject j3 = {{"v6", 6}, {"v7", 7}, {"v8", 8}};
+		QTest::newRow("map<map>") << ParentGadget::createMap({{"v3", 3}, {"v7", 7}, {"v13", 13}}, {{"m1", m1}, {"m2", m2}, {"m3", m3}})
+								  << QJsonObject({
+													 {"intProperty", 0},
+													 {"boolProperty", false},
+													 {"stringProperty", QString()},
+													 {"doubleProperty", 0},
+													 {"normalEnumProperty", TestGadget::Normal0},
+													 {"enumFlagsProperty", 0},
+													 {"simpleList", QJsonArray()},
+													 {"leveledList", QJsonArray()},
+													 {"simpleMap", QJsonObject({
+														  {"v3", 3},
+														  {"v7", 7},
+														  {"v13", 13}
+													  })},
+													 {"leveledMap", QJsonObject({
+														  {"m1", j1},
+														  {"m2", j2},
+														  {"m3", j3}
+													  })},
+													 {"childGadget", QJsonObject({
+														  {"intProperty", 0},
+														  {"boolProperty", false},
+														  {"stringProperty", QString()},
+														  {"doubleProperty", 0},
+														  {"normalEnumProperty", TestGadget::Normal0},
+														  {"enumFlagsProperty", 0},
+														  {"simpleList", QJsonArray()},
+														  {"leveledList", QJsonArray()},
+														  {"simpleMap", QJsonObject()},
+														  {"leveledMap", QJsonObject()}
+													  })},
+													 {"simpleChildren", QJsonArray()},
+													 {"leveledChildren", QJsonArray()}
+												 });
 	}
 
 	QTest::newRow("child") << ParentGadget::createChild(ParentGadget::createBasic(42, true, "baum", 4.2), {}, {})
