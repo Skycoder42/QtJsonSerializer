@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QList>
+#include <QMap>
 #include <QFlags>
 
 class TestObject : public QObject
@@ -19,6 +20,9 @@ class TestObject : public QObject
 
 	Q_PROPERTY(QList<int> simpleList MEMBER simpleList)
 	Q_PROPERTY(QList<QList<int>> leveledList MEMBER leveledList)
+
+	Q_PROPERTY(QMap<QString, int> simpleMap MEMBER simpleMap)
+	Q_PROPERTY(QMap<QString, QMap<QString, int>> leveledMap MEMBER leveledMap)
 
 	Q_PROPERTY(TestObject* childObject MEMBER childObject)
 	Q_PROPERTY(QList<TestObject*> simpleChildren MEMBER simpleChildren)
@@ -61,6 +65,9 @@ public:
 
 	QList<int> simpleList;
 	QList<QList<int>> leveledList;
+
+	QMap<QString, int> simpleMap;
+	QMap<QString, QMap<QString, int>> leveledMap;
 
 	TestObject* childObject;
 	QList<TestObject*> simpleChildren;
