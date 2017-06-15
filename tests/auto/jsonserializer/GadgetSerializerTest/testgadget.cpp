@@ -22,7 +22,9 @@ bool TestGadget::operator==(const TestGadget &other) const
 			normalEnumProperty == other.normalEnumProperty &&
 			enumFlagsProperty == other.enumFlagsProperty &&
 			simpleList == other.simpleList &&
-			leveledList == other.leveledList;
+			leveledList == other.leveledList &&
+			simpleMap == other.simpleMap &&
+			leveledMap == other.leveledMap;
 }
 
 bool TestGadget::operator!=(const TestGadget &other) const
@@ -34,7 +36,9 @@ bool TestGadget::operator!=(const TestGadget &other) const
 			normalEnumProperty != other.normalEnumProperty ||
 			enumFlagsProperty != other.enumFlagsProperty ||
 			simpleList != other.simpleList ||
-						 leveledList != other.leveledList;
+			leveledList != other.leveledList ||
+			simpleMap != other.simpleMap ||
+			leveledMap != other.leveledMap;
 }
 
 bool TestGadget::operator<(const TestGadget &) const
@@ -67,6 +71,8 @@ bool ParentGadget::operator==(const ParentGadget &other) const
 			doubleProperty == other.doubleProperty &&
 			simpleList == other.simpleList &&
 			leveledList == other.leveledList &&
+			simpleMap == other.simpleMap &&
+			leveledMap == other.leveledMap &&
 			childGadget == other.childGadget &&
 			simpleChildren == other.simpleChildren &&
 			leveledChildren == other.leveledChildren;
@@ -80,6 +86,8 @@ bool ParentGadget::operator!=(const ParentGadget &other) const
 			doubleProperty != other.doubleProperty ||
 			simpleList != other.simpleList ||
 			leveledList != other.leveledList ||
+			simpleMap != other.simpleMap ||
+			leveledMap != other.leveledMap ||
 			childGadget != other.childGadget ||
 			simpleChildren != other.simpleChildren ||
 			leveledChildren != other.leveledChildren;

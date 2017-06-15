@@ -99,6 +99,8 @@ bool TestObject::equals(const TestObject *other) const
 				  enumFlagsProperty == other->enumFlagsProperty &&
 				  simpleList == other->simpleList &&
 				  leveledList == other->leveledList &&
+				  simpleMap == other->simpleMap &&
+				  leveledMap == other->leveledMap &&
 				  simpleChildren.size() == other->simpleChildren.size() &&
 				  leveledChildren.size() == other->leveledChildren.size() ;
 		if(!ok)
