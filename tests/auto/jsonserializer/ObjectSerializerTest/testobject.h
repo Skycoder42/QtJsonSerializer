@@ -12,11 +12,13 @@ class ChildObject : public QObject
 	Q_OBJECT
 
 	Q_PROPERTY(int data MEMBER data)
+	Q_PROPERTY(ChildObject *child MEMBER child)
 
 public:
 	int data;
+	ChildObject *child;
 
-	explicit ChildObject(int data, QObject *parent);
+	explicit ChildObject(int data, QObject *parent = nullptr);
 	Q_INVOKABLE ChildObject(QObject *parent);
 
 	bool equals(const ChildObject *other) const;

@@ -114,7 +114,7 @@ QJsonObject TestObject::createJson(const QJsonObject &delta, const QString &rmKe
 								{"leveledList", QJsonArray()},
 								{"simpleMap", QJsonObject()},
 								{"leveledMap", QJsonObject()},
-								{"childGadget", QJsonValue::Null},
+								{"childObject", QJsonValue::Null},
 								{"simpleChildren", QJsonArray()},
 								{"leveledChildren", QJsonArray()},
 								{"simpleRelatives", QJsonObject()},
@@ -210,11 +210,14 @@ void TestObject::setEnumFlagsProperty(const EnumFlags &value)
 
 ChildObject::ChildObject(int data, QObject *parent) :
 	QObject(parent),
-	data(data)
+	data(data),
+	child(nullptr)
 {}
 
 ChildObject::ChildObject(QObject *parent) :
-	ChildObject(0, parent)
+	QObject(parent),
+	data(0),
+	child(nullptr)
 {}
 
 bool ChildObject::equals(const ChildObject *other) const
@@ -225,6 +228,8 @@ bool ChildObject::equals(const ChildObject *other) const
 		return false;
 	else if(metaObject()->className() != other->metaObject()->className())
 		return false;
+	if(child && !child->equals(other->child))
+		return false;
 	else
 		return data == other->data;
 }
@@ -233,5 +238,6 @@ QJsonObject ChildObject::createJson(const int &data)
 {
 	return QJsonObject({
 						   {"data", data},
+						   {"child", QJsonValue::Null}
 					   });
 }
