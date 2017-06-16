@@ -29,6 +29,8 @@ private Q_SLOTS:
 
 	void testObjectNameSerialization();
 	void testNullDeserialization();
+	void testDeserializationValidation_data();
+	void testDeserializationValidation();
 
 	void testEnumSpecialSerialization_data();
 	void testEnumSpecialSerialization();
@@ -302,6 +304,101 @@ void ObjectSerializerTest::testNullDeserialization()
 
 	testObj->deleteLater();
 	serializer->setAllowDefaultNull(false);
+}
+
+void ObjectSerializerTest::testDeserializationValidation_data()
+{
+	QTest::addColumn<QJsonObject>("data");
+	QTest::addColumn<QJsonSerializer::ValidationFlags>("flags");
+	QTest::addColumn<bool>("success");
+
+	QTest::newRow("standard") << QJsonObject({
+												 {"intProperty", 0},
+												 {"boolProperty", false},
+												 {"stringProperty", QString()},
+												 {"doubleProperty", 0},
+												 {"normalEnumProperty", TestObject::Normal0},
+												 {"enumFlagsProperty", 0},
+												 {"simpleList", QJsonArray()},
+												 {"leveledList", QJsonArray()},
+												 {"simpleMap", QJsonObject()},
+												 //{"leveledMap", QJsonObject()}, missing property
+												 {"garbage", QJsonValue::Null} //extra property
+											 })
+							  << (QJsonSerializer::ValidationFlags)QJsonSerializer::StandardValidation
+							  << true;
+
+	QTest::newRow("validateExtra") << QJsonObject({
+													  {"intProperty", 0},
+													  {"boolProperty", false},
+													  {"stringProperty", QString()},
+													  {"doubleProperty", 0},
+													  {"normalEnumProperty", TestObject::Normal0},
+													  {"enumFlagsProperty", 0},
+													  {"simpleList", QJsonArray()},
+													  {"leveledList", QJsonArray()},
+													  {"simpleMap", QJsonObject()},
+													  {"leveledMap", QJsonObject()},
+													  {"garbage", QJsonValue::Null} //extra property
+												  })
+								   << (QJsonSerializer::ValidationFlags)QJsonSerializer::NoExtraProperties
+								   << false;
+
+	QTest::newRow("validateMissing") << QJsonObject({
+														{"intProperty", 0},
+														{"boolProperty", false},
+														{"stringProperty", QString()},
+														{"doubleProperty", 0},
+														{"normalEnumProperty", TestObject::Normal0},
+														{"enumFlagsProperty", 0},
+														{"simpleList", QJsonArray()},
+														{"leveledList", QJsonArray()},
+														{"simpleMap", QJsonObject()}
+														//{"leveledMap", QJsonObject()}, missing property
+													})
+									 << (QJsonSerializer::ValidationFlags)QJsonSerializer::AllProperties
+									 << false;
+
+	QTest::newRow("validateAll") << QJsonObject({
+													{"intProperty", 0},
+													{"boolProperty", false},
+													{"stringProperty", QString()},
+													{"doubleProperty", 0},
+													{"normalEnumProperty", TestObject::Normal0},
+													{"enumFlagsProperty", 0},
+													{"simpleList", QJsonArray()},
+													{"leveledList", QJsonArray()},
+													{"simpleMap", QJsonObject()},
+													//{"leveledMap", QJsonObject()}, missing property
+													{"garbage", QJsonValue::Null}, //extra property
+												})
+								 << (QJsonSerializer::ValidationFlags)QJsonSerializer::FullValidation
+								 << false;
+}
+
+void ObjectSerializerTest::testDeserializationValidation()
+{
+	QFETCH(QJsonObject, data);
+	QFETCH(QJsonSerializer::ValidationFlags, flags);
+	QFETCH(bool, success);
+
+	serializer->setValidationFlags(flags);
+
+	auto t1 = new TestObject(this);
+
+	try {
+		if(success) {
+			auto deser = serializer->deserialize<TestObject*>(data, this);
+			QVERIFY(t1->equals(deser));
+			deser->deleteLater();
+		} else
+			QVERIFY_EXCEPTION_THROWN(serializer->deserialize<TestObject*>(data, this), QJsonDeserializationException);
+	} catch (QException &e) {
+		QFAIL(e.what());
+	}
+
+	serializer->setValidationFlags(QJsonSerializer::StandardValidation);
+	t1->deleteLater();
 }
 
 void ObjectSerializerTest::testEnumSpecialSerialization_data()
