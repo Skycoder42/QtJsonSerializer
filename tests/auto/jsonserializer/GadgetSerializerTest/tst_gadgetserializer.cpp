@@ -39,8 +39,8 @@ private Q_SLOTS:
 	void testEnumSpecialDeserialization_data();
 	void testEnumSpecialDeserialization();
 
-//	void testDeviceSerialization_data();
-//	void testDeviceSerialization();
+	void testDeviceSerialization_data();
+	void testDeviceSerialization();
 
 private:
 	QJsonSerializer *serializer;
@@ -60,16 +60,22 @@ void GadgetSerializerTest::initTestCase()
 	QJsonSerializer::registerListConverters<QList<ChildGadget>>();
 	QJsonSerializer::registerMapConverters<QMap<QString, ChildGadget>>();
 
+	QJsonSerializer::registerAllConverters<TestGadget>();
+
 	//register list comparators, needed for test only!
-	QMetaType::registerComparators<ChildGadget>();
 	QMetaType::registerComparators<QList<int>>();
 	QMetaType::registerComparators<QList<QList<int>>>();
 	QMetaType::registerComparators<QMap<QString, int>>();
 	QMetaType::registerComparators<QMap<QString, QMap<QString, int>>>();
+
+	QMetaType::registerComparators<ChildGadget>();
 	QMetaType::registerComparators<QList<ChildGadget>>();
 	QMetaType::registerComparators<QList<QList<ChildGadget>>>();
 	QMetaType::registerComparators<QMap<QString, ChildGadget>>();
 	QMetaType::registerComparators<QMap<QString, QMap<QString, ChildGadget>>>();
+
+	QMetaType::registerComparators<TestGadget>();
+	QMetaType::registerComparators<QList<TestGadget>>();
 	serializer = new QJsonSerializer(this);
 }
 
@@ -378,6 +384,8 @@ void GadgetSerializerTest::testEnumSpecialSerialization()
 	} catch(QException &e) {
 		QFAIL(e.what());
 	}
+
+	serializer->setEnumAsString(false);
 }
 
 void GadgetSerializerTest::testEnumSpecialDeserialization_data()
@@ -442,61 +450,61 @@ void GadgetSerializerTest::testEnumSpecialDeserialization()
 	}
 }
 
-//void GadgetSerializerTest::testDeviceSerialization_data()
-//{
-//	QTest::addColumn<QVariant>("data");
-//	QTest::addColumn<QByteArray>("fakeDevice");
-//	QTest::addColumn<bool>("works");
+void GadgetSerializerTest::testDeviceSerialization_data()
+{
+	QTest::addColumn<QVariant>("data");
+	QTest::addColumn<QByteArray>("fakeDevice");
+	QTest::addColumn<bool>("works");
 
-//	QTest::newRow("object") << QVariant::fromValue(TestGadget::createBasic(42, true, "baum", 4.2))
-//							<< QByteArray()
-//							<< true;
+	QTest::newRow("object") << QVariant::fromValue(TestGadget::createBasic(42, true, "baum", 4.2))
+							<< QByteArray()
+							<< true;
 
-//	QTest::newRow("list") << QVariant::fromValue(QList<TestGadget>({ParentGadget::createBasic(42, true, "baum", 4.2), ParentGadget()}))
-//						  << QByteArray()
-//						  << true;
+	QTest::newRow("list") << QVariant::fromValue(QList<TestGadget>({TestGadget::createBasic(42, true, "baum", 4.2), TestGadget()}))
+						  << QByteArray()
+						  << true;
 
-//	QTest::newRow("data") << QVariant(42)
-//						  << QByteArray()
-//						  << false;
+	QTest::newRow("data") << QVariant(42)
+						  << QByteArray()
+						  << false;
 
-//	QTest::newRow("object") << QVariant::fromValue(ParentGadget())
-//							<< QByteArray("invalid stuff")
-//							<< true;
-//}
+	QTest::newRow("objectdata") << QVariant::fromValue(TestGadget())
+								<< QByteArray("invalid stuff")
+								<< true;
+}
 
-//void GadgetSerializerTest::testDeviceSerialization()
-//{
-//	QFETCH(QVariant, data);
-//	QFETCH(QByteArray, fakeDevice);
-//	QFETCH(bool, works);
+void GadgetSerializerTest::testDeviceSerialization()
+{
+	QFETCH(QVariant, data);
+	QFETCH(QByteArray, fakeDevice);
+	QFETCH(bool, works);
 
-//	try {
-//		QTemporaryFile tFile;
-//		QVERIFY(tFile.open());
-//		if(works)
-//			serializer->serializeTo(&tFile, data);
-//		else {
-//			QVERIFY_EXCEPTION_THROWN(serializer->serializeTo(&tFile, data), QJsonSerializerException);
-//			return;
-//		}
+	try {
+		QTemporaryFile tFile;
+		QVERIFY(tFile.open());
+		if(works)
+			serializer->serializeTo(&tFile, data);
+		else {
+			QVERIFY_EXCEPTION_THROWN(serializer->serializeTo(&tFile, data), QJsonSerializerException);
+			return;
+		}
 
-//		tFile.close();
-//		if(!fakeDevice.isEmpty()){
-//			QBuffer buffer(&fakeDevice);
-//			buffer.open(QIODevice::ReadOnly);
-//			QVERIFY_EXCEPTION_THROWN(serializer->deserializeFrom(&buffer, data.userType(), this), QJsonSerializerException);
-//		} else {
-//			QVERIFY(tFile.open());
-//			auto res = serializer->deserializeFrom(&tFile, data.userType(), this);
-//			QCOMPARE(res, data);
-//		}
+		tFile.close();
+		if(!fakeDevice.isEmpty()){
+			QBuffer buffer(&fakeDevice);
+			buffer.open(QIODevice::ReadOnly);
+			QVERIFY_EXCEPTION_THROWN(serializer->deserializeFrom(&buffer, data.userType(), this), QJsonSerializerException);
+		} else {
+			QVERIFY(tFile.open());
+			auto res = serializer->deserializeFrom(&tFile, data.userType(), this);
+			QCOMPARE(res, data);
+		}
 
-//		tFile.close();
-//	} catch(QException &e) {
-//		QFAIL(e.what());
-//	}
-//}
+		tFile.close();
+	} catch(QException &e) {
+		QFAIL(e.what());
+	}
+}
 
 void GadgetSerializerTest::generateValidTestData()
 {
@@ -657,62 +665,62 @@ void GadgetSerializerTest::generateValidTestData()
 	}
 }
 
-//static void compile_test()
-//{
-//	QJsonSerializer s;
-//	QVariant v;
-//	TestGadget t;
-//	QList<TestGadget> l;
-//	QMap<QString, TestGadget> m;
-//	QIODevice *d = nullptr;
-//	QByteArray b;
-//	QJsonValue jv;
-//	QJsonObject jo;
-//	QJsonArray ja;
-//	QObject *p = nullptr;
+static void compile_test()
+{
+	QJsonSerializer s;
+	QVariant v;
+	TestGadget t;
+	QList<TestGadget> l;
+	QMap<QString, TestGadget> m;
+	QIODevice *d = nullptr;
+	QByteArray b;
+	QJsonValue jv;
+	QJsonObject jo;
+	QJsonArray ja;
+	QObject *p = nullptr;
 
-//	jv = s.serialize(v);
-//	jo = s.serialize(t);
-//	ja = s.serialize(l);
-//	jo = s.serialize(m);
+	jv = s.serialize(v);
+	jo = s.serialize(t);
+	ja = s.serialize(l);
+	jo = s.serialize(m);
 
-//	s.serializeTo(d, v);
-//	s.serializeTo(d, t);
-//	s.serializeTo(d, l);
-//	s.serializeTo(d, m);
+	s.serializeTo(d, v);
+	s.serializeTo(d, t);
+	s.serializeTo(d, l);
+	s.serializeTo(d, m);
 
-//	b = s.serializeTo(v);
-//	b = s.serializeTo(t);
-//	b = s.serializeTo(l);
-//	b = s.serializeTo(m);
+	b = s.serializeTo(v);
+	b = s.serializeTo(t);
+	b = s.serializeTo(l);
+	b = s.serializeTo(m);
 
-//	v = s.deserialize(jv, qMetaTypeId<TestGadget>());
-//	v = s.deserialize(jv, qMetaTypeId<TestGadget>(), p);
-//	t = s.deserialize<TestGadget>(jo);
-//	t = s.deserialize<TestGadget>(jo, p);
-//	l = s.deserialize<QList<TestGadget>>(ja);
-//	l = s.deserialize<QList<TestGadget>>(ja, p);
-//	m = s.deserialize<QMap<QString, TestGadget>>(jo);
-//	m = s.deserialize<QMap<QString, TestGadget>>(jo, p);
+	v = s.deserialize(jv, qMetaTypeId<TestGadget>());
+	v = s.deserialize(jv, qMetaTypeId<TestGadget>(), p);
+	t = s.deserialize<TestGadget>(jo);
+	t = s.deserialize<TestGadget>(jo, p);
+	l = s.deserialize<QList<TestGadget>>(ja);
+	l = s.deserialize<QList<TestGadget>>(ja, p);
+	m = s.deserialize<QMap<QString, TestGadget>>(jo);
+	m = s.deserialize<QMap<QString, TestGadget>>(jo, p);
 
-//	v = s.deserializeFrom(d, qMetaTypeId<TestGadget>());
-//	v = s.deserializeFrom(d, qMetaTypeId<TestGadget>(), p);
-//	t = s.deserializeFrom<TestGadget>(d);
-//	t = s.deserializeFrom<TestGadget>(d, p);
-//	l = s.deserializeFrom<QList<TestGadget>>(d);
-//	l = s.deserializeFrom<QList<TestGadget>>(d, p);
-//	m = s.deserializeFrom<QMap<QString, TestGadget>>(d);
-//	m = s.deserializeFrom<QMap<QString, TestGadget>>(d, p);
+	v = s.deserializeFrom(d, qMetaTypeId<TestGadget>());
+	v = s.deserializeFrom(d, qMetaTypeId<TestGadget>(), p);
+	t = s.deserializeFrom<TestGadget>(d);
+	t = s.deserializeFrom<TestGadget>(d, p);
+	l = s.deserializeFrom<QList<TestGadget>>(d);
+	l = s.deserializeFrom<QList<TestGadget>>(d, p);
+	m = s.deserializeFrom<QMap<QString, TestGadget>>(d);
+	m = s.deserializeFrom<QMap<QString, TestGadget>>(d, p);
 
-//	v = s.deserializeFrom(b, qMetaTypeId<TestGadget>());
-//	v = s.deserializeFrom(b, qMetaTypeId<TestGadget>(), p);
-//	t = s.deserializeFrom<TestGadget>(b);
-//	t = s.deserializeFrom<TestGadget>(b, p);
-//	l = s.deserializeFrom<QList<TestGadget>>(b);
-//	l = s.deserializeFrom<QList<TestGadget>>(b, p);
-//	m = s.deserializeFrom<QMap<QString, TestGadget>>(b);
-//	m = s.deserializeFrom<QMap<QString, TestGadget>>(b, p);
-//}
+	v = s.deserializeFrom(b, qMetaTypeId<TestGadget>());
+	v = s.deserializeFrom(b, qMetaTypeId<TestGadget>(), p);
+	t = s.deserializeFrom<TestGadget>(b);
+	t = s.deserializeFrom<TestGadget>(b, p);
+	l = s.deserializeFrom<QList<TestGadget>>(b);
+	l = s.deserializeFrom<QList<TestGadget>>(b, p);
+	m = s.deserializeFrom<QMap<QString, TestGadget>>(b);
+	m = s.deserializeFrom<QMap<QString, TestGadget>>(b, p);
+}
 
 QTEST_MAIN(GadgetSerializerTest)
 
