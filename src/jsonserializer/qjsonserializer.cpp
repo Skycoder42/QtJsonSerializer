@@ -291,6 +291,18 @@ QObject *QJsonSerializer::deserializeObject(const QJsonObject &jsonObject, const
 											metaObject->className() +
 											QByteArray(" (Does the constructor \"Q_INVOKABLE class(QObject*);\" exist?)"));
 
+	QSet<QByteArray> reqProps;
+	if(d->validationFlags.testFlag(AllProperties)) {
+		auto i = QObject::staticMetaObject.indexOfProperty("objectName");
+		if(!d->keepObjectName)
+		   i++;
+		for(; i < metaObject->propertyCount(); i++) {
+			auto property = metaObject->property(i);
+			if(property.isStored())
+				reqProps.insert(property.name());
+		}
+	}
+
 	//now deserialize all json properties
 	for(auto it = jsonObject.constBegin(); it != jsonObject.constEnd(); it++) {
 		auto propIndex = metaObject->indexOfProperty(qUtf8Printable(it.key()));
@@ -301,13 +313,21 @@ QObject *QJsonSerializer::deserializeObject(const QJsonObject &jsonObject, const
 				value = deserializeEnum(property.enumerator(), it.value());
 			else
 				value = deserializeVariant(property.userType(), it.value(), object);
+			reqProps.remove(property.name());
 		} else if(d->validationFlags.testFlag(NoExtraProperties)) {
-			throw QJsonDeserializationException(QByteArray("Found extra property ") +
+			throw QJsonDeserializationException("Found extra property " +
 												it.key().toUtf8() +
 												" but extra properties are not allowed");
 		} else
 			deserializeVariant(QMetaType::UnknownType, it.value(), object);
 		object->setProperty(qUtf8Printable(it.key()), value);
+	}
+
+	if(d->validationFlags.testFlag(AllProperties) && !reqProps.isEmpty()) {
+		throw QJsonDeserializationException(QByteArray("Not all properties for ") +
+											metaObject->className() +
+											QByteArray(" are present in the json object Missing properties: ") +
+											reqProps.toList().join(", "));
 	}
 
 	return object;
@@ -318,6 +338,15 @@ void QJsonSerializer::deserializeGadget(const QJsonObject &jsonObject, int typeI
 	auto metaObject = QMetaType::metaObjectForType(typeId);
 	if(!QMetaType::construct(typeId, gadgetPtr, nullptr))
 		throw QJsonDeserializationException(QByteArray("Failed to construct gadget of type ") + QMetaType::typeName(typeId));
+
+	QSet<QByteArray> reqProps;
+	if(d->validationFlags.testFlag(AllProperties)) {
+		for(auto i = 0; i < metaObject->propertyCount(); i++) {
+			auto property = metaObject->property(i);
+			if(property.isStored())
+				reqProps.insert(property.name());
+		}
+	}
 
 	//now deserialize all json properties
 	for(auto it = jsonObject.constBegin(); it != jsonObject.constEnd(); it++) {
@@ -330,11 +359,19 @@ void QJsonSerializer::deserializeGadget(const QJsonObject &jsonObject, int typeI
 			else
 				value = deserializeVariant(property.userType(), it.value(), nullptr);
 			property.writeOnGadget(gadgetPtr, value);
+			reqProps.remove(property.name());
 		} else if(d->validationFlags.testFlag(NoExtraProperties)) {
-			throw QJsonDeserializationException(QByteArray("Found extra property ") +
+			throw QJsonDeserializationException("Found extra property " +
 												it.key().toUtf8() +
 												" but extra properties are not allowed");
 		}
+	}
+
+	if(d->validationFlags.testFlag(AllProperties) && !reqProps.isEmpty()) {
+		throw QJsonDeserializationException(QByteArray("Not all properties for ") +
+											metaObject->className() +
+											QByteArray(" are present in the json object. Missing properties: ") +
+											reqProps.toList().join(", "));
 	}
 }
 
@@ -363,7 +400,7 @@ QVariantMap QJsonSerializer::deserializeMap(int mapType, const QJsonObject &obje
 			metaType = QMetaType::type(match.captured(1).toLatin1().trimmed());
 	}
 
-	//generate the list
+	//generate the map
 	QVariantMap map;
 	for(auto it = object.constBegin(); it != object.constEnd(); ++it)
 		map.insert(it.key(), deserializeVariant(metaType, it.value(), parent));
@@ -376,15 +413,15 @@ QVariant QJsonSerializer::deserializeEnum(const QMetaEnum &metaEnum, const QJson
 		auto result = -1;
 		auto ok = false;
 		if(metaEnum.isFlag())
-			result = metaEnum.keysToValue(value.toString().toUtf8().constData(), &ok);
+			result = metaEnum.keysToValue(qUtf8Printable(value.toString()), &ok);
 		else
-			result = metaEnum.keyToValue(value.toString().toUtf8().constData(), &ok);
+			result = metaEnum.keyToValue(qUtf8Printable(value.toString()), &ok);
 		if(ok)
 			return result;
 		else if(metaEnum.isFlag() && value.toString().isEmpty())
-			return QVariant();
+			return 0x00;
 		else
-			throw QJsonDeserializationException("Invalid value for enum type found");
+			throw QJsonDeserializationException("Invalid value for enum type found: " + value.toString().toUtf8());
 	} else
 		return value.toInt();
 }
