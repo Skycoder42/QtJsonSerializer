@@ -239,14 +239,18 @@ QVariant QJsonSerializer::deserializeVariant(int propertyType, const QJsonValue 
 	else if(value.isArray()) {
 		if(propertyType == QMetaType::QJsonArray)//special case: target type is a json array!
 			variant = QVariant::fromValue(value.toArray());
-		else
+		else if(propertyType == QMetaType::QVariantList ||
+				listTypeRegex.match(QString::fromUtf8(QMetaType::typeName(propertyType))).hasMatch())
 			variant = deserializeList(propertyType, value.toArray(), parent);
+		else
+			variant = deserializeValue(propertyType, value);
 	} else if(value.isObject() || value.isNull()) {
 		auto flags = QMetaType::typeFlags(propertyType);
 
 		if(propertyType == QMetaType::QJsonObject)//special case: target type is a json object!
 			variant = QVariant::fromValue(value.toObject());
-		else if(propertyType == QMetaType::QVariantMap)
+		else if(propertyType == QMetaType::QVariantMap ||
+				mapTypeRegex.match(QString::fromUtf8(QMetaType::typeName(propertyType))).hasMatch())
 			variant = deserializeMap(propertyType, value.toObject(), parent);
 		else if(flags.testFlag(QMetaType::IsGadget)) {
 			if(!value.isNull()) {

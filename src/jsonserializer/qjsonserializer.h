@@ -168,9 +168,9 @@ bool QJsonSerializer::registerListConverters() {
 			if(v.convert(qMetaTypeId<T>()))
 				l.append(v.value<T>());
 			else {
-				qWarning() << QByteArray("Conversion to")
+				qWarning() << "Conversion to"
 						   << QMetaType::typeName(qMetaTypeId<QList<T>>())
-						   << QByteArray("failed, could not convert element of type")
+						   << "failed, could not convert element of type"
 						   << QMetaType::typeName(vt);
 				l.append(T());
 			}
@@ -199,9 +199,9 @@ bool QJsonSerializer::registerMapConverters()
 			if(v.convert(qMetaTypeId<T>()))
 				m.insert(it.key(), v.value<T>());
 			else {
-				qWarning() << QByteArray("Conversion to")
-						   << QMetaType::typeName(qMetaTypeId<QList<T>>())
-						   << QByteArray("failed, could not convert element of type")
+				qWarning() << "Conversion to"
+						   << QMetaType::typeName(qMetaTypeId<QMap<QString, T>>())
+						   << "failed, could not convert element value of type"
 						   << QMetaType::typeName(vt);
 				m.insert(it.key(), T());
 			}
