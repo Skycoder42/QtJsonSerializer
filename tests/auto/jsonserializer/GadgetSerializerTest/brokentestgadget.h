@@ -3,7 +3,7 @@
 
 #include "testgadget.h"
 
-struct BrokenTestGadget : public ParentGadget
+struct BrokenTestGadget : public TestGadget
 {
 	Q_GADGET
 

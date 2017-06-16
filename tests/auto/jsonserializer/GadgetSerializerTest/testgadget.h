@@ -4,6 +4,25 @@
 #include <QObject>
 #include <QList>
 #include <QMap>
+#include <QJsonObject>
+
+struct ChildGadget
+{
+	Q_GADGET
+
+	Q_PROPERTY(int data MEMBER data)
+
+public:
+	int data;
+
+	ChildGadget(int data = 0);
+
+	bool operator==(const ChildGadget &other) const;
+	bool operator!=(const ChildGadget &other) const;
+	bool operator<(const ChildGadget &other) const;
+
+	static QJsonObject createJson(const int &data = 0);
+};
 
 struct TestGadget
 {
@@ -22,6 +41,14 @@ struct TestGadget
 
 	Q_PROPERTY(QMap<QString, int> simpleMap MEMBER simpleMap)
 	Q_PROPERTY(QMap<QString, QMap<QString, int>> leveledMap MEMBER leveledMap)
+
+	Q_PROPERTY(ChildGadget childGadget MEMBER childGadget)
+
+	Q_PROPERTY(QList<ChildGadget> simpleChildren MEMBER simpleChildren)
+	Q_PROPERTY(QList<QList<ChildGadget>> leveledChildren MEMBER leveledChildren)
+
+	Q_PROPERTY(QMap<QString, ChildGadget> simpleRelatives MEMBER simpleRelatives)
+	Q_PROPERTY(QMap<QString, QMap<QString, ChildGadget>> leveledRelatives MEMBER leveledRelatives)
 
 public:
 	enum NormalEnum {
@@ -46,6 +73,16 @@ public:
 	bool operator!=(const TestGadget &other) const;
 	bool operator<(const TestGadget &other) const;
 
+	static TestGadget createBasic(int intProperty, bool boolProperty, QString stringProperty, double doubleProperty);
+	static TestGadget createEnum(NormalEnum normalEnumProperty, EnumFlags enumFlagsProperty);
+	static TestGadget createList(QList<int> simpleList, QList<QList<int>> leveledList);
+	static TestGadget createMap(QMap<QString, int> simpleMap, QMap<QString, QMap<QString, int>> leveledMap);
+	static TestGadget createChild(ChildGadget childGadget);
+	static TestGadget createChildren(QList<ChildGadget> simpleChildren, QList<QList<ChildGadget>> leveledChildren);
+	static TestGadget createRelatives(QMap<QString, ChildGadget> simpleRelatives, QMap<QString, QMap<QString, ChildGadget>> leveledRelatives);
+
+	static QJsonObject createJson(const QJsonObject &delta = QJsonObject());
+
 	int intProperty;
 	bool boolProperty;
 	QString stringProperty;
@@ -60,39 +97,19 @@ public:
 	QMap<QString, int> simpleMap;
 	QMap<QString, QMap<QString, int>> leveledMap;
 
+	ChildGadget childGadget;
+
+	QList<ChildGadget> simpleChildren;
+	QList<QList<ChildGadget>> leveledChildren;
+
+	QMap<QString, ChildGadget> simpleRelatives;
+	QMap<QString, QMap<QString, ChildGadget>> leveledRelatives;
+
 	EnumFlags getEnumFlagsProperty() const;
 	void setEnumFlagsProperty(const EnumFlags &value);
 };
 
 Q_DECLARE_METATYPE(TestGadget)
 Q_DECLARE_OPERATORS_FOR_FLAGS(TestGadget::EnumFlags)
-
-struct ParentGadget : public TestGadget
-{
-	Q_GADGET
-
-	Q_PROPERTY(TestGadget childGadget MEMBER childGadget)
-	Q_PROPERTY(QList<TestGadget> simpleChildren MEMBER simpleChildren)
-	Q_PROPERTY(QList<QList<TestGadget>> leveledChildren MEMBER leveledChildren)
-
-public:
-	ParentGadget();
-
-	bool operator==(const ParentGadget &other) const;
-	bool operator!=(const ParentGadget &other) const;
-
-
-	static ParentGadget createBasic(int intProperty, bool boolProperty, QString stringProperty, double doubleProperty);
-	static ParentGadget createEnum(NormalEnum normalEnumProperty, EnumFlags enumFlagsProperty);
-	static ParentGadget createList(QList<int> simpleList, QList<QList<int>> leveledList);
-	static ParentGadget createMap(QMap<QString, int> simpleMap, QMap<QString, QMap<QString, int>> leveledMap);
-	static ParentGadget createChild(TestGadget childGadget, QList<TestGadget> simpleChildren, QList<QList<TestGadget>> leveledChildren);
-
-	TestGadget childGadget;
-	QList<TestGadget> simpleChildren;
-	QList<QList<TestGadget>> leveledChildren;
-};
-
-Q_DECLARE_METATYPE(ParentGadget)
 
 #endif // TESTGADGET_H
