@@ -110,6 +110,7 @@ In order for the serializer to properly work, there are a few things you have to
 	- `QObject*` and deriving classes
 	- Classes/structs marked with `Q_GADGET` (as value types only!)
 	- `QList`, of any type that is serializable as well
+	- `QMap<QString, T>`, with T beeing any type that is serializable as well (string as key type is required)
 	- Simple types, that are supported by QJsonValue (See [QJsonValue::fromVariant](https://doc.qt.io/qt-5/qjsonvalue.html#fromVariant) and [QJsonValue::toVariant](https://doc.qt.io/qt-5/qjsonvalue.html#toVariant))
 	- `Q_ENUM` and `Q_FLAG` types, as integer or as string
 		- The string de/serialization of Q_ENUM and Q_FLAG types only works if used as a Q_PROPERTY. Integer will always work.

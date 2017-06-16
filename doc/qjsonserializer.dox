@@ -95,7 +95,6 @@ requirement for the serializer, if you want to be able to serialize lists of a t
 calls the following methods for the given type:
 - `QMetaType::registerConverter<QList<T>, QVariantList>()`
 - `QMetaType::registerConverter<QVariantList, QList<T>>()`
-- `QMetaType::registerComparators<QList<T>>()`
 
 with a generic conversion using QVariant.
 
@@ -124,6 +123,40 @@ The following types are already registered by default:
 <tr><td>QUuid</td></tr>
 <tr><td>QObject *</td></tr>
 </table>
+
+@sa QJsonSerializer::registerAllConverters, QJsonSerializer::registerMapConverters
+*/
+
+/*!
+@fn QJsonSerializer::registerMapConverters
+
+@tparam T The type to register converters for
+
+Performs the registration of converters for `QMap<QString, T> <--> QVariantMap`. This conversion is a
+requirement for the serializer, if you want to be able to serialize maps of a type. The function
+calls the following methods for the given type:
+- `QMetaType::registerConverter<QMap<QString, T>, QVariantMap>()`
+- `QMetaType::registerConverter<QVariantMap, QMap<QString, T>>()`
+
+with a generic conversion using QVariant.
+
+The types for which converters are already registered are the same as for QJsonSerializer::registerListConverters
+
+@sa QJsonSerializer::registerAllConverters, QJsonSerializer::registerListConverters
+*/
+
+/*!
+@fn QJsonSerializer::registerAllConverters
+
+@tparam T The type to register converters for
+
+A shortcut for all the converter registrations QJsonSerializer provides. The method internall calls:
+- `QJsonSerializer::registerListConverters<T>()`
+- `QJsonSerializer::registerMapConverters<T>()`
+
+The types for which converters are already registered are the same as for QJsonSerializer::registerListConverters
+
+@sa QJsonSerializer::registerListConverters, QJsonSerializer::registerMapConverters
 */
 
 /*!
