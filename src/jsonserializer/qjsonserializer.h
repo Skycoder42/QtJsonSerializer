@@ -30,9 +30,9 @@ class Q_JSONSERIALIZER_EXPORT QJsonSerializer : public QObject
 public:
 	//! Flags to specify how strict the serializer should validate when deserializing
 	enum ValidationFlag {
-		StandardValidation = 0x00,//!< Do not perform extra validation, only make shure types are valid and compatible
-		NoExtraProperties = 0x01,//!< Make shure the json does not contain any properties that are not in the type to deserialize it to
-		AllProperties = 0x02,//!< Make shure all properties of the type have a value in the deserialized json data
+		StandardValidation = 0x00,//!< Do not perform extra validation, only make sure types are valid and compatible
+		NoExtraProperties = 0x01,//!< Make sure the json does not contain any properties that are not in the type to deserialize it to
+		AllProperties = 0x02,//!< Make sure all properties of the type have a value in the deserialized json data
 		FullValidation = (NoExtraProperties | AllProperties)//!< Validate everything
 	};
 	Q_DECLARE_FLAGS(ValidationFlags, ValidationFlag)

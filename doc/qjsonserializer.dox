@@ -13,7 +13,7 @@ page Usage Hints for details about what is possible and what is not.
 @section extending Extending the serializer
 To extend the serializers functionality, the protected functions are the place to look. For
 both serialization and deserialization, there are 5 methods each, with the following functionality:
-- <b>...Variant:</b> Decides, where to go next, by analysing the given type and data. Calls one of
+- <b>...Variant (primary methods):</b> Decides, where to go next, by analysing the given type and data. Calls one of
 the other functions to perform the actual de/serialization, and verifies the resulted data meets
 the expectations
 - <b>...Object:</b> Performs `QObject <--> QJsonObject` conversions. Calls the variant method for
@@ -22,6 +22,8 @@ each of it's properties
 each of it's properties. Basically the same as the object one, but for gadet types
 - <b>...List:</b> Performs `QList<T> <--> QJsonArray` conversions. Calls the variant method for
 each element in the list
+- <b>...Map:</b> Performs `QMap<QString, T> <--> QJsonObject` conversions. Calls the variant method for
+each element in the map
 - <b>...Enum:</b> Performs `enum/flags <--> int/string` conversions. Depending on QJsonSerializer::enumAsString,
 enums are serialized as int or string. The other way around is always enabled for both
 - <b>...Value:</b> Called for any other type, that does not match one of the three above. Tries to
@@ -82,6 +84,22 @@ to serialize them as a string, the "name" of each value, enable this propterty.
 @accessors{
 	@readAc{enumAsString()}
 	@writeAc{setEnumAsString()}
+}
+*/
+
+/*!
+@property QJsonSerializer::validationFlags
+
+@default{`QJsonSerialzer::StandardValidation`}
+
+Applies to deserialization only.<br/>
+By specifying those flags, you can set which additional attributes the serializer should check when deserializing.
+In those stricter modes, the serializer will fail with an exception if the conditions are not met instead of simply
+using defaults values etc.
+
+@accessors{
+	@readAc{validationFlags()}
+	@writeAc{setValidationFlags()}
 }
 */
 
