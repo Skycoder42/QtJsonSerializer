@@ -8,6 +8,8 @@ var searchData=
   ['geometryshadercode',['geometryShaderCode',['https://doc.qt.io/qt-5/qt3drender-qshaderprogram.html#geometryShaderCode-prop',0,'Qt3DRender::QShaderProgram']]],
   ['gesturecancelpolicy',['gestureCancelPolicy',['https://doc.qt.io/qt-5/qgesture.html#gestureCancelPolicy-prop',0,'QGesture']]],
   ['gesturetype',['gestureType',['https://doc.qt.io/qt-5/qgesture.html#gestureType-prop',0,'QGesture']]],
+  ['globalheaders',['globalHeaders',['https://doc.qt.io/qt-5/class_qt_rest_client_1_1_rest_client.html#a318cf677192305b97721d1f28a05a91e',0,'QtRestClient::RestClient']]],
+  ['globalparameters',['globalParameters',['https://doc.qt.io/qt-5/class_qt_rest_client_1_1_rest_client.html#a7a168edc300d0f9b2e0e1a934d01ed13',0,'QtRestClient::RestClient']]],
   ['globalrestorepolicy',['globalRestorePolicy',['https://doc.qt.io/qt-5/qstatemachine.html#globalRestorePolicy-prop',0,'QStateMachine']]],
   ['globalstrut',['globalStrut',['https://doc.qt.io/qt-5/qapplication.html#globalStrut-prop',0,'QApplication']]],
   ['graphicsapifilter',['graphicsApiFilter',['https://doc.qt.io/qt-5/qt3drender-qtechnique.html#graphicsApiFilter-prop',0,'Qt3DRender::QTechnique']]],

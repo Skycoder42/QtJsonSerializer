@@ -17,9 +17,11 @@ var searchData=
   ['regularexpression',['regularExpression',['https://doc.qt.io/qt-5/qregularexpressionvalidator.html#regularExpression-prop',0,'QRegularExpressionValidator']]],
   ['relativehumidity',['relativeHumidity',['https://doc.qt.io/qt-5/qhumidityreading.html#relativeHumidity-prop',0,'QHumidityReading']]],
   ['remainingtime',['remainingTime',['https://doc.qt.io/qt-5/qtimer.html#remainingTime-prop',0,'QTimer']]],
+  ['remoteurl',['remoteUrl',['https://doc.qt.io/qt-5/class_qt_data_sync_1_1_ws_authenticator.html#af042685cc0e56efcb7514ad9f5bf1578',0,'QtDataSync::WsAuthenticator']]],
   ['renderhints',['renderHints',['https://doc.qt.io/qt-5/qgraphicsview.html#renderHints-prop',0,'QGraphicsView']]],
   ['renderpolicy',['renderPolicy',['https://doc.qt.io/qt-5/qt3drender-quick-qscene2d.html#renderPolicy-prop',0,'Qt3DRender::Quick::QScene2D::renderPolicy()'],['https://doc.qt.io/qt-5/qt3drender-qrendersettings.html#renderPolicy-prop',0,'Qt3DRender::QRenderSettings::renderPolicy()']]],
   ['rendertarget',['renderTarget',['https://doc.qt.io/qt-5/qquickpainteditem.html#renderTarget-prop',0,'QQuickPaintedItem']]],
+  ['requestattributes',['requestAttributes',['https://doc.qt.io/qt-5/class_qt_rest_client_1_1_rest_client.html#a702de0d9054f8869b8473b85ec2a06c1',0,'QtRestClient::RestClient']]],
   ['requestedurl',['requestedUrl',['https://doc.qt.io/qt-5/qwebenginepage.html#requestedUrl-prop',0,'QWebEnginePage']]],
   ['resizeanchor',['resizeAnchor',['https://doc.qt.io/qt-5/qgraphicsview.html#resizeAnchor-prop',0,'QGraphicsView']]],
   ['resizegripsvisible',['resizeGripsVisible',['https://doc.qt.io/qt-5/qcolumnview.html#resizeGripsVisible-prop',0,'QColumnView']]],
@@ -41,6 +43,7 @@ var searchData=
   ['rowcount',['rowCount',['https://doc.qt.io/qt-5/qtablewidget.html#rowCount-prop',0,'QTableWidget']]],
   ['rowwrappolicy',['rowWrapPolicy',['https://doc.qt.io/qt-5/qformlayout.html#rowWrapPolicy-prop',0,'QFormLayout']]],
   ['rubberbandselectionmode',['rubberBandSelectionMode',['https://doc.qt.io/qt-5/qgraphicsview.html#rubberBandSelectionMode-prop',0,'QGraphicsView']]],
-  ['running',['running',['https://doc.qt.io/qt-5/qstatemachine.html#running-prop',0,'QStateMachine::running()'],['https://doc.qt.io/qt-5/qscxmlstatemachine.html#running-prop',0,'QScxmlStateMachine::running()'],['https://doc.qt.io/qt-5/qt3danimation-qabstractclipanimator.html#running-prop',0,'Qt3DAnimation::QAbstractClipAnimator::running()']]],
+  ['runasadmin',['runAsAdmin',['https://doc.qt.io/qt-5/class_qt_auto_updater_1_1_update_controller.html#a1c5a18c8728e9803a1e3ed927f038a53',0,'QtAutoUpdater::UpdateController']]],
+  ['running',['running',['https://doc.qt.io/qt-5/class_qt_auto_updater_1_1_update_controller.html#a7fa2f115bc28f412003822cc0dfdb3d0',0,'QtAutoUpdater::UpdateController::running()'],['https://doc.qt.io/qt-5/class_qt_auto_updater_1_1_updater.html#aef607db5109f57300e47b8e35615c7fa',0,'QtAutoUpdater::Updater::running()'],['https://doc.qt.io/qt-5/qstatemachine.html#running-prop',0,'QStateMachine::running()'],['https://doc.qt.io/qt-5/qscxmlstatemachine.html#running-prop',0,'QScxmlStateMachine::running()'],['https://doc.qt.io/qt-5/qt3danimation-qabstractclipanimator.html#running-prop',0,'Qt3DAnimation::QAbstractClipAnimator::running()']]],
   ['runonsubframes',['runOnSubframes',['https://doc.qt.io/qt-5/qquickwebenginescript.html#runOnSubframes-prop',0,'QQuickWebEngineScript']]]
 ];

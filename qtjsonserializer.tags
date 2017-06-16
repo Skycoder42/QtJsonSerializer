@@ -15,10 +15,6 @@
     <templarg></templarg>
   </compound>
   <compound kind="class">
-    <name>QBasicMutex</name>
-    <filename>class_q_basic_mutex.html</filename>
-  </compound>
-  <compound kind="class">
     <name>QJsonDeserializationException</name>
     <filename>class_q_json_deserialization_exception.html</filename>
     <base>QJsonSerializerException</base>
@@ -74,6 +70,61 @@
     <name>QJsonSerializer</name>
     <filename>class_q_json_serializer.html</filename>
     <base>QObject</base>
+    <member kind="enumeration">
+      <type></type>
+      <name>ValidationFlag</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>a0fb6dc294c5f0c2279e1e60c8bf19b37</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>StandardValidation</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>a0fb6dc294c5f0c2279e1e60c8bf19b37a3afc20b935753249378a0c00a884c995</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>NoExtraProperties</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>a0fb6dc294c5f0c2279e1e60c8bf19b37ac8cb0e946f61b483209cb2484259bcf0</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>AllProperties</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>a0fb6dc294c5f0c2279e1e60c8bf19b37aa598894025ccd81d3ed66d3e379c9f7e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>FullValidation</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>a0fb6dc294c5f0c2279e1e60c8bf19b37a78d3cfb1306be19cd4099429483dfd8f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>StandardValidation</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>a0fb6dc294c5f0c2279e1e60c8bf19b37a3afc20b935753249378a0c00a884c995</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>NoExtraProperties</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>a0fb6dc294c5f0c2279e1e60c8bf19b37ac8cb0e946f61b483209cb2484259bcf0</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>AllProperties</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>a0fb6dc294c5f0c2279e1e60c8bf19b37aa598894025ccd81d3ed66d3e379c9f7e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>FullValidation</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>a0fb6dc294c5f0c2279e1e60c8bf19b37a78d3cfb1306be19cd4099429483dfd8f</anchor>
+      <arglist></arglist>
+    </member>
     <member kind="slot">
       <type>void</type>
       <name>setAllowDefaultNull</name>
@@ -94,6 +145,13 @@
       <anchorfile>class_q_json_serializer.html</anchorfile>
       <anchor>a46a707a369bfd1beb45e7506cb36b783</anchor>
       <arglist>(bool enumAsString)</arglist>
+    </member>
+    <member kind="slot">
+      <type>void</type>
+      <name>setValidationFlags</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>a3441ff7a583a30f3f6d38bfc8b7bee39</anchor>
+      <arglist>(ValidationFlags validationFlags)</arglist>
     </member>
     <member kind="function">
       <type></type>
@@ -128,6 +186,13 @@
       <name>enumAsString</name>
       <anchorfile>class_q_json_serializer.html</anchorfile>
       <anchor>a3c26e7a387e04a367813e10cb6b716f2</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function">
+      <type>ValidationFlags</type>
+      <name>validationFlags</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>a9d8a8113d3f0b32eb6821dbb6fc5a89a</anchor>
       <arglist>() const</arglist>
     </member>
     <member kind="function">
@@ -221,6 +286,20 @@
       <anchor>a98b3e1ea1e844e2f3806dbf3566d9972</anchor>
       <arglist>()</arglist>
     </member>
+    <member kind="function" static="yes">
+      <type>static bool</type>
+      <name>registerMapConverters</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>a99a740629458388670ee7978e029ee33</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static bool</type>
+      <name>registerAllConverters</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>a1c0222392bf3ebacbf170521fdd2f08a</anchor>
+      <arglist>()</arglist>
+    </member>
     <member kind="function" protection="protected" virtualness="virtual">
       <type>virtual QJsonValue</type>
       <name>serializeVariant</name>
@@ -248,6 +327,13 @@
       <anchorfile>class_q_json_serializer.html</anchorfile>
       <anchor>a21c6c7088e7992207f40bd0d8b1a3f51</anchor>
       <arglist>(int listType, const QVariantList &amp;value) const</arglist>
+    </member>
+    <member kind="function" protection="protected">
+      <type>QJsonObject</type>
+      <name>serializeMap</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>a4c899955f97b325ffc7f03d96ab79250</anchor>
+      <arglist>(int mapType, const QVariantMap &amp;value) const</arglist>
     </member>
     <member kind="function" protection="protected" virtualness="virtual">
       <type>virtual QJsonValue</type>
@@ -291,6 +377,13 @@
       <anchor>a16beee8729c68dcfaeebf56fdc16c924</anchor>
       <arglist>(int listType, const QJsonArray &amp;array, QObject *parent) const</arglist>
     </member>
+    <member kind="function" protection="protected">
+      <type>QVariantMap</type>
+      <name>deserializeMap</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>abd7c1223167f30699a51972036bd8a09</anchor>
+      <arglist>(int mapType, const QJsonObject &amp;object, QObject *parent) const</arglist>
+    </member>
     <member kind="function" protection="protected" virtualness="virtual">
       <type>virtual QVariant</type>
       <name>deserializeEnum</name>
@@ -324,6 +417,13 @@
       <name>enumAsString</name>
       <anchorfile>class_q_json_serializer.html</anchorfile>
       <anchor>ac430c1962106cc1d0efcbef4a11b03f3</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="property">
+      <type>ValidationFlags</type>
+      <name>validationFlags</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>a6baa7de9acfd41c1780ea90464b696e3</anchor>
       <arglist></arglist>
     </member>
     <docanchor file="class_q_json_serializer" title="Supported types">supported</docanchor>
@@ -466,6 +566,47 @@
     </member>
   </compound>
   <compound kind="struct">
+    <name>_qjsonserializer_helpertypes::type_helper&lt; QMap&lt; QString, T &gt; &gt;</name>
+    <filename>struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_map_3_01_q_string_00_01_t_01_4_01_4.html</filename>
+    <templarg></templarg>
+    <base>_qjsonserializer_helpertypes::has_metaobject</base>
+    <member kind="typedef">
+      <type>QMap&lt; QString, T &gt;</type>
+      <name>Type</name>
+      <anchorfile>struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_map_3_01_q_string_00_01_t_01_4_01_4.html</anchorfile>
+      <anchor>a7af1b9a695f96bc7d7b2cdbb4863b273</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>T</type>
+      <name>ObjectType</name>
+      <anchorfile>struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_map_3_01_q_string_00_01_t_01_4_01_4.html</anchorfile>
+      <anchor>a3244a65962fb7376544d22704fe28381</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>QJsonObject</type>
+      <name>JsonType</name>
+      <anchorfile>struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_map_3_01_q_string_00_01_t_01_4_01_4.html</anchorfile>
+      <anchor>a1682e10ecd7fd54ccd6fbe92f5d6edf9</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static JsonType</type>
+      <name>convert</name>
+      <anchorfile>struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_map_3_01_q_string_00_01_t_01_4_01_4.html</anchorfile>
+      <anchor>adb10f03640df4bc67a6da730c7dd6756</anchor>
+      <arglist>(const QJsonValue &amp;value)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static QVariant</type>
+      <name>variant</name>
+      <anchorfile>struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_map_3_01_q_string_00_01_t_01_4_01_4.html</anchorfile>
+      <anchor>a75b347c0aec8812ba1ef60622e9920b1</anchor>
+      <arglist>(const Type &amp;data)</arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
     <name>_qjsonserializer_helpertypes::type_helper&lt; QVariant &gt;</name>
     <filename>struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_variant_01_4.html</filename>
     <base>_qjsonserializer_helpertypes::has_metaobject&lt; QVariant &gt;</base>
@@ -513,6 +654,7 @@
     <class kind="struct">_qjsonserializer_helpertypes::has_metaobject&lt; T * &gt;</class>
     <class kind="struct">_qjsonserializer_helpertypes::type_helper</class>
     <class kind="struct">_qjsonserializer_helpertypes::type_helper&lt; QList&lt; T &gt; &gt;</class>
+    <class kind="struct">_qjsonserializer_helpertypes::type_helper&lt; QMap&lt; QString, T &gt; &gt;</class>
     <class kind="struct">_qjsonserializer_helpertypes::type_helper&lt; QVariant &gt;</class>
   </compound>
   <compound kind="page">

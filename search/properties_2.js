@@ -51,6 +51,8 @@ var searchData=
   ['completionrole',['completionRole',['https://doc.qt.io/qt-5/qcompleter.html#completionRole-prop',0,'QCompleter']]],
   ['computeshadercode',['computeShaderCode',['https://doc.qt.io/qt-5/qt3drender-qshaderprogram.html#computeShaderCode-prop',0,'Qt3DRender::QShaderProgram']]],
   ['confirmoverwrite',['confirmOverwrite',['https://doc.qt.io/qt-5/qfiledialog-obsolete.html#confirmOverwrite-prop',0,'QFileDialog']]],
+  ['connected',['connected',['https://doc.qt.io/qt-5/class_qt_data_sync_1_1_ws_authenticator.html#a7b8c14e79d93e81950faf69ba089e40b',0,'QtDataSync::WsAuthenticator']]],
+  ['connectedterminals',['connectedTerminals',['https://doc.qt.io/qt-5/class_qt_background_process_1_1_app.html#a691dc150ad2814eb4be2936f681ea10f',0,'QtBackgroundProcess::App']]],
   ['connectedtobackend',['connectedToBackend',['https://doc.qt.io/qt-5/qsensor.html#connectedToBackend-prop',0,'QSensor']]],
   ['constantattenuation',['constantAttenuation',['https://doc.qt.io/qt-5/qt3drender-qpointlight.html#constantAttenuation-prop',0,'Qt3DRender::QPointLight::constantAttenuation()'],['https://doc.qt.io/qt-5/qt3drender-qspotlight.html#constantAttenuation-prop',0,'Qt3DRender::QSpotLight::constantAttenuation()']]],
   ['containsmouse',['containsMouse',['https://doc.qt.io/qt-5/qt3drender-qobjectpicker.html#containsMouse-prop',0,'Qt3DRender::QObjectPicker::containsMouse()'],['https://doc.qt.io/qt-5/qt3dinput-qmousehandler.html#containsMouse-prop',0,'Qt3DInput::QMouseHandler::containsMouse()']]],
@@ -62,6 +64,7 @@ var searchData=
   ['context',['context',['https://doc.qt.io/qt-5/qshortcut.html#context-prop',0,'QShortcut']]],
   ['contextmenupolicy',['contextMenuPolicy',['https://doc.qt.io/qt-5/qwidget.html#contextMenuPolicy-prop',0,'QWidget']]],
   ['control',['control',['https://doc.qt.io/qt-5/qaxbase.html#control-prop',0,'QAxBase']]],
+  ['controller',['controller',['https://doc.qt.io/qt-5/class_qt_auto_updater_1_1_update_button.html#a607115185059dbc525c5040d94a1329e',0,'QtAutoUpdater::UpdateButton']]],
   ['cool',['cool',['https://doc.qt.io/qt-5/qt3dextras-qgoochmaterial.html#cool-prop',0,'Qt3DExtras::QGoochMaterial']]],
   ['cornerbuttonenabled',['cornerButtonEnabled',['https://doc.qt.io/qt-5/qtableview.html#cornerButtonEnabled-prop',0,'QTableView']]],
   ['correctionmode',['correctionMode',['https://doc.qt.io/qt-5/qabstractspinbox.html#correctionMode-prop',0,'QAbstractSpinBox']]],
@@ -87,5 +90,6 @@ var searchData=
   ['cursorrectangle',['cursorRectangle',['https://doc.qt.io/qt-5/qinputmethod.html#cursorRectangle-prop',0,'QInputMethod']]],
   ['cursorwidth',['cursorWidth',['https://doc.qt.io/qt-5/qplaintextedit.html#cursorWidth-prop',0,'QPlainTextEdit::cursorWidth()'],['https://doc.qt.io/qt-5/qplaintextdocumentlayout.html#cursorWidth-prop',0,'QPlainTextDocumentLayout::cursorWidth()'],['https://doc.qt.io/qt-5/qtextedit.html#cursorWidth-prop',0,'QTextEdit::cursorWidth()']]],
   ['curveshape',['curveShape',['https://doc.qt.io/qt-5/qtimeline.html#curveShape-prop',0,'QTimeLine']]],
+  ['customheaders',['customHeaders',['https://doc.qt.io/qt-5/class_qt_data_sync_1_1_ws_authenticator.html#a38d5b115dbdeb0e557f15a9fbb1464d6',0,'QtDataSync::WsAuthenticator']]],
   ['cutoffangle',['cutOffAngle',['https://doc.qt.io/qt-5/qt3drender-qspotlight.html#cutOffAngle-prop',0,'Qt3DRender::QSpotLight']]]
 ];

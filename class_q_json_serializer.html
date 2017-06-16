@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">QtJsonSerializer
-   &#160;<span id="projectnumber">2.1.1</span>
+   &#160;<span id="projectnumber">2.2.0</span>
    </div>
    <div id="projectbrief">A library to perform generic seralization and deserialization of QObjects</div>
   </td>
@@ -65,6 +65,7 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-slots">Public Slots</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
@@ -92,6 +93,16 @@ $(function() {
 </map>
  </div></div>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:a0fb6dc294c5f0c2279e1e60c8bf19b37"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_q_json_serializer.html#a0fb6dc294c5f0c2279e1e60c8bf19b37">ValidationFlag</a> { <a class="el" href="class_q_json_serializer.html#a0fb6dc294c5f0c2279e1e60c8bf19b37a3afc20b935753249378a0c00a884c995">StandardValidation</a> = 0x00, 
+<a class="el" href="class_q_json_serializer.html#a0fb6dc294c5f0c2279e1e60c8bf19b37ac8cb0e946f61b483209cb2484259bcf0">NoExtraProperties</a> = 0x01, 
+<a class="el" href="class_q_json_serializer.html#a0fb6dc294c5f0c2279e1e60c8bf19b37aa598894025ccd81d3ed66d3e379c9f7e">AllProperties</a> = 0x02, 
+<a class="el" href="class_q_json_serializer.html#a0fb6dc294c5f0c2279e1e60c8bf19b37a78d3cfb1306be19cd4099429483dfd8f">FullValidation</a> = (NoExtraProperties | AllProperties)
+ }<tr class="memdesc:a0fb6dc294c5f0c2279e1e60c8bf19b37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flags to specify how strict the serializer should validate when deserializing.  <a href="class_q_json_serializer.html#a0fb6dc294c5f0c2279e1e60c8bf19b37">More...</a><br /></td></tr>
+</td></tr>
+<tr class="separator:a0fb6dc294c5f0c2279e1e60c8bf19b37"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-slots"></a>
 Public Slots</h2></td></tr>
 <tr class="memitem:ad807b89a053e8aac9930b2b6d8cf8cc4"><td class="memItemLeft" align="right" valign="top"><a id="ad807b89a053e8aac9930b2b6d8cf8cc4"></a>
@@ -106,6 +117,10 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_q_json_serializer.html#a46a707a369bfd1beb45e7506cb36b783">setEnumAsString</a> (bool <a class="el" href="class_q_json_serializer.html#ac430c1962106cc1d0efcbef4a11b03f3">enumAsString</a>)</td></tr>
 <tr class="memdesc:a46a707a369bfd1beb45e7506cb36b783"><td class="mdescLeft">&#160;</td><td class="mdescRight">WRITE accessor for <a class="el" href="class_q_json_serializer.html#ac430c1962106cc1d0efcbef4a11b03f3" title="Specifies, whether enums should be serialized as integer or as string. ">QJsonSerializer::enumAsString</a>. <br /></td></tr>
 <tr class="separator:a46a707a369bfd1beb45e7506cb36b783"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3441ff7a583a30f3f6d38bfc8b7bee39"><td class="memItemLeft" align="right" valign="top"><a id="a3441ff7a583a30f3f6d38bfc8b7bee39"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_q_json_serializer.html#a3441ff7a583a30f3f6d38bfc8b7bee39">setValidationFlags</a> (ValidationFlags <a class="el" href="class_q_json_serializer.html#a6baa7de9acfd41c1780ea90464b696e3">validationFlags</a>)</td></tr>
+<tr class="memdesc:a3441ff7a583a30f3f6d38bfc8b7bee39"><td class="mdescLeft">&#160;</td><td class="mdescRight">WRITE accessor for <a class="el" href="class_q_json_serializer.html#a6baa7de9acfd41c1780ea90464b696e3" title="Specify how strictly the serializer should verify data when deserializing. ">QJsonSerializer::validationFlags</a>. <br /></td></tr>
+<tr class="separator:a3441ff7a583a30f3f6d38bfc8b7bee39"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -129,6 +144,10 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_q_json_serializer.html#a3c26e7a387e04a367813e10cb6b716f2">enumAsString</a> () const</td></tr>
 <tr class="memdesc:a3c26e7a387e04a367813e10cb6b716f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">READ accessor for <a class="el" href="class_q_json_serializer.html#ac430c1962106cc1d0efcbef4a11b03f3" title="Specifies, whether enums should be serialized as integer or as string. ">QJsonSerializer::enumAsString</a>. <br /></td></tr>
 <tr class="separator:a3c26e7a387e04a367813e10cb6b716f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d8a8113d3f0b32eb6821dbb6fc5a89a"><td class="memItemLeft" align="right" valign="top"><a id="a9d8a8113d3f0b32eb6821dbb6fc5a89a"></a>
+ValidationFlags&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_q_json_serializer.html#a9d8a8113d3f0b32eb6821dbb6fc5a89a">validationFlags</a> () const</td></tr>
+<tr class="memdesc:a9d8a8113d3f0b32eb6821dbb6fc5a89a"><td class="mdescLeft">&#160;</td><td class="mdescRight">READ accessor for <a class="el" href="class_q_json_serializer.html#a6baa7de9acfd41c1780ea90464b696e3" title="Specify how strictly the serializer should verify data when deserializing. ">QJsonSerializer::validationFlags</a>. <br /></td></tr>
+<tr class="separator:a9d8a8113d3f0b32eb6821dbb6fc5a89a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab68cf3a3dc0b5d8fecf85b729d0be0a9"><td class="memItemLeft" align="right" valign="top"><a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qjsonvalue.html">QJsonValue</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_q_json_serializer.html#ab68cf3a3dc0b5d8fecf85b729d0be0a9">serialize</a> (const <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qvariant.html">QVariant</a> &amp;data) const</td></tr>
 <tr class="memdesc:ab68cf3a3dc0b5d8fecf85b729d0be0a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Serializers a <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qvariant.html">QVariant</a> value to a <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qjsonvalue.html">QJsonValue</a>.  <a href="#ab68cf3a3dc0b5d8fecf85b729d0be0a9">More...</a><br /></td></tr>
 <tr class="separator:ab68cf3a3dc0b5d8fecf85b729d0be0a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -293,6 +312,14 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a98b3e1ea1e844e2f3806dbf3566d9972"><td class="memTemplItemLeft" align="right" valign="top">static bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_q_json_serializer.html#a98b3e1ea1e844e2f3806dbf3566d9972">registerListConverters</a> ()</td></tr>
 <tr class="memdesc:a98b3e1ea1e844e2f3806dbf3566d9972"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers a custom type for list converisons.  <a href="#a98b3e1ea1e844e2f3806dbf3566d9972">More...</a><br /></td></tr>
 <tr class="separator:a98b3e1ea1e844e2f3806dbf3566d9972"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a99a740629458388670ee7978e029ee33"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:a99a740629458388670ee7978e029ee33"><td class="memTemplItemLeft" align="right" valign="top">static bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_q_json_serializer.html#a99a740629458388670ee7978e029ee33">registerMapConverters</a> ()</td></tr>
+<tr class="memdesc:a99a740629458388670ee7978e029ee33"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers a custom type for map converisons.  <a href="#a99a740629458388670ee7978e029ee33">More...</a><br /></td></tr>
+<tr class="separator:a99a740629458388670ee7978e029ee33"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1c0222392bf3ebacbf170521fdd2f08a"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:a1c0222392bf3ebacbf170521fdd2f08a"><td class="memTemplItemLeft" align="right" valign="top">static bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_q_json_serializer.html#a1c0222392bf3ebacbf170521fdd2f08a">registerAllConverters</a> ()</td></tr>
+<tr class="memdesc:a1c0222392bf3ebacbf170521fdd2f08a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers a custom type for list and map converisons.  <a href="#a1c0222392bf3ebacbf170521fdd2f08a">More...</a><br /></td></tr>
+<tr class="separator:a1c0222392bf3ebacbf170521fdd2f08a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_static_methods_qobject"><td colspan="2" onclick="javascript:toggleInherit('pub_static_methods_qobject')"><img src="closed.png" alt="-"/>&#160;Static Public Member Functions inherited from <a class="el" href="target="_blank" https://doc.qt.io/qt-5/qobject.html">QObject</a></td></tr>
 <tr class="memitem:tr inherit pub_static_methods_qobject"><td class="memItemLeft" align="right" valign="top"><a id="tr"></a>
 <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qstring.html">QString</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qobject.html#tr">tr</a> (const char *sourceText, const char *disambiguation, int n)</td></tr>
@@ -346,6 +373,10 @@ virtual <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcor
 virtual <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qjsonarray.html">QJsonArray</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_q_json_serializer.html#a21c6c7088e7992207f40bd0d8b1a3f51">serializeList</a> (int listType, const QVariantList &amp;value) const</td></tr>
 <tr class="memdesc:a21c6c7088e7992207f40bd0d8b1a3f51"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs the serialization of any <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qlist.html">QList</a> to a json array. <br /></td></tr>
 <tr class="separator:a21c6c7088e7992207f40bd0d8b1a3f51"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4c899955f97b325ffc7f03d96ab79250"><td class="memItemLeft" align="right" valign="top"><a id="a4c899955f97b325ffc7f03d96ab79250"></a>
+<a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qjsonobject.html">QJsonObject</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_q_json_serializer.html#a4c899955f97b325ffc7f03d96ab79250">serializeMap</a> (int mapType, const QVariantMap &amp;value) const</td></tr>
+<tr class="memdesc:a4c899955f97b325ffc7f03d96ab79250"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs the serialization of any QMap&lt;QString, T&gt; to a json object. <br /></td></tr>
+<tr class="separator:a4c899955f97b325ffc7f03d96ab79250"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af0db653b58dd5269fc3bf4dbd5d096a8"><td class="memItemLeft" align="right" valign="top"><a id="af0db653b58dd5269fc3bf4dbd5d096a8"></a>
 virtual <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qjsonvalue.html">QJsonValue</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_q_json_serializer.html#af0db653b58dd5269fc3bf4dbd5d096a8">serializeEnum</a> (const <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qmetaenum.html">QMetaEnum</a> &amp;metaEnum, const <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qvariant.html">QVariant</a> &amp;value) const</td></tr>
 <tr class="memdesc:af0db653b58dd5269fc3bf4dbd5d096a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs the serialization of an enum type <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qvariant.html">QVariant</a> to a json representation. <br /></td></tr>
@@ -370,6 +401,10 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 virtual QVariantList&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_q_json_serializer.html#a16beee8729c68dcfaeebf56fdc16c924">deserializeList</a> (int listType, const <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qjsonarray.html">QJsonArray</a> &amp;array, <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qobject.html">QObject</a> *<a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qobject.html#parent">parent</a>) const</td></tr>
 <tr class="memdesc:a16beee8729c68dcfaeebf56fdc16c924"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs the deserialization of any json array to a list. <br /></td></tr>
 <tr class="separator:a16beee8729c68dcfaeebf56fdc16c924"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abd7c1223167f30699a51972036bd8a09"><td class="memItemLeft" align="right" valign="top"><a id="abd7c1223167f30699a51972036bd8a09"></a>
+QVariantMap&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_q_json_serializer.html#abd7c1223167f30699a51972036bd8a09">deserializeMap</a> (int mapType, const <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qjsonobject.html">QJsonObject</a> &amp;object, <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qobject.html">QObject</a> *<a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qobject.html#parent">parent</a>) const</td></tr>
+<tr class="memdesc:abd7c1223167f30699a51972036bd8a09"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs the deserialization of any json object to a map. <br /></td></tr>
+<tr class="separator:abd7c1223167f30699a51972036bd8a09"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab372af0004be21357bfd81139d241f4f"><td class="memItemLeft" align="right" valign="top"><a id="ab372af0004be21357bfd81139d241f4f"></a>
 virtual <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qvariant.html">QVariant</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_q_json_serializer.html#ab372af0004be21357bfd81139d241f4f">deserializeEnum</a> (const <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qmetaenum.html">QMetaEnum</a> &amp;metaEnum, const <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qjsonvalue.html">QJsonValue</a> &amp;value) const</td></tr>
 <tr class="memdesc:ab372af0004be21357bfd81139d241f4f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs the deserialization of an enum value to a variant value type. <br /></td></tr>
@@ -418,6 +453,9 @@ Properties</h2></td></tr>
 <tr class="memitem:ac430c1962106cc1d0efcbef4a11b03f3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_q_json_serializer.html#ac430c1962106cc1d0efcbef4a11b03f3">enumAsString</a></td></tr>
 <tr class="memdesc:ac430c1962106cc1d0efcbef4a11b03f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Specifies, whether enums should be serialized as integer or as string.  <a href="#ac430c1962106cc1d0efcbef4a11b03f3">More...</a><br /></td></tr>
 <tr class="separator:ac430c1962106cc1d0efcbef4a11b03f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6baa7de9acfd41c1780ea90464b696e3"><td class="memItemLeft" align="right" valign="top">ValidationFlags&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_q_json_serializer.html#a6baa7de9acfd41c1780ea90464b696e3">validationFlags</a></td></tr>
+<tr class="memdesc:a6baa7de9acfd41c1780ea90464b696e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Specify how strictly the serializer should verify data when deserializing.  <a href="#a6baa7de9acfd41c1780ea90464b696e3">More...</a><br /></td></tr>
+<tr class="separator:a6baa7de9acfd41c1780ea90464b696e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header properties_qobject"><td colspan="2" onclick="javascript:toggleInherit('properties_qobject')"><img src="closed.png" alt="-"/>&#160;Properties inherited from <a class="el" href="target="_blank" https://doc.qt.io/qt-5/qobject.html">QObject</a></td></tr>
 <tr class="memitem:objectName-prop inherit properties_qobject"><td class="memItemLeft" align="right" valign="top"><a id="objectName-prop"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qobject.html#objectName-prop">objectName</a></td></tr>
@@ -432,16 +470,46 @@ Supported types</h1>
 <h1><a class="anchor" id="extending"></a>
 Extending the serializer</h1>
 <p>To extend the serializers functionality, the protected functions are the place to look. For both serialization and deserialization, there are 5 methods each, with the following functionality:</p><ul>
-<li><b>...Variant:</b> Decides, where to go next, by analysing the given type and data. Calls one of the other functions to perform the actual de/serialization, and verifies the resulted data meets the expectations</li>
+<li><b>...Variant (primary methods):</b> Decides, where to go next, by analysing the given type and data. Calls one of the other functions to perform the actual de/serialization, and verifies the resulted data meets the expectations</li>
 <li><b>...Object:</b> Performs <code><a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qobject.html">QObject</a> &lt;--&gt; <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qjsonobject.html">QJsonObject</a></code> conversions. Calls the variant method for each of it's properties</li>
 <li><b>...Gadget:</b> Performs <code>Q_GADGET &lt;--&gt; <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qjsonobject.html">QJsonObject</a></code> conversions. Calls the variant method for each of it's properties. Basically the same as the object one, but for gadet types</li>
 <li><b>...List:</b> Performs <code><a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qlist.html">QList</a>&lt;T&gt; &lt;--&gt; <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qjsonarray.html">QJsonArray</a></code> conversions. Calls the variant method for each element in the list</li>
+<li><b>...Map:</b> Performs <code><a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qmap.html">QMap</a>&lt;<a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qstring.html">QString</a>, T&gt; &lt;--&gt; <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qjsonobject.html">QJsonObject</a></code> conversions. Calls the variant method for each element in the map</li>
 <li><b>...Enum:</b> Performs <code>enum/flags &lt;--&gt; int/string</code> conversions. Depending on <a class="el" href="class_q_json_serializer.html#ac430c1962106cc1d0efcbef4a11b03f3" title="Specifies, whether enums should be serialized as integer or as string. ">QJsonSerializer::enumAsString</a>, enums are serialized as int or string. The other way around is always enabled for both</li>
 <li><b>...Value:</b> Called for any other type, that does not match one of the three above. Tries to convert whatever comes by using the build-in <code><a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qvariant.html">QVariant</a> &lt;--&gt; <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qjsonvalue.html">QJsonValue</a></code> conversions. See <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qjsonvalue.html#fromVariant">QJsonValue::fromVariant</a> and <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qjsonvalue.html#toVariant">QJsonValue::toVariant</a> for more details on the supported types </li>
 </ul>
 
 <p class="definition">Definition at line <a class="el" href="qjsonserializer_8h_source.html#l00017">17</a> of file <a class="el" href="qjsonserializer_8h_source.html">qjsonserializer.h</a>.</p>
-</div><h2 class="groupheader">Member Function Documentation</h2>
+</div><h2 class="groupheader">Member Enumeration Documentation</h2>
+<a id="a0fb6dc294c5f0c2279e1e60c8bf19b37"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0fb6dc294c5f0c2279e1e60c8bf19b37">&#9670;&nbsp;</a></span>ValidationFlag</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="class_q_json_serializer.html#a0fb6dc294c5f0c2279e1e60c8bf19b37">QJsonSerializer::ValidationFlag</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Flags to specify how strict the serializer should validate when deserializing. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a0fb6dc294c5f0c2279e1e60c8bf19b37a3afc20b935753249378a0c00a884c995"></a>StandardValidation&#160;</td><td class="fielddoc"><p>Do not perform extra validation, only make sure types are valid and compatible. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a0fb6dc294c5f0c2279e1e60c8bf19b37ac8cb0e946f61b483209cb2484259bcf0"></a>NoExtraProperties&#160;</td><td class="fielddoc"><p>Make sure the json does not contain any properties that are not in the type to deserialize it to. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a0fb6dc294c5f0c2279e1e60c8bf19b37aa598894025ccd81d3ed66d3e379c9f7e"></a>AllProperties&#160;</td><td class="fielddoc"><p>Make sure all properties of the type have a value in the deserialized json data. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a0fb6dc294c5f0c2279e1e60c8bf19b37a78d3cfb1306be19cd4099429483dfd8f"></a>FullValidation&#160;</td><td class="fielddoc"><p>Validate everything. </p>
+</td></tr>
+</table>
+
+<p class="definition">Definition at line <a class="el" href="qjsonserializer_8h_source.html#l00032">32</a> of file <a class="el" href="qjsonserializer_8h_source.html">qjsonserializer.h</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
 <a id="ac2abe7502e5082e9e77ddc08e224840a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac2abe7502e5082e9e77ddc08e224840a">&#9670;&nbsp;</a></span>deserialize() <span class="overload">[1/2]</span></h2>
 
@@ -492,7 +560,7 @@ Extending the serializer</h1>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="class_q_json_serializer.html#ab68cf3a3dc0b5d8fecf85b729d0be0a9" title="Serializers a QVariant value to a QJsonValue. ">QJsonSerializer::serialize</a>, <a class="el" href="class_q_json_serializer.html#aafa3d1873bf297dca6a60ccc380415cc" title="Deserializes data from a device to a QVariant value, based on the given type id. ">QJsonSerializer::deserializeFrom</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="qjsonserializer_8cpp_source.html#l00054">54</a> of file <a class="el" href="qjsonserializer_8cpp_source.html">qjsonserializer.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="qjsonserializer_8cpp_source.html#l00060">60</a> of file <a class="el" href="qjsonserializer_8cpp_source.html">qjsonserializer.cpp</a>.</p>
 
 </div>
 </div>
@@ -547,7 +615,7 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="class_q_json_serializer.html#ab68cf3a3dc0b5d8fecf85b729d0be0a9" title="Serializers a QVariant value to a QJsonValue. ">QJsonSerializer::serialize</a>, <a class="el" href="class_q_json_serializer.html#aafa3d1873bf297dca6a60ccc380415cc" title="Deserializes data from a device to a QVariant value, based on the given type id. ">QJsonSerializer::deserializeFrom</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="qjsonserializer_8h_source.html#l00178">178</a> of file <a class="el" href="qjsonserializer_8h_source.html">qjsonserializer.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="qjsonserializer_8h_source.html#l00245">245</a> of file <a class="el" href="qjsonserializer_8h_source.html">qjsonserializer.h</a>.</p>
 
 </div>
 </div>
@@ -601,7 +669,7 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="class_q_json_serializer.html#a163d6f5b77e0b8b874d49a2cd546c88d" title="Serializers a QVariant value to a device. ">QJsonSerializer::serializeTo</a>, <a class="el" href="class_q_json_serializer.html#ac2abe7502e5082e9e77ddc08e224840a" title="Deserializes a QJsonValue to a QVariant value, based on the given type id. ">QJsonSerializer::deserialize</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="qjsonserializer_8cpp_source.html#l00059">59</a> of file <a class="el" href="qjsonserializer_8cpp_source.html">qjsonserializer.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="qjsonserializer_8cpp_source.html#l00065">65</a> of file <a class="el" href="qjsonserializer_8cpp_source.html">qjsonserializer.cpp</a>.</p>
 
 </div>
 </div>
@@ -655,7 +723,7 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="class_q_json_serializer.html#a163d6f5b77e0b8b874d49a2cd546c88d" title="Serializers a QVariant value to a device. ">QJsonSerializer::serializeTo</a>, <a class="el" href="class_q_json_serializer.html#ac2abe7502e5082e9e77ddc08e224840a" title="Deserializes a QJsonValue to a QVariant value, based on the given type id. ">QJsonSerializer::deserialize</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="qjsonserializer_8cpp_source.html#l00064">64</a> of file <a class="el" href="qjsonserializer_8cpp_source.html">qjsonserializer.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="qjsonserializer_8cpp_source.html#l00070">70</a> of file <a class="el" href="qjsonserializer_8cpp_source.html">qjsonserializer.cpp</a>.</p>
 
 </div>
 </div>
@@ -710,7 +778,7 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="class_q_json_serializer.html#a163d6f5b77e0b8b874d49a2cd546c88d" title="Serializers a QVariant value to a device. ">QJsonSerializer::serializeTo</a>, <a class="el" href="class_q_json_serializer.html#ac2abe7502e5082e9e77ddc08e224840a" title="Deserializes a QJsonValue to a QVariant value, based on the given type id. ">QJsonSerializer::deserialize</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="qjsonserializer_8h_source.html#l00185">185</a> of file <a class="el" href="qjsonserializer_8h_source.html">qjsonserializer.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="qjsonserializer_8h_source.html#l00252">252</a> of file <a class="el" href="qjsonserializer_8h_source.html">qjsonserializer.h</a>.</p>
 
 </div>
 </div>
@@ -765,7 +833,50 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="class_q_json_serializer.html#a163d6f5b77e0b8b874d49a2cd546c88d" title="Serializers a QVariant value to a device. ">QJsonSerializer::serializeTo</a>, <a class="el" href="class_q_json_serializer.html#ac2abe7502e5082e9e77ddc08e224840a" title="Deserializes a QJsonValue to a QVariant value, based on the given type id. ">QJsonSerializer::deserialize</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="qjsonserializer_8h_source.html#l00192">192</a> of file <a class="el" href="qjsonserializer_8h_source.html">qjsonserializer.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="qjsonserializer_8h_source.html#l00259">259</a> of file <a class="el" href="qjsonserializer_8h_source.html">qjsonserializer.h</a>.</p>
+
+</div>
+</div>
+<a id="a1c0222392bf3ebacbf170521fdd2f08a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1c0222392bf3ebacbf170521fdd2f08a">&#9670;&nbsp;</a></span>registerAllConverters()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QJsonSerializer::registerAllConverters </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Registers a custom type for list and map converisons. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T</td><td>The type to register converters for</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>A shortcut for all the converter registrations <a class="el" href="class_q_json_serializer.html" title="A class to serializer and deserializer QObjects and Q_GADGETS to and from JSON. ">QJsonSerializer</a> provides. The method internall calls:</p><ul>
+<li><code><a class="el" href="class_q_json_serializer.html#a98b3e1ea1e844e2f3806dbf3566d9972" title="Registers a custom type for list converisons. ">QJsonSerializer::registerListConverters</a>&lt;T&gt;()</code></li>
+<li><code><a class="el" href="class_q_json_serializer.html#a99a740629458388670ee7978e029ee33" title="Registers a custom type for map converisons. ">QJsonSerializer::registerMapConverters</a>&lt;T&gt;()</code></li>
+</ul>
+<p>The types for which converters are already registered are the same as for <a class="el" href="class_q_json_serializer.html#a98b3e1ea1e844e2f3806dbf3566d9972" title="Registers a custom type for list converisons. ">QJsonSerializer::registerListConverters</a></p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="class_q_json_serializer.html#a98b3e1ea1e844e2f3806dbf3566d9972" title="Registers a custom type for list converisons. ">QJsonSerializer::registerListConverters</a>, <a class="el" href="class_q_json_serializer.html#a99a740629458388670ee7978e029ee33" title="Registers a custom type for map converisons. ">QJsonSerializer::registerMapConverters</a> </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="qjsonserializer_8h_source.html#l00216">216</a> of file <a class="el" href="qjsonserializer_8h_source.html">qjsonserializer.h</a>.</p>
 
 </div>
 </div>
@@ -804,7 +915,6 @@ template&lt;typename T &gt; </div>
 <p>Performs the registration of converters for <code><a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qlist.html">QList</a>&lt;T&gt; &lt;--&gt; QVariantList</code>. This conversion is a requirement for the serializer, if you want to be able to serialize lists of a type. The function calls the following methods for the given type:</p><ul>
 <li><code><a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qmetatype.html#registerConverter">QMetaType::registerConverter</a>&lt;<a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qlist.html">QList</a>&lt;T&gt;, QVariantList&gt;()</code></li>
 <li><code><a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qmetatype.html#registerConverter">QMetaType::registerConverter</a>&lt;QVariantList, <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qlist.html">QList</a>&lt;T&gt;&gt;()</code></li>
-<li><code><a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qmetatype.html#registerComparators">QMetaType::registerComparators</a>&lt;<a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qlist.html">QList</a>&lt;T&gt;&gt;()</code></li>
 </ul>
 <p>with a generic conversion using <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qvariant.html">QVariant</a>.</p>
 <p>The following types are already registered by default: </p><table class="doxtable">
@@ -853,8 +963,53 @@ template&lt;typename T &gt; </div>
 <tr>
 <td><a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qobject.html">QObject</a> * </td></tr>
 </table>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="class_q_json_serializer.html#a1c0222392bf3ebacbf170521fdd2f08a" title="Registers a custom type for list and map converisons. ">QJsonSerializer::registerAllConverters</a>, <a class="el" href="class_q_json_serializer.html#a99a740629458388670ee7978e029ee33" title="Registers a custom type for map converisons. ">QJsonSerializer::registerMapConverters</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="qjsonserializer_8h_source.html#l00128">128</a> of file <a class="el" href="qjsonserializer_8h_source.html">qjsonserializer.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="qjsonserializer_8h_source.html#l00156">156</a> of file <a class="el" href="qjsonserializer_8h_source.html">qjsonserializer.h</a>.</p>
+
+</div>
+</div>
+<a id="a99a740629458388670ee7978e029ee33"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a99a740629458388670ee7978e029ee33">&#9670;&nbsp;</a></span>registerMapConverters()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QJsonSerializer::registerMapConverters </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Registers a custom type for map converisons. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T</td><td>The type to register converters for</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Performs the registration of converters for <code><a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qmap.html">QMap</a>&lt;<a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qstring.html">QString</a>, T&gt; &lt;--&gt; QVariantMap</code>. This conversion is a requirement for the serializer, if you want to be able to serialize maps of a type. The function calls the following methods for the given type:</p><ul>
+<li><code><a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qmetatype.html#registerConverter">QMetaType::registerConverter</a>&lt;<a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qmap.html">QMap</a>&lt;<a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qstring.html">QString</a>, T&gt;, QVariantMap&gt;()</code></li>
+<li><code><a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qmetatype.html#registerConverter">QMetaType::registerConverter</a>&lt;QVariantMap, <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qmap.html">QMap</a>&lt;<a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qstring.html">QString</a>, T&gt;&gt;()</code></li>
+</ul>
+<p>with a generic conversion using <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qvariant.html">QVariant</a>.</p>
+<p>The types for which converters are already registered are the same as for <a class="el" href="class_q_json_serializer.html#a98b3e1ea1e844e2f3806dbf3566d9972" title="Registers a custom type for list converisons. ">QJsonSerializer::registerListConverters</a></p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="class_q_json_serializer.html#a1c0222392bf3ebacbf170521fdd2f08a" title="Registers a custom type for list and map converisons. ">QJsonSerializer::registerAllConverters</a>, <a class="el" href="class_q_json_serializer.html#a98b3e1ea1e844e2f3806dbf3566d9972" title="Registers a custom type for list converisons. ">QJsonSerializer::registerListConverters</a> </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="qjsonserializer_8h_source.html#l00185">185</a> of file <a class="el" href="qjsonserializer_8h_source.html">qjsonserializer.h</a>.</p>
 
 </div>
 </div>
@@ -890,7 +1045,7 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="class_q_json_serializer.html#ac2abe7502e5082e9e77ddc08e224840a" title="Deserializes a QJsonValue to a QVariant value, based on the given type id. ">QJsonSerializer::deserialize</a>, <a class="el" href="class_q_json_serializer.html#a163d6f5b77e0b8b874d49a2cd546c88d" title="Serializers a QVariant value to a device. ">QJsonSerializer::serializeTo</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="qjsonserializer_8cpp_source.html#l00039">39</a> of file <a class="el" href="qjsonserializer_8cpp_source.html">qjsonserializer.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="qjsonserializer_8cpp_source.html#l00045">45</a> of file <a class="el" href="qjsonserializer_8cpp_source.html">qjsonserializer.cpp</a>.</p>
 
 </div>
 </div>
@@ -934,7 +1089,7 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="class_q_json_serializer.html#ac2abe7502e5082e9e77ddc08e224840a" title="Deserializes a QJsonValue to a QVariant value, based on the given type id. ">QJsonSerializer::deserialize</a>, <a class="el" href="class_q_json_serializer.html#a163d6f5b77e0b8b874d49a2cd546c88d" title="Serializers a QVariant value to a device. ">QJsonSerializer::serializeTo</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="qjsonserializer_8h_source.html#l00157">157</a> of file <a class="el" href="qjsonserializer_8h_source.html">qjsonserializer.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="qjsonserializer_8h_source.html#l00224">224</a> of file <a class="el" href="qjsonserializer_8h_source.html">qjsonserializer.h</a>.</p>
 
 </div>
 </div>
@@ -980,7 +1135,7 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="class_q_json_serializer.html#aafa3d1873bf297dca6a60ccc380415cc" title="Deserializes data from a device to a QVariant value, based on the given type id. ">QJsonSerializer::deserializeFrom</a>, <a class="el" href="class_q_json_serializer.html#ab68cf3a3dc0b5d8fecf85b729d0be0a9" title="Serializers a QVariant value to a QJsonValue. ">QJsonSerializer::serialize</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="qjsonserializer_8cpp_source.html#l00044">44</a> of file <a class="el" href="qjsonserializer_8cpp_source.html">qjsonserializer.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="qjsonserializer_8cpp_source.html#l00050">50</a> of file <a class="el" href="qjsonserializer_8cpp_source.html">qjsonserializer.cpp</a>.</p>
 
 </div>
 </div>
@@ -1016,7 +1171,7 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="class_q_json_serializer.html#aafa3d1873bf297dca6a60ccc380415cc" title="Deserializes data from a device to a QVariant value, based on the given type id. ">QJsonSerializer::deserializeFrom</a>, <a class="el" href="class_q_json_serializer.html#ab68cf3a3dc0b5d8fecf85b729d0be0a9" title="Serializers a QVariant value to a QJsonValue. ">QJsonSerializer::serialize</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="qjsonserializer_8cpp_source.html#l00049">49</a> of file <a class="el" href="qjsonserializer_8cpp_source.html">qjsonserializer.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="qjsonserializer_8cpp_source.html#l00055">55</a> of file <a class="el" href="qjsonserializer_8cpp_source.html">qjsonserializer.cpp</a>.</p>
 
 </div>
 </div>
@@ -1070,7 +1225,7 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="class_q_json_serializer.html#aafa3d1873bf297dca6a60ccc380415cc" title="Deserializes data from a device to a QVariant value, based on the given type id. ">QJsonSerializer::deserializeFrom</a>, <a class="el" href="class_q_json_serializer.html#ab68cf3a3dc0b5d8fecf85b729d0be0a9" title="Serializers a QVariant value to a QJsonValue. ">QJsonSerializer::serialize</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="qjsonserializer_8h_source.html#l00164">164</a> of file <a class="el" href="qjsonserializer_8h_source.html">qjsonserializer.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="qjsonserializer_8h_source.html#l00231">231</a> of file <a class="el" href="qjsonserializer_8h_source.html">qjsonserializer.h</a>.</p>
 
 </div>
 </div>
@@ -1114,7 +1269,7 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="class_q_json_serializer.html#aafa3d1873bf297dca6a60ccc380415cc" title="Deserializes data from a device to a QVariant value, based on the given type id. ">QJsonSerializer::deserializeFrom</a>, <a class="el" href="class_q_json_serializer.html#ab68cf3a3dc0b5d8fecf85b729d0be0a9" title="Serializers a QVariant value to a QJsonValue. ">QJsonSerializer::serialize</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="qjsonserializer_8h_source.html#l00171">171</a> of file <a class="el" href="qjsonserializer_8h_source.html">qjsonserializer.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="qjsonserializer_8h_source.html#l00238">238</a> of file <a class="el" href="qjsonserializer_8h_source.html">qjsonserializer.h</a>.</p>
 
 </div>
 </div>
@@ -1237,6 +1392,44 @@ template&lt;typename T &gt; </div>
 
 </div>
 </div>
+<a id="a6baa7de9acfd41c1780ea90464b696e3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6baa7de9acfd41c1780ea90464b696e3">&#9670;&nbsp;</a></span>validationFlags</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QJsonSerializer::validationFlags</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">read</span><span class="mlabel">write</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Specify how strictly the serializer should verify data when deserializing. </p>
+<p><b>Default:</b> <code>QJsonSerialzer::StandardValidation</code> <br />
+</p>
+<p>Applies to deserialization only.<br />
+ By specifying those flags, you can set which additional attributes the serializer should check when deserializing. In those stricter modes, the serializer will fail with an exception if the conditions are not met instead of simply using defaults values etc.</p>
+<table class="doxtable">
+<tr>
+<th colspan="2">Accessors </th></tr>
+<tr>
+<td><b>READ</b></td><td><a class="el" href="class_q_json_serializer.html#a6baa7de9acfd41c1780ea90464b696e3" title="Specify how strictly the serializer should verify data when deserializing. ">validationFlags()</a> </td></tr>
+<tr>
+<td><b>WRITE</b></td><td><a class="el" href="class_q_json_serializer.html#a3441ff7a583a30f3f6d38bfc8b7bee39" title="WRITE accessor for QJsonSerializer::validationFlags. ">setValidationFlags()</a> </td></tr>
+</table>
+
+<p class="definition">Definition at line <a class="el" href="qjsonserializer_8h_source.html#l00028">28</a> of file <a class="el" href="qjsonserializer_8h_source.html">qjsonserializer.h</a>.</p>
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li><a class="el" href="qjsonserializer_8h_source.html">qjsonserializer.h</a></li>
 <li><a class="el" href="qjsonserializer_8cpp_source.html">qjsonserializer.cpp</a></li>
@@ -1245,7 +1438,7 @@ template&lt;typename T &gt; </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Jun 2 2017 11:43:01 for QtJsonSerializer by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Jun 16 2017 17:33:32 for QtJsonSerializer by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.13
 </small></address>

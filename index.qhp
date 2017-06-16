@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <QtHelpProject version="1.0">
-  <namespace>de.skycoder42.qtjsonserializer.211</namespace>
+  <namespace>de.skycoder42.qtjsonserializer.220</namespace>
   <virtualFolder>doc_qtjsonserializer</virtualFolder>
-  <customFilter name="JsonSerializer 2.1.1">
+  <customFilter name="JsonSerializer 2.2.0">
     <filterAttribute>qtjsonserializer</filterAttribute>
-    <filterAttribute>2.1.1</filterAttribute>
+    <filterAttribute>2.2.0</filterAttribute>
   </customFilter>
   <filterSection>
     <filterAttribute>doxygen</filterAttribute>
     <toc>
-      <section title="QtJsonSerializer 2.1.1" ref="index.html">
+      <section title="QtJsonSerializer 2.2.0" ref="index.html">
         <section title="Features" ref="index.html#qtjsonserializer_readme_label_0" />
         <section title="Download/Installation" ref="index.html#qtjsonserializer_readme_label_1" />
         <section title="Usage" ref="index.html#qtjsonserializer_readme_label_2">
@@ -38,13 +38,17 @@
                 <section title="ObjectType" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_list_3_01_t_01_4_01_4.html#a69ed8cac9ffd22669e6804089822ae60" />
                 <section title="Type" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_list_3_01_t_01_4_01_4.html#a2442fafc9940ca5445096507bdde28af" />
               </section>
+              <section title="type_helper&lt; QMap&lt; QString, T &gt; &gt;" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_map_3_01_q_string_00_01_t_01_4_01_4.html">
+                <section title="JsonType" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_map_3_01_q_string_00_01_t_01_4_01_4.html#a1682e10ecd7fd54ccd6fbe92f5d6edf9" />
+                <section title="ObjectType" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_map_3_01_q_string_00_01_t_01_4_01_4.html#a3244a65962fb7376544d22704fe28381" />
+                <section title="Type" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_map_3_01_q_string_00_01_t_01_4_01_4.html#a7af1b9a695f96bc7d7b2cdbb4863b273" />
+              </section>
               <section title="type_helper&lt; QVariant &gt;" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_variant_01_4.html">
                 <section title="JsonType" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_variant_01_4.html#a647d88720963f090836d04ee5b75a367" />
                 <section title="ObjectType" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_variant_01_4.html#a4df3f194269a9ac48a9d6795e5c5f761" />
                 <section title="Type" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_variant_01_4.html#a69c8f01a33021f62907969b8f892650b" />
               </section>
             </section>
-            <section title="QBasicMutex" ref="class_q_basic_mutex.html" />
             <section title="QJsonDeserializationException" ref="class_q_json_deserialization_exception.html">
               <section title="QJsonDeserializationException" ref="class_q_json_deserialization_exception.html#ad37e36ebc35f0812018106e1a65895b1" />
               <section title="clone" ref="class_q_json_deserialization_exception.html#ad4196cb826c8770beab48325bc3cbddf" />
@@ -56,6 +60,12 @@
               <section title="raise" ref="class_q_json_serialization_exception.html#a1f2c5dc5b525da2d02c51fbb093fad2c" />
             </section>
             <section title="QJsonSerializer" ref="class_q_json_serializer.html">
+              <section title="ValidationFlag" ref="class_q_json_serializer.html#a0fb6dc294c5f0c2279e1e60c8bf19b37">
+                <section title="StandardValidation" ref="class_q_json_serializer.html#a0fb6dc294c5f0c2279e1e60c8bf19b37a3afc20b935753249378a0c00a884c995" />
+                <section title="NoExtraProperties" ref="class_q_json_serializer.html#a0fb6dc294c5f0c2279e1e60c8bf19b37ac8cb0e946f61b483209cb2484259bcf0" />
+                <section title="AllProperties" ref="class_q_json_serializer.html#a0fb6dc294c5f0c2279e1e60c8bf19b37aa598894025ccd81d3ed66d3e379c9f7e" />
+                <section title="FullValidation" ref="class_q_json_serializer.html#a0fb6dc294c5f0c2279e1e60c8bf19b37a78d3cfb1306be19cd4099429483dfd8f" />
+              </section>
               <section title="QJsonSerializer" ref="class_q_json_serializer.html#ae0d46bea68e7abc4f0a7444a40c03017" />
               <section title="~QJsonSerializer" ref="class_q_json_serializer.html#aa6a590f7c89c651ca77555a1fec9c5bc" />
               <section title="allowDefaultNull" ref="class_q_json_serializer.html#a194c09466f37e35a189c3e67df74f0b9" />
@@ -68,6 +78,7 @@
               <section title="deserializeFrom" ref="class_q_json_serializer.html#afbca1b7d26866f48db10656e0284bbd6" />
               <section title="deserializeGadget" ref="class_q_json_serializer.html#a2764651e0a8236814d83f704f5f89751" />
               <section title="deserializeList" ref="class_q_json_serializer.html#a16beee8729c68dcfaeebf56fdc16c924" />
+              <section title="deserializeMap" ref="class_q_json_serializer.html#abd7c1223167f30699a51972036bd8a09" />
               <section title="deserializeObject" ref="class_q_json_serializer.html#a708c1375a8776cc38a94997b6b879d99" />
               <section title="deserializeValue" ref="class_q_json_serializer.html#ae767df019ead6232fc8c24a107f682f5" />
               <section title="deserializeVariant" ref="class_q_json_serializer.html#a26a9ab6826e95f9902f9b5f7daa12c4f" />
@@ -78,6 +89,7 @@
               <section title="serializeEnum" ref="class_q_json_serializer.html#af0db653b58dd5269fc3bf4dbd5d096a8" />
               <section title="serializeGadget" ref="class_q_json_serializer.html#ab247470405a303068400e77f1804666c" />
               <section title="serializeList" ref="class_q_json_serializer.html#a21c6c7088e7992207f40bd0d8b1a3f51" />
+              <section title="serializeMap" ref="class_q_json_serializer.html#a4c899955f97b325ffc7f03d96ab79250" />
               <section title="serializeObject" ref="class_q_json_serializer.html#aa23c9ff8064d76e9a02ee6f685a73ce3" />
               <section title="serializeTo" ref="class_q_json_serializer.html#a163d6f5b77e0b8b874d49a2cd546c88d" />
               <section title="serializeTo" ref="class_q_json_serializer.html#a1a7c606d60801923008752f43a16e0aa" />
@@ -88,9 +100,12 @@
               <section title="setAllowDefaultNull" ref="class_q_json_serializer.html#ad807b89a053e8aac9930b2b6d8cf8cc4" />
               <section title="setEnumAsString" ref="class_q_json_serializer.html#a46a707a369bfd1beb45e7506cb36b783" />
               <section title="setKeepObjectName" ref="class_q_json_serializer.html#af4d083e88a88bec52b4951b2d8395767" />
+              <section title="setValidationFlags" ref="class_q_json_serializer.html#a3441ff7a583a30f3f6d38bfc8b7bee39" />
+              <section title="validationFlags" ref="class_q_json_serializer.html#a9d8a8113d3f0b32eb6821dbb6fc5a89a" />
               <section title="allowDefaultNull" ref="class_q_json_serializer.html#acc7b17076756d1acd0d95e955614b289" />
               <section title="enumAsString" ref="class_q_json_serializer.html#ac430c1962106cc1d0efcbef4a11b03f3" />
               <section title="keepObjectName" ref="class_q_json_serializer.html#a6c0d933bd43f30870c9379fb04f65f00" />
+              <section title="validationFlags" ref="class_q_json_serializer.html#a6baa7de9acfd41c1780ea90464b696e3" />
             </section>
             <section title="QJsonSerializerException" ref="class_q_json_serializer_exception.html">
               <section title="QJsonSerializerException" ref="class_q_json_serializer_exception.html#ab1746396d417b43bf2228dc62c706b1b" />
@@ -111,9 +126,9 @@
               <section title="_qjsonserializer_helpertypes::has_metaobject&lt; T &gt;" ref="struct__qjsonserializer__helpertypes_1_1has__metaobject.html">
                 <section title="_qjsonserializer_helpertypes::type_helper&lt; T &gt;" ref="struct__qjsonserializer__helpertypes_1_1type__helper.html" />
                 <section title="_qjsonserializer_helpertypes::type_helper&lt; QList&lt; T &gt; &gt;" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_list_3_01_t_01_4_01_4.html" />
+                <section title="_qjsonserializer_helpertypes::type_helper&lt; QMap&lt; QString, T &gt; &gt;" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_map_3_01_q_string_00_01_t_01_4_01_4.html" />
               </section>
             </section>
-            <section title="QBasicMutex" ref="class_q_basic_mutex.html" />
             <section title="QException" ref="qexception.html">
               <section title="QJsonSerializerException" ref="class_q_json_serializer_exception.html">
                 <section title="QJsonDeserializationException" ref="class_q_json_deserialization_exception.html" />
@@ -128,12 +143,15 @@
                 <section title="_qjsonserializer_helpertypes::type_helper&lt; QVariant &gt;" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_variant_01_4.html" />
               </section>
             </section>
+            <section title="typedef" ref="classtypedef.html" />
           </section>
           <section title="Class Members" ref="functions.html">
             <section title="All" ref="functions.html" />
             <section title="Functions" ref="functions_func.html" />
             <section title="Variables" ref="functions_vars.html" />
             <section title="Typedefs" ref="functions_type.html" />
+            <section title="Enumerations" ref="functions_enum.html" />
+            <section title="Enumerator" ref="functions_eval.html" />
             <section title="Properties" ref="functions_prop.html" />
           </section>
         </section>
@@ -151,7 +169,6 @@
       </section>
     </toc>
     <keywords>
-      <keyword name="QBasicMutex" id="QBasicMutex" ref="class_q_basic_mutex.html" />
       <keyword name="QJsonDeserializationException" id="QJsonDeserializationException" ref="class_q_json_deserialization_exception.html" />
       <keyword name="QJsonDeserializationException" id="QJsonDeserializationException::QJsonDeserializationException" ref="class_q_json_deserialization_exception.html#ad37e36ebc35f0812018106e1a65895b1" />
       <keyword name="raise" id="QJsonDeserializationException::raise" ref="class_q_json_deserialization_exception.html#a48291abca66222ed578833a1c1c169c0" />
@@ -174,11 +191,13 @@
       <keyword name="setAllowDefaultNull" id="QJsonSerializer::setAllowDefaultNull" ref="class_q_json_serializer.html#ad807b89a053e8aac9930b2b6d8cf8cc4" />
       <keyword name="setKeepObjectName" id="QJsonSerializer::setKeepObjectName" ref="class_q_json_serializer.html#af4d083e88a88bec52b4951b2d8395767" />
       <keyword name="setEnumAsString" id="QJsonSerializer::setEnumAsString" ref="class_q_json_serializer.html#a46a707a369bfd1beb45e7506cb36b783" />
+      <keyword name="setValidationFlags" id="QJsonSerializer::setValidationFlags" ref="class_q_json_serializer.html#a3441ff7a583a30f3f6d38bfc8b7bee39" />
       <keyword name="QJsonSerializer" id="QJsonSerializer::QJsonSerializer" ref="class_q_json_serializer.html#ae0d46bea68e7abc4f0a7444a40c03017" />
       <keyword name="~QJsonSerializer" id="QJsonSerializer::~QJsonSerializer" ref="class_q_json_serializer.html#aa6a590f7c89c651ca77555a1fec9c5bc" />
       <keyword name="allowDefaultNull" id="QJsonSerializer::allowDefaultNull" ref="class_q_json_serializer.html#a194c09466f37e35a189c3e67df74f0b9" />
       <keyword name="keepObjectName" id="QJsonSerializer::keepObjectName" ref="class_q_json_serializer.html#afd4632ae8b3725d2c3d1568edd08a8f5" />
       <keyword name="enumAsString" id="QJsonSerializer::enumAsString" ref="class_q_json_serializer.html#a3c26e7a387e04a367813e10cb6b716f2" />
+      <keyword name="validationFlags" id="QJsonSerializer::validationFlags" ref="class_q_json_serializer.html#a9d8a8113d3f0b32eb6821dbb6fc5a89a" />
       <keyword name="serialize" id="QJsonSerializer::serialize" ref="class_q_json_serializer.html#ab68cf3a3dc0b5d8fecf85b729d0be0a9" />
       <keyword name="serializeTo" id="QJsonSerializer::serializeTo" ref="class_q_json_serializer.html#a163d6f5b77e0b8b874d49a2cd546c88d" />
       <keyword name="serializeTo" id="QJsonSerializer::serializeTo" ref="class_q_json_serializer.html#a1a7c606d60801923008752f43a16e0aa" />
@@ -230,6 +249,8 @@
       <keyword name="inherits" id="QObject::inherits" ref="qobject.html#inherits" />
       <keyword name="deleteLater" id="QObject::deleteLater" ref="qobject.html#deleteLater" />
       <keyword name="registerListConverters" id="QJsonSerializer::registerListConverters" ref="class_q_json_serializer.html#a98b3e1ea1e844e2f3806dbf3566d9972" />
+      <keyword name="registerMapConverters" id="QJsonSerializer::registerMapConverters" ref="class_q_json_serializer.html#a99a740629458388670ee7978e029ee33" />
+      <keyword name="registerAllConverters" id="QJsonSerializer::registerAllConverters" ref="class_q_json_serializer.html#a1c0222392bf3ebacbf170521fdd2f08a" />
       <keyword name="tr" id="QObject::tr" ref="qobject.html#tr" />
       <keyword name="trUtf8" id="QObject::trUtf8" ref="qobject.html#trUtf8" />
       <keyword name="connect" id="QObject::connect" ref="qobject.html#connect" />
@@ -245,12 +266,14 @@
       <keyword name="serializeObject" id="QJsonSerializer::serializeObject" ref="class_q_json_serializer.html#aa23c9ff8064d76e9a02ee6f685a73ce3" />
       <keyword name="serializeGadget" id="QJsonSerializer::serializeGadget" ref="class_q_json_serializer.html#ab247470405a303068400e77f1804666c" />
       <keyword name="serializeList" id="QJsonSerializer::serializeList" ref="class_q_json_serializer.html#a21c6c7088e7992207f40bd0d8b1a3f51" />
+      <keyword name="serializeMap" id="QJsonSerializer::serializeMap" ref="class_q_json_serializer.html#a4c899955f97b325ffc7f03d96ab79250" />
       <keyword name="serializeEnum" id="QJsonSerializer::serializeEnum" ref="class_q_json_serializer.html#af0db653b58dd5269fc3bf4dbd5d096a8" />
       <keyword name="serializeValue" id="QJsonSerializer::serializeValue" ref="class_q_json_serializer.html#a87cb2307625b39c10f46306b4aa585e7" />
       <keyword name="deserializeVariant" id="QJsonSerializer::deserializeVariant" ref="class_q_json_serializer.html#a26a9ab6826e95f9902f9b5f7daa12c4f" />
       <keyword name="deserializeObject" id="QJsonSerializer::deserializeObject" ref="class_q_json_serializer.html#a708c1375a8776cc38a94997b6b879d99" />
       <keyword name="deserializeGadget" id="QJsonSerializer::deserializeGadget" ref="class_q_json_serializer.html#a2764651e0a8236814d83f704f5f89751" />
       <keyword name="deserializeList" id="QJsonSerializer::deserializeList" ref="class_q_json_serializer.html#a16beee8729c68dcfaeebf56fdc16c924" />
+      <keyword name="deserializeMap" id="QJsonSerializer::deserializeMap" ref="class_q_json_serializer.html#abd7c1223167f30699a51972036bd8a09" />
       <keyword name="deserializeEnum" id="QJsonSerializer::deserializeEnum" ref="class_q_json_serializer.html#ab372af0004be21357bfd81139d241f4f" />
       <keyword name="deserializeValue" id="QJsonSerializer::deserializeValue" ref="class_q_json_serializer.html#ae767df019ead6232fc8c24a107f682f5" />
       <keyword name="sender" id="QObject::sender" ref="qobject.html#sender" />
@@ -265,7 +288,12 @@
       <keyword name="allowDefaultNull" id="QJsonSerializer::allowDefaultNull" ref="class_q_json_serializer.html#acc7b17076756d1acd0d95e955614b289" />
       <keyword name="keepObjectName" id="QJsonSerializer::keepObjectName" ref="class_q_json_serializer.html#a6c0d933bd43f30870c9379fb04f65f00" />
       <keyword name="enumAsString" id="QJsonSerializer::enumAsString" ref="class_q_json_serializer.html#ac430c1962106cc1d0efcbef4a11b03f3" />
+      <keyword name="validationFlags" id="QJsonSerializer::validationFlags" ref="class_q_json_serializer.html#a6baa7de9acfd41c1780ea90464b696e3" />
       <keyword name="objectName" id="QObject::objectName" ref="qobject.html#objectName-prop" />
+      <keyword name="StandardValidation" id="QJsonSerializer::StandardValidation" ref="class_q_json_serializer.html#a0fb6dc294c5f0c2279e1e60c8bf19b37a3afc20b935753249378a0c00a884c995" />
+      <keyword name="NoExtraProperties" id="QJsonSerializer::NoExtraProperties" ref="class_q_json_serializer.html#a0fb6dc294c5f0c2279e1e60c8bf19b37ac8cb0e946f61b483209cb2484259bcf0" />
+      <keyword name="AllProperties" id="QJsonSerializer::AllProperties" ref="class_q_json_serializer.html#a0fb6dc294c5f0c2279e1e60c8bf19b37aa598894025ccd81d3ed66d3e379c9f7e" />
+      <keyword name="FullValidation" id="QJsonSerializer::FullValidation" ref="class_q_json_serializer.html#a0fb6dc294c5f0c2279e1e60c8bf19b37a78d3cfb1306be19cd4099429483dfd8f" />
       <keyword name="QJsonSerializerException" id="QJsonSerializerException" ref="class_q_json_serializer_exception.html" />
       <keyword name="QJsonSerializerException" id="QJsonSerializerException::QJsonSerializerException" ref="class_q_json_serializer_exception.html#ab1746396d417b43bf2228dc62c706b1b" />
       <keyword name="isDeserializationException" id="QJsonSerializerException::isDeserializationException" ref="class_q_json_serializer_exception.html#a363cc20cd7aaaf56f389a18be5836e63" />
@@ -274,6 +302,7 @@
       <keyword name="clone" id="QJsonSerializerException::clone" ref="class_q_json_serializer_exception.html#aedc8fa4385bbbb0d34c6ad6c11e37378" />
       <keyword name="_what" id="QJsonSerializerException::_what" ref="class_q_json_serializer_exception.html#ac259c8dd25c565b9da8104c811052e61" />
       <keyword name="_isDeser" id="QJsonSerializerException::_isDeser" ref="class_q_json_serializer_exception.html#a42915bf5a162ff58498302dcbfd25af0" />
+      <keyword name="typedef" id="typedef" ref="classtypedef.html" />
       <keyword name="_qjsonserializer_helpertypes" id="_qjsonserializer_helpertypes" ref="namespace__qjsonserializer__helpertypes.html" />
       <keyword name="_qjsonserializer_helpertypes::has_metaobject" id="_qjsonserializer_helpertypes::has_metaobject" ref="struct__qjsonserializer__helpertypes_1_1has__metaobject.html" />
       <keyword name="_qjsonserializer_helpertypes::has_metaobject&lt; QVariant &gt;" id="_qjsonserializer_helpertypes::has_metaobject&lt; QVariant &gt;" ref="struct__qjsonserializer__helpertypes_1_1has__metaobject_3_01_q_variant_01_4.html" />
@@ -290,6 +319,12 @@
       <keyword name="JsonType" id="_qjsonserializer_helpertypes::type_helper&lt; QList&lt; T &gt; &gt;::JsonType" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_list_3_01_t_01_4_01_4.html#a91921e7acacb02943b492804eb387ffb" />
       <keyword name="convert" id="_qjsonserializer_helpertypes::type_helper&lt; QList&lt; T &gt; &gt;::convert" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_list_3_01_t_01_4_01_4.html#a58aa32cbb0611a557057e2679929e0e4" />
       <keyword name="variant" id="_qjsonserializer_helpertypes::type_helper&lt; QList&lt; T &gt; &gt;::variant" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_list_3_01_t_01_4_01_4.html#a51a090c599415eb18eb5bf99d17201f7" />
+      <keyword name="_qjsonserializer_helpertypes::type_helper&lt; QMap&lt; QString, T &gt; &gt;" id="_qjsonserializer_helpertypes::type_helper&lt; QMap&lt; QString, T &gt; &gt;" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_map_3_01_q_string_00_01_t_01_4_01_4.html" />
+      <keyword name="Type" id="_qjsonserializer_helpertypes::type_helper&lt; QMap&lt; QString, T &gt; &gt;::Type" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_map_3_01_q_string_00_01_t_01_4_01_4.html#a7af1b9a695f96bc7d7b2cdbb4863b273" />
+      <keyword name="ObjectType" id="_qjsonserializer_helpertypes::type_helper&lt; QMap&lt; QString, T &gt; &gt;::ObjectType" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_map_3_01_q_string_00_01_t_01_4_01_4.html#a3244a65962fb7376544d22704fe28381" />
+      <keyword name="JsonType" id="_qjsonserializer_helpertypes::type_helper&lt; QMap&lt; QString, T &gt; &gt;::JsonType" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_map_3_01_q_string_00_01_t_01_4_01_4.html#a1682e10ecd7fd54ccd6fbe92f5d6edf9" />
+      <keyword name="convert" id="_qjsonserializer_helpertypes::type_helper&lt; QMap&lt; QString, T &gt; &gt;::convert" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_map_3_01_q_string_00_01_t_01_4_01_4.html#adb10f03640df4bc67a6da730c7dd6756" />
+      <keyword name="variant" id="_qjsonserializer_helpertypes::type_helper&lt; QMap&lt; QString, T &gt; &gt;::variant" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_map_3_01_q_string_00_01_t_01_4_01_4.html#a75b347c0aec8812ba1ef60622e9920b1" />
       <keyword name="_qjsonserializer_helpertypes::type_helper&lt; QVariant &gt;" id="_qjsonserializer_helpertypes::type_helper&lt; QVariant &gt;" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_variant_01_4.html" />
       <keyword name="Type" id="_qjsonserializer_helpertypes::type_helper&lt; QVariant &gt;::Type" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_variant_01_4.html#a69c8f01a33021f62907969b8f892650b" />
       <keyword name="ObjectType" id="_qjsonserializer_helpertypes::type_helper&lt; QVariant &gt;::ObjectType" ref="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_variant_01_4.html#a4df3f194269a9ac48a9d6795e5c5f761" />
@@ -330,7 +365,6 @@
       <file>qjsonserializerexception_8h_source.html</file>
       <file>qtjsonserializer__global_8h_source.html</file>
       <file>_r_e_a_d_m_e_8md_source.html</file>
-      <file>class_q_basic_mutex.html</file>
       <file>class_q_json_deserialization_exception.html</file>
       <file>class_q_json_deserialization_exception.png</file>
       <file>class_q_json_deserialization_exception-members.html</file>
@@ -343,6 +377,7 @@
       <file>class_q_json_serializer_exception.html</file>
       <file>class_q_json_serializer_exception.png</file>
       <file>class_q_json_serializer_exception-members.html</file>
+      <file>classtypedef.html</file>
       <file>namespace__qjsonserializer__helpertypes.html</file>
       <file>struct__qjsonserializer__helpertypes_1_1has__metaobject.html</file>
       <file>struct__qjsonserializer__helpertypes_1_1has__metaobject.png</file>
@@ -356,16 +391,22 @@
       <file>struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_list_3_01_t_01_4_01_4.html</file>
       <file>struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_list_3_01_t_01_4_01_4.png</file>
       <file>struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_list_3_01_t_01_4_01_4-members.html</file>
+      <file>struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_map_3_01_q_string_00_01_t_01_4_01_4.html</file>
+      <file>struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_map_3_01_q_string_00_01_t_01_4_01_4.png</file>
+      <file>struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_map_3_01_q_string_00_01_t_01_4_01_4-members.html</file>
       <file>struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_variant_01_4.html</file>
       <file>struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_variant_01_4.png</file>
       <file>struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_variant_01_4-members.html</file>
       <file>dir_e6be44ad11e6f84d257d285665f94458.html</file>
       <file>dir_68267d1309a1af8e8297ef4c3efbcdba.html</file>
       <file>index.html</file>
+      <file>pages.html</file>
       <file>namespaces.html</file>
       <file>annotated.html</file>
       <file>classes.html</file>
       <file>hierarchy.html</file>
+      <file>functions.html</file>
+      <file>functions.html</file>
       <file>functions.html</file>
       <file>functions.html</file>
       <file>functions.html</file>
@@ -398,6 +439,12 @@
       <file>functions_type.html</file>
       <file>functions_type.html</file>
       <file>functions_type.html</file>
+      <file>functions_enum.html</file>
+      <file>functions_eval.html</file>
+      <file>functions_eval.html</file>
+      <file>functions_eval.html</file>
+      <file>functions_eval.html</file>
+      <file>functions_prop.html</file>
       <file>functions_prop.html</file>
       <file>functions_prop.html</file>
       <file>functions_prop.html</file>

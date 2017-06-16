@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['invokeinfo',['InvokeInfo',['https://doc.qt.io/qt-5/qscxmlexecutablecontent-invokeinfo.html',0,'QScxmlExecutableContent']]],
-  ['itemchangedata',['ItemChangeData',['https://doc.qt.io/qt-5/qquickitem-itemchangedata.html',0,'QQuickItem']]],
-  ['iterator',['iterator',['https://doc.qt.io/qt-5/qhash-iterator.html',0,'QHash::iterator'],['https://doc.qt.io/qt-5/qlinkedlist-iterator.html',0,'QLinkedList::iterator'],['https://doc.qt.io/qt-5/qlist-iterator.html',0,'QList::iterator'],['https://doc.qt.io/qt-5/qmap-iterator.html',0,'QMap::iterator'],['https://doc.qt.io/qt-5/qset-iterator.html',0,'QSet::iterator'],['https://doc.qt.io/qt-5/qjsonarray-iterator.html',0,'QJsonArray::iterator'],['https://doc.qt.io/qt-5/qjsonobject-iterator.html',0,'QJsonObject::iterator'],['https://doc.qt.io/qt-5/qtextframe-iterator.html',0,'QTextFrame::iterator'],['https://doc.qt.io/qt-5/qtextblock-iterator.html',0,'QTextBlock::iterator']]]
+  ['has_5fmetaobject',['has_metaobject',['../struct__qjsonserializer__helpertypes_1_1has__metaobject.html',1,'_qjsonserializer_helpertypes']]],
+  ['has_5fmetaobject_3c_20qvariant_20_3e',['has_metaobject&lt; QVariant &gt;',['../struct__qjsonserializer__helpertypes_1_1has__metaobject_3_01_q_variant_01_4.html',1,'_qjsonserializer_helpertypes']]],
+  ['has_5fmetaobject_3c_20t_20_2a_20_3e',['has_metaobject&lt; T * &gt;',['../struct__qjsonserializer__helpertypes_1_1has__metaobject_3_01_t_01_5_01_4.html',1,'_qjsonserializer_helpertypes']]]
 ];
