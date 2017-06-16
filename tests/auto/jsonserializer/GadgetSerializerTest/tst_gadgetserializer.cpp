@@ -366,6 +366,7 @@ void GadgetSerializerTest::testEnumSpecialDeserialization_data()
 {
 	QTest::addColumn<TestGadget>("result");
 	QTest::addColumn<QJsonObject>("data");
+	QTest::addColumn<bool>("success");
 
 	QTest::newRow("normal") << (TestGadget)ParentGadget::createEnum(TestGadget::Normal1, 0)
 							<< QJsonObject({
@@ -379,7 +380,8 @@ void GadgetSerializerTest::testEnumSpecialDeserialization_data()
 											   {"leveledList", QJsonArray()},
 											   {"simpleMap", QJsonObject()},
 											   {"leveledMap", QJsonObject()}
-										   });
+										   })
+							<< true;
 
 	QTest::newRow("stringEnum") << (TestGadget)ParentGadget::createEnum(TestGadget::Normal1, 0)
 								<< QJsonObject({
@@ -393,21 +395,38 @@ void GadgetSerializerTest::testEnumSpecialDeserialization_data()
 												   {"leveledList", QJsonArray()},
 												   {"simpleMap", QJsonObject()},
 												   {"leveledMap", QJsonObject()}
-											   });
+											   })
+								<< true;
+
+	QTest::newRow("invalidEnum") << (TestGadget)ParentGadget::createEnum(TestGadget::Normal2, 0)
+								 << QJsonObject({
+													{"intProperty", 0},
+													{"boolProperty", false},
+													{"stringProperty", QString()},
+													{"doubleProperty", 0},
+													{"normalEnumProperty", "baum"},
+													{"enumFlagsProperty", 0},
+													{"simpleList", QJsonArray()},
+													{"leveledList", QJsonArray()},
+													{"simpleMap", QJsonObject()},
+													{"leveledMap", QJsonObject()}
+												})
+								 << false;
 
 	QTest::newRow("stringFlags") << (TestGadget)ParentGadget::createEnum(TestGadget::Normal0, TestGadget::FlagX)
-								<< QJsonObject({
-												   {"intProperty", 0},
-												   {"boolProperty", false},
-												   {"stringProperty", QString()},
-												   {"doubleProperty", 0},
-												   {"normalEnumProperty", "Normal0"},
-												   {"enumFlagsProperty", "FlagX"},
-												   {"simpleList", QJsonArray()},
-												   {"leveledList", QJsonArray()},
-												   {"simpleMap", QJsonObject()},
-												   {"leveledMap", QJsonObject()}
-											   });
+								 << QJsonObject({
+													{"intProperty", 0},
+													{"boolProperty", false},
+													{"stringProperty", QString()},
+													{"doubleProperty", 0},
+													{"normalEnumProperty", "Normal0"},
+													{"enumFlagsProperty", "FlagX"},
+													{"simpleList", QJsonArray()},
+													{"leveledList", QJsonArray()},
+													{"simpleMap", QJsonObject()},
+													{"leveledMap", QJsonObject()}
+												})
+								 << true;
 
 	QTest::newRow("stringMultiFlags") << (TestGadget)ParentGadget::createEnum(TestGadget::Normal2, TestGadget::Flag1 | TestGadget::Flag3)
 									  << QJsonObject({
@@ -421,17 +440,37 @@ void GadgetSerializerTest::testEnumSpecialDeserialization_data()
 														 {"leveledList", QJsonArray()},
 														 {"simpleMap", QJsonObject()},
 														 {"leveledMap", QJsonObject()}
-													 });
+													 })
+									  << true;
+
+	QTest::newRow("invalidFlags") << (TestGadget)ParentGadget::createEnum(TestGadget::Normal0, TestGadget::FlagX)
+								  << QJsonObject({
+													 {"intProperty", 0},
+													 {"boolProperty", false},
+													 {"stringProperty", QString()},
+													 {"doubleProperty", 0},
+													 {"normalEnumProperty", 0},
+													 {"enumFlagsProperty", "baum"},
+													 {"simpleList", QJsonArray()},
+													 {"leveledList", QJsonArray()},
+													 {"simpleMap", QJsonObject()},
+													 {"leveledMap", QJsonObject()}
+												 })
+								  << false;
 }
 
 void GadgetSerializerTest::testEnumSpecialDeserialization()
 {
 	QFETCH(QJsonObject, data);
 	QFETCH(TestGadget, result);
+	QFETCH(bool, success);
 
 	try {
-		auto obj = serializer->deserialize<TestGadget>(data, this);
-		QCOMPARE(obj, result);
+		if(success) {
+			auto obj = serializer->deserialize<TestGadget>(data, this);
+			QCOMPARE(obj, result);
+		} else
+			QVERIFY_EXCEPTION_THROWN(serializer->deserialize<TestGadget>(data, this), QJsonDeserializationException);
 	} catch(QException &e) {
 		QFAIL(e.what());
 	}

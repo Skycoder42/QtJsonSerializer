@@ -363,8 +363,10 @@ QVariant QJsonSerializer::deserializeEnum(const QMetaEnum &metaEnum, const QJson
 			result = metaEnum.keyToValue(value.toString().toUtf8().constData(), &ok);
 		if(ok)
 			return result;
-		else
+		else if(metaEnum.isFlag() && value.toString().isEmpty())
 			return QVariant();
+		else
+			throw QJsonDeserializationException("Invalid value for enum type found");
 	} else
 		return value.toInt();
 }
