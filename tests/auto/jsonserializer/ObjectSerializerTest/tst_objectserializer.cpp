@@ -27,15 +27,15 @@ private Q_SLOTS:
 	void testDeserialization_data();
 	void testDeserialization();
 
-//	void testObjectNameSerialization();
-//	void testNullDeserialization();
-//	void testDeserializationValidation_data();
-//	void testDeserializationValidation();
+	void testObjectNameSerialization();
+	void testNullDeserialization();
+	void testDeserializationValidation_data();
+	void testDeserializationValidation();
 
-//	void testEnumSpecialSerialization_data();
-//	void testEnumSpecialSerialization();
-//	void testEnumSpecialDeserialization_data();
-//	void testEnumSpecialDeserialization();
+	void testEnumSpecialSerialization_data();
+	void testEnumSpecialSerialization();
+	void testEnumSpecialDeserialization_data();
+	void testEnumSpecialDeserialization();
 
 //	void testDeviceSerialization_data();
 //	void testDeviceSerialization();
@@ -259,404 +259,236 @@ void ObjectSerializerTest::testDeserialization()
 	result->deleteLater();
 }
 
-//void ObjectSerializerTest::testObjectNameSerialization()
-//{
-//	auto testObj = new TestObject(this);
-//	testObj->setObjectName("test");
-//	auto testJson = QJsonObject({
-//									{"intProperty", 0},
-//									{"boolProperty", false},
-//									{"stringProperty", QString()},
-//									{"doubleProperty", 0},
-//									{"normalEnumProperty", TestObject::Normal0},
-//									{"enumFlagsProperty", 0},
-//									{"simpleList", QJsonArray()},
-//									{"leveledList", QJsonArray()},
-//									{"simpleMap", QJsonObject()},
-//									{"leveledMap", QJsonObject()},
-//									{"childObject", QJsonValue::Null},
-//									{"simpleChildren", QJsonArray()},
-//									{"leveledChildren", QJsonArray()}
-//								});
+void ObjectSerializerTest::testObjectNameSerialization()
+{
+	auto testObj = new TestObject(this);
+	testObj->setObjectName("test");
+	auto testJson = TestObject::createJson();
 
-//	try {
-//		serializer->setKeepObjectName(false);
-//		auto json = serializer->serialize(testObj);
-//		QCOMPARE(json, testJson);
+	try {
+		serializer->setKeepObjectName(false);
+		auto json = serializer->serialize(testObj);
+		QCOMPARE(json, testJson);
 
-//		serializer->setKeepObjectName(true);
-//		testJson["objectName"] = "test";
-//		json = serializer->serialize(testObj);
-//		QCOMPARE(json, testJson);
-//	} catch(QException &e) {
-//		QFAIL(e.what());
-//	}
+		serializer->setKeepObjectName(true);
+		testJson["objectName"] = "test";
+		json = serializer->serialize(testObj);
+		QCOMPARE(json, testJson);
+	} catch(QException &e) {
+		QFAIL(e.what());
+	}
 
-//	testObj->deleteLater();
-//	serializer->setKeepObjectName(false);
-//}
+	testObj->deleteLater();
+	serializer->setKeepObjectName(false);
+}
 
-//void ObjectSerializerTest::testNullDeserialization()
-//{
-//	auto testObj = new TestObject(this);
-//	auto testJson = QJsonObject({
-//									{"intProperty", QJsonValue::Null},
-//									{"boolProperty", QJsonValue::Null},
-//									{"stringProperty", QJsonValue::Null},
-//									{"doubleProperty", QJsonValue::Null},
-//									{"normalEnumProperty", QJsonValue::Null},
-//									{"enumFlagsProperty", QJsonValue::Null},
-//									{"simpleList", QJsonValue::Null},
-//									{"leveledList", QJsonValue::Null},
-//									{"simpleMap", QJsonValue::Null},
-//									{"leveledMap", QJsonValue::Null},
-//									{"childObject", QJsonValue::Null},
-//									{"simpleChildren", QJsonValue::Null},
-//									{"leveledChildren", QJsonValue::Null}
-//								});
+void ObjectSerializerTest::testNullDeserialization()
+{
+	auto testObj = new TestObject(this);
+	auto testJson = QJsonObject({
+									{"intProperty", QJsonValue::Null},
+									{"boolProperty", QJsonValue::Null},
+									{"stringProperty", QJsonValue::Null},
+									{"doubleProperty", QJsonValue::Null},
+									{"normalEnumProperty", QJsonValue::Null},
+									{"enumFlagsProperty", QJsonValue::Null},
+									{"simpleList", QJsonValue::Null},
+									{"leveledList", QJsonValue::Null},
+									{"simpleMap", QJsonValue::Null},
+									{"leveledMap", QJsonValue::Null},
+									{"childObject", QJsonValue::Null},
+									{"simpleChildren", QJsonValue::Null},
+									{"leveledChildren", QJsonValue::Null},
+									{"simpleRelatives", QJsonValue::Null},
+									{"leveledRelatives", QJsonValue::Null}
+								});
 
-//	try {
-//		serializer->setAllowDefaultNull(false);
-//		QVERIFY_EXCEPTION_THROWN(serializer->deserialize<TestObject*>(testJson, this), QJsonSerializerException);
+	try {
+		serializer->setAllowDefaultNull(false);
+		QVERIFY_EXCEPTION_THROWN(serializer->deserialize<TestObject*>(testJson, this), QJsonSerializerException);
 
-//		serializer->setAllowDefaultNull(true);
-//		auto obj = serializer->deserialize<TestObject*>(testJson, this);
-//		QVERIFY(obj);
-//		QVERIFY(testObj->equals(obj));
-//		obj->deleteLater();
-//	} catch(QException &e) {
-//		QFAIL(e.what());
-//	}
+		serializer->setAllowDefaultNull(true);
+		auto obj = serializer->deserialize<TestObject*>(testJson, this);
+		QVERIFY(obj);
+		QVERIFY(testObj->equals(obj));
+		obj->deleteLater();
+	} catch(QException &e) {
+		QFAIL(e.what());
+	}
 
-//	testObj->deleteLater();
-//	serializer->setAllowDefaultNull(false);
-//}
+	testObj->deleteLater();
+	serializer->setAllowDefaultNull(false);
+}
 
-//void ObjectSerializerTest::testDeserializationValidation_data()
-//{
-//	QTest::addColumn<QJsonObject>("data");
-//	QTest::addColumn<QJsonSerializer::ValidationFlags>("flags");
-//	QTest::addColumn<bool>("success");
+void ObjectSerializerTest::testDeserializationValidation_data()
+{
+	QTest::addColumn<QJsonObject>("data");
+	QTest::addColumn<QJsonSerializer::ValidationFlags>("flags");
+	QTest::addColumn<bool>("success");
 
-//	QTest::newRow("standard") << QJsonObject({
-//												 {"intProperty", 0},
-//												 {"boolProperty", false},
-//												 {"stringProperty", QString()},
-//												 {"doubleProperty", 0},
-//												 {"normalEnumProperty", TestObject::Normal0},
-//												 {"enumFlagsProperty", 0},
-//												 {"simpleList", QJsonArray()},
-//												 {"leveledList", QJsonArray()},
-//												 {"simpleMap", QJsonObject()},
-//												 //{"leveledMap", QJsonObject()}, missing property
-//												 {"garbage", QJsonValue::Null} //extra property
-//											 })
-//							  << (QJsonSerializer::ValidationFlags)QJsonSerializer::StandardValidation
-//							  << true;
+	QTest::newRow("standard") << TestObject::createJson({
+															{"garbage", QJsonValue::Null} //extra property
+														}, "leveledMap")
+							  << (QJsonSerializer::ValidationFlags)QJsonSerializer::StandardValidation
+							  << true;
 
-//	QTest::newRow("validateExtra") << QJsonObject({
-//													  {"intProperty", 0},
-//													  {"boolProperty", false},
-//													  {"stringProperty", QString()},
-//													  {"doubleProperty", 0},
-//													  {"normalEnumProperty", TestObject::Normal0},
-//													  {"enumFlagsProperty", 0},
-//													  {"simpleList", QJsonArray()},
-//													  {"leveledList", QJsonArray()},
-//													  {"simpleMap", QJsonObject()},
-//													  {"leveledMap", QJsonObject()},
-//													  {"garbage", QJsonValue::Null} //extra property
-//												  })
-//								   << (QJsonSerializer::ValidationFlags)QJsonSerializer::NoExtraProperties
-//								   << false;
+	QTest::newRow("validateExtra") << TestObject::createJson({
+																 {"garbage", QJsonValue::Null} //extra property
+															 })
+								   << (QJsonSerializer::ValidationFlags)QJsonSerializer::NoExtraProperties
+								   << false;
 
-//	QTest::newRow("validateMissing") << QJsonObject({
-//														{"intProperty", 0},
-//														{"boolProperty", false},
-//														{"stringProperty", QString()},
-//														{"doubleProperty", 0},
-//														{"normalEnumProperty", TestObject::Normal0},
-//														{"enumFlagsProperty", 0},
-//														{"simpleList", QJsonArray()},
-//														{"leveledList", QJsonArray()},
-//														{"simpleMap", QJsonObject()}
-//														//{"leveledMap", QJsonObject()}, missing property
-//													})
-//									 << (QJsonSerializer::ValidationFlags)QJsonSerializer::AllProperties
-//									 << false;
+	QTest::newRow("validateMissing") << TestObject::createJson({}, "leveledMap")
+									 << (QJsonSerializer::ValidationFlags)QJsonSerializer::AllProperties
+									 << false;
 
-//	QTest::newRow("validateAll") << QJsonObject({
-//													{"intProperty", 0},
-//													{"boolProperty", false},
-//													{"stringProperty", QString()},
-//													{"doubleProperty", 0},
-//													{"normalEnumProperty", TestObject::Normal0},
-//													{"enumFlagsProperty", 0},
-//													{"simpleList", QJsonArray()},
-//													{"leveledList", QJsonArray()},
-//													{"simpleMap", QJsonObject()},
-//													//{"leveledMap", QJsonObject()}, missing property
-//													{"garbage", QJsonValue::Null}, //extra property
-//												})
-//								 << (QJsonSerializer::ValidationFlags)QJsonSerializer::FullValidation
-//								 << false;
-//}
+	QTest::newRow("validateAll") << TestObject::createJson({
+															   {"garbage", QJsonValue::Null} //extra property
+														   }, "leveledMap")
+								 << (QJsonSerializer::ValidationFlags)QJsonSerializer::FullValidation
+								 << false;
+}
 
-//void ObjectSerializerTest::testDeserializationValidation()
-//{
-//	QFETCH(QJsonObject, data);
-//	QFETCH(QJsonSerializer::ValidationFlags, flags);
-//	QFETCH(bool, success);
+void ObjectSerializerTest::testDeserializationValidation()
+{
+	QFETCH(QJsonObject, data);
+	QFETCH(QJsonSerializer::ValidationFlags, flags);
+	QFETCH(bool, success);
 
-//	serializer->setValidationFlags(flags);
+	serializer->setValidationFlags(flags);
 
-//	auto t1 = new TestObject(this);
+	auto t1 = new TestObject(this);
 
-//	try {
-//		if(success) {
-//			auto deser = serializer->deserialize<TestObject*>(data, this);
-//			QVERIFY(t1->equals(deser));
-//			deser->deleteLater();
-//		} else
-//			QVERIFY_EXCEPTION_THROWN(serializer->deserialize<TestObject*>(data, this), QJsonDeserializationException);
-//	} catch (QException &e) {
-//		QFAIL(e.what());
-//	}
+	try {
+		if(success) {
+			auto deser = serializer->deserialize<TestObject*>(data, this);
+			QVERIFY(t1->equals(deser));
+			deser->deleteLater();
+		} else
+			QVERIFY_EXCEPTION_THROWN(serializer->deserialize<TestObject*>(data, this), QJsonDeserializationException);
+	} catch (QException &e) {
+		QFAIL(e.what());
+	}
 
-//	serializer->setValidationFlags(QJsonSerializer::StandardValidation);
-//	t1->deleteLater();
-//}
+	serializer->setValidationFlags(QJsonSerializer::StandardValidation);
+	t1->deleteLater();
+}
 
-//void ObjectSerializerTest::testEnumSpecialSerialization_data()
-//{
-//	QTest::addColumn<TestObject*>("object");
-//	QTest::addColumn<QJsonObject>("result");
-//	QTest::addColumn<bool>("asString");
+void ObjectSerializerTest::testEnumSpecialSerialization_data()
+{
+	QTest::addColumn<TestObject*>("object");
+	QTest::addColumn<QJsonObject>("result");
+	QTest::addColumn<bool>("asString");
 
-//	QTest::newRow("normal") << TestObject::createEnum(TestObject::Normal1, 0, this)
-//							<< QJsonObject({
-//											   {"intProperty", 0},
-//											   {"boolProperty", false},
-//											   {"stringProperty", QString()},
-//											   {"doubleProperty", 0},
-//											   {"normalEnumProperty", TestObject::Normal1},
-//											   {"enumFlagsProperty", 0},
-//											   {"simpleList", QJsonArray()},
-//											   {"leveledList", QJsonArray()},
-//											   {"simpleMap", QJsonObject()},
-//											   {"leveledMap", QJsonObject()},
-//											   {"childObject", QJsonValue::Null},
-//											   {"simpleChildren", QJsonArray()},
-//											   {"leveledChildren", QJsonArray()}
-//										   })
-//							<< false;
+	QTest::newRow("normal") << TestObject::createEnum(TestObject::Normal1, 0, this)
+							<< TestObject::createJson({
+														  {"normalEnumProperty", TestObject::Normal1},
+														  {"enumFlagsProperty", 0}
+													  })
+							<< false;
 
-//	QTest::newRow("stringEnum") << TestObject::createEnum(TestObject::Normal1, 0, this)
-//								<< QJsonObject({
-//												   {"intProperty", 0},
-//												   {"boolProperty", false},
-//												   {"stringProperty", QString()},
-//												   {"doubleProperty", 0},
-//												   {"normalEnumProperty", "Normal1"},
-//												   {"enumFlagsProperty", QString()},
-//												   {"simpleList", QJsonArray()},
-//												   {"leveledList", QJsonArray()},
-//												   {"simpleMap", QJsonObject()},
-//												   {"leveledMap", QJsonObject()},
-//												   {"childObject", QJsonValue::Null},
-//												   {"simpleChildren", QJsonArray()},
-//												   {"leveledChildren", QJsonArray()}
-//											   })
-//								<< true;
+	QTest::newRow("stringEnum") << TestObject::createEnum(TestObject::Normal1, 0, this)
+								<< TestObject::createJson({
+															  {"normalEnumProperty", "Normal1"},
+															  {"enumFlagsProperty", QString()},
+														  })
+								<< true;
 
-//	QTest::newRow("stringFlags") << TestObject::createEnum(TestObject::Normal0, TestObject::FlagX, this)
-//								<< QJsonObject({
-//												   {"intProperty", 0},
-//												   {"boolProperty", false},
-//												   {"stringProperty", QString()},
-//												   {"doubleProperty", 0},
-//												   {"normalEnumProperty", "Normal0"},
-//												   {"enumFlagsProperty", "FlagX"},
-//												   {"simpleList", QJsonArray()},
-//												   {"leveledList", QJsonArray()},
-//												   {"simpleMap", QJsonObject()},
-//												   {"leveledMap", QJsonObject()},
-//												   {"childObject", QJsonValue::Null},
-//												   {"simpleChildren", QJsonArray()},
-//												   {"leveledChildren", QJsonArray()}
-//											   })
-//								<< true;
+	QTest::newRow("stringFlags") << TestObject::createEnum(TestObject::Normal0, TestObject::FlagX, this)
+								 << TestObject::createJson({
+															   {"normalEnumProperty", "Normal0"},
+															   {"enumFlagsProperty", "FlagX"}
+														   })
+								 << true;
 
-//	QTest::newRow("stringMultiFlags") << TestObject::createEnum(TestObject::Normal2, TestObject::Flag1 | TestObject::Flag3, this)
-//									  << QJsonObject({
-//														 {"intProperty", 0},
-//														 {"boolProperty", false},
-//														 {"stringProperty", QString()},
-//														 {"doubleProperty", 0},
-//														 {"normalEnumProperty", "Normal2"},
-//														 {"enumFlagsProperty", "Flag1|Flag3"},
-//														 {"simpleList", QJsonArray()},
-//														 {"leveledList", QJsonArray()},
-//														 {"simpleMap", QJsonObject()},
-//														 {"leveledMap", QJsonObject()},
-//														 {"childObject", QJsonValue::Null},
-//														 {"simpleChildren", QJsonArray()},
-//														 {"leveledChildren", QJsonArray()}
-//													 })
-//									  << true;
-//}
+	QTest::newRow("stringMultiFlags") << TestObject::createEnum(TestObject::Normal0, TestObject::Flag1 | TestObject::Flag3, this)
+									  << TestObject::createJson({
+																	{"normalEnumProperty", "Normal0"},
+																	{"enumFlagsProperty", "Flag1|Flag3"}
+																})
+									  << true;
+}
 
-//void ObjectSerializerTest::testEnumSpecialSerialization()
-//{
-//	QFETCH(TestObject*, object);
-//	QFETCH(QJsonObject, result);
-//	QFETCH(bool, asString);
+void ObjectSerializerTest::testEnumSpecialSerialization()
+{
+	QFETCH(TestObject*, object);
+	QFETCH(QJsonObject, result);
+	QFETCH(bool, asString);
 
-//	try {
-//		serializer->setEnumAsString(asString);
-//		QCOMPARE(serializer->serialize(object), result);
-//	} catch(QException &e) {
-//		QFAIL(e.what());
-//	}
+	try {
+		serializer->setEnumAsString(asString);
+		QCOMPARE(serializer->serialize(object), result);
+	} catch(QException &e) {
+		QFAIL(e.what());
+	}
 
-//	object->deleteLater();
-//}
+	object->deleteLater();
+}
 
-//void ObjectSerializerTest::testEnumSpecialDeserialization_data()
-//{
-//	QTest::addColumn<TestObject*>("result");
-//	QTest::addColumn<QJsonObject>("data");
-//	QTest::addColumn<bool>("success");
+void ObjectSerializerTest::testEnumSpecialDeserialization_data()
+{
+	QTest::addColumn<TestObject*>("result");
+	QTest::addColumn<QJsonObject>("data");
+	QTest::addColumn<bool>("success");
 
-//	QTest::newRow("normal") << TestObject::createEnum(TestObject::Normal1, 0, this)
-//							<< QJsonObject({
-//											   {"intProperty", 0},
-//											   {"boolProperty", false},
-//											   {"stringProperty", QString()},
-//											   {"doubleProperty", 0},
-//											   {"normalEnumProperty", TestObject::Normal1},
-//											   {"enumFlagsProperty", 0},
-//											   {"simpleList", QJsonArray()},
-//											   {"leveledList", QJsonArray()},
-//											   {"simpleMap", QJsonObject()},
-//											   {"leveledMap", QJsonObject()},
-//											   {"childObject", QJsonValue::Null},
-//											   {"simpleChildren", QJsonArray()},
-//											   {"leveledChildren", QJsonArray()}
-//										   })
-//							<< true;
+	QTest::newRow("normal") << TestObject::createEnum(TestObject::Normal1, 0, this)
+							<< TestObject::createJson({
+														  {"normalEnumProperty", TestObject::Normal1},
+														  {"enumFlagsProperty", 0}
+													  })
+							<< true;
 
-//	QTest::newRow("stringEnum") << TestObject::createEnum(TestObject::Normal1, 0, this)
-//								<< QJsonObject({
-//												   {"intProperty", 0},
-//												   {"boolProperty", false},
-//												   {"stringProperty", QString()},
-//												   {"doubleProperty", 0},
-//												   {"normalEnumProperty", "Normal1"},
-//												   {"enumFlagsProperty", 0},
-//												   {"simpleList", QJsonArray()},
-//												   {"leveledList", QJsonArray()},
-//												   {"simpleMap", QJsonObject()},
-//												   {"leveledMap", QJsonObject()},
-//												   {"childObject", QJsonValue::Null},
-//												   {"simpleChildren", QJsonArray()},
-//												   {"leveledChildren", QJsonArray()}
-//											   })
-//								<< true;
+	QTest::newRow("stringEnum") << TestObject::createEnum(TestObject::Normal1, 0, this)
+								<< TestObject::createJson({
+															  {"normalEnumProperty", "Normal1"}
+														  })
+								<< true;
 
-//	QTest::newRow("invalidEnum") << TestObject::createEnum(TestObject::Normal2, 0, this)
-//								 << QJsonObject({
-//													{"intProperty", 0},
-//													{"boolProperty", false},
-//													{"stringProperty", QString()},
-//													{"doubleProperty", 0},
-//													{"normalEnumProperty", "baum"},
-//													{"enumFlagsProperty", 0},
-//													{"simpleList", QJsonArray()},
-//													{"leveledList", QJsonArray()},
-//													{"simpleMap", QJsonObject()},
-//													{"leveledMap", QJsonObject()},
-//													{"childObject", QJsonValue::Null},
-//													{"simpleChildren", QJsonArray()},
-//													{"leveledChildren", QJsonArray()}
-//												})
-//								 << false;
+	QTest::newRow("invalidEnum") << TestObject::createEnum(TestObject::Normal2, 0, this)
+								 << TestObject::createJson({
+															   {"normalEnumProperty", "baum"}
+														   })
+								 << false;
 
-//	QTest::newRow("stringFlags") << TestObject::createEnum(TestObject::Normal0, TestObject::FlagX, this)
-//								 << QJsonObject({
-//													{"intProperty", 0},
-//													{"boolProperty", false},
-//													{"stringProperty", QString()},
-//													{"doubleProperty", 0},
-//													{"normalEnumProperty", "Normal0"},
-//													{"enumFlagsProperty", "FlagX"},
-//													{"simpleList", QJsonArray()},
-//													{"leveledList", QJsonArray()},
-//													{"simpleMap", QJsonObject()},
-//													{"leveledMap", QJsonObject()},
-//													{"childObject", QJsonValue::Null},
-//													{"simpleChildren", QJsonArray()},
-//													{"leveledChildren", QJsonArray()}
-//												})
-//								 << true;
+	QTest::newRow("stringFlags") << TestObject::createEnum(TestObject::Normal0, TestObject::FlagX, this)
+								 << TestObject::createJson({
+															   {"enumFlagsProperty", "FlagX"}
+														   })
+								 << true;
 
-//	QTest::newRow("stringMultiFlags") << TestObject::createEnum(TestObject::Normal2, TestObject::Flag1 | TestObject::Flag3, this)
-//									  << QJsonObject({
-//														 {"intProperty", 0},
-//														 {"boolProperty", false},
-//														 {"stringProperty", QString()},
-//														 {"doubleProperty", 0},
-//														 {"normalEnumProperty", "Normal2"},
-//														 {"enumFlagsProperty", "Flag1|Flag3"},
-//														 {"simpleList", QJsonArray()},
-//														 {"leveledList", QJsonArray()},
-//														 {"simpleMap", QJsonObject()},
-//														 {"leveledMap", QJsonObject()},
-//														 {"childObject", QJsonValue::Null},
-//														 {"simpleChildren", QJsonArray()},
-//														 {"leveledChildren", QJsonArray()}
-//													 })
-//									  << true;
+	QTest::newRow("stringMultiFlags") << TestObject::createEnum(TestObject::Normal0, TestObject::Flag1 | TestObject::Flag3, this)
+									  << TestObject::createJson({
+																	{"enumFlagsProperty", "Flag1|Flag3"}
+																})
+									  << true;
 
-//	QTest::newRow("invalidFlags") << TestObject::createEnum(TestObject::Normal0, TestObject::FlagX, this)
-//								  << QJsonObject({
-//													 {"intProperty", 0},
-//													 {"boolProperty", false},
-//													 {"stringProperty", QString()},
-//													 {"doubleProperty", 0},
-//													 {"normalEnumProperty", 0},
-//													 {"enumFlagsProperty", "baum"},
-//													 {"simpleList", QJsonArray()},
-//													 {"leveledList", QJsonArray()},
-//													 {"simpleMap", QJsonObject()},
-//													 {"leveledMap", QJsonObject()},
-//													 {"childObject", QJsonValue::Null},
-//													 {"simpleChildren", QJsonArray()},
-//													 {"leveledChildren", QJsonArray()}
-//												 })
-//								  << false;
-//}
+	QTest::newRow("invalidFlags") << TestObject::createEnum(TestObject::Normal0, TestObject::FlagX, this)
+								  << TestObject::createJson({
+																{"enumFlagsProperty", "baum"}
+															})
+								  << false;
+}
 
-//void ObjectSerializerTest::testEnumSpecialDeserialization()
-//{
-//	QFETCH(QJsonObject, data);
-//	QFETCH(TestObject*, result);
-//	QFETCH(bool, success);
+void ObjectSerializerTest::testEnumSpecialDeserialization()
+{
+	QFETCH(QJsonObject, data);
+	QFETCH(TestObject*, result);
+	QFETCH(bool, success);
 
-//	try {
-//		if(success) {
-//			auto obj = serializer->deserialize<TestObject*>(data, this);
-//			QVERIFY(obj);
-//			QVERIFY(result->equals(obj));
-//			obj->deleteLater();
-//		} else
-//			QVERIFY_EXCEPTION_THROWN(serializer->deserialize<TestObject*>(data, this), QJsonDeserializationException);
-//	} catch(QException &e) {
-//		QFAIL(e.what());
-//	}
+	try {
+		if(success) {
+			auto obj = serializer->deserialize<TestObject*>(data, this);
+			QVERIFY(obj);
+			QVERIFY(result->equals(obj));
+			obj->deleteLater();
+		} else
+			QVERIFY_EXCEPTION_THROWN(serializer->deserialize<TestObject*>(data, this), QJsonDeserializationException);
+	} catch(QException &e) {
+		QFAIL(e.what());
+	}
 
-//	result->deleteLater();
-//}
+	result->deleteLater();
+}
 
 //void ObjectSerializerTest::testDeviceSerialization_data()
 //{
