@@ -37,8 +37,8 @@ private Q_SLOTS:
 	void testEnumSpecialDeserialization_data();
 	void testEnumSpecialDeserialization();
 
-//	void testDeviceSerialization_data();
-//	void testDeviceSerialization();
+	void testDeviceSerialization_data();
+	void testDeviceSerialization();
 
 private:
 	QJsonSerializer *serializer;
@@ -490,67 +490,67 @@ void ObjectSerializerTest::testEnumSpecialDeserialization()
 	result->deleteLater();
 }
 
-//void ObjectSerializerTest::testDeviceSerialization_data()
-//{
-//	QTest::addColumn<QVariant>("data");
-//	QTest::addColumn<QByteArray>("fakeDevice");
-//	QTest::addColumn<bool>("works");
+void ObjectSerializerTest::testDeviceSerialization_data()
+{
+	QTest::addColumn<QVariant>("data");
+	QTest::addColumn<QByteArray>("fakeDevice");
+	QTest::addColumn<bool>("works");
 
-//	QTest::newRow("object") << QVariant::fromValue(TestObject::createBasic(42, true, "baum", 4.2, this))
-//							<< QByteArray()
-//							<< true;
+	QTest::newRow("object") << QVariant::fromValue(TestObject::createBasic(42, true, "baum", 4.2, this))
+							<< QByteArray()
+							<< true;
 
-//	QTest::newRow("list") << QVariant::fromValue(QList<TestObject*>({TestObject::createBasic(42, true, "baum", 4.2, this), new TestObject(this)}))
-//						  << QByteArray()
-//						  << true;
+	QTest::newRow("list") << QVariant::fromValue(QList<TestObject*>({TestObject::createBasic(42, true, "baum", 4.2, this), new TestObject(this)}))
+						  << QByteArray()
+						  << true;
 
-//	QTest::newRow("data") << QVariant(42)
-//						  << QByteArray()
-//						  << false;
+	QTest::newRow("data") << QVariant(42)
+						  << QByteArray()
+						  << false;
 
-//	QTest::newRow("object") << QVariant::fromValue(new TestObject(this))
-//							<< QByteArray("invalid stuff")
-//							<< true;
+	QTest::newRow("object") << QVariant::fromValue(new TestObject(this))
+							<< QByteArray("invalid stuff")
+							<< true;
 
-//}
+}
 
-//void ObjectSerializerTest::testDeviceSerialization()
-//{
-//	QFETCH(QVariant, data);
-//	QFETCH(QByteArray, fakeDevice);
-//	QFETCH(bool, works);
+void ObjectSerializerTest::testDeviceSerialization()
+{
+	QFETCH(QVariant, data);
+	QFETCH(QByteArray, fakeDevice);
+	QFETCH(bool, works);
 
-//	try {
-//		QTemporaryFile tFile;
-//		QVERIFY(tFile.open());
-//		if(works)
-//			serializer->serializeTo(&tFile, data);
-//		else {
-//			QVERIFY_EXCEPTION_THROWN(serializer->serializeTo(&tFile, data), QJsonSerializerException);
-//			return;
-//		}
+	try {
+		QTemporaryFile tFile;
+		QVERIFY(tFile.open());
+		if(works)
+			serializer->serializeTo(&tFile, data);
+		else {
+			QVERIFY_EXCEPTION_THROWN(serializer->serializeTo(&tFile, data), QJsonSerializerException);
+			return;
+		}
 
-//		tFile.close();
-//		if(!fakeDevice.isEmpty()){
-//			QBuffer buffer(&fakeDevice);
-//			buffer.open(QIODevice::ReadOnly);
-//			QVERIFY_EXCEPTION_THROWN(serializer->deserializeFrom(&buffer, data.userType(), this), QJsonSerializerException);
-//		} else {
-//			QVERIFY(tFile.open());
-//			auto res = serializer->deserializeFrom(&tFile, data.userType(), this);
-//			if(data.userType() == qMetaTypeId<TestObject*>())
-//				QVERIFY(res.value<TestObject*>()->equals(data.value<TestObject*>()));
-//			else if(data.userType() == qMetaTypeId<QList<TestObject*>>())
-//				QCOMPARE(res.value<QList<TestObject*>>().size(), data.value<QList<TestObject*>>().size());
-//			else
-//				QCOMPARE(res, data);
-//		}
+		tFile.close();
+		if(!fakeDevice.isEmpty()){
+			QBuffer buffer(&fakeDevice);
+			buffer.open(QIODevice::ReadOnly);
+			QVERIFY_EXCEPTION_THROWN(serializer->deserializeFrom(&buffer, data.userType(), this), QJsonSerializerException);
+		} else {
+			QVERIFY(tFile.open());
+			auto res = serializer->deserializeFrom(&tFile, data.userType(), this);
+			if(data.userType() == qMetaTypeId<TestObject*>())
+				QVERIFY(res.value<TestObject*>()->equals(data.value<TestObject*>()));
+			else if(data.userType() == qMetaTypeId<QList<TestObject*>>())
+				QCOMPARE(res.value<QList<TestObject*>>().size(), data.value<QList<TestObject*>>().size());
+			else
+				QCOMPARE(res, data);
+		}
 
-//		tFile.close();
-//	} catch(QException &e) {
-//		QFAIL(e.what());
-//	}
-//}
+		tFile.close();
+	} catch(QException &e) {
+		QFAIL(e.what());
+	}
+}
 
 void ObjectSerializerTest::generateValidTestData()
 {
@@ -740,62 +740,62 @@ void ObjectSerializerTest::generateValidTestData()
 	}
 }
 
-//static void compile_test()
-//{
-//	QJsonSerializer s;
-//	QVariant v;
-//	TestObject *t;
-//	QList<TestObject*> l;
-//	QMap<QString, TestObject*> m;
-//	QIODevice *d = nullptr;
-//	QByteArray b;
-//	QJsonValue jv;
-//	QJsonObject jo;
-//	QJsonArray ja;
-//	QObject *p = nullptr;
+static void compile_test()
+{
+	QJsonSerializer s;
+	QVariant v;
+	TestObject *t;
+	QList<TestObject*> l;
+	QMap<QString, TestObject*> m;
+	QIODevice *d = nullptr;
+	QByteArray b;
+	QJsonValue jv;
+	QJsonObject jo;
+	QJsonArray ja;
+	QObject *p = nullptr;
 
-//	jv = s.serialize(v);
-//	jo = s.serialize(t);
-//	ja = s.serialize(l);
-//	jo = s.serialize(m);
+	jv = s.serialize(v);
+	jo = s.serialize(t);
+	ja = s.serialize(l);
+	jo = s.serialize(m);
 
-//	s.serializeTo(d, v);
-//	s.serializeTo(d, t);
-//	s.serializeTo(d, l);
-//	s.serializeTo(d, m);
+	s.serializeTo(d, v);
+	s.serializeTo(d, t);
+	s.serializeTo(d, l);
+	s.serializeTo(d, m);
 
-//	b = s.serializeTo(v);
-//	b = s.serializeTo(t);
-//	b = s.serializeTo(l);
-//	b = s.serializeTo(m);
+	b = s.serializeTo(v);
+	b = s.serializeTo(t);
+	b = s.serializeTo(l);
+	b = s.serializeTo(m);
 
-//	v = s.deserialize(jv, qMetaTypeId<TestObject*>());
-//	v = s.deserialize(jv, qMetaTypeId<TestObject*>(), p);
-//	t = s.deserialize<TestObject*>(jo);
-//	t = s.deserialize<TestObject*>(jo, p);
-//	l = s.deserialize<QList<TestObject*>>(ja);
-//	l = s.deserialize<QList<TestObject*>>(ja, p);
-//	m = s.deserialize<QMap<QString, TestObject*>>(jo);
-//	m = s.deserialize<QMap<QString, TestObject*>>(jo, p);
+	v = s.deserialize(jv, qMetaTypeId<TestObject*>());
+	v = s.deserialize(jv, qMetaTypeId<TestObject*>(), p);
+	t = s.deserialize<TestObject*>(jo);
+	t = s.deserialize<TestObject*>(jo, p);
+	l = s.deserialize<QList<TestObject*>>(ja);
+	l = s.deserialize<QList<TestObject*>>(ja, p);
+	m = s.deserialize<QMap<QString, TestObject*>>(jo);
+	m = s.deserialize<QMap<QString, TestObject*>>(jo, p);
 
-//	v = s.deserializeFrom(d, qMetaTypeId<TestObject*>());
-//	v = s.deserializeFrom(d, qMetaTypeId<TestObject*>(), p);
-//	t = s.deserializeFrom<TestObject*>(d);
-//	t = s.deserializeFrom<TestObject*>(d, p);
-//	l = s.deserializeFrom<QList<TestObject*>>(d);
-//	l = s.deserializeFrom<QList<TestObject*>>(d, p);
-//	m = s.deserializeFrom<QMap<QString, TestObject*>>(d);
-//	m = s.deserializeFrom<QMap<QString, TestObject*>>(d, p);
+	v = s.deserializeFrom(d, qMetaTypeId<TestObject*>());
+	v = s.deserializeFrom(d, qMetaTypeId<TestObject*>(), p);
+	t = s.deserializeFrom<TestObject*>(d);
+	t = s.deserializeFrom<TestObject*>(d, p);
+	l = s.deserializeFrom<QList<TestObject*>>(d);
+	l = s.deserializeFrom<QList<TestObject*>>(d, p);
+	m = s.deserializeFrom<QMap<QString, TestObject*>>(d);
+	m = s.deserializeFrom<QMap<QString, TestObject*>>(d, p);
 
-//	v = s.deserializeFrom(b, qMetaTypeId<TestObject*>());
-//	v = s.deserializeFrom(b, qMetaTypeId<TestObject*>(), p);
-//	t = s.deserializeFrom<TestObject*>(b);
-//	t = s.deserializeFrom<TestObject*>(b, p);
-//	l = s.deserializeFrom<QList<TestObject*>>(b);
-//	l = s.deserializeFrom<QList<TestObject*>>(b, p);
-//	m = s.deserializeFrom<QMap<QString, TestObject*>>(b);
-//	m = s.deserializeFrom<QMap<QString, TestObject*>>(b, p);
-//}
+	v = s.deserializeFrom(b, qMetaTypeId<TestObject*>());
+	v = s.deserializeFrom(b, qMetaTypeId<TestObject*>(), p);
+	t = s.deserializeFrom<TestObject*>(b);
+	t = s.deserializeFrom<TestObject*>(b, p);
+	l = s.deserializeFrom<QList<TestObject*>>(b);
+	l = s.deserializeFrom<QList<TestObject*>>(b, p);
+	m = s.deserializeFrom<QMap<QString, TestObject*>>(b);
+	m = s.deserializeFrom<QMap<QString, TestObject*>>(b, p);
+}
 
 QTEST_MAIN(ObjectSerializerTest)
 
