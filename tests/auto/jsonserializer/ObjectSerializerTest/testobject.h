@@ -5,6 +5,24 @@
 #include <QList>
 #include <QMap>
 #include <QFlags>
+#include <QJsonObject>
+
+class ChildObject : public QObject
+{
+	Q_OBJECT
+
+	Q_PROPERTY(int data MEMBER data)
+
+public:
+	int data;
+
+	explicit ChildObject(int data, QObject *parent);
+	Q_INVOKABLE ChildObject(QObject *parent);
+
+	bool equals(const ChildObject *other) const;
+
+	static QJsonObject createJson(const int &data = 0);
+};
 
 class TestObject : public QObject
 {
@@ -24,9 +42,13 @@ class TestObject : public QObject
 	Q_PROPERTY(QMap<QString, int> simpleMap MEMBER simpleMap)
 	Q_PROPERTY(QMap<QString, QMap<QString, int>> leveledMap MEMBER leveledMap)
 
-	Q_PROPERTY(TestObject* childObject MEMBER childObject)
-	Q_PROPERTY(QList<TestObject*> simpleChildren MEMBER simpleChildren)
-	Q_PROPERTY(QList<QList<TestObject*>> leveledChildren MEMBER leveledChildren)
+	Q_PROPERTY(ChildObject* childObject MEMBER childObject)
+
+	Q_PROPERTY(QList<ChildObject*> simpleChildren MEMBER simpleChildren)
+	Q_PROPERTY(QList<QList<ChildObject*>> leveledChildren MEMBER leveledChildren)
+
+	Q_PROPERTY(QMap<QString, ChildObject*> simpleRelatives MEMBER simpleRelatives)
+	Q_PROPERTY(QMap<QString, QMap<QString, ChildObject*>> leveledRelatives MEMBER leveledRelatives)
 
 public:
 	enum NormalEnum {
@@ -45,13 +67,17 @@ public:
 	Q_DECLARE_FLAGS(EnumFlags, EnumFlag)
 	Q_FLAG(EnumFlags)
 
-	Q_INVOKABLE TestObject(QObject *parent = nullptr);
+	Q_INVOKABLE TestObject(QObject *parent);
 
-	static TestObject *createBasic(int intProperty, bool boolProperty, QString stringProperty, double doubleProperty, QObject *parent = nullptr);
-	static TestObject *createEnum(NormalEnum normalEnumProperty, EnumFlags enumFlagsProperty, QObject *parent = nullptr);
-	static TestObject *createList(QList<int> simpleList, QList<QList<int>> leveledList, QObject *parent = nullptr);
-	static TestObject *createMap(QMap<QString, int> simpleMap, QMap<QString, QMap<QString, int>> leveledMap, QObject *parent = nullptr);
-	static TestObject *createChild(TestObject* childObject, QList<TestObject*> simpleChildren, QList<QList<TestObject*>> leveledChildren, QObject *parent = nullptr);
+	static TestObject *createBasic(int intProperty, bool boolProperty, QString stringProperty, double doubleProperty, QObject *parent);
+	static TestObject *createEnum(NormalEnum normalEnumProperty, EnumFlags enumFlagsProperty, QObject *parent);
+	static TestObject *createList(QList<int> simpleList, QList<QList<int>> leveledList, QObject *parent);
+	static TestObject *createMap(QMap<QString, int> simpleMap, QMap<QString, QMap<QString, int>> leveledMap, QObject *parent);
+	static TestObject *createChild(ChildObject* childObject, QObject *parent);
+	static TestObject *createChildren(QList<ChildObject*> simpleChildren, QList<QList<ChildObject*>> leveledChildren, QObject *parent);
+	static TestObject *createRelatives(QMap<QString, ChildObject*> simpleRelatives, QMap<QString, QMap<QString, ChildObject*>> leveledRelatives, QObject *parent);
+
+	static QJsonObject createJson(const QJsonObject &delta = QJsonObject(), const QString &rmKey = {});
 
 	static bool equals(const TestObject *left, const TestObject *right);
 	bool equals(const TestObject *other) const;
@@ -70,9 +96,13 @@ public:
 	QMap<QString, int> simpleMap;
 	QMap<QString, QMap<QString, int>> leveledMap;
 
-	TestObject* childObject;
-	QList<TestObject*> simpleChildren;
-	QList<QList<TestObject*>> leveledChildren;
+	ChildObject* childObject;
+
+	QList<ChildObject*> simpleChildren;
+	QList<QList<ChildObject*>> leveledChildren;
+
+	QMap<QString, ChildObject*> simpleRelatives;
+	QMap<QString, QMap<QString, ChildObject*>> leveledRelatives;
 
 	EnumFlags getEnumFlagsProperty() const;
 	void setEnumFlagsProperty(const EnumFlags &value);

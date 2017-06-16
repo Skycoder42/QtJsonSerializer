@@ -1,4 +1,5 @@
 #include "testobject.h"
+#include <QJsonArray>
 #include <QMetaObject>
 #include <QMetaProperty>
 
@@ -12,9 +13,13 @@ TestObject::TestObject(QObject *parent) :
 	enumFlagsProperty(0x00),
 	simpleList(),
 	leveledList(),
+	simpleMap(),
+	leveledMap(),
 	childObject(nullptr),
 	simpleChildren(),
-	leveledChildren()
+	leveledChildren(),
+	simpleRelatives(),
+	leveledRelatives()
 {}
 
 TestObject *TestObject::createBasic(int intProperty, bool boolProperty, QString stringProperty, double doubleProperty, QObject *parent)
@@ -51,13 +56,20 @@ TestObject *TestObject::createMap(QMap<QString, int> simpleMap, QMap<QString, QM
 	return t;
 }
 
-TestObject *TestObject::createChild(TestObject *childObject, QList<TestObject *> simpleChildren, QList<QList<TestObject *> > leveledChildren, QObject *parent)
+TestObject *TestObject::createChild(ChildObject *childObject, QObject *parent)
 {
 	auto t = new TestObject(parent);
 
 	t->childObject = childObject;
 	if(t->childObject)
 		t->childObject->setParent(t);
+
+	return t;
+}
+
+TestObject *TestObject::createChildren(QList<ChildObject *> simpleChildren, QList<QList<ChildObject *> > leveledChildren, QObject *parent)
+{
+	auto t = new TestObject(parent);
 
 	t->simpleChildren = simpleChildren;
 	foreach (auto child, t->simpleChildren)
@@ -70,6 +82,48 @@ TestObject *TestObject::createChild(TestObject *childObject, QList<TestObject *>
 	}
 
 	return t;
+}
+
+TestObject *TestObject::createRelatives(QMap<QString, ChildObject *> simpleRelatives, QMap<QString, QMap<QString, ChildObject *> > leveledRelatives, QObject *parent)
+{
+	auto t = new TestObject(parent);
+
+	t->simpleRelatives = simpleRelatives;
+	foreach (auto child, t->simpleRelatives)
+		child->setParent(t);
+
+	t->leveledRelatives = leveledRelatives;
+	foreach (auto children, t->leveledRelatives) {
+		foreach (auto child, children)
+			child->setParent(t);
+	}
+
+	return t;
+}
+
+QJsonObject TestObject::createJson(const QJsonObject &delta, const QString &rmKey)
+{
+	auto base = QJsonObject({
+								{"intProperty", 0},
+								{"boolProperty", false},
+								{"stringProperty", QString()},
+								{"doubleProperty", 0},
+								{"normalEnumProperty", TestObject::Normal0},
+								{"enumFlagsProperty", 0},
+								{"simpleList", QJsonArray()},
+								{"leveledList", QJsonArray()},
+								{"simpleMap", QJsonObject()},
+								{"leveledMap", QJsonObject()},
+								{"childGadget", QJsonValue::Null},
+								{"simpleChildren", QJsonArray()},
+								{"leveledChildren", QJsonArray()},
+								{"simpleRelatives", QJsonObject()},
+								{"leveledRelatives", QJsonObject()}
+							});
+	for(auto it = delta.constBegin(); it != delta.constEnd(); ++it)
+		base[it.key()] = it.value();
+	base.remove(rmKey);
+	return base;
 }
 
 bool TestObject::equals(const TestObject *left, const TestObject *right)
@@ -102,20 +156,40 @@ bool TestObject::equals(const TestObject *other) const
 				  simpleMap == other->simpleMap &&
 				  leveledMap == other->leveledMap &&
 				  simpleChildren.size() == other->simpleChildren.size() &&
-				  leveledChildren.size() == other->leveledChildren.size() ;
+				  leveledChildren.size() == other->leveledChildren.size() &&
+				  simpleRelatives.size() == other->simpleRelatives.size() &&
+				  leveledRelatives.size() == other->leveledRelatives.size();
 		if(!ok)
 			return false;
+
 		if(!childObject->equals(other->childObject))
 			return false;
+
 		for(auto i = 0; i < simpleChildren.size(); i++) {
 			if(!simpleChildren[i]->equals(other->simpleChildren[i]))
 				return false;
 		}
+
 		for(auto i = 0; i < leveledChildren.size(); i++) {
 			if(leveledChildren[i].size() != other->leveledChildren[i].size())
 				return false;
 			for(auto j = 0; j < leveledChildren[i].size(); j++) {
 				if(!leveledChildren[i][j]->equals(other->leveledChildren[i][j]))
+					return false;
+			}
+		}
+
+		for(auto it = simpleRelatives.constBegin(); it != simpleRelatives.constEnd(); ++it) {
+			if(!it.value()->equals(other->simpleRelatives[it.key()]))
+				return false;
+		}
+
+		for(auto it = leveledRelatives.constBegin(); it != leveledRelatives.constEnd(); ++it) {
+			const auto &otherMap = other->leveledRelatives[it.key()];
+			if(it->size() != otherMap.size())
+				return false;
+			for(auto jt = it->constBegin(); jt != it->constEnd(); ++jt) {
+				if(!jt.value()->equals(otherMap[jt.key()]))
 					return false;
 			}
 		}
@@ -132,4 +206,32 @@ TestObject::EnumFlags TestObject::getEnumFlagsProperty() const
 void TestObject::setEnumFlagsProperty(const EnumFlags &value)
 {
 	enumFlagsProperty = value;
+}
+
+ChildObject::ChildObject(int data, QObject *parent) :
+	QObject(parent),
+	data(data)
+{}
+
+ChildObject::ChildObject(QObject *parent) :
+	ChildObject(0, parent)
+{}
+
+bool ChildObject::equals(const ChildObject *other) const
+{
+	if(this == other)
+		return true;
+	else if(!other || !this)
+		return false;
+	else if(metaObject()->className() != other->metaObject()->className())
+		return false;
+	else
+		return data == other->data;
+}
+
+QJsonObject ChildObject::createJson(const int &data)
+{
+	return QJsonObject({
+						   {"data", data},
+					   });
 }
