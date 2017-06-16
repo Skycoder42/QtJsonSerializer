@@ -17,11 +17,11 @@ class GadgetSerializerTest : public QObject
 	Q_OBJECT
 
 private Q_SLOTS:
-//	void initTestCase();
-//	void cleanupTestCase();
+	void initTestCase();
+	void cleanupTestCase();
 
-//	void testVariantConversions_data();
-//	void testVariantConversions();
+	void testVariantConversions_data();
+	void testVariantConversions();
 //	void testSerialization_data();
 //	void testSerialization();
 //	void testInvalidSerialization();
@@ -48,97 +48,127 @@ private:
 	//void generateValidTestData();
 };
 
-//void GadgetSerializerTest::initTestCase()
-//{
-//#ifdef Q_OS_LINUX
-//	Q_ASSERT(qgetenv("LD_PRELOAD").contains("Qt5JsonSerializer"));
-//#endif
-//	QJsonSerializer::registerListConverters<QList<int>>();
-//	QJsonSerializer::registerListConverters<TestGadget>();
-//	QJsonSerializer::registerListConverters<QList<TestGadget>>();
-//	QJsonSerializer::registerMapConverters<QMap<QString, int>>();
-//	//register list comparators, needed for test only!
-//	QMetaType::registerComparators<TestGadget>();
-//	QMetaType::registerComparators<QList<int>>();
-//	QMetaType::registerComparators<QList<QList<int>>>();
-//	QMetaType::registerComparators<QMap<QString, int>>();
-//	QMetaType::registerComparators<QMap<QString, QMap<QString, int>>>();
-//	QMetaType::registerComparators<QList<TestGadget>>();
-//	QMetaType::registerComparators<QList<QList<TestGadget>>>();
-//	serializer = new QJsonSerializer(this);
-//}
+void GadgetSerializerTest::initTestCase()
+{
+#ifdef Q_OS_LINUX
+	Q_ASSERT(qgetenv("LD_PRELOAD").contains("Qt5JsonSerializer"));
+#endif
+	QJsonSerializer::registerListConverters<QList<int>>();
+	QJsonSerializer::registerMapConverters<QMap<QString, int>>();
 
-//void GadgetSerializerTest::cleanupTestCase()
-//{
-//	serializer->deleteLater();
-//	serializer = nullptr;
-//}
+	QJsonSerializer::registerAllConverters<ChildGadget>();
+	QJsonSerializer::registerListConverters<QList<ChildGadget>>();
+	QJsonSerializer::registerMapConverters<QMap<QString, ChildGadget>>();
 
-//void GadgetSerializerTest::testVariantConversions_data()
-//{
-//	QTest::addColumn<QVariant>("data");
-//	QTest::addColumn<int>("targetType");
+	//register list comparators, needed for test only!
+	QMetaType::registerComparators<ChildGadget>();
+	QMetaType::registerComparators<QList<int>>();
+	QMetaType::registerComparators<QList<QList<int>>>();
+	QMetaType::registerComparators<QMap<QString, int>>();
+	QMetaType::registerComparators<QMap<QString, QMap<QString, int>>>();
+	QMetaType::registerComparators<QList<ChildGadget>>();
+	QMetaType::registerComparators<QList<QList<ChildGadget>>>();
+	QMetaType::registerComparators<QMap<QString, ChildGadget>>();
+	QMetaType::registerComparators<QMap<QString, QMap<QString, ChildGadget>>>();
+	serializer = new QJsonSerializer(this);
+}
 
-//	QTest::newRow("QList<int>") << QVariant::fromValue<QList<int>>({3, 7, 13})
-//								<< (int)QVariant::List;
-//	QList<int> l1 = {0, 1, 2};
-//	QList<int> l2 = {3, 4, 5};
-//	QList<int> l3 = {6, 7, 8};
-//	QTest::newRow("QList<QList<int>>") << QVariant::fromValue<QList<QList<int>>>({l1, l2, l3})
-//									   << (int)QVariant::List;
+void GadgetSerializerTest::cleanupTestCase()
+{
+	serializer->deleteLater();
+	serializer = nullptr;
+}
 
-//	QTest::newRow("QMap<QString, int>") << QVariant::fromValue<QMap<QString, int>>({
-//																					   {"baum", 42},
-//																					   {"devil", 666},
-//																					   {"fun", 0}
-//																				   })
-//										<< (int)QVariant::Map;
-//	QMap<QString, int> m1 = {{"v0", 0}, {"v1", 1}, {"v2", 2}};
-//	QMap<QString, int> m2 = {{"v3", 3}, {"v4", 4}, {"v5", 5}};
-//	QMap<QString, int> m3 = {{"v6", 6}, {"v7", 7}, {"v8", 8}};
-//	QTest::newRow("QMap<QString, QMap<QString, int>>") << QVariant::fromValue<QMap<QString, QMap<QString, int>>>({
-//																													 {"m1", m1},
-//																													 {"m2", m2},
-//																													 {"m3", m3}
-//																												 })
-//									   << (int)QVariant::Map;
+void GadgetSerializerTest::testVariantConversions_data()
+{
+	QTest::addColumn<QVariant>("data");
+	QTest::addColumn<int>("targetType");
 
-//	QTest::newRow("QList<TestGadget>") << QVariant::fromValue<QList<TestGadget>>({
-//																					   TestGadget(),
-//																					   TestGadget(),
-//																					   TestGadget()
-//																				   })
-//										<< (int)QVariant::List;
-//	QList<TestGadget> o1 = {
-//		TestGadget(),
-//		TestGadget(),
-//		TestGadget()
-//	};
-//	QList<TestGadget> o2 = {
-//		TestGadget(),
-//		TestGadget(),
-//		TestGadget()
-//	};
-//	QList<TestGadget> o3 = {
-//		TestGadget(),
-//		TestGadget(),
-//		TestGadget()
-//	};
-//	QTest::newRow("QList<QList<TestGadget>>") << QVariant::fromValue<QList<QList<TestGadget>>>({o1, o2, o3})
-//											   << (int)QVariant::List;
-//}
+	QTest::newRow("QList<int>") << QVariant::fromValue<QList<int>>({3, 7, 13})
+								<< (int)QVariant::List;
+	QList<int> l1 = {0, 1, 2};
+	QList<int> l2 = {3, 4, 5};
+	QList<int> l3 = {6, 7, 8};
+	QTest::newRow("QList<QList<int>>") << QVariant::fromValue<QList<QList<int>>>({l1, l2, l3})
+									   << (int)QVariant::List;
 
-//void GadgetSerializerTest::testVariantConversions()
-//{
-//	QFETCH(QVariant, data);
-//	QFETCH(int, targetType);
+	QTest::newRow("QMap<QString, int>") << QVariant::fromValue<QMap<QString, int>>({
+																					   {"baum", 42},
+																					   {"devil", 666},
+																					   {"fun", 0}
+																				   })
+										<< (int)QVariant::Map;
+	QMap<QString, int> m1 = {{"v0", 0}, {"v1", 1}, {"v2", 2}};
+	QMap<QString, int> m2 = {{"v3", 3}, {"v4", 4}, {"v5", 5}};
+	QMap<QString, int> m3 = {{"v6", 6}, {"v7", 7}, {"v8", 8}};
+	QTest::newRow("QMap<QString, QMap<QString, int>>") << QVariant::fromValue<QMap<QString, QMap<QString, int>>>({
+																													 {"m1", m1},
+																													 {"m2", m2},
+																													 {"m3", m3}
+																												 })
+									   << (int)QVariant::Map;
 
-//	auto origType = data.userType();
-//	auto convData = data;
-//	QVERIFY(convData.convert(targetType));
-//	QVERIFY(convData.convert(origType));
-//	QCOMPARE(convData, data);
-//}
+	QTest::newRow("QList<ChildGadget>") << QVariant::fromValue<QList<ChildGadget>>({
+																					  ChildGadget(),
+																					  ChildGadget(),
+																					  ChildGadget()
+																				  })
+										<< (int)QVariant::List;
+	QList<ChildGadget> o1 = {
+		ChildGadget(),
+		ChildGadget(),
+		ChildGadget()
+	};
+	QList<ChildGadget> o2 = {
+		ChildGadget(),
+		ChildGadget(),
+		ChildGadget()
+	};
+	QList<ChildGadget> o3 = {
+		ChildGadget(),
+		ChildGadget(),
+		ChildGadget()
+	};
+	QTest::newRow("QList<QList<ChildGadget>>") << QVariant::fromValue<QList<QList<ChildGadget>>>({o1, o2, o3})
+											   << (int)QVariant::List;
+
+	QTest::newRow("QMap<QString, ChildGadget>") << QVariant::fromValue<QMap<QString, ChildGadget>>({
+																									   {"baum", ChildGadget()},
+																									   {"devil", ChildGadget()},
+																									   {"fun", ChildGadget()}
+																								   })
+												<< (int)QVariant::Map;
+	QMap<QString, ChildGadget> r1 = {
+		{"v0", ChildGadget()},
+		{"v1", ChildGadget()},
+		{"v2", ChildGadget()}};
+	QMap<QString, ChildGadget> r2 = {
+		{"v3", ChildGadget()},
+		{"v4", ChildGadget()},
+		{"v5", ChildGadget()}};
+	QMap<QString, ChildGadget> r3 = {
+		{"v6", ChildGadget()},
+		{"v7", ChildGadget()},
+		{"v8", ChildGadget()}};
+	QTest::newRow("QMap<QString, QMap<QString, ChildGadget>>") << QVariant::fromValue<QMap<QString, QMap<QString, ChildGadget>>>({
+																																	 {"m1", r1},
+																																	 {"m2", r2},
+																																	 {"m3", r3}
+																																 })
+															   << (int)QVariant::Map;
+}
+
+void GadgetSerializerTest::testVariantConversions()
+{
+	QFETCH(QVariant, data);
+	QFETCH(int, targetType);
+
+	auto origType = data.userType();
+	auto convData = data;
+	QVERIFY(convData.convert(targetType));
+	QVERIFY(convData.convert(origType));
+	QCOMPARE(convData, data);
+}
 
 //void GadgetSerializerTest::testSerialization_data()
 //{
