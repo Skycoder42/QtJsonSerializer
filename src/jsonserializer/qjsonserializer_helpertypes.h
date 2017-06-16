@@ -64,6 +64,26 @@ struct type_helper<QList<T>> : public has_metaobject<T> {
 };
 
 //! @copydoc _qjsonserializer_helpertypes::type_helper
+template <typename T>
+struct type_helper<QMap<QString, T>> : public has_metaobject<T> {
+	//! @copydoc _qjsonserializer_helpertypes::type_helper::Type
+	typedef QMap<QString, T> Type;
+	//! @copydoc _qjsonserializer_helpertypes::type_helper::ObjectType
+	typedef T ObjectType;
+	//! @copydoc _qjsonserializer_helpertypes::type_helper::JsonType
+	typedef QJsonObject JsonType;
+
+	//! @copydoc _qjsonserializer_helpertypes::type_helper::convert
+	static inline JsonType convert(const QJsonValue &value) {
+		return value.toObject();
+	}
+	//! @copydoc _qjsonserializer_helpertypes::type_helper::variant
+	static inline QVariant variant(const Type &data) {
+		return QVariant::fromValue(data);
+	}
+};
+
+//! @copydoc _qjsonserializer_helpertypes::type_helper
 template <>
 struct type_helper<QVariant> : public has_metaobject<QVariant> {
 	//! @copydoc _qjsonserializer_helpertypes::type_helper::Type

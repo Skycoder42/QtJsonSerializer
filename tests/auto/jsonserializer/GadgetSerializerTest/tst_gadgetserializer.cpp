@@ -1007,6 +1007,7 @@ static void compile_test()
 	QVariant v;
 	TestGadget t;
 	QList<TestGadget> l;
+	QMap<QString, TestGadget> m;
 	QIODevice *d = nullptr;
 	QByteArray b;
 	QJsonValue jv;
@@ -1017,14 +1018,17 @@ static void compile_test()
 	jv = s.serialize(v);
 	jo = s.serialize(t);
 	ja = s.serialize(l);
+	jo = s.serialize(m);
 
 	s.serializeTo(d, v);
 	s.serializeTo(d, t);
 	s.serializeTo(d, l);
+	s.serializeTo(d, m);
 
 	b = s.serializeTo(v);
 	b = s.serializeTo(t);
 	b = s.serializeTo(l);
+	b = s.serializeTo(m);
 
 	v = s.deserialize(jv, qMetaTypeId<TestGadget>());
 	v = s.deserialize(jv, qMetaTypeId<TestGadget>(), p);
@@ -1032,6 +1036,8 @@ static void compile_test()
 	t = s.deserialize<TestGadget>(jo, p);
 	l = s.deserialize<QList<TestGadget>>(ja);
 	l = s.deserialize<QList<TestGadget>>(ja, p);
+	m = s.deserialize<QMap<QString, TestGadget>>(jo);
+	m = s.deserialize<QMap<QString, TestGadget>>(jo, p);
 
 	v = s.deserializeFrom(d, qMetaTypeId<TestGadget>());
 	v = s.deserializeFrom(d, qMetaTypeId<TestGadget>(), p);
@@ -1039,6 +1045,8 @@ static void compile_test()
 	t = s.deserializeFrom<TestGadget>(d, p);
 	l = s.deserializeFrom<QList<TestGadget>>(d);
 	l = s.deserializeFrom<QList<TestGadget>>(d, p);
+	m = s.deserializeFrom<QMap<QString, TestGadget>>(d);
+	m = s.deserializeFrom<QMap<QString, TestGadget>>(d, p);
 
 	v = s.deserializeFrom(b, qMetaTypeId<TestGadget>());
 	v = s.deserializeFrom(b, qMetaTypeId<TestGadget>(), p);
@@ -1046,6 +1054,8 @@ static void compile_test()
 	t = s.deserializeFrom<TestGadget>(b, p);
 	l = s.deserializeFrom<QList<TestGadget>>(b);
 	l = s.deserializeFrom<QList<TestGadget>>(b, p);
+	m = s.deserializeFrom<QMap<QString, TestGadget>>(b);
+	m = s.deserializeFrom<QMap<QString, TestGadget>>(b, p);
 }
 
 QTEST_MAIN(GadgetSerializerTest)
