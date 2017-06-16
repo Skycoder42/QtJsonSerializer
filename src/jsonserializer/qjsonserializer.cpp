@@ -211,12 +211,12 @@ QJsonValue QJsonSerializer::serializeValue(int propertyType, const QVariant &val
 	else {
 		if(value.userType() == QMetaType::QJsonValue)//value needs special treatment
 			return value.value<QJsonValue>();
-		if(value.userType() == QMetaType::Nullptr)//std::nullptr_t as well
-			return QJsonValue::Null;
 
 		auto json = QJsonValue::fromVariant(value);
 		if(json.isNull()) {
-			if(propertyType == QMetaType::QDate ||
+			if(value.userType() == QMetaType::Nullptr)//std::nullptr_t is of course null
+				return QJsonValue::Null;
+			else if(propertyType == QMetaType::QDate ||
 			   propertyType == QMetaType::QTime ||
 			   propertyType == QMetaType::QDateTime ||
 			   value.userType() == QMetaType::QDate ||
