@@ -81,7 +81,7 @@ public:
 	static TestGadget createChildren(QList<ChildGadget> simpleChildren, QList<QList<ChildGadget>> leveledChildren);
 	static TestGadget createRelatives(QMap<QString, ChildGadget> simpleRelatives, QMap<QString, QMap<QString, ChildGadget>> leveledRelatives);
 
-	static QJsonObject createJson(const QJsonObject &delta = QJsonObject());
+	static QJsonObject createJson(const QJsonObject &delta = QJsonObject(), const QString &rmKey = {});
 
 	int intProperty;
 	bool boolProperty;

@@ -131,7 +131,7 @@ TestGadget TestGadget::createRelatives(QMap<QString, ChildGadget> simpleRelative
 	return t;
 }
 
-QJsonObject TestGadget::createJson(const QJsonObject &delta)
+QJsonObject TestGadget::createJson(const QJsonObject &delta, const QString &rmKey)
 {
 	auto base = QJsonObject({
 								{"intProperty", 0},
@@ -152,6 +152,7 @@ QJsonObject TestGadget::createJson(const QJsonObject &delta)
 							});
 	for(auto it = delta.constBegin(); it != delta.constEnd(); ++it)
 		base[it.key()] = it.value();
+	base.remove(rmKey);
 	return base;
 }
 
