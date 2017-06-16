@@ -146,7 +146,6 @@ private:
 	QJsonValue serializeImpl(const QVariant &data) const;
 	void serializeToImpl(QIODevice *device, const QVariant &data) const;
 	QByteArray serializeToImpl(const QVariant &data) const;
-	ValidationFlags m_validationFlags;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QJsonSerializer::ValidationFlags)
