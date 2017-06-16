@@ -269,7 +269,10 @@ void GadgetSerializerTest::testNullDeserialization()
 									{"simpleChildren", QJsonValue::Null},
 									{"leveledChildren", QJsonValue::Null},
 									{"simpleRelatives", QJsonValue::Null},
-									{"leveledRelatives", QJsonValue::Null}
+									{"leveledRelatives", QJsonValue::Null},
+									{"object", QJsonValue::Null},
+									{"array", QJsonValue::Null},
+									{"value", QJsonValue::Null}
 								});
 
 	try {
@@ -663,6 +666,21 @@ void GadgetSerializerTest::generateValidTestData()
 																	 {"leveledRelatives", jjm}
 																 });
 	}
+
+	QTest::newRow("jobject") << TestGadget::createEmbedded(ChildGadget::createJson(), QJsonArray(), QJsonValue())
+							 << TestGadget::createJson({
+														   {"object", ChildGadget::createJson()}
+													   });
+
+	QTest::newRow("jarray") << TestGadget::createEmbedded(QJsonObject(), QJsonArray({1, 2, 3}), QJsonValue())
+							<< TestGadget::createJson({
+														  {"array", QJsonArray({1, 2, 3})}
+													  });
+
+	QTest::newRow("jvalue") << TestGadget::createEmbedded(QJsonObject(), QJsonArray(), 42)
+							<< TestGadget::createJson({
+														  {"value", 42}
+													  });
 }
 
 static void compile_test()

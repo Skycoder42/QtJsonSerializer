@@ -18,7 +18,10 @@ TestGadget::TestGadget() :
 	simpleChildren(),
 	leveledChildren(),
 	simpleRelatives(),
-	leveledRelatives()
+	leveledRelatives(),
+	object(),
+	array(),
+	value(QJsonValue::Null)
 {}
 
 bool TestGadget::operator==(const TestGadget &other) const
@@ -37,7 +40,10 @@ bool TestGadget::operator==(const TestGadget &other) const
 			simpleChildren == other.simpleChildren &&
 			leveledChildren == other.leveledChildren &&
 			simpleRelatives == other.simpleRelatives &&
-			leveledRelatives == other.leveledRelatives;
+			leveledRelatives == other.leveledRelatives &&
+			object == other.object &&
+			array == other.array &&
+			value == other.value;
 }
 
 bool TestGadget::operator!=(const TestGadget &other) const
@@ -56,7 +62,10 @@ bool TestGadget::operator!=(const TestGadget &other) const
 			simpleChildren != other.simpleChildren ||
 			leveledChildren != other.leveledChildren ||
 			simpleRelatives != other.simpleRelatives ||
-			leveledRelatives != other.leveledRelatives;
+			leveledRelatives != other.leveledRelatives ||
+			object != other.object ||
+			array != other.array ||
+			value != other.value;
 }
 
 bool TestGadget::operator<(const TestGadget &) const
@@ -131,6 +140,15 @@ TestGadget TestGadget::createRelatives(QMap<QString, ChildGadget> simpleRelative
 	return t;
 }
 
+TestGadget TestGadget::createEmbedded(QJsonObject object, QJsonArray array, QJsonValue value)
+{
+	TestGadget t;
+	t.object = object;
+	t.array = array;
+	t.value = value;
+	return t;
+}
+
 QJsonObject TestGadget::createJson(const QJsonObject &delta, const QString &rmKey)
 {
 	auto base = QJsonObject({
@@ -148,7 +166,10 @@ QJsonObject TestGadget::createJson(const QJsonObject &delta, const QString &rmKe
 								{"simpleChildren", QJsonArray()},
 								{"leveledChildren", QJsonArray()},
 								{"simpleRelatives", QJsonObject()},
-								{"leveledRelatives", QJsonObject()}
+								{"leveledRelatives", QJsonObject()},
+								{"object", QJsonObject()},
+								{"array", QJsonArray()},
+								{"value", QJsonValue::Null}
 							});
 	for(auto it = delta.constBegin(); it != delta.constEnd(); ++it)
 		base[it.key()] = it.value();

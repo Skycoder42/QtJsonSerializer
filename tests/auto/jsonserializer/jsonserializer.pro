@@ -1,5 +1,4 @@
 TEMPLATE = subdirs
 
 SUBDIRS += ObjectSerializerTest \
-	GadgetSerializerTest \
-    JsonPropertyTest
+	GadgetSerializerTest

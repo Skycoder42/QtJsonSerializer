@@ -5,6 +5,7 @@
 #include <QList>
 #include <QMap>
 #include <QJsonObject>
+#include <QJsonArray>
 
 struct ChildGadget
 {
@@ -50,6 +51,10 @@ struct TestGadget
 	Q_PROPERTY(QMap<QString, ChildGadget> simpleRelatives MEMBER simpleRelatives)
 	Q_PROPERTY(QMap<QString, QMap<QString, ChildGadget>> leveledRelatives MEMBER leveledRelatives)
 
+	Q_PROPERTY(QJsonObject object MEMBER object)
+	Q_PROPERTY(QJsonArray array MEMBER array)
+	Q_PROPERTY(QJsonValue value MEMBER value)
+
 public:
 	enum NormalEnum {
 		Normal0 = 0,
@@ -80,6 +85,7 @@ public:
 	static TestGadget createChild(ChildGadget childGadget);
 	static TestGadget createChildren(QList<ChildGadget> simpleChildren, QList<QList<ChildGadget>> leveledChildren);
 	static TestGadget createRelatives(QMap<QString, ChildGadget> simpleRelatives, QMap<QString, QMap<QString, ChildGadget>> leveledRelatives);
+	static TestGadget createEmbedded(QJsonObject object, QJsonArray array, QJsonValue value);
 
 	static QJsonObject createJson(const QJsonObject &delta = QJsonObject(), const QString &rmKey = {});
 
@@ -104,6 +110,10 @@ public:
 
 	QMap<QString, ChildGadget> simpleRelatives;
 	QMap<QString, QMap<QString, ChildGadget>> leveledRelatives;
+
+	QJsonObject object;
+	QJsonArray array;
+	QJsonValue value;
 
 	EnumFlags getEnumFlagsProperty() const;
 	void setEnumFlagsProperty(const EnumFlags &value);

@@ -19,7 +19,10 @@ TestObject::TestObject(QObject *parent) :
 	simpleChildren(),
 	leveledChildren(),
 	simpleRelatives(),
-	leveledRelatives()
+	leveledRelatives(),
+	object(),
+	array(),
+	value(QJsonValue::Null)
 {}
 
 TestObject *TestObject::createBasic(int intProperty, bool boolProperty, QString stringProperty, double doubleProperty, QObject *parent)
@@ -101,6 +104,15 @@ TestObject *TestObject::createRelatives(QMap<QString, ChildObject *> simpleRelat
 	return t;
 }
 
+TestObject *TestObject::createEmbedded(QJsonObject object, QJsonArray array, QJsonValue value, QObject *parent)
+{
+	auto t = new TestObject(parent);
+	t->object = object;
+	t->array = array;
+	t->value = value;
+	return t;
+}
+
 QJsonObject TestObject::createJson(const QJsonObject &delta, const QString &rmKey)
 {
 	auto base = QJsonObject({
@@ -118,7 +130,10 @@ QJsonObject TestObject::createJson(const QJsonObject &delta, const QString &rmKe
 								{"simpleChildren", QJsonArray()},
 								{"leveledChildren", QJsonArray()},
 								{"simpleRelatives", QJsonObject()},
-								{"leveledRelatives", QJsonObject()}
+								{"leveledRelatives", QJsonObject()},
+								{"object", QJsonObject()},
+								{"array", QJsonArray()},
+								{"value", QJsonValue::Null}
 							});
 	for(auto it = delta.constBegin(); it != delta.constEnd(); ++it)
 		base[it.key()] = it.value();
@@ -158,7 +173,10 @@ bool TestObject::equals(const TestObject *other) const
 				  simpleChildren.size() == other->simpleChildren.size() &&
 				  leveledChildren.size() == other->leveledChildren.size() &&
 				  simpleRelatives.size() == other->simpleRelatives.size() &&
-				  leveledRelatives.size() == other->leveledRelatives.size();
+				  leveledRelatives.size() == other->leveledRelatives.size() &&
+				  object == other->object &&
+				  array == other->array &&
+				  value == other->value;
 		if(!ok)
 			return false;
 

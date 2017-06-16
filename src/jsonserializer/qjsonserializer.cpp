@@ -211,6 +211,8 @@ QJsonValue QJsonSerializer::serializeValue(int propertyType, const QVariant &val
 	else {
 		if(value.userType() == QMetaType::QJsonValue)//value needs special treatment
 			return value.value<QJsonValue>();
+		if(value.userType() == QMetaType::Nullptr)//std::nullptr_t as well
+			return QJsonValue::Null;
 
 		auto json = QJsonValue::fromVariant(value);
 		if(json.isNull()) {

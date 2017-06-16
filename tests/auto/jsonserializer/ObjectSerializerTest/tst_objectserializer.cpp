@@ -632,6 +632,22 @@ void ObjectSerializerTest::generateValidTestData()
 													 })
 						   << true;
 
+	{
+		auto gc = new ChildObject(42);
+		auto c = new ChildObject(666);
+		c->child = gc;
+		gc->setParent(c);
+
+		QTest::newRow("child<child>") << TestObject::createChild(c, this)
+									  << TestObject::createJson({
+																	{"childObject", QJsonObject({
+																		 {"data", 666},
+																		 {"child", ChildObject::createJson(42)}
+																	 })}
+																})
+									  << true;
+	}
+
 	QTest::newRow("childlist") << TestObject::createChildren({new ChildObject(3), new ChildObject(7), new ChildObject(13)}, {}, this)
 							   << TestObject::createJson({
 															 {"simpleChildren", QJsonArray({
@@ -723,21 +739,23 @@ void ObjectSerializerTest::generateValidTestData()
 									   << true;
 	}
 
-	{
-		auto gc = new ChildObject(42);
-		auto c = new ChildObject(666);
-		c->child = gc;
-		gc->setParent(c);
+	QTest::newRow("jobject") << TestObject::createEmbedded(ChildObject::createJson(), QJsonArray(), QJsonValue(), this)
+							 << TestObject::createJson({
+														   {"object", ChildObject::createJson()}
+													   })
+							 << true;
 
-		QTest::newRow("child<child>") << TestObject::createChild(c, this)
-									  << TestObject::createJson({
-																	{"childObject", QJsonObject({
-																		 {"data", 666},
-																		 {"child", ChildObject::createJson(42)}
-																	 })}
-																})
-									  << true;
-	}
+	QTest::newRow("jarray") << TestObject::createEmbedded(QJsonObject(), QJsonArray({1, 2, 3}), QJsonValue(), this)
+							<< TestObject::createJson({
+														  {"array", QJsonArray({1, 2, 3})}
+													  })
+							<< true;
+
+	QTest::newRow("jvalue") << TestObject::createEmbedded(QJsonObject(), QJsonArray(), 42, this)
+							<< TestObject::createJson({
+														  {"value", 42}
+													  })
+							<< true;
 }
 
 static void compile_test()
