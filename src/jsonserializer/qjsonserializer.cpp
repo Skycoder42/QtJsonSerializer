@@ -37,6 +37,11 @@ bool QJsonSerializer::enumAsString() const
 	return d->enumAsString;
 }
 
+QJsonSerializer::ValidationFlags QJsonSerializer::validationFlags() const
+{
+	return d->validationFlags;
+}
+
 QJsonValue QJsonSerializer::serialize(const QVariant &data) const
 {
 	return serializeImpl(data);
@@ -84,6 +89,11 @@ void QJsonSerializer::setKeepObjectName(bool keepObjectName)
 void QJsonSerializer::setEnumAsString(bool enumAsString)
 {
 	d->enumAsString = enumAsString;
+}
+
+void QJsonSerializer::setValidationFlags(ValidationFlags validationFlags)
+{
+	d->validationFlags = validationFlags;
 }
 
 QJsonValue QJsonSerializer::serializeVariant(int propertyType, const QVariant &value) const
@@ -291,6 +301,10 @@ QObject *QJsonSerializer::deserializeObject(const QJsonObject &jsonObject, const
 				value = deserializeEnum(property.enumerator(), it.value());
 			else
 				value = deserializeVariant(property.userType(), it.value(), object);
+		} else if(d->validationFlags.testFlag(NoExtraProperties)) {
+			throw QJsonDeserializationException(QByteArray("Found extra property ") +
+												it.key().toUtf8() +
+												" but extra properties are not allowed");
 		} else
 			deserializeVariant(QMetaType::UnknownType, it.value(), object);
 		object->setProperty(qUtf8Printable(it.key()), value);
@@ -316,6 +330,10 @@ void QJsonSerializer::deserializeGadget(const QJsonObject &jsonObject, int typeI
 			else
 				value = deserializeVariant(property.userType(), it.value(), nullptr);
 			property.writeOnGadget(gadgetPtr, value);
+		} else if(d->validationFlags.testFlag(NoExtraProperties)) {
+			throw QJsonDeserializationException(QByteArray("Found extra property ") +
+												it.key().toUtf8() +
+												" but extra properties are not allowed");
 		}
 	}
 }
@@ -429,7 +447,8 @@ QByteArray QJsonSerializer::serializeToImpl(const QVariant &data) const
 QJsonSerializerPrivate::QJsonSerializerPrivate() :
 	allowNull(false),
 	keepObjectName(false),
-	enumAsString(false)
+	enumAsString(false),
+	validationFlags(QJsonSerializer::StandardValidation)
 {}
 
 // ------------- Startup function implementation -------------

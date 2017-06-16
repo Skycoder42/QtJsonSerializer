@@ -24,8 +24,20 @@ class Q_JSONSERIALIZER_EXPORT QJsonSerializer : public QObject
 	Q_PROPERTY(bool keepObjectName READ keepObjectName WRITE setKeepObjectName)
 	//! Specifies, whether enums should be serialized as integer or as string
 	Q_PROPERTY(bool enumAsString READ enumAsString WRITE setEnumAsString)
+	//! Specify how strictly the serializer should verify data when deserializing
+	Q_PROPERTY(ValidationFlags validationFlags READ validationFlags WRITE setValidationFlags)
 
 public:
+	//! Flags to specify how strict the serializer should validate when deserializing
+	enum ValidationFlag {
+		StandardValidation = 0x00,//!< Do not perform extra validation, only make shure types are valid and compatible
+		NoExtraProperties = 0x01,//!< Make shure the json does not contain any properties that are not in the type to deserialize it to
+		AllProperties = 0x02,//!< Make shure all properties of the type have a value in the deserialized json data
+		FullValidation = (NoExtraProperties | AllProperties)//!< Validate everything
+	};
+	Q_DECLARE_FLAGS(ValidationFlags, ValidationFlag)
+	Q_FLAG(ValidationFlags)
+
 	//! Constructor
 	explicit QJsonSerializer(QObject *parent = nullptr);
 	//! Destructor
@@ -47,6 +59,8 @@ public:
 	bool keepObjectName() const;
 	//! @readAcFn{QJsonSerializer::enumAsString}
 	bool enumAsString() const;
+	//! @readAcFn{QJsonSerializer::validationFlags}
+	ValidationFlags validationFlags() const;
 
 	//! Serializers a QVariant value to a QJsonValue
 	QJsonValue serialize(const QVariant &data) const;
@@ -89,6 +103,8 @@ public Q_SLOTS:
 	void setKeepObjectName(bool keepObjectName);
 	//! @writeAcFn{QJsonSerializer::enumAsString}
 	void setEnumAsString(bool enumAsString);
+	//! @writeAcFn{QJsonSerializer::validationFlags}
+	void setValidationFlags(ValidationFlags validationFlags);
 
 protected:
 	//! Performs the serialization of any QVariant to a json representation
@@ -130,7 +146,10 @@ private:
 	QJsonValue serializeImpl(const QVariant &data) const;
 	void serializeToImpl(QIODevice *device, const QVariant &data) const;
 	QByteArray serializeToImpl(const QVariant &data) const;
+	ValidationFlags m_validationFlags;
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(QJsonSerializer::ValidationFlags)
 
 // ------------- Generic Implementation -------------
 

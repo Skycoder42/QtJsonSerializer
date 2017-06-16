@@ -10,6 +10,7 @@ public:
 	bool allowNull;
 	bool keepObjectName;
 	bool enumAsString;
+	QJsonSerializer::ValidationFlags validationFlags;
 
 	QJsonSerializerPrivate();
 };
