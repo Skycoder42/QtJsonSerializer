@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <QtHelpProject version="1.0">
-  <namespace>de.skycoder42.qtjsonserializer.220</namespace>
+  <namespace>de.skycoder42.qtjsonserializer.221</namespace>
   <virtualFolder>doc_qtjsonserializer</virtualFolder>
-  <customFilter name="JsonSerializer 2.2.0">
+  <customFilter name="JsonSerializer 2.2.1">
     <filterAttribute>qtjsonserializer</filterAttribute>
-    <filterAttribute>2.2.0</filterAttribute>
+    <filterAttribute>2.2.1</filterAttribute>
   </customFilter>
   <filterSection>
     <filterAttribute>doxygen</filterAttribute>
     <toc>
-      <section title="QtJsonSerializer 2.2.0" ref="index.html">
+      <section title="QtJsonSerializer 2.2.1" ref="index.html">
         <section title="Features" ref="index.html#qtjsonserializer_readme_label_0" />
         <section title="Download/Installation" ref="index.html#qtjsonserializer_readme_label_1" />
         <section title="Usage" ref="index.html#qtjsonserializer_readme_label_2">
