@@ -4,4 +4,7 @@
 # $2 version
 
 myDir=$(dirname "$0")
-"$myDir/../QtModules/repogen.py" "$1" JsonSerializer "" "" "A library to perform generic seralization and deserialization of QObjects." "$2" "$myDir/LICENSE" BSD-3-Clause
+qtDir=${1?First parameter must be set to the dir to install}
+version=${2?Set the version as second parameter}
+
+"$myDir/../QtModules/deploy/repogen.py" "$qtDir" JsonSerializer "" "" "A library to perform generic seralization and deserialization of QObjects." "$version" "$myDir/LICENSE" BSD-3-Clause
