@@ -3,6 +3,10 @@ A library to perform generic seralization and deserialization of QObjects.
 
 With this small library, you are able to serialize any QObject or Q_GADGET class to JSON and back. This is done with help of Qt's meta system.
 
+[![Build Status](https://travis-ci.org/Skycoder42/QJsonSerializer.svg?branch=master)](https://travis-ci.org/Skycoder42/QJsonSerializer)
+[![Build status](https://ci.appveyor.com/api/projects/status/hj4rw0rikh8w1i4h?svg=true)](https://ci.appveyor.com/project/Skycoder42/qjsonserializer)
+
+
 ## Features
 - Serialize QObjects, Q_GADGETS, and lists of both to JSON, in a generic matter
 - ... and of course deserialize JSON back as well
