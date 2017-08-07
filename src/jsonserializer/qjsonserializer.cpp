@@ -105,7 +105,7 @@ QJsonValue QJsonSerializer::serializeVariant(int propertyType, const QVariant &v
 	} else if((propertyType == QVariant::Map) ||
 			  (convertValue.canConvert(QVariant::Map) && convertValue.convert(QVariant::Map))) {
 		return serializeMap(propertyType, value.toMap());
-	} else{
+	} else {
 		convertValue = value;
 		auto flags = QMetaType::typeFlags(propertyType);
 
@@ -118,7 +118,7 @@ QJsonValue QJsonSerializer::serializeVariant(int propertyType, const QVariant &v
 			if(object)
 				return serializeObject(object);
 			else
-				return QJsonValue::Null;
+				return QJsonValue();
 		} else
 			return serializeValue(propertyType, value);
 	}
@@ -207,7 +207,7 @@ QJsonValue QJsonSerializer::serializeEnum(const QMetaEnum &metaEnum, const QVari
 QJsonValue QJsonSerializer::serializeValue(int propertyType, const QVariant &value) const
 {
 	if(!value.isValid())
-		return QJsonValue::Null;
+		return QJsonValue();
 	else {
 		if(value.userType() == QMetaType::QJsonValue)//value needs special treatment
 			return value.value<QJsonValue>();
@@ -215,14 +215,14 @@ QJsonValue QJsonSerializer::serializeValue(int propertyType, const QVariant &val
 		auto json = QJsonValue::fromVariant(value);
 		if(json.isNull()) {
 			if(value.userType() == QMetaType::Nullptr)//std::nullptr_t is of course null
-				return QJsonValue::Null;
+				return json;
 			else if(propertyType == QMetaType::QDate ||
 			   propertyType == QMetaType::QTime ||
 			   propertyType == QMetaType::QDateTime ||
 			   value.userType() == QMetaType::QDate ||
 			   value.userType() == QMetaType::QTime ||
 			   value.userType() == QMetaType::QDateTime)
-				return QJsonValue::String;//special case date: invalid date -> empty string -> interpret as fail
+				return QString();//special case date: invalid date -> empty string -> interpreted as fail -> thus return empty string
 			else
 				throw QJsonSerializationException(QByteArray("Failed to convert type ") +
 												  value.typeName() +
