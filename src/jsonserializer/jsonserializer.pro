@@ -5,15 +5,17 @@ QT = core
 SOURCES += \
 	qjsonserializerexception.cpp \
 	qjsonserializer.cpp \
-    qjsontypeconverter.cpp
+	qjsontypeconverter.cpp
 
 HEADERS += \
 	qjsonserializerexception.h \
 	qjsonserializer.h \
-    qjsonserializer_p.h \
-    qtjsonserializer_global.h \
-    qjsonserializer_helpertypes.h \
-    qjsontypeconverter.h
+	qjsonserializer_p.h \
+	qtjsonserializer_global.h \
+	qjsonserializer_helpertypes.h \
+	qjsontypeconverter.h
+
+include(typeconverters/typeconverters.pri)
 
 load(qt_module)
 

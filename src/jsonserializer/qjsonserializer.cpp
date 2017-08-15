@@ -9,6 +9,8 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QBuffer>
 
+#include "typeconverters/qjsonlistconverter_p.h"
+
 static const QRegularExpression listTypeRegex(QStringLiteral(R"__(^QList<\s*(.*)\s*>$)__"));
 static const QRegularExpression mapTypeRegex(QStringLiteral(R"__(^QMap<\s*QString\s*,\s*(.*)\s*>$)__"));
 
@@ -18,7 +20,9 @@ Q_COREAPP_STARTUP_FUNCTION(qJsonSerializerStartup)
 QJsonSerializer::QJsonSerializer(QObject *parent) :
 	QObject(parent),
 	d(new QJsonSerializerPrivate())
-{}
+{
+	registerConverter(new QJsonListConverter());
+}
 
 QJsonSerializer::~QJsonSerializer() {}
 
@@ -76,6 +80,14 @@ QVariant QJsonSerializer::deserializeFrom(const QByteArray &data, int metaTypeId
 	return res;
 }
 
+void QJsonSerializer::registerConverter(QJsonTypeConverter *converter)
+{
+	QSharedPointer<QJsonTypeConverter> sp(converter);
+	foreach(auto jsonType, converter->jsonTypes())
+		d->typeConverters.insert(jsonType, sp);
+	d->typeConverterTypeCache.clear();
+}
+
 void QJsonSerializer::setAllowDefaultNull(bool allowDefaultNull)
 {
 	d->allowNull = allowDefaultNull;
@@ -124,31 +136,21 @@ QJsonValue QJsonSerializer::serializeVariant(int propertyType, const QVariant &v
 	else
 		return converter->serialize(propertyType, value, this);
 
-	//old implementation
-	auto convertValue = value;
-	if((propertyType == QVariant::List) ||
-	   (convertValue.canConvert(QVariant::List) && convertValue.convert(QVariant::List))) {
-		return serializeList(propertyType, value.toList());
-	} else if((propertyType == QVariant::Map) ||
-			  (convertValue.canConvert(QVariant::Map) && convertValue.convert(QVariant::Map))) {
-		return serializeMap(propertyType, value.toMap());
-	} else {
-		convertValue = value;
-		auto flags = QMetaType::typeFlags(propertyType);
+//	//old implementation
+//	auto convertValue = value;
+//	if((propertyType == QVariant::Map) ||
+//			  (convertValue.canConvert(QVariant::Map) && convertValue.convert(QVariant::Map))) {
+//		return serializeMap(propertyType, value.toMap());
+//	} else {
+//		convertValue = value;
+//		auto flags = QMetaType::typeFlags(propertyType);
 
-		if(flags.testFlag(QMetaType::IsGadget)) {
-			auto metaObject = QMetaType::metaObjectForType(propertyType);
-			return serializeGadget(value.constData(), metaObject);
-		} else if(flags.testFlag(QMetaType::PointerToQObject) ||
-				  (convertValue.canConvert(QMetaType::QObjectStar) && convertValue.convert(QMetaType::QObjectStar))) {
-			auto object = convertValue.value<QObject*>();
-			if(object)
-				return serializeObject(object);
-			else
-				return QJsonValue();
-		} else
-			return serializeValue(propertyType, value);
-	}
+//		if(flags.testFlag(QMetaType::IsGadget)) {
+//			auto metaObject = QMetaType::metaObjectForType(propertyType);
+//			return serializeGadget(value.constData(), metaObject);
+//		} else
+//			return serializeValue(propertyType, value);
+//	}
 }
 
 QJsonObject QJsonSerializer::serializeObject(const QObject *object) const
@@ -192,19 +194,6 @@ QJsonObject QJsonSerializer::serializeGadget(const void *gadget, const QMetaObje
 	}
 
 	return jsonObject;
-}
-
-QJsonArray QJsonSerializer::serializeList(int listType, const QVariantList &value) const
-{
-	auto match = listTypeRegex.match(QString::fromUtf8(QMetaType::typeName(listType)));
-	int metaType = QMetaType::UnknownType;
-	if(match.hasMatch())
-		metaType = QMetaType::type(match.captured(1).toLatin1().trimmed());
-
-	QJsonArray array;
-	foreach(auto element, value)
-		array.append(serializeVariant(metaType, element));
-	return array;
 }
 
 QJsonObject QJsonSerializer::serializeMap(int mapType, const QVariantMap &value) const
@@ -273,48 +262,11 @@ QVariant QJsonSerializer::deserializeVariant(int propertyType, const QJsonValue 
 		}
 	}
 
-	if(!converter)// use fallback method
-		return deserializeValue(propertyType, value);
-	else
-		return converter->deserialize(propertyType, value, parent, this);
-
-	//old implementation
 	QVariant variant;
-	if(propertyType == QMetaType::QJsonValue)//special case: target type is a json value!
-		variant = QVariant::fromValue(value);
-	else if(value.isArray()) {
-		if(propertyType == QMetaType::QJsonArray)//special case: target type is a json array!
-			variant = QVariant::fromValue(value.toArray());
-		else if(propertyType == QMetaType::QVariantList ||
-				listTypeRegex.match(QString::fromUtf8(QMetaType::typeName(propertyType))).hasMatch())
-			variant = deserializeList(propertyType, value.toArray(), parent);
-		else
-			variant = deserializeValue(propertyType, value);
-	} else if(value.isObject() || value.isNull()) {
-		auto flags = QMetaType::typeFlags(propertyType);
-
-		if(propertyType == QMetaType::QJsonObject)//special case: target type is a json object!
-			variant = QVariant::fromValue(value.toObject());
-		else if(propertyType == QMetaType::QVariantMap ||
-				mapTypeRegex.match(QString::fromUtf8(QMetaType::typeName(propertyType))).hasMatch())
-			variant = deserializeMap(propertyType, value.toObject(), parent);
-		else if(flags.testFlag(QMetaType::IsGadget)) {
-			if(!value.isNull()) {
-				QVariant gadget(propertyType, nullptr);
-				deserializeGadget(value.toObject(), propertyType, gadget.data());
-				variant = gadget;
-			}
-		} else if(flags.testFlag(QMetaType::PointerToQObject)) {
-			if(value.isNull())
-				variant = QVariant::fromValue<QObject*>(nullptr);
-			else {
-				auto object = deserializeObject(value.toObject(), QMetaType::metaObjectForType(propertyType), parent);
-				variant = QVariant::fromValue(object);
-			}
-		} else
-			variant = deserializeValue(propertyType, value);
-	} else
+	if(!converter)// use fallback method
 		variant = deserializeValue(propertyType, value);
+	else
+		variant = converter->deserialize(propertyType, value, parent, this);
 
 	if(propertyType != QMetaType::UnknownType) {
 		auto vType = variant.typeName();
@@ -330,6 +282,54 @@ QVariant QJsonSerializer::deserializeVariant(int propertyType, const QJsonValue 
 		}
 	} else
 		return variant;
+
+//	//old implementation
+//	QVariant variant;
+//	if(propertyType == QMetaType::QJsonValue)//special case: target type is a json value!
+//		variant = QVariant::fromValue(value);
+//	else if(value.isArray()) {
+//		if(propertyType == QMetaType::QJsonArray)//special case: target type is a json array!
+//			variant = QVariant::fromValue(value.toArray());
+//	} else if(value.isObject() || value.isNull()) {
+//		auto flags = QMetaType::typeFlags(propertyType);
+
+//		if(propertyType == QMetaType::QJsonObject)//special case: target type is a json object!
+//			variant = QVariant::fromValue(value.toObject());
+//		else if(propertyType == QMetaType::QVariantMap ||
+//				mapTypeRegex.match(QString::fromUtf8(QMetaType::typeName(propertyType))).hasMatch())
+//			variant = deserializeMap(propertyType, value.toObject(), parent);
+//		else if(flags.testFlag(QMetaType::IsGadget)) {
+//			if(!value.isNull()) {
+//				QVariant gadget(propertyType, nullptr);
+//				deserializeGadget(value.toObject(), propertyType, gadget.data());
+//				variant = gadget;
+//			}
+//		} else if(flags.testFlag(QMetaType::PointerToQObject)) {
+//			if(value.isNull())
+//				variant = QVariant::fromValue<QObject*>(nullptr);
+//			else {
+//				auto object = deserializeObject(value.toObject(), QMetaType::metaObjectForType(propertyType), parent);
+//				variant = QVariant::fromValue(object);
+//			}
+//		} else
+//			variant = deserializeValue(propertyType, value);
+//	} else
+//		variant = deserializeValue(propertyType, value);
+
+//	if(propertyType != QMetaType::UnknownType) {
+//		auto vType = variant.typeName();
+//		if(variant.canConvert(propertyType) && variant.convert(propertyType))
+//			return variant;
+//		else if(d->allowNull && value.isNull())
+//			return QVariant();
+//		else {
+//			throw QJsonDeserializationException(QByteArray("Failed to convert deserialized variant of type ") +
+//												(vType ? vType : "<unknown>") +
+//												QByteArray(" to property type ") +
+//												QMetaType::typeName(propertyType));
+//		}
+//	} else
+//		return variant;
 }
 
 QObject *QJsonSerializer::deserializeObject(const QJsonObject &jsonObject, const QMetaObject *metaObject, QObject *parent) const
@@ -423,22 +423,6 @@ void QJsonSerializer::deserializeGadget(const QJsonObject &jsonObject, int typeI
 											QByteArray(" are present in the json object. Missing properties: ") +
 											reqProps.toList().join(", "));
 	}
-}
-
-QVariantList QJsonSerializer::deserializeList(int listType, const QJsonArray &array, QObject *parent) const
-{
-	int metaType = QMetaType::UnknownType;
-	if(listType != QMetaType::UnknownType) {
-		auto match = listTypeRegex.match(QString::fromUtf8(QMetaType::typeName(listType)));
-		if(match.hasMatch())
-			metaType = QMetaType::type(match.captured(1).toLatin1().trimmed());
-	}
-
-	//generate the list
-	QVariantList list;
-	foreach(auto element, array)
-		list.append(deserializeVariant(metaType, element, parent));
-	return list;
 }
 
 QVariantMap QJsonSerializer::deserializeMap(int mapType, const QJsonObject &object, QObject *parent) const
@@ -537,6 +521,15 @@ QJsonSerializerPrivate::QJsonSerializerPrivate() :
 	enumAsString(false),
 	validationFlags(QJsonSerializer::StandardValidation)
 {}
+
+QJsonSerializerPrivate *QJsonSerializerPrivate::fromHelper(const QJsonTypeConverter::SerializationHelper *helper)
+{
+	auto jser = dynamic_cast<const QJsonSerializer*>(helper);
+	if(jser)
+		return jser->d.data();
+	else
+		return nullptr;
+}
 
 // ------------- Startup function implementation -------------
 

@@ -97,6 +97,8 @@ public:
 	template <typename T>
 	T deserializeFrom(const QByteArray &data, QObject *parent = nullptr) const;
 
+	void registerConverter(QJsonTypeConverter *converter);
+
 public Q_SLOTS:
 	//! @writeAcFn{QJsonSerializer::allowDefaultNull}
 	void setAllowDefaultNull(bool allowDefaultNull);
@@ -118,8 +120,6 @@ protected:
 	virtual QJsonObject serializeObject(const QObject *object) const;
 	//! Performs the serialization of a Q_GADGET class to a json object
 	virtual QJsonObject serializeGadget(const void *gadget, const QMetaObject *metaObject) const;
-	//! Performs the serialization of any QList to a json array
-	virtual QJsonArray serializeList(int listType, const QVariantList &value) const;
 	//! Performs the serialization of any QMap<QString, T> to a json object
 	QJsonObject serializeMap(int mapType, const QVariantMap &value) const; //MAJOR make virtual
 	//! Performs the serialization of an enum type QVariant to a json representation
@@ -133,8 +133,6 @@ protected:
 	virtual QObject *deserializeObject(const QJsonObject &jsonObject, const QMetaObject *metaObject, QObject *parent) const;
 	//! Performs the deserialization of a json object to the given Q_GADGET type
 	virtual void deserializeGadget(const QJsonObject &jsonObject, int typeId, void *gadgetPtr) const;
-	//! Performs the deserialization of any json array to a list
-	virtual QVariantList deserializeList(int listType, const QJsonArray &array, QObject *parent) const;
 	//! Performs the deserialization of any json object to a map
 	QVariantMap deserializeMap(int mapType, const QJsonObject &object, QObject *parent) const; //MAJOR make virtual
 	//! Performs the deserialization of an enum value to a variant value type
@@ -143,6 +141,7 @@ protected:
 	virtual QVariant deserializeValue(int propertyType, const QJsonValue &value) const;
 
 private:
+	friend class QJsonSerializerPrivate;
 	QScopedPointer<QJsonSerializerPrivate> d;
 
 	void writeToDevice(const QJsonValue &data, QIODevice *device) const;

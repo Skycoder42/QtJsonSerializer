@@ -90,6 +90,8 @@ void ObjectSerializerTest::testVariantConversions_data()
 	QTest::addColumn<QVariant>("data");
 	QTest::addColumn<int>("targetType");
 
+	//TODO test QStringList, QByteArrayList
+
 	QTest::newRow("QList<int>") << QVariant::fromValue<QList<int>>({3, 7, 13})
 								<< (int)QVariant::List;
 	QList<int> l1 = {0, 1, 2};
