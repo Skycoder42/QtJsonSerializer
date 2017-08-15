@@ -46,7 +46,7 @@ QJsonValue QJsonObjectConverter::serialize(int propertyType, const QVariant &val
 		for(; i < meta->propertyCount(); i++) {
 			auto property = meta->property(i);
 			if(property.isStored())
-				jsonObject[QString::fromUtf8(property.name())] = helper->serializeSubtype(property.userType(), property.read(object));
+				jsonObject[QString::fromUtf8(property.name())] = helper->serializeSubtype(property, property.read(object));
 		}
 
 		return jsonObject;
@@ -93,7 +93,7 @@ QVariant QJsonObjectConverter::deserialize(int propertyType, const QJsonValue &v
 		QVariant value;
 		if(propIndex != -1) {
 			auto property = metaObject->property(propIndex);
-			value = helper->deserializeSubtype(property.userType(), it.value(), object);
+			value = helper->deserializeSubtype(property, it.value(), object);
 			reqProps.remove(property.name());
 		} else if(d->validationFlags.testFlag(QJsonSerializer::NoExtraProperties)) {
 			throw QJsonDeserializationException("Found extra property " +

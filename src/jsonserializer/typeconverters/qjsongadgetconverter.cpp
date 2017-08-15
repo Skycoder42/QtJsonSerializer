@@ -26,7 +26,7 @@ QJsonValue QJsonGadgetConverter::serialize(int propertyType, const QVariant &val
 	for(auto i = 0; i < metaObject->propertyCount(); i++) {
 		auto property = metaObject->property(i);
 		if(property.isStored())
-			jsonObject[QString::fromUtf8(property.name())] = helper->serializeSubtype(property.userType(), property.readOnGadget(gadget));
+			jsonObject[QString::fromUtf8(property.name())] = helper->serializeSubtype(property, property.readOnGadget(gadget));
 	}
 
 	return jsonObject;
@@ -38,16 +38,12 @@ QVariant QJsonGadgetConverter::deserialize(int propertyType, const QJsonValue &v
 
 	QVariant gadget(propertyType, nullptr);
 	auto gadgetPtr = gadget.data();
-	qDebug() << "default constructed gadget:" << gadgetPtr;
 	if(!gadgetPtr)
 		throw QJsonDeserializationException(QByteArray("Failed to construct gadget of type ") + QMetaType::typeName(propertyType));
 
 	auto metaObject = QMetaType::metaObjectForType(propertyType);
 	if(!metaObject)
 		throw QJsonDeserializationException(QByteArray("Unable to get metaobject for type") + QMetaType::typeName(propertyType));
-
-//	if(!QMetaType::construct(propertyType, gadgetPtr, nullptr))
-//		throw QJsonDeserializationException(QByteArray("Failed to construct gadget of type ") + QMetaType::typeName(typeId));
 
 	auto d = QJsonSerializerPrivate::fromHelper(helper);
 	auto jsonObject = value.toObject();
@@ -67,7 +63,7 @@ QVariant QJsonGadgetConverter::deserialize(int propertyType, const QJsonValue &v
 		auto propIndex = metaObject->indexOfProperty(qUtf8Printable(it.key()));
 		if(propIndex != -1) {
 			auto property = metaObject->property(propIndex);
-			auto value = helper->deserializeSubtype(property.userType(), it.value(), nullptr);
+			auto value = helper->deserializeSubtype(property, it.value(), nullptr);
 			property.writeOnGadget(gadgetPtr, value);
 			reqProps.remove(property.name());
 		} else if(d->validationFlags.testFlag(QJsonSerializer::NoExtraProperties)) {

@@ -4,7 +4,7 @@
 #include "qtjsonserializer_global.h"
 #include "qjsontypeconverter.h"
 
-class QJsonJsonConverter : public QSimpleJsonTypeConverter
+class QJsonJsonConverter : public QSimpleJsonTypeConverter //TODO one converter per type...
 {
 public:
 	bool canConvert(int metaTypeId) const override;

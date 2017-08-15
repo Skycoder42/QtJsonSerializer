@@ -2,9 +2,9 @@
 #include "qjsonserializerexception.h"
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 9, 2)
-const QRegularExpression QJsonMapConverter::mapTypeRegex(QStringLiteral(R"__(^QMap<\s*QString\s*,\s*(.*?)\s*>$)__"));
+const QRegularExpression QJsonMapConverter::mapTypeRegex(QStringLiteral(R"__(^(?:QMap|QHash)<\s*QString\s*,\s*(.*?)\s*>$)__"));
 #else
-const QRegularExpression QJsonMapConverter::mapTypeRegex(QStringLiteral(R"__(^(?:QMap|QHash)<\s*QString\s*,\s*(.*?)\s*>|$)__"));
+const QRegularExpression QJsonMapConverter::mapTypeRegex(QStringLiteral(R"__(^QMap<\s*QString\s*,\s*(.*?)\s*>$)__"));
 #endif
 
 bool QJsonMapConverter::canConvert(int metaTypeId) const

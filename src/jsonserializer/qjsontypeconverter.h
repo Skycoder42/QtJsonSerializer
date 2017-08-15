@@ -4,6 +4,7 @@
 #include "QtJsonSerializer/qtjsonserializer_global.h"
 
 #include <QtCore/qmetatype.h>
+#include <QtCore/qmetaobject.h>
 #include <QtCore/qjsonvalue.h>
 #include <QtCore/qvariant.h>
 
@@ -15,7 +16,9 @@ public:
 	public:
 		virtual ~SerializationHelper();
 
+		virtual QJsonValue serializeSubtype(QMetaProperty property, const QVariant &value) const = 0;
 		virtual QJsonValue serializeSubtype(int propertyType, const QVariant &value) const = 0;
+		virtual QVariant deserializeSubtype(QMetaProperty property, const QJsonValue &value, QObject *parent) const = 0;
 		virtual QVariant deserializeSubtype(int propertyType, const QJsonValue &value, QObject *parent) const = 0;
 	};
 

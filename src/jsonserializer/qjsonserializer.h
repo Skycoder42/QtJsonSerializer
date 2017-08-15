@@ -111,6 +111,8 @@ public Q_SLOTS:
 
 protected:
 	//protected implementation -> internal use for the type converters
+	QJsonValue serializeSubtype(QMetaProperty property, const QVariant &value) const override;
+	QVariant deserializeSubtype(QMetaProperty property, const QJsonValue &value, QObject *parent) const override;
 	QJsonValue serializeSubtype(int propertyType, const QVariant &value) const override;
 	QVariant deserializeSubtype(int propertyType, const QJsonValue &value, QObject *parent) const override;
 
@@ -123,6 +125,9 @@ private:
 
 	QJsonValue serializeValue(int propertyType, const QVariant &value) const;
 	QVariant deserializeValue(int propertyType, const QJsonValue &value) const;
+
+	QJsonValue serializeEnum(const QMetaEnum &metaEnum, const QVariant &value) const;
+	QVariant deserializeEnum(const QMetaEnum &metaEnum, const QJsonValue &value) const;
 
 	void writeToDevice(const QJsonValue &data, QIODevice *device) const;
 	QJsonValue readFromDevice(QIODevice *device) const;

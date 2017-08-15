@@ -17,7 +17,7 @@ public:
 
 	QJsonSerializerPrivate();
 
-	static QJsonSerializerPrivate *fromHelper(const QJsonTypeConverter::SerializationHelper *helper);
+	static QJsonSerializerPrivate *fromHelper(const QJsonTypeConverter::SerializationHelper *helper);//TODO use "get property" instead
 };
 
 #endif // QJSONSERIALIZER_P_H
