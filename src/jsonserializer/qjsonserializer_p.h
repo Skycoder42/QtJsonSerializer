@@ -12,6 +12,9 @@ public:
 	bool enumAsString;
 	QJsonSerializer::ValidationFlags validationFlags;
 
+	QMultiHash<QJsonValue::Type, QSharedPointer<QJsonTypeConverter>> typeConverters;
+	mutable QHash<int, QSharedPointer<QJsonTypeConverter>> typeConverterTypeCache;
+
 	QJsonSerializerPrivate();
 };
 

@@ -96,8 +96,35 @@ void QJsonSerializer::setValidationFlags(ValidationFlags validationFlags)
 	d->validationFlags = validationFlags;
 }
 
+QJsonValue QJsonSerializer::serializeSubtype(int propertyType, const QVariant &value) const
+{
+	return serializeVariant(propertyType, value);
+}
+
+QVariant QJsonSerializer::deserializeSubtype(int propertyType, const QJsonValue &value, QObject *parent) const
+{
+	return deserializeVariant(propertyType, value, parent);
+}
+
 QJsonValue QJsonSerializer::serializeVariant(int propertyType, const QVariant &value) const
 {
+	auto converter = d->typeConverterTypeCache.value(propertyType, nullptr);
+	if(!converter){
+		foreach(auto c, d->typeConverters) {
+			if(c && c->canConvert(propertyType)) {
+				converter = c;
+				d->typeConverterTypeCache.insert(propertyType, converter);
+				break;
+			}
+		}
+	}
+
+	if(!converter)// use fallback method
+		return serializeValue(propertyType, value);
+	else
+		return converter->serialize(propertyType, value, this);
+
+	//old implementation
 	auto convertValue = value;
 	if((propertyType == QVariant::List) ||
 	   (convertValue.canConvert(QVariant::List) && convertValue.convert(QVariant::List))) {
@@ -235,6 +262,23 @@ QJsonValue QJsonSerializer::serializeValue(int propertyType, const QVariant &val
 
 QVariant QJsonSerializer::deserializeVariant(int propertyType, const QJsonValue &value, QObject *parent) const
 {
+	auto converter = d->typeConverterTypeCache.value(propertyType, nullptr);
+	if(!converter || !converter->jsonTypes().contains(value.type())){
+		foreach(auto c, d->typeConverters.values(value.type())) {
+			if(c && c->canConvert(propertyType)) {
+				converter = c;
+				d->typeConverterTypeCache.insert(propertyType, converter);
+				break;
+			}
+		}
+	}
+
+	if(!converter)// use fallback method
+		return deserializeValue(propertyType, value);
+	else
+		return converter->deserialize(propertyType, value, parent, this);
+
+	//old implementation
 	QVariant variant;
 	if(propertyType == QMetaType::QJsonValue)//special case: target type is a json value!
 		variant = QVariant::fromValue(value);

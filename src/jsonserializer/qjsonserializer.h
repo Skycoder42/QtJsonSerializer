@@ -4,6 +4,7 @@
 #include "QtJsonSerializer/qtjsonserializer_global.h"
 #include "QtJsonSerializer/qjsonserializerexception.h"
 #include "QtJsonSerializer/qjsonserializer_helpertypes.h"
+#include "QtJsonSerializer/qjsontypeconverter.h"
 
 #include <QtCore/qjsonobject.h>
 #include <QtCore/qjsonarray.h>
@@ -14,7 +15,7 @@
 
 class QJsonSerializerPrivate;
 //! A class to serializer and deserializer QObjects and Q_GADGETS to and from JSON
-class Q_JSONSERIALIZER_EXPORT QJsonSerializer : public QObject
+class Q_JSONSERIALIZER_EXPORT QJsonSerializer : public QObject, protected QJsonTypeConverter::SerializationHelper
 {
 	Q_OBJECT
 
@@ -107,6 +108,10 @@ public Q_SLOTS:
 	void setValidationFlags(ValidationFlags validationFlags);
 
 protected:
+	//protected implementation -> internal use for the type converters
+	QJsonValue serializeSubtype(int propertyType, const QVariant &value) const override;
+	QVariant deserializeSubtype(int propertyType, const QJsonValue &value, QObject *parent) const override;
+
 	//! Performs the serialization of any QVariant to a json representation
 	virtual QJsonValue serializeVariant(int propertyType, const QVariant &value) const;
 	//! Performs the serialization of a QObject class to a json object
