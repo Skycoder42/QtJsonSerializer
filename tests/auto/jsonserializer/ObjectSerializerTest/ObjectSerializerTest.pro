@@ -6,6 +6,8 @@ CONFIG   -= app_bundle
 
 TARGET = tst_objectserializer
 
+DEFINES -= QT_ASCII_CAST_WARNINGS
+
 SOURCES += \
 	testobject.cpp \
 	brokentestobject.cpp \
