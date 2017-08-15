@@ -12,6 +12,7 @@
 #include "typeconverters/qjsongadgetconverter_p.h"
 #include "typeconverters/qjsonmapconverter_p.h"
 #include "typeconverters/qjsonlistconverter_p.h"
+#include "typeconverters/qjsonenumconverter_p.h"
 
 static void qJsonSerializerStartup();
 Q_COREAPP_STARTUP_FUNCTION(qJsonSerializerStartup)
@@ -24,6 +25,7 @@ QJsonSerializer::QJsonSerializer(QObject *parent) :
 	registerConverter(new QJsonGadgetConverter());
 	registerConverter(new QJsonMapConverter());
 	registerConverter(new QJsonListConverter());
+	registerConverter(new QJsonEnumConverter());
 }
 
 QJsonSerializer::~QJsonSerializer() {}
@@ -139,46 +141,6 @@ QJsonValue QJsonSerializer::serializeVariant(int propertyType, const QVariant &v
 		return converter->serialize(propertyType, value, this);
 }
 
-QJsonValue QJsonSerializer::serializeEnum(const QMetaEnum &metaEnum, const QVariant &value) const
-{
-	if(d->enumAsString) {
-		if(metaEnum.isFlag())
-			return QString::fromUtf8(metaEnum.valueToKeys(value.toInt()));
-		else
-			return QString::fromUtf8(metaEnum.valueToKey(value.toInt()));
-	} else
-		return value.toInt();
-}
-
-QJsonValue QJsonSerializer::serializeValue(int propertyType, const QVariant &value) const
-{
-	if(!value.isValid())
-		return QJsonValue();
-	else {
-		if(value.userType() == QMetaType::QJsonValue)//value needs special treatment
-			return value.value<QJsonValue>();
-
-		auto json = QJsonValue::fromVariant(value);
-		if(json.isNull()) {
-			if(value.userType() == QMetaType::Nullptr)//std::nullptr_t is of course null
-				return json;
-			else if(propertyType == QMetaType::QDate ||
-			   propertyType == QMetaType::QTime ||
-			   propertyType == QMetaType::QDateTime ||
-			   value.userType() == QMetaType::QDate ||
-			   value.userType() == QMetaType::QTime ||
-			   value.userType() == QMetaType::QDateTime)
-				return QString();//special case date: invalid date -> empty string -> interpreted as fail -> thus return empty string
-			else
-				throw QJsonSerializationException(QByteArray("Failed to convert type ") +
-												  value.typeName() +
-												  QByteArray(" to a JSON representation"));
-		}
-		else
-			return json;
-	}
-}
-
 QVariant QJsonSerializer::deserializeVariant(int propertyType, const QJsonValue &value, QObject *parent) const
 {
 	auto converter = d->typeConverterTypeCache.value(propertyType, nullptr);
@@ -231,23 +193,33 @@ QVariant QJsonSerializer::deserializeVariant(int propertyType, const QJsonValue 
 //		variant = deserializeValue(propertyType, value);
 }
 
-QVariant QJsonSerializer::deserializeEnum(const QMetaEnum &metaEnum, const QJsonValue &value) const
+QJsonValue QJsonSerializer::serializeValue(int propertyType, const QVariant &value) const
 {
-	if(value.isString()) {
-		auto result = -1;
-		auto ok = false;
-		if(metaEnum.isFlag())
-			result = metaEnum.keysToValue(qUtf8Printable(value.toString()), &ok);
+	if(!value.isValid())
+		return QJsonValue();
+	else {
+		if(value.userType() == QMetaType::QJsonValue)//value needs special treatment
+			return value.value<QJsonValue>();
+
+		auto json = QJsonValue::fromVariant(value);
+		if(json.isNull()) {
+			if(value.userType() == QMetaType::Nullptr)//std::nullptr_t is of course null
+				return json;
+			else if(propertyType == QMetaType::QDate ||
+			   propertyType == QMetaType::QTime ||
+			   propertyType == QMetaType::QDateTime ||
+			   value.userType() == QMetaType::QDate ||
+			   value.userType() == QMetaType::QTime ||
+			   value.userType() == QMetaType::QDateTime)
+				return QString();//special case date: invalid date -> empty string -> interpreted as fail -> thus return empty string
+			else
+				throw QJsonSerializationException(QByteArray("Failed to convert type ") +
+												  value.typeName() +
+												  QByteArray(" to a JSON representation"));
+		}
 		else
-			result = metaEnum.keyToValue(qUtf8Printable(value.toString()), &ok);
-		if(ok)
-			return result;
-		else if(metaEnum.isFlag() && value.toString().isEmpty())
-			return 0x00;
-		else
-			throw QJsonDeserializationException("Invalid value for enum type found: " + value.toString().toUtf8());
-	} else
-		return value.toInt();
+			return json;
+	}
 }
 
 QVariant QJsonSerializer::deserializeValue(int propertyType, const QJsonValue &value) const

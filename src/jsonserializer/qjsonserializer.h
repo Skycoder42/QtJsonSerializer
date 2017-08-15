@@ -114,23 +114,15 @@ protected:
 	QJsonValue serializeSubtype(int propertyType, const QVariant &value) const override;
 	QVariant deserializeSubtype(int propertyType, const QJsonValue &value, QObject *parent) const override;
 
-	//! Performs the serialization of any QVariant to a json representation
-	virtual QJsonValue serializeVariant(int propertyType, const QVariant &value) const;
-	//! Performs the serialization of an enum type QVariant to a json representation
-	virtual QJsonValue serializeEnum(const QMetaEnum &metaEnum, const QVariant &value) const;
-	//! Performs the serialization of a value type QVariant to a json representation
-	virtual QJsonValue serializeValue(int propertyType, const QVariant &value) const;
-
-	//! Performs the deserialization of any json to a QVariant of the given type
-	virtual QVariant deserializeVariant(int propertyType, const QJsonValue &value, QObject *parent) const;
-	//! Performs the deserialization of an enum value to a variant value type
-	virtual QVariant deserializeEnum(const QMetaEnum &metaEnum, const QJsonValue &value) const;
-	//! Performs the deserialization of a json value to a variant value type
-	virtual QVariant deserializeValue(int propertyType, const QJsonValue &value) const;
-
 private:
 	friend class QJsonSerializerPrivate;
 	QScopedPointer<QJsonSerializerPrivate> d;
+
+	QJsonValue serializeVariant(int propertyType, const QVariant &value) const;
+	QVariant deserializeVariant(int propertyType, const QJsonValue &value, QObject *parent) const;
+
+	QJsonValue serializeValue(int propertyType, const QVariant &value) const;
+	QVariant deserializeValue(int propertyType, const QJsonValue &value) const;
 
 	void writeToDevice(const QJsonValue &data, QIODevice *device) const;
 	QJsonValue readFromDevice(QIODevice *device) const;
