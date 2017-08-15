@@ -59,70 +59,69 @@ QVariant QJsonObjectConverter::deserialize(int propertyType, const QJsonValue &v
 {
 	if(value.isNull())
 		return QVariant::fromValue<QObject*>(nullptr);
+
+	auto d = QJsonSerializerPrivate::fromHelper(helper);
+	auto metaObject = QMetaType::metaObjectForType(propertyType);
+	if(!metaObject)
+		throw QJsonDeserializationException(QByteArray("Unable to get metaobject for type") + QMetaType::typeName(propertyType));
+
+	//try to construct the object
+	auto object = metaObject->newInstance(Q_ARG(QObject*, parent));
+	if(!object) {
+		throw QJsonDeserializationException(QByteArray("Failed to construct object of type ") +
+											metaObject->className() +
+											QByteArray(" (Does the constructor \"Q_INVOKABLE class(QObject*);\" exist?)"));
+	}
+
+	//collect required properties, if set
+	QSet<QByteArray> reqProps;
+	if(d->validationFlags.testFlag(QJsonSerializer::AllProperties)) {
+		auto i = QObject::staticMetaObject.indexOfProperty("objectName");
+		if(!d->keepObjectName)
+		   i++;
+		for(; i < metaObject->propertyCount(); i++) {
+			auto property = metaObject->property(i);
+			if(property.isStored())
+				reqProps.insert(property.name());
+		}
+	}
+
+	//now deserialize all json properties
+	auto jsonObject = value.toObject();
+	for(auto it = jsonObject.constBegin(); it != jsonObject.constEnd(); it++) {
+		auto propIndex = metaObject->indexOfProperty(qUtf8Printable(it.key()));
+		QVariant value;
+		if(propIndex != -1) {
+			auto property = metaObject->property(propIndex);
+			value = helper->deserializeSubtype(property.userType(), it.value(), object);
+			reqProps.remove(property.name());
+		} else if(d->validationFlags.testFlag(QJsonSerializer::NoExtraProperties)) {
+			throw QJsonDeserializationException("Found extra property " +
+												it.key().toUtf8() +
+												" but extra properties are not allowed");
+		} else
+			value = helper->deserializeSubtype(QMetaType::UnknownType, it.value(), object);
+		object->setProperty(qUtf8Printable(it.key()), value);
+	}
+
+	//make shure all required properties have been read
+	if(d->validationFlags.testFlag(QJsonSerializer::AllProperties) && !reqProps.isEmpty()) {
+		throw QJsonDeserializationException(QByteArray("Not all properties for ") +
+											metaObject->className() +
+											QByteArray(" are present in the json object Missing properties: ") +
+											reqProps.toList().join(", "));
+	}
+
+	auto flags = QMetaType::typeFlags(propertyType);
+	if(flags.testFlag(QMetaType::PointerToQObject))
+		return QVariant::fromValue(object);
+	else if(flags.testFlag(QMetaType::SharedPointerToQObject))
+		return QVariant::fromValue(QSharedPointer<QObject>(object));
+	else if(flags.testFlag(QMetaType::TrackingPointerToQObject))
+		return QVariant::fromValue<QPointer<QObject>>(object);
 	else {
-		auto d = QJsonSerializerPrivate::fromHelper(helper);
-		auto metaObject = QMetaType::metaObjectForType(propertyType);
-		if(!metaObject)
-			throw QJsonDeserializationException(QByteArray("Unable to get metaobject for type") + QMetaType::typeName(propertyType));
-
-		//try to construct the object
-		auto object = metaObject->newInstance(Q_ARG(QObject*, parent));
-		if(!object) {
-			throw QJsonDeserializationException(QByteArray("Failed to construct object of type ") +
-												metaObject->className() +
-												QByteArray(" (Does the constructor \"Q_INVOKABLE class(QObject*);\" exist?)"));
-		}
-
-		//collect required properties, if set
-		QSet<QByteArray> reqProps;
-		if(d->validationFlags.testFlag(QJsonSerializer::AllProperties)) {
-			auto i = QObject::staticMetaObject.indexOfProperty("objectName");
-			if(!d->keepObjectName)
-			   i++;
-			for(; i < metaObject->propertyCount(); i++) {
-				auto property = metaObject->property(i);
-				if(property.isStored())
-					reqProps.insert(property.name());
-			}
-		}
-
-		//now deserialize all json properties
-		auto jsonObject = value.toObject();
-		for(auto it = jsonObject.constBegin(); it != jsonObject.constEnd(); it++) {
-			auto propIndex = metaObject->indexOfProperty(qUtf8Printable(it.key()));
-			QVariant value;
-			if(propIndex != -1) {
-				auto property = metaObject->property(propIndex);
-				value = helper->deserializeSubtype(property.userType(), it.value(), object);
-				reqProps.remove(property.name());
-			} else if(d->validationFlags.testFlag(QJsonSerializer::NoExtraProperties)) {
-				throw QJsonDeserializationException("Found extra property " +
-													it.key().toUtf8() +
-													" but extra properties are not allowed");
-			} else
-				value = helper->deserializeSubtype(QMetaType::UnknownType, it.value(), object);
-			object->setProperty(qUtf8Printable(it.key()), value);
-		}
-
-		//make shure all required properties have been read
-		if(d->validationFlags.testFlag(QJsonSerializer::AllProperties) && !reqProps.isEmpty()) {
-			throw QJsonDeserializationException(QByteArray("Not all properties for ") +
-												metaObject->className() +
-												QByteArray(" are present in the json object Missing properties: ") +
-												reqProps.toList().join(", "));
-		}
-
-		auto flags = QMetaType::typeFlags(propertyType);
-		if(flags.testFlag(QMetaType::PointerToQObject))
-			return QVariant::fromValue(object);
-		else if(flags.testFlag(QMetaType::SharedPointerToQObject))
-			return QVariant::fromValue(QSharedPointer<QObject>(object));
-		else if(flags.testFlag(QMetaType::TrackingPointerToQObject))
-			return QVariant::fromValue<QPointer<QObject>>(object);
-		else {
-			Q_UNREACHABLE();
-			return QVariant();
-		}
+		Q_UNREACHABLE();
+		return QVariant();
 	}
 }
 

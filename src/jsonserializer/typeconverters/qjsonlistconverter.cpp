@@ -1,7 +1,7 @@
 #include "qjsonlistconverter_p.h"
 #include "qjsonserializerexception.h"
 
-const QRegularExpression QJsonListConverter::listTypeRegex(QStringLiteral(R"__(^QList<\s*(.*)\s*>$)__"));
+const QRegularExpression QJsonListConverter::listTypeRegex(QStringLiteral(R"__(^QList<\s*(.*?)\s*>$)__"));
 
 bool QJsonListConverter::canConvert(int metaTypeId) const
 {
@@ -24,7 +24,7 @@ QJsonValue QJsonListConverter::serialize(int propertyType, const QVariant &value
 	if(!cValue.convert(QVariant::List)) {
 		throw QJsonSerializationException(QByteArray("Failed to convert type ") +
 										  QMetaType::typeName(propertyType) +
-										  QByteArray(" to a variant list"));
+										  QByteArray(" to a variant list. Make shure to register list types via QJsonSerializer::registerListConverters"));
 	}
 
 	QJsonArray array;
