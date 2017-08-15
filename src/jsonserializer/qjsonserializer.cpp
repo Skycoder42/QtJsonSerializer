@@ -13,6 +13,7 @@
 #include "typeconverters/qjsonmapconverter_p.h"
 #include "typeconverters/qjsonlistconverter_p.h"
 #include "typeconverters/qjsonenumconverter_p.h"
+#include "typeconverters/qjsonjsonconverter_p.h"
 
 static void qJsonSerializerStartup();
 Q_COREAPP_STARTUP_FUNCTION(qJsonSerializerStartup)
@@ -26,6 +27,7 @@ QJsonSerializer::QJsonSerializer(QObject *parent) :
 	registerConverter(new QJsonMapConverter());
 	registerConverter(new QJsonListConverter());
 	registerConverter(new QJsonEnumConverter());
+	registerConverter(new QJsonJsonConverter());
 }
 
 QJsonSerializer::~QJsonSerializer() {}
@@ -174,23 +176,6 @@ QVariant QJsonSerializer::deserializeVariant(int propertyType, const QJsonValue 
 		}
 	} else
 		return variant;
-
-//	//old implementation
-//	QVariant variant;
-//	if(propertyType == QMetaType::QJsonValue)//special case: target type is a json value!
-//		variant = QVariant::fromValue(value);
-//	else if(value.isArray()) {
-//		if(propertyType == QMetaType::QJsonArray)//special case: target type is a json array!
-//			variant = QVariant::fromValue(value.toArray());
-//	} else if(value.isObject() || value.isNull()) {
-//		auto flags = QMetaType::typeFlags(propertyType);
-
-//		if(propertyType == QMetaType::QJsonObject)//special case: target type is a json object!
-//			variant = QVariant::fromValue(value.toObject());
-//		else
-//			variant = deserializeValue(propertyType, value);
-//	} else
-//		variant = deserializeValue(propertyType, value);
 }
 
 QJsonValue QJsonSerializer::serializeValue(int propertyType, const QVariant &value) const
