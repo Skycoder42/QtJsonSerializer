@@ -14,7 +14,7 @@ bool QJsonObjectConverter::canConvert(int metaTypeId) const
 	auto flags = QMetaType::typeFlags(metaTypeId);
 	return flags.testFlag(QMetaType::PointerToQObject) ||
 			flags.testFlag(QMetaType::SharedPointerToQObject) ||//weak ptr cannot be constructed
-			flags.testFlag(QMetaType::TrackingPointerToQObject);//TODO test all types
+			flags.testFlag(QMetaType::TrackingPointerToQObject);
 }
 
 QList<QJsonValue::Type> QJsonObjectConverter::jsonTypes() const
@@ -39,7 +39,7 @@ QJsonValue QJsonObjectConverter::serialize(int propertyType, const QVariant &val
 	  Q_UNREACHABLE();
 
 	if(object) {
-		auto meta = object->metaObject();//TODO use type metaobject instead
+		auto meta = getMetaObject(propertyType);
 		auto keepObjectName = helper->getProperty("keepObjectName").toBool();
 
 		QJsonObject jsonObject;

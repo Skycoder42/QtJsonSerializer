@@ -211,7 +211,7 @@ void ObjectSerializerTest::testSerialization()
 		if(works)
 			QCOMPARE(serializer->serialize(object), result);
 		else
-			QVERIFY_EXCEPTION_THROWN(serializer->serialize(object), QJsonSerializerException);
+			QVERIFY_EXCEPTION_THROWN(serializer->serialize((BrokenTestObject*)object), QJsonSerializerException);
 	} catch(QException &e) {
 		QFAIL(e.what());
 	}
