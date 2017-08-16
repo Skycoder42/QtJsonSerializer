@@ -281,10 +281,15 @@ QVariant QJsonSerializer::deserializeEnum(const QMetaEnum &metaEnum, const QJson
 			throw QJsonDeserializationException("Invalid value for enum type found: " + value.toString().toUtf8());
 	} else {
 		auto intValue = value.toInt();
-		if(value.toDouble() == (double)intValue)
-			return intValue;//TODO validate enum value
-		else
-			throw QJsonDeserializationException("Invalid value (double) for enum type found: " + QByteArray::number(value.toDouble()));
+		if(value.toDouble() != (double)intValue) {
+			throw QJsonDeserializationException("Invalid value (double) for enum type found: " +
+												QByteArray::number(value.toDouble()));
+		}
+		if(!metaEnum.isFlag() && metaEnum.valueToKey(intValue) == nullptr) {
+			throw QJsonDeserializationException("Invalid integer value. Not a valid enum element: " +
+												QByteArray::number(intValue));
+		}
+		return intValue;
 	}
 }
 
