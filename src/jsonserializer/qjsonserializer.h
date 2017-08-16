@@ -53,6 +53,8 @@ public:
 	//! Registers a custom type for list and map converisons
 	template<typename T>
 	static bool registerAllConverters();
+	template<typename T>
+	static bool registerPointerConverters();
 
 	//! @readAcFn{QJsonSerializer::allowDefaultNull}
 	bool allowDefaultNull() const;
@@ -207,6 +209,18 @@ bool QJsonSerializer::registerAllConverters()
 {
 	auto ok1 = registerListConverters<T>();
 	auto ok2 = registerMapConverters<T>();
+	return ok1 && ok2;
+}
+
+template<typename T>
+bool QJsonSerializer::registerPointerConverters()
+{
+	auto ok1 = QMetaType::registerConverter<QSharedPointer<QObject>, QSharedPointer<T>>([](const QSharedPointer<QObject> &object) -> QSharedPointer<T> {
+		return object.objectCast<T>();
+	});
+	auto ok2 = QMetaType::registerConverter<QPointer<QObject>, QPointer<T>>([](const QPointer<QObject> &object) -> QPointer<T> {
+		return qobject_cast<T*>(object.data());
+	});
 	return ok1 && ok2;
 }
 

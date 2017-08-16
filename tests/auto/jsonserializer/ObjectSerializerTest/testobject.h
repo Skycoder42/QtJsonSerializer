@@ -7,6 +7,8 @@
 #include <QFlags>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QSharedPointer>
+#include <QPointer>
 
 class ChildObject : public QObject
 {
@@ -46,6 +48,8 @@ class TestObject : public QObject
 	Q_PROPERTY(QMap<QString, QMap<QString, int>> leveledMap MEMBER leveledMap)
 
 	Q_PROPERTY(ChildObject* childObject MEMBER childObject)
+	Q_PROPERTY(QSharedPointer<ChildObject> sharedChildObject MEMBER sharedChildObject)
+	Q_PROPERTY(QPointer<ChildObject> trackedChildObject MEMBER trackedChildObject)
 
 	Q_PROPERTY(QList<ChildObject*> simpleChildren MEMBER simpleChildren)
 	Q_PROPERTY(QList<QList<ChildObject*>> leveledChildren MEMBER leveledChildren)
@@ -105,6 +109,8 @@ public:
 	QMap<QString, QMap<QString, int>> leveledMap;
 
 	ChildObject* childObject;
+	QSharedPointer<ChildObject> sharedChildObject;
+	QPointer<ChildObject> trackedChildObject;
 
 	QList<ChildObject*> simpleChildren;
 	QList<QList<ChildObject*>> leveledChildren;

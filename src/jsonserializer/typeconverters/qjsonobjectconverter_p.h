@@ -13,8 +13,7 @@ public:
 	QVariant deserialize(int propertyType, const QJsonValue &value, QObject *parent, const SerializationHelper *helper) const override;
 
 private:
-	template <typename T>
-	static T extract(QVariant variant);
+	static QVariant toVariant(QObject *object, QMetaType::TypeFlags flags);
 };
 
 #endif // QJSONOBJECTCONVERTER_P_H
