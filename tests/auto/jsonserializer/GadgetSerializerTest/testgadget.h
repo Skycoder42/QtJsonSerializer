@@ -43,6 +43,10 @@ struct TestGadget
 	Q_PROPERTY(QMap<QString, int> simpleMap MEMBER simpleMap)
 	Q_PROPERTY(QMap<QString, QMap<QString, int>> leveledMap MEMBER leveledMap)
 
+	Q_PROPERTY(QPair<int, QString> pair MEMBER pair)
+	Q_PROPERTY(QPair<ChildGadget, QList<int>> extraPair MEMBER extraPair)
+	Q_PROPERTY(QList<QPair<bool, bool>> listPair MEMBER listPair)
+
 	Q_PROPERTY(ChildGadget childGadget MEMBER childGadget)
 
 	Q_PROPERTY(QList<ChildGadget> simpleChildren MEMBER simpleChildren)
@@ -82,6 +86,7 @@ public:
 	static TestGadget createEnum(NormalEnum normalEnumProperty, EnumFlags enumFlagsProperty);
 	static TestGadget createList(QList<int> simpleList, QList<QList<int>> leveledList);
 	static TestGadget createMap(QMap<QString, int> simpleMap, QMap<QString, QMap<QString, int>> leveledMap);
+	static TestGadget createPair(QPair<int, QString> pair, QPair<ChildGadget, QList<int>> extraPair, QList<QPair<bool, bool>> listPair);
 	static TestGadget createChild(ChildGadget childGadget);
 	static TestGadget createChildren(QList<ChildGadget> simpleChildren, QList<QList<ChildGadget>> leveledChildren);
 	static TestGadget createRelatives(QMap<QString, ChildGadget> simpleRelatives, QMap<QString, QMap<QString, ChildGadget>> leveledRelatives);
@@ -102,6 +107,10 @@ public:
 
 	QMap<QString, int> simpleMap;
 	QMap<QString, QMap<QString, int>> leveledMap;
+
+	QPair<int, QString> pair;
+	QPair<ChildGadget, QList<int>> extraPair;
+	QList<QPair<bool, bool>> listPair;
 
 	ChildGadget childGadget;
 

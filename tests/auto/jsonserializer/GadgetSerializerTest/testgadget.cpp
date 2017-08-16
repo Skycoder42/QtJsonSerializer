@@ -14,6 +14,9 @@ TestGadget::TestGadget() :
 	leveledList(),
 	simpleMap(),
 	leveledMap(),
+	pair(),
+	extraPair(),
+	listPair(),
 	childGadget(),
 	simpleChildren(),
 	leveledChildren(),
@@ -36,6 +39,9 @@ bool TestGadget::operator==(const TestGadget &other) const
 			leveledList == other.leveledList &&
 			simpleMap == other.simpleMap &&
 			leveledMap == other.leveledMap &&
+			pair == other.pair &&
+			extraPair == other.extraPair &&
+			listPair == other.listPair &&
 			childGadget == other.childGadget &&
 			simpleChildren == other.simpleChildren &&
 			leveledChildren == other.leveledChildren &&
@@ -58,6 +64,9 @@ bool TestGadget::operator!=(const TestGadget &other) const
 			leveledList != other.leveledList ||
 			simpleMap != other.simpleMap ||
 			leveledMap != other.leveledMap ||
+			pair != other.pair ||
+			extraPair != other.extraPair ||
+			listPair != other.listPair ||
 			childGadget != other.childGadget ||
 			simpleChildren != other.simpleChildren ||
 			leveledChildren != other.leveledChildren ||
@@ -117,6 +126,15 @@ TestGadget TestGadget::createMap(QMap<QString, int> simpleMap, QMap<QString, QMa
 	return t;
 }
 
+TestGadget TestGadget::createPair(QPair<int, QString> pair, QPair<ChildGadget, QList<int> > extraPair, QList<QPair<bool, bool> > listPair)
+{
+	TestGadget t;
+	t.pair = pair;
+	t.extraPair = extraPair;
+	t.listPair = listPair;
+	return t;
+}
+
 TestGadget TestGadget::createChild(ChildGadget childGadget)
 {
 	TestGadget t;
@@ -162,6 +180,11 @@ QJsonObject TestGadget::createJson(const QJsonObject &delta, const QString &rmKe
 								{"leveledList", QJsonArray()},
 								{"simpleMap", QJsonObject()},
 								{"leveledMap", QJsonObject()},
+								{"pair", QJsonArray({0, QString()})},
+								{"extraPair", QJsonArray({ChildGadget::createJson(), QJsonArray()})},
+								{"listPair", QJsonArray()},
+								{"simpleList", QJsonArray()},
+								{"simpleList", QJsonArray()},
 								{"childGadget", ChildGadget::createJson()},
 								{"simpleChildren", QJsonArray()},
 								{"leveledChildren", QJsonArray()},

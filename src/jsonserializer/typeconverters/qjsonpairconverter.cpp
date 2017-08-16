@@ -42,7 +42,7 @@ QVariant QJsonPairConverter::deserialize(int propertyType, const QJsonValue &val
 
 	QPair<QVariant, QVariant> vPair;
 	vPair.first = helper->deserializeSubtype(types.first, array[0], parent);
-	vPair.first = helper->deserializeSubtype(types.second, array[1], parent);
+	vPair.second = helper->deserializeSubtype(types.second, array[1], parent);
 	return QVariant::fromValue(vPair);
 }
 

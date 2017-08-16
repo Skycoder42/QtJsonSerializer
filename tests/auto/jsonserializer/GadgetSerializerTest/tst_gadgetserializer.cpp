@@ -62,6 +62,9 @@ void GadgetSerializerTest::initTestCase()
 
 	QJsonSerializer::registerAllConverters<TestGadget>();
 
+	QJsonSerializer::registerPairConverters<ChildGadget, QList<int>>();
+	QJsonSerializer::registerListConverters<QPair<bool, bool>>();
+
 	//register list comparators, needed for test only!
 	QMetaType::registerComparators<QList<int>>();
 	QMetaType::registerComparators<QList<QList<int>>>();
@@ -78,6 +81,8 @@ void GadgetSerializerTest::initTestCase()
 	QMetaType::registerComparators<QList<TestGadget>>();
 
 	QMetaType::registerComparators<QPair<int, QString>>();
+	QMetaType::registerComparators<QPair<ChildGadget, QList<int>>>();
+	QMetaType::registerComparators<QList<QPair<bool, bool>>>();
 
 	serializer = new QJsonSerializer(this);
 }
@@ -169,7 +174,13 @@ void GadgetSerializerTest::testVariantConversions_data()
 															   << (int)QVariant::Map;
 
 	QTest::newRow("QPair<int, QString>") << QVariant::fromValue<QPair<int, QString>>({42, "baum"})
-										<< qMetaTypeId<QPair<QVariant, QVariant>>();
+										 << qMetaTypeId<QPair<QVariant, QVariant>>();
+
+	QTest::newRow("QPair<ChildGadget, QList<int>>") << QVariant::fromValue<QPair<ChildGadget, QList<int>>>({ChildGadget(), {1, 2, 3}})
+													<< qMetaTypeId<QPair<QVariant, QVariant>>();
+
+	QTest::newRow("QList<QPair<bool, bool>>") << QVariant::fromValue<QList<QPair<bool, bool>>>({{false, true}, {true, false}})
+											  << (int)QVariant::List;
 }
 
 void GadgetSerializerTest::testVariantConversions()
@@ -227,6 +238,7 @@ void GadgetSerializerTest::testDeserialization()
 	QFETCH(TestGadget, gadget);
 
 	try {
+		auto t1 = serializer->deserialize<TestGadget>(data);
 		QCOMPARE(serializer->deserialize<TestGadget>(data), gadget);
 	} catch(QException &e) {
 		QFAIL(e.what());
@@ -581,6 +593,19 @@ void GadgetSerializerTest::generateValidTestData()
 																 })}
 															});
 	}
+
+	QTest::newRow("pair") << TestGadget::createPair({42, "baum"}, {}, {})
+						  << TestGadget::createJson({
+														{"pair", QJsonArray({42, "baum"})}
+													});
+	QTest::newRow("extraPair") << TestGadget::createPair({}, {ChildGadget(42), {6, 6, 666}}, {})
+							   << TestGadget::createJson({
+															 {"extraPair", QJsonArray({ChildGadget::createJson(42), QJsonArray({6, 6, 666})})}
+														 });
+	QTest::newRow("listPair") << TestGadget::createPair({}, {}, {{true, false}, {false, true}})
+							  << TestGadget::createJson({
+															{"listPair", QJsonArray({QJsonArray({true, false}), QJsonArray({false, true})})}
+														});
 
 	QTest::newRow("child") << TestGadget::createChild(ChildGadget(77))
 						   << TestGadget::createJson({
