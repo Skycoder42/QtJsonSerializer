@@ -16,8 +16,6 @@ public:
 	mutable QHash<int, QSharedPointer<QJsonTypeConverter>> typeConverterTypeCache;
 
 	QJsonSerializerPrivate();
-
-	static QJsonSerializerPrivate *fromHelper(const QJsonTypeConverter::SerializationHelper *helper);//TODO use "get property" instead
 };
 
 #endif // QJSONSERIALIZER_P_H

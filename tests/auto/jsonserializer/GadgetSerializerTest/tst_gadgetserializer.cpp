@@ -192,7 +192,6 @@ void GadgetSerializerTest::testSerialization()
 	QFETCH(QJsonObject, result);
 
 	try {
-		qDebug() << result;
 		QCOMPARE(serializer->serialize(gadget), result);
 	} catch(QException &e) {
 		QFAIL(e.what());

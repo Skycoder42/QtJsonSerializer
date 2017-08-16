@@ -114,6 +114,11 @@ void QJsonSerializer::setValidationFlags(ValidationFlags validationFlags)
 	d->validationFlags = validationFlags;
 }
 
+QVariant QJsonSerializer::getProperty(const char *name) const
+{
+	return property(name);
+}
+
 QJsonValue QJsonSerializer::serializeSubtype(QMetaProperty property, const QVariant &value) const
 {
 	if(property.isEnumType())
@@ -162,7 +167,6 @@ QJsonValue QJsonSerializer::serializeVariant(int propertyType, const QVariant &v
 QVariant QJsonSerializer::deserializeVariant(int propertyType, const QJsonValue &value, QObject *parent) const
 {
 	auto converter = d->typeConverterTypeCache.value(propertyType, nullptr);
-	qDebug() << value.type();
 	if(!converter || !converter->jsonTypes().contains(value.type())) {
 		converter = nullptr; //in case json type did not match
 		foreach(auto c, d->typeConverters.values(value.type())) {
@@ -321,15 +325,6 @@ QJsonSerializerPrivate::QJsonSerializerPrivate() :
 	enumAsString(false),
 	validationFlags(QJsonSerializer::StandardValidation)
 {}
-
-QJsonSerializerPrivate *QJsonSerializerPrivate::fromHelper(const QJsonTypeConverter::SerializationHelper *helper)
-{
-	auto jser = static_cast<const QJsonSerializer*>(helper);
-	if(jser)
-		return jser->d.data();
-	else
-		return nullptr;
-}
 
 // ------------- Startup function implementation -------------
 
