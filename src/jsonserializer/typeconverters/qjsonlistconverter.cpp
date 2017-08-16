@@ -7,7 +7,6 @@ bool QJsonListConverter::canConvert(int metaTypeId) const
 {
 	return metaTypeId == QMetaType::QVariantList ||
 			metaTypeId == QMetaType::QStringList ||
-			metaTypeId == QMetaType::QByteArrayList ||
 			listTypeRegex.match(QString::fromUtf8(QMetaType::typeName(metaTypeId))).hasMatch();
 }
 
@@ -49,8 +48,6 @@ int QJsonListConverter::getSubtype(int listType)
 	int metaType = QMetaType::UnknownType;
 	if(listType == QMetaType::QStringList)
 		metaType = QMetaType::QString;
-	else if(listType == QMetaType::QByteArrayList)
-		metaType = QMetaType::QByteArray;
 	else {
 		auto match = listTypeRegex.match(QString::fromUtf8(QMetaType::typeName(listType)));
 		if(match.hasMatch())

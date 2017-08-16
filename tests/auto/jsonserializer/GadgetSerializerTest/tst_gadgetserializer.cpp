@@ -90,8 +90,6 @@ void GadgetSerializerTest::testVariantConversions_data()
 	QTest::addColumn<QVariant>("data");
 	QTest::addColumn<int>("targetType");
 
-	//TODO test QStringList, QByteArrayList
-
 	QTest::newRow("QList<int>") << QVariant::fromValue<QList<int>>({3, 7, 13})
 								<< (int)QVariant::List;
 	QList<int> l1 = {0, 1, 2};
@@ -99,6 +97,8 @@ void GadgetSerializerTest::testVariantConversions_data()
 	QList<int> l3 = {6, 7, 8};
 	QTest::newRow("QList<QList<int>>") << QVariant::fromValue<QList<QList<int>>>({l1, l2, l3})
 									   << (int)QVariant::List;
+	QTest::newRow("QStringList") << QVariant::fromValue<QStringList>({"a", "b", "c"})
+								<< (int)QVariant::List;
 
 	QTest::newRow("QMap<QString, int>") << QVariant::fromValue<QMap<QString, int>>({
 																					   {"baum", 42},
