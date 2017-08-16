@@ -8,9 +8,20 @@
 #include <QtCore/qjsonvalue.h>
 #include <QtCore/qvariant.h>
 
+class QJsonTypeConverterPrivate;
 class Q_JSONSERIALIZER_EXPORT QJsonTypeConverter
 {
 public:
+	enum Priority : qint32 {
+		Standard = 0x00000000,
+		High = 0x000000FF,
+		VeryHigh = 0x0000FFFF,
+		ExtremlyHigh = 0x00FFFFFF,
+		Low = -0x000000FF,
+		VeryLow = -0x0000FFFF,
+		ExtremlyLow = -0x00FFFFFF
+	};
+
 	class SerializationHelper
 	{
 	public:
@@ -24,15 +35,20 @@ public:
 		virtual QVariant deserializeSubtype(int propertyType, const QJsonValue &value, QObject *parent) const = 0;
 	};
 
+	QJsonTypeConverter();
 	virtual ~QJsonTypeConverter();
 
-	//TODO priority
+	int priority() const;
+	void setPriority(int priority);
 
 	virtual bool canConvert(int metaTypeId) const = 0;
 	virtual QList<QJsonValue::Type> jsonTypes() const = 0;
 
 	virtual QJsonValue serialize(int propertyType, const QVariant &value, const SerializationHelper *helper) const = 0;
 	virtual QVariant deserialize(int propertyType, const QJsonValue &value, QObject *parent, const SerializationHelper *helper) const = 0;
+
+private:
+	QScopedPointer<QJsonTypeConverterPrivate> d;
 };
 
 class Q_JSONSERIALIZER_EXPORT QSimpleJsonTypeConverter : public QJsonTypeConverter
