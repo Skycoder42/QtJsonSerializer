@@ -1,6 +1,8 @@
 #include "qjsonlistconverter_p.h"
 #include "qjsonserializerexception.h"
 
+#include <QtCore/QJsonArray>
+
 const QRegularExpression QJsonListConverter::listTypeRegex(QStringLiteral(R"__(^QList<\s*(.*?)\s*>$)__"));
 
 bool QJsonListConverter::canConvert(int metaTypeId) const

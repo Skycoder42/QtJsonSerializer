@@ -12,6 +12,8 @@
 #include <QtCore/qobject.h>
 #include <QtCore/qvariant.h>
 #include <QtCore/qdebug.h>
+#include <QtCore/qsharedpointer.h>
+#include <QtCore/qpointer.h>
 
 class QJsonSerializerPrivate;
 //! A class to serializer and deserializer QObjects and Q_GADGETS to and from JSON
