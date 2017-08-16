@@ -62,6 +62,8 @@ void GadgetSerializerTest::initTestCase()
 
 	QJsonSerializer::registerAllConverters<TestGadget>();
 
+	QJsonSerializer::registerPairConverters<int, QString>();
+
 	//register list comparators, needed for test only!
 	QMetaType::registerComparators<QList<int>>();
 	QMetaType::registerComparators<QList<QList<int>>>();
@@ -76,6 +78,9 @@ void GadgetSerializerTest::initTestCase()
 
 	QMetaType::registerComparators<TestGadget>();
 	QMetaType::registerComparators<QList<TestGadget>>();
+
+	QMetaType::registerComparators<QPair<int, QString>>();
+
 	serializer = new QJsonSerializer(this);
 }
 
@@ -164,6 +169,9 @@ void GadgetSerializerTest::testVariantConversions_data()
 																																	 {"m3", r3}
 																																 })
 															   << (int)QVariant::Map;
+
+	QTest::newRow("QPair<int, QString>") << QVariant::fromValue<QPair<int, QString>>({42, "baum"})
+										<< qMetaTypeId<QPair<QVariant, QVariant>>();
 }
 
 void GadgetSerializerTest::testVariantConversions()

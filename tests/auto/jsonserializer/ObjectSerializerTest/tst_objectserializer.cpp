@@ -61,6 +61,8 @@ void ObjectSerializerTest::initTestCase()
 	QJsonSerializer::registerAllConverters<TestObject*>();
 	QJsonSerializer::registerPointerConverters<ChildObject>();
 
+	QJsonSerializer::registerPairConverters<int, QString>();
+
 	//register list comparators, needed for test only!
 	QMetaType::registerComparators<QList<int>>();
 	QMetaType::registerComparators<QList<QList<int>>>();
@@ -75,6 +77,9 @@ void ObjectSerializerTest::initTestCase()
 
 	QMetaType::registerComparators<TestObject*>();
 	QMetaType::registerComparators<QList<TestObject*>>();
+
+	QMetaType::registerComparators<QPair<int, QString>>();
+
 	serializer = new QJsonSerializer(this);
 
 	qMetaTypeId<TestObject*>();
@@ -174,6 +179,9 @@ void ObjectSerializerTest::testVariantConversions_data()
 												 << qMetaTypeId<QSharedPointer<QObject>>();
 	QTest::newRow("QPointer<ChildObject>") << QVariant::fromValue<QPointer<ChildObject>>(new ChildObject(this))
 										   << qMetaTypeId<QPointer<QObject>>();
+
+	QTest::newRow("QPair<int, QString>") << QVariant::fromValue<QPair<int, QString>>({42, "baum"})
+										<< qMetaTypeId<QPair<QVariant, QVariant>>();
 }
 
 void ObjectSerializerTest::testVariantConversions()
