@@ -54,7 +54,7 @@ public:
 	template<typename T>
 	static bool registerAllConverters();
 	template<typename T>
-	static bool registerPointerConverters();
+	static bool registerPointerConverters(); //TODO include to all converters
 
 	//! @readAcFn{QJsonSerializer::allowDefaultNull}
 	bool allowDefaultNull() const;
@@ -215,13 +215,20 @@ bool QJsonSerializer::registerAllConverters()
 template<typename T>
 bool QJsonSerializer::registerPointerConverters()
 {
+	static_assert(std::is_base_of<QObject, T>::value, "T must inherit QObject");
 	auto ok1 = QMetaType::registerConverter<QSharedPointer<QObject>, QSharedPointer<T>>([](const QSharedPointer<QObject> &object) -> QSharedPointer<T> {
 		return object.objectCast<T>();
 	});
-	auto ok2 = QMetaType::registerConverter<QPointer<QObject>, QPointer<T>>([](const QPointer<QObject> &object) -> QPointer<T> {
+	auto ok2 = QMetaType::registerConverter<QSharedPointer<T>, QSharedPointer<QObject>>([](const QSharedPointer<T> &object) -> QSharedPointer<QObject> {
+		return object.template staticCast<QObject>();//must work, because of static assert
+	});
+	auto ok3 = QMetaType::registerConverter<QPointer<QObject>, QPointer<T>>([](const QPointer<QObject> &object) -> QPointer<T> {
 		return qobject_cast<T*>(object.data());
 	});
-	return ok1 && ok2;
+	auto ok4 = QMetaType::registerConverter<QPointer<T>, QPointer<QObject>>([](const QPointer<T> &object) -> QPointer<QObject> {
+		return static_cast<QObject*>(object.data());
+	});
+	return ok1 && ok2 && ok3 && ok4;
 }
 
 template<typename T>

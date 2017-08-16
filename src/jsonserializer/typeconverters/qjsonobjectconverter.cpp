@@ -24,11 +24,16 @@ QList<QJsonValue::Type> QJsonObjectConverter::jsonTypes() const
 QJsonValue QJsonObjectConverter::serialize(int propertyType, const QVariant &value, const QJsonTypeConverter::SerializationHelper *helper) const
 {
 	QObject *object = nullptr;
-	auto cValue = value;
-	if(!cValue.canConvert(QMetaType::QObjectStar) || !cValue.convert(QMetaType::QObjectStar))
-		throw QJsonSerializationException(QByteArray("unable to get QObject pointer from type ") + QMetaType::typeName(propertyType));
+	auto flags = QMetaType::typeFlags(propertyType);
+	if(flags.testFlag(QMetaType::PointerToQObject))
+	  object = extract<QObject*>(value);
+	else if(flags.testFlag(QMetaType::SharedPointerToQObject))
+	  object = extract<QSharedPointer<QObject>>(value).data();
+	else if(flags.testFlag(QMetaType::TrackingPointerToQObject))
+	  object = extract<QPointer<QObject>>(value).data();
+	else
+	  Q_UNREACHABLE();
 
-	object = cValue.value<QObject*>();
 	if(object) {
 		auto meta = object->metaObject();
 		auto keepObjectName = helper->getProperty("keepObjectName").toBool();
@@ -109,6 +114,16 @@ QVariant QJsonObjectConverter::deserialize(int propertyType, const QJsonValue &v
 	}
 
 	return toVariant(object, QMetaType::typeFlags(propertyType));
+}
+
+template<typename T>
+T QJsonObjectConverter::extract(QVariant variant)
+{
+  auto id = qMetaTypeId<T>();
+  if(variant.canConvert(id) && variant.convert(id))
+	return variant.value<T>();
+  else
+	throw QJsonSerializationException(QByteArray("unable to get QObject pointer from type ") + QMetaType::typeName(id));
 }
 
 QVariant QJsonObjectConverter::toVariant(QObject *object, QMetaType::TypeFlags flags)

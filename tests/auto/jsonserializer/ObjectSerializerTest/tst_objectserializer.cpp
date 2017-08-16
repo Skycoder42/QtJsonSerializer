@@ -169,6 +169,11 @@ void ObjectSerializerTest::testVariantConversions_data()
 																																	 {"m3", r3}
 																																 })
 															   << (int)QVariant::Map;
+
+	QTest::newRow("QSharedPointer<ChildObject>") << QVariant::fromValue(QSharedPointer<ChildObject>(new ChildObject(nullptr)))
+												 << qMetaTypeId<QSharedPointer<QObject>>();
+	QTest::newRow("QPointer<ChildObject>") << QVariant::fromValue<QPointer<ChildObject>>(new ChildObject(this))
+										   << qMetaTypeId<QPointer<QObject>>();
 }
 
 void ObjectSerializerTest::testVariantConversions()
