@@ -24,6 +24,8 @@ public:
 
 	virtual ~QJsonTypeConverter();
 
+	//TODO priority
+
 	virtual bool canConvert(int metaTypeId) const = 0;
 	virtual QList<QJsonValue::Type> jsonTypes() const = 0;
 

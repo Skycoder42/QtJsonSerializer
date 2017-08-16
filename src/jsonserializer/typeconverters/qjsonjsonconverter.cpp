@@ -1,14 +1,12 @@
 #include "qjsonjsonconverter_p.h"
 #include "qjsonserializerexception.h"
 
-bool QJsonJsonConverter::canConvert(int metaTypeId) const
+bool QJsonJsonValueConverter::canConvert(int metaTypeId) const
 {
-	return metaTypeId == QMetaType::QJsonValue ||
-			metaTypeId == QMetaType::QJsonObject ||
-			metaTypeId == QMetaType::QJsonArray;
+	return metaTypeId == QMetaType::QJsonValue;
 }
 
-QList<QJsonValue::Type> QJsonJsonConverter::jsonTypes() const
+QList<QJsonValue::Type> QJsonJsonValueConverter::jsonTypes() const
 {
 	return { //All valid types
 		QJsonValue::Null,
@@ -20,33 +18,61 @@ QList<QJsonValue::Type> QJsonJsonConverter::jsonTypes() const
 	};
 }
 
-QJsonValue QJsonJsonConverter::serialize(int propertyType, const QVariant &value) const
+QJsonValue QJsonJsonValueConverter::serialize(int propertyType, const QVariant &value) const
 {
-	if(propertyType == QMetaType::QJsonValue)
-		return value.toJsonValue();
-	else if(propertyType == QMetaType::QJsonObject)
-		return value.toJsonObject();
-	else if(propertyType == QMetaType::QJsonArray)
-		return value.toJsonArray();
-	else {
-		Q_UNREACHABLE();
-		return QJsonValue();
-	}
+	Q_UNUSED(propertyType)
+	return value.toJsonValue();
 }
 
-QVariant QJsonJsonConverter::deserialize(int propertyType, const QJsonValue &value, QObject *parent) const
+QVariant QJsonJsonValueConverter::deserialize(int propertyType, const QJsonValue &value, QObject *parent) const
 {
+	Q_UNUSED(propertyType)
 	Q_UNUSED(parent)
+	return QVariant::fromValue(value);
+}
 
-	if(propertyType == QMetaType::QJsonValue)
-		return QVariant::fromValue(value);
-	else if(propertyType == QMetaType::QJsonArray && value.isArray())
-		return QVariant::fromValue(value.toArray());
-	if(propertyType == QMetaType::QJsonObject && value.isObject())
-		return QVariant::fromValue(value.toObject());
-	else
-		throw QJsonDeserializationException(QByteArray("Read json type (") +
-											QByteArray::number(value.type()) +
-											QByteArray(") does not match the target type: ") +
-											QMetaType::typeName(propertyType));
+bool QJsonJsonObjectConverter::canConvert(int metaTypeId) const
+{
+	return metaTypeId == QMetaType::QJsonObject;
+}
+
+QList<QJsonValue::Type> QJsonJsonObjectConverter::jsonTypes() const
+{
+	return {QJsonValue::Object};
+}
+
+QJsonValue QJsonJsonObjectConverter::serialize(int propertyType, const QVariant &value) const
+{
+	Q_UNUSED(propertyType)
+	return value.toJsonObject();
+}
+
+QVariant QJsonJsonObjectConverter::deserialize(int propertyType, const QJsonValue &value, QObject *parent) const
+{
+	Q_UNUSED(propertyType)
+	Q_UNUSED(parent)
+	return QVariant::fromValue(value.toObject());
+}
+
+bool QJsonJsonArrayConverter::canConvert(int metaTypeId) const
+{
+	return metaTypeId == QMetaType::QJsonArray;
+}
+
+QList<QJsonValue::Type> QJsonJsonArrayConverter::jsonTypes() const
+{
+	return {QJsonValue::Array};
+}
+
+QJsonValue QJsonJsonArrayConverter::serialize(int propertyType, const QVariant &value) const
+{
+	Q_UNUSED(propertyType)
+	return value.toJsonArray();
+}
+
+QVariant QJsonJsonArrayConverter::deserialize(int propertyType, const QJsonValue &value, QObject *parent) const
+{
+	Q_UNUSED(propertyType)
+	Q_UNUSED(parent)
+	return QVariant::fromValue(value.toArray());
 }

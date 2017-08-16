@@ -25,7 +25,9 @@ QJsonSerializer::QJsonSerializer(QObject *parent) :
 	registerConverter(new QJsonGadgetConverter());
 	registerConverter(new QJsonMapConverter());
 	registerConverter(new QJsonListConverter());
-	registerConverter(new QJsonJsonConverter());
+	registerConverter(new QJsonJsonValueConverter());
+	registerConverter(new QJsonJsonObjectConverter());
+	registerConverter(new QJsonJsonArrayConverter());
 }
 
 QJsonSerializer::~QJsonSerializer() {}
