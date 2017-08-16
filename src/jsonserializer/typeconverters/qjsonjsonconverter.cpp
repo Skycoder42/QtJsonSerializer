@@ -1,6 +1,9 @@
 #include "qjsonjsonconverter_p.h"
 #include "qjsonserializerexception.h"
 
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonArray>
+
 bool QJsonJsonValueConverter::canConvert(int metaTypeId) const
 {
 	return metaTypeId == QMetaType::QJsonValue;
