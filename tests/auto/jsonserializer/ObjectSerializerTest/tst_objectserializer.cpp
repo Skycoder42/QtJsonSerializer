@@ -61,8 +61,6 @@ void ObjectSerializerTest::initTestCase()
 	QJsonSerializer::registerAllConverters<TestObject*>();
 	QJsonSerializer::registerPointerConverters<ChildObject>();
 
-	QJsonSerializer::registerPairConverters<int, QString>();
-
 	//register list comparators, needed for test only!
 	QMetaType::registerComparators<QList<int>>();
 	QMetaType::registerComparators<QList<QList<int>>>();

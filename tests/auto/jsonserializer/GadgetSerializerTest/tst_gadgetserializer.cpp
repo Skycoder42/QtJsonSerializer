@@ -62,8 +62,6 @@ void GadgetSerializerTest::initTestCase()
 
 	QJsonSerializer::registerAllConverters<TestGadget>();
 
-	QJsonSerializer::registerPairConverters<int, QString>();
-
 	//register list comparators, needed for test only!
 	QMetaType::registerComparators<QList<int>>();
 	QMetaType::registerComparators<QList<QList<int>>>();
