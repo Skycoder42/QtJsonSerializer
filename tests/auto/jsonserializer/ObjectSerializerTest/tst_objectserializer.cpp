@@ -640,6 +640,18 @@ void ObjectSerializerTest::generateValidTestData()
 													 })
 						   << true;
 
+	QTest::newRow("sharedChild") << TestObject::createChild(new ChildObject(42), this, 1)
+								 << TestObject::createJson({
+															   {"sharedChildObject", ChildObject::createJson(42)},
+														   })
+								 << true;
+
+	QTest::newRow("trackedChild") << TestObject::createChild(new ChildObject(42), this, 2)
+								   << TestObject::createJson({
+																 {"trackedChildObject", ChildObject::createJson(42)},
+															 })
+								   << true;
+
 	{
 		auto gc = new ChildObject(42);
 		auto c = new ChildObject(666);

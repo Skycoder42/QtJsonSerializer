@@ -84,7 +84,7 @@ public:
 	static TestObject *createEnum(NormalEnum normalEnumProperty, EnumFlags enumFlagsProperty, QObject *parent);
 	static TestObject *createList(QList<int> simpleList, QList<QList<int>> leveledList, QObject *parent);
 	static TestObject *createMap(QMap<QString, int> simpleMap, QMap<QString, QMap<QString, int>> leveledMap, QObject *parent);
-	static TestObject *createChild(ChildObject* childObject, QObject *parent);
+	static TestObject *createChild(ChildObject* childObject, QObject *parent, int memberFlag = 0);//0: ptr, 1: sp, 2: tp
 	static TestObject *createChildren(QList<ChildObject*> simpleChildren, QList<QList<ChildObject*>> leveledChildren, QObject *parent);
 	static TestObject *createRelatives(QMap<QString, ChildObject*> simpleRelatives, QMap<QString, QMap<QString, ChildObject*>> leveledRelatives, QObject *parent);
 	static TestObject *createEmbedded(QJsonObject object, QJsonArray array, QJsonValue value, QObject *parent);

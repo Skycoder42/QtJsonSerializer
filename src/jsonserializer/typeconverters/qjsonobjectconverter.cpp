@@ -4,6 +4,10 @@
 
 #include <QtCore/QPointer>
 #include <QtCore/QSharedPointer>
+#include <QtCore/QRegularExpression>
+
+const QRegularExpression QJsonObjectConverter::sharedTypeRegex(QStringLiteral(R"__(^QSharedPointer<\s*(.*?)\s*>$)__"));
+const QRegularExpression QJsonObjectConverter::trackingTypeRegex(QStringLiteral(R"__(^QPointer<\s*(.*?)\s*>$)__"));
 
 bool QJsonObjectConverter::canConvert(int metaTypeId) const
 {
@@ -35,7 +39,7 @@ QJsonValue QJsonObjectConverter::serialize(int propertyType, const QVariant &val
 	  Q_UNREACHABLE();
 
 	if(object) {
-		auto meta = object->metaObject();
+		auto meta = object->metaObject();//TODO use type metaobject instead
 		auto keepObjectName = helper->getProperty("keepObjectName").toBool();
 
 		QJsonObject jsonObject;
@@ -62,7 +66,7 @@ QVariant QJsonObjectConverter::deserialize(int propertyType, const QJsonValue &v
 
 	auto validationFlags = helper->getProperty("validationFlags").value<QJsonSerializer::ValidationFlags>();
 	auto keepObjectName = helper->getProperty("keepObjectName").toBool();
-	auto metaObject = QMetaType::metaObjectForType(propertyType);
+	auto metaObject = getMetaObject(propertyType);
 	if(!metaObject)
 		throw QJsonDeserializationException(QByteArray("Unable to get metaobject for type ") + QMetaType::typeName(propertyType));
 
@@ -114,6 +118,32 @@ QVariant QJsonObjectConverter::deserialize(int propertyType, const QJsonValue &v
 	}
 
 	return toVariant(object, QMetaType::typeFlags(propertyType));
+}
+
+const QMetaObject *QJsonObjectConverter::getMetaObject(int typeId)
+{
+	auto flags = QMetaType::typeFlags(typeId);
+	if(flags.testFlag(QMetaType::PointerToQObject))
+		return QMetaType::metaObjectForType(typeId);
+	else {
+		QRegularExpression regex;
+		if(flags.testFlag(QMetaType::SharedPointerToQObject))
+			regex = sharedTypeRegex;
+		else if(flags.testFlag(QMetaType::TrackingPointerToQObject))
+			regex = trackingTypeRegex;
+		else {
+			Q_UNREACHABLE();
+			return nullptr;
+		}
+
+		//extract template type, and if found, add the pointer star and find the meta type
+		auto match = regex.match(QString::fromUtf8(QMetaType::typeName(typeId)));
+		if(match.hasMatch()) {
+			auto type = QMetaType::type(match.captured(1).toUtf8().trimmed() + "*");
+			return QMetaType::metaObjectForType(type);
+		} else
+			return nullptr;
+	}
 }
 
 template<typename T>

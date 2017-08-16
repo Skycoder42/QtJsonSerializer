@@ -61,13 +61,22 @@ TestObject *TestObject::createMap(QMap<QString, int> simpleMap, QMap<QString, QM
 	return t;
 }
 
-TestObject *TestObject::createChild(ChildObject *childObject, QObject *parent)
+TestObject *TestObject::createChild(ChildObject *childObject, QObject *parent, int memberFlag)
 {
 	auto t = new TestObject(parent);
 
-	t->childObject = childObject;
-	if(t->childObject)
-		t->childObject->setParent(t);
+	if(memberFlag == 0) {
+		t->childObject = childObject;
+		if(t->childObject)
+			t->childObject->setParent(t);
+	} else if(memberFlag == 1)
+		t->sharedChildObject = QSharedPointer<ChildObject>(childObject);
+	else if(memberFlag == 2) {
+		t->trackedChildObject = childObject;
+		if(t->trackedChildObject)
+			t->trackedChildObject->setParent(t);
+	} else
+		Q_UNREACHABLE();
 
 	return t;
 }
