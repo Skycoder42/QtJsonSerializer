@@ -54,6 +54,11 @@ QJsonSerializer::ValidationFlags QJsonSerializer::validationFlags() const
 	return d->validationFlags;
 }
 
+QJsonSerializer::Polymorphing QJsonSerializer::polymorphing() const
+{
+	return d->polymorphing;
+}
+
 QJsonValue QJsonSerializer::serialize(const QVariant &data) const
 {
 	return serializeImpl(data);
@@ -130,6 +135,11 @@ void QJsonSerializer::setEnumAsString(bool enumAsString)
 void QJsonSerializer::setValidationFlags(ValidationFlags validationFlags)
 {
 	d->validationFlags = validationFlags;
+}
+
+void QJsonSerializer::setPolymorphing(QJsonSerializer::Polymorphing polymorphing)
+{
+	d->polymorphing = polymorphing;
 }
 
 QVariant QJsonSerializer::getProperty(const char *name) const
@@ -348,7 +358,8 @@ QJsonSerializerPrivate::QJsonSerializerPrivate() :
 	allowNull(false),
 	keepObjectName(false),
 	enumAsString(false),
-	validationFlags(QJsonSerializer::StandardValidation)
+	validationFlags(QJsonSerializer::StandardValidation),
+	polymorphing(QJsonSerializer::Enabled)
 {}
 
 // ------------- Startup function implementation -------------

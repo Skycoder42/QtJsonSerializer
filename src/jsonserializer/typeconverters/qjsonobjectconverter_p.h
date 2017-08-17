@@ -20,6 +20,7 @@ private:
 	static T extract(QVariant variant);
 	static const QMetaObject *getMetaObject(int typeId);
 	static QVariant toVariant(QObject *object, QMetaType::TypeFlags flags);
+	static bool polyMetaObject(QObject *object);
 };
 
 #endif // QJSONOBJECTCONVERTER_P_H

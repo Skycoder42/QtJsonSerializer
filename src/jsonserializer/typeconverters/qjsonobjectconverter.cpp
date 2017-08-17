@@ -5,6 +5,7 @@
 #include <QtCore/QPointer>
 #include <QtCore/QSharedPointer>
 #include <QtCore/QRegularExpression>
+#include <QtCore/QDebug>
 
 const QRegularExpression QJsonObjectConverter::sharedTypeRegex(QStringLiteral(R"__(^QSharedPointer<\s*(.*?)\s*>$)__"));
 const QRegularExpression QJsonObjectConverter::trackingTypeRegex(QStringLiteral(R"__(^QPointer<\s*(.*?)\s*>$)__"));
@@ -39,11 +40,36 @@ QJsonValue QJsonObjectConverter::serialize(int propertyType, const QVariant &val
 	  Q_UNREACHABLE();
 
 	if(object) {
-		auto meta = getMetaObject(propertyType);
-		auto keepObjectName = helper->getProperty("keepObjectName").toBool();
+		//get the metaobject, based on polymorphism
+		const QMetaObject *meta = nullptr;
+		auto poly = (QJsonSerializer::Polymorphing)helper->getProperty("polymorphic").toInt();
+		auto isPoly = false;
+		switch (poly) {
+		case QJsonSerializer::Disabled:
+			isPoly = false;
+			break;
+		case QJsonSerializer::Enabled:
+			isPoly = polyMetaObject(object);
+			break;
+		case QJsonSerializer::Forced:
+			isPoly = true;
+			break;
+		default:
+			Q_UNREACHABLE();
+			break;
+		}
 
 		QJsonObject jsonObject;
+
+		if(isPoly) {
+			meta = object->metaObject();
+			//first: pass the class name
+			jsonObject[QStringLiteral("@class")] = QString::fromUtf8(meta->className());
+		} else
+			meta = getMetaObject(propertyType);
+
 		//go through all properties and try to serialize them
+		auto keepObjectName = helper->getProperty("keepObjectName").toBool();
 		auto i = QObject::staticMetaObject.indexOfProperty("objectName");
 		if(!keepObjectName)
 		   i++;
@@ -171,4 +197,30 @@ QVariant QJsonObjectConverter::toVariant(QObject *object, QMetaType::TypeFlags f
 		Q_UNREACHABLE();
 		return QVariant();
 	}
+}
+
+bool QJsonObjectConverter::polyMetaObject(QObject *object)
+{
+	auto meta = object->metaObject();
+
+	//check the internal property
+	if(object->dynamicPropertyNames().contains("__qt_json_serializer_polymorphic")) {
+		auto polyProp = object->property("__qt_json_serializer_polymorphic").toBool();
+		return polyProp;
+	}
+
+	//check the class info
+	auto polyIndex = meta->indexOfClassInfo("polymorphic");
+	if(polyIndex != -1) {
+		auto info = meta->classInfo(polyIndex);
+		if(info.value() == QByteArray("true"))
+			return true;// use the object
+		else if(info.value() == QByteArray("false"))
+			return false;// use the class
+		else
+			qWarning() << "Invalid value for polymorphic classinfo on object type" << meta->className() << "ignored";
+	}
+
+	//default: the class
+	return false;// use the class
 }

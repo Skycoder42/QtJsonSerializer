@@ -29,6 +29,7 @@ class Q_JSONSERIALIZER_EXPORT QJsonSerializer : public QObject, protected QJsonT
 	Q_PROPERTY(bool enumAsString READ enumAsString WRITE setEnumAsString)
 	//! Specify how strictly the serializer should verify data when deserializing
 	Q_PROPERTY(ValidationFlags validationFlags READ validationFlags WRITE setValidationFlags)
+	Q_PROPERTY(Polymorphing polymorphing READ polymorphing WRITE setPolymorphing)
 
 public:
 	//! Flags to specify how strict the serializer should validate when deserializing
@@ -40,6 +41,13 @@ public:
 	};
 	Q_DECLARE_FLAGS(ValidationFlags, ValidationFlag)
 	Q_FLAG(ValidationFlags)
+
+	enum Polymorphing {
+		Disabled,
+		Enabled,
+		Forced
+	};
+	Q_ENUM(Polymorphing)
 
 	//! Constructor
 	explicit QJsonSerializer(QObject *parent = nullptr);
@@ -68,6 +76,7 @@ public:
 	bool enumAsString() const;
 	//! @readAcFn{QJsonSerializer::validationFlags}
 	ValidationFlags validationFlags() const;
+	Polymorphing polymorphing() const;
 
 	//! Serializers a QVariant value to a QJsonValue
 	QJsonValue serialize(const QVariant &data) const;
@@ -114,6 +123,7 @@ public Q_SLOTS:
 	void setEnumAsString(bool enumAsString);
 	//! @writeAcFn{QJsonSerializer::validationFlags}
 	void setValidationFlags(ValidationFlags validationFlags);
+	void setPolymorphing(Polymorphing polymorphing);
 
 protected:
 	//protected implementation -> internal use for the type converters

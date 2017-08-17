@@ -23,7 +23,7 @@ QJsonValue QJsonPairConverter::serialize(int propertyType, const QVariant &value
 	if(!cValue.canConvert(targetType) || !cValue.convert(targetType)) {
 		throw QJsonSerializationException(QByteArray("Failed to convert type ") +
 										  QMetaType::typeName(propertyType) +
-										  QByteArray(" to QPair<QVariant, QVariant>"));
+										  QByteArray(" to QPair<QVariant, QVariant>. Make shure to register pair types via QJsonSerializer::registerPairConverters"));
 	}
 
 	auto variant = cValue.value<QPair<QVariant, QVariant>>();
