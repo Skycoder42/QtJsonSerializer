@@ -61,6 +61,9 @@ void ObjectSerializerTest::initTestCase()
 	QJsonSerializer::registerAllConverters<TestObject*>();
 	QJsonSerializer::registerPointerConverters<ChildObject>();
 
+	QJsonSerializer::registerPairConverters<ChildObject*, QList<int>>();
+	QJsonSerializer::registerListConverters<QPair<bool, bool>>();
+
 	//register list comparators, needed for test only!
 	QMetaType::registerComparators<QList<int>>();
 	QMetaType::registerComparators<QList<QList<int>>>();
@@ -77,6 +80,8 @@ void ObjectSerializerTest::initTestCase()
 	QMetaType::registerComparators<QList<TestObject*>>();
 
 	QMetaType::registerComparators<QPair<int, QString>>();
+	QMetaType::registerComparators<QPair<ChildObject*, QList<int>>>();
+	QMetaType::registerComparators<QList<QPair<bool, bool>>>();
 
 	serializer = new QJsonSerializer(this);
 
@@ -179,7 +184,13 @@ void ObjectSerializerTest::testVariantConversions_data()
 										   << qMetaTypeId<QPointer<QObject>>();
 
 	QTest::newRow("QPair<int, QString>") << QVariant::fromValue<QPair<int, QString>>({42, "baum"})
-										<< qMetaTypeId<QPair<QVariant, QVariant>>();
+										 << qMetaTypeId<QPair<QVariant, QVariant>>();
+
+	QTest::newRow("QPair<ChildObject*, QList<int>>") << QVariant::fromValue<QPair<ChildObject*, QList<int>>>({nullptr, {1, 2, 3}})
+													<< qMetaTypeId<QPair<QVariant, QVariant>>();
+
+	QTest::newRow("QList<QPair<bool, bool>>") << QVariant::fromValue<QList<QPair<bool, bool>>>({{false, true}, {true, false}})
+											  << (int)QVariant::List;
 }
 
 void ObjectSerializerTest::testVariantConversions()
@@ -639,6 +650,22 @@ void ObjectSerializerTest::generateValidTestData()
 															})
 								  << true;
 	}
+
+	QTest::newRow("pair") << TestObject::createPair({42, "baum"}, {}, {}, this)
+						  << TestObject::createJson({
+														{"pair", QJsonArray({42, "baum"})}
+													})
+						  << true;
+	QTest::newRow("extraPair") << TestObject::createPair({}, {new ChildObject(42), {6, 6, 666}}, {}, this)
+							   << TestObject::createJson({
+															 {"extraPair", QJsonArray({ChildObject::createJson(42), QJsonArray({6, 6, 666})})}
+														 })
+							   << true;
+	QTest::newRow("listPair") << TestObject::createPair({}, {}, {{true, false}, {false, true}}, this)
+							  << TestObject::createJson({
+															{"listPair", QJsonArray({QJsonArray({true, false}), QJsonArray({false, true})})}
+														})
+							  << true;
 
 	QTest::newRow("child") << TestObject::createChild(new ChildObject(42), this)
 						   << TestObject::createJson({

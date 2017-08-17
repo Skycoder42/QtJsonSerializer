@@ -238,7 +238,6 @@ void GadgetSerializerTest::testDeserialization()
 	QFETCH(TestGadget, gadget);
 
 	try {
-		auto t1 = serializer->deserialize<TestGadget>(data);
 		QCOMPARE(serializer->deserialize<TestGadget>(data), gadget);
 	} catch(QException &e) {
 		QFAIL(e.what());

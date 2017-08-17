@@ -15,6 +15,9 @@ TestObject::TestObject(QObject *parent) :
 	leveledList(),
 	simpleMap(),
 	leveledMap(),
+	pair(),
+	extraPair(),
+	listPair(),
 	childObject(nullptr),
 	sharedChildObject(),
 	trackedChildObject(),
@@ -58,6 +61,17 @@ TestObject *TestObject::createMap(QMap<QString, int> simpleMap, QMap<QString, QM
 	auto t = new TestObject(parent);
 	t->simpleMap = simpleMap;
 	t->leveledMap = leveledMap;
+	return t;
+}
+
+TestObject *TestObject::createPair(QPair<int, QString> pair, QPair<ChildObject *, QList<int> > extraPair, QList<QPair<bool, bool> > listPair, QObject *parent)
+{
+	auto t = new TestObject(parent);
+	t->pair = pair;
+	t->extraPair = extraPair;
+	if(t->extraPair.first)
+		t->extraPair.first->setParent(t);
+	t->listPair = listPair;
 	return t;
 }
 
@@ -137,6 +151,9 @@ QJsonObject TestObject::createJson(const QJsonObject &delta, const QString &rmKe
 								{"leveledList", QJsonArray()},
 								{"simpleMap", QJsonObject()},
 								{"leveledMap", QJsonObject()},
+								{"pair", QJsonArray({0, QString()})},
+								{"extraPair", QJsonArray({QJsonValue::Null, QJsonArray()})},
+								{"listPair", QJsonArray()},
 								{"childObject", QJsonValue::Null},
 								{"sharedChildObject", QJsonValue::Null},
 								{"trackedChildObject", QJsonValue::Null},
@@ -183,6 +200,9 @@ bool TestObject::equals(const TestObject *other) const
 				  leveledList == other->leveledList &&
 				  simpleMap == other->simpleMap &&
 				  leveledMap == other->leveledMap &&
+				  pair == other->pair &&
+				  extraPair.second == other->extraPair.second &&
+				  listPair == other->listPair &&
 				  simpleChildren.size() == other->simpleChildren.size() &&
 				  leveledChildren.size() == other->leveledChildren.size() &&
 				  simpleRelatives.size() == other->simpleRelatives.size() &&
@@ -194,6 +214,12 @@ bool TestObject::equals(const TestObject *other) const
 			return false;
 
 		if(!childObject->equals(other->childObject))
+			return false;
+		if(!sharedChildObject.data()->equals(other->sharedChildObject.data()))
+			return false;
+		if(!trackedChildObject.data()->equals(other->trackedChildObject.data()))
+			return false;
+		if(!extraPair.first->equals(other->extraPair.first))
 			return false;
 
 		for(auto i = 0; i < simpleChildren.size(); i++) {
