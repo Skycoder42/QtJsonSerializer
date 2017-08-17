@@ -92,9 +92,31 @@ QVariant QJsonObjectConverter::deserialize(int propertyType, const QJsonValue &v
 
 	auto validationFlags = helper->getProperty("validationFlags").value<QJsonSerializer::ValidationFlags>();
 	auto keepObjectName = helper->getProperty("keepObjectName").toBool();
+	auto poly = (QJsonSerializer::Polymorphing)helper->getProperty("polymorphic").toInt();
+
 	auto metaObject = getMetaObject(propertyType);
 	if(!metaObject)
 		throw QJsonDeserializationException(QByteArray("Unable to get metaobject for type ") + QMetaType::typeName(propertyType));
+
+	//try to get the polymorphic metatype (if allowed)
+	auto jsonObject = value.toObject();
+	if(poly != QJsonSerializer::Disabled) {
+		if(jsonObject.contains(QStringLiteral("@class"))) {
+			auto classField = jsonObject[QStringLiteral("@class")].toString().toUtf8();
+			auto typeId = QMetaType::type(classField.constData());
+			auto nMeta = QMetaType::metaObjectForType(typeId);
+			if(!nMeta)
+				throw QJsonDeserializationException("Unable to find class requested from json \"@class\" property: " + classField);
+			if(!nMeta->inherits(metaObject)) {
+				throw QJsonDeserializationException("Requested class from \"@class\" field, " +
+													classField +
+													QByteArray(", does not inhert the property type ") +
+													QMetaType::typeName(propertyType));
+			}
+			metaObject = nMeta;
+		} else if(poly == QJsonSerializer::Forced)
+			throw QJsonDeserializationException("Json does not contain the \"@class\" field, but forced polymorphism requires it");
+	}
 
 	//try to construct the object
 	auto object = metaObject->newInstance(Q_ARG(QObject*, parent));
@@ -118,7 +140,6 @@ QVariant QJsonObjectConverter::deserialize(int propertyType, const QJsonValue &v
 	}
 
 	//now deserialize all json properties
-	auto jsonObject = value.toObject();
 	for(auto it = jsonObject.constBegin(); it != jsonObject.constEnd(); it++) {
 		auto propIndex = metaObject->indexOfProperty(qUtf8Printable(it.key()));
 		QVariant value;
