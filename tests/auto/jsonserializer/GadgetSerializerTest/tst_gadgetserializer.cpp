@@ -62,6 +62,8 @@ void GadgetSerializerTest::initTestCase()
 
 	QJsonSerializer::registerAllConverters<TestGadget>();
 
+	QJsonSerializer::registerPairConverters<int, QString>();
+	QJsonSerializer::registerPairConverters<bool, bool>();
 	QJsonSerializer::registerPairConverters<ChildGadget, QList<int>>();
 	QJsonSerializer::registerListConverters<QPair<bool, bool>>();
 
