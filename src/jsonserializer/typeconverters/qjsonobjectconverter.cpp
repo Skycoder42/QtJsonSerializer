@@ -42,7 +42,7 @@ QJsonValue QJsonObjectConverter::serialize(int propertyType, const QVariant &val
 	if(object) {
 		//get the metaobject, based on polymorphism
 		const QMetaObject *meta = nullptr;
-		auto poly = (QJsonSerializer::Polymorphing)helper->getProperty("polymorphic").toInt();
+		auto poly = (QJsonSerializer::Polymorphing)helper->getProperty("polymorphing").toInt();
 		auto isPoly = false;
 		switch (poly) {
 		case QJsonSerializer::Disabled:
@@ -92,7 +92,7 @@ QVariant QJsonObjectConverter::deserialize(int propertyType, const QJsonValue &v
 
 	auto validationFlags = helper->getProperty("validationFlags").value<QJsonSerializer::ValidationFlags>();
 	auto keepObjectName = helper->getProperty("keepObjectName").toBool();
-	auto poly = (QJsonSerializer::Polymorphing)helper->getProperty("polymorphic").toInt();
+	auto poly = (QJsonSerializer::Polymorphing)helper->getProperty("polymorphing").toInt();
 
 	auto metaObject = getMetaObject(propertyType);
 	if(!metaObject)

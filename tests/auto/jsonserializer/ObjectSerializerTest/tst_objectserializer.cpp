@@ -1,5 +1,6 @@
 #include "brokentestobject.h"
 #include "testobject.h"
+#include "testpolyobject.h"
 
 #include <QString>
 #include <QtTest>
@@ -36,6 +37,9 @@ private Q_SLOTS:
 	void testEnumSpecialSerialization();
 	void testEnumSpecialDeserialization_data();
 	void testEnumSpecialDeserialization();
+
+	void testPolySerialization_data();
+	void testPolySerialization();
 
 	void testDeviceSerialization_data();
 	void testDeviceSerialization();
@@ -449,6 +453,7 @@ void ObjectSerializerTest::testEnumSpecialSerialization()
 		QFAIL(e.what());
 	}
 
+	serializer->setEnumAsString(false);
 	object->deleteLater();
 }
 
@@ -515,6 +520,107 @@ void ObjectSerializerTest::testEnumSpecialDeserialization()
 	}
 
 	result->deleteLater();
+}
+
+void ObjectSerializerTest::testPolySerialization_data()
+{
+	QTest::addColumn<QObject*>("data");
+	QTest::addColumn<QJsonObject>("result");
+	QTest::addColumn<QJsonSerializer::Polymorphing>("poly");
+
+	QObject *testObj = new TestObject(this);
+	testObj->setObjectName("test");
+	QTest::newRow("default") << testObj
+							 << QJsonObject({
+												{"objectName", "test"}
+											})
+							 << QJsonSerializer::Enabled;
+
+	testObj = new TestObject(this);
+	testObj->setObjectName("test");
+	QTest::newRow("forced") << testObj
+							 << TestObject::createJson({
+														   {"@class", "TestObject"},
+														   {"objectName", "test"}
+													   })
+							 << QJsonSerializer::Forced;
+
+	testObj = new TestObject(this);
+	testObj->setObjectName("test");
+	testObj->setProperty("__qt_json_serializer_polymorphic", true);
+	QTest::newRow("property") << testObj
+							  << TestObject::createJson({
+															{"@class", "TestObject"},
+															{"objectName", "test"}
+														})
+							  << QJsonSerializer::Enabled;
+
+	testObj = new TestObject(this);
+	testObj->setObjectName("test");
+	testObj->setProperty("__qt_json_serializer_polymorphic", true);
+	QTest::newRow("propertyDisabled") << testObj
+									  << QJsonObject({
+														 {"objectName", "test"}
+													 })
+									  << QJsonSerializer::Disabled;
+
+	testObj = new TestObject(this);
+	testObj->setObjectName("test");
+	testObj->setProperty("__qt_json_serializer_polymorphic", false);
+	QTest::newRow("propertyForced") << testObj
+									<< TestObject::createJson({
+																  {"@class", "TestObject"},
+																  {"objectName", "test"}
+															  })
+									<< QJsonSerializer::Forced;
+
+	testObj = new TestPolyObject(10, this);
+	testObj->setObjectName("test");
+	QTest::newRow("classinfo") << testObj
+							   << QJsonObject({
+												  {"@class", "TestPolyObject"},
+												  {"objectName", "test"},
+												  {"data", 10}
+											  })
+							   << QJsonSerializer::Enabled;
+
+	testObj = new TestPolyObject(10, this);
+	testObj->setObjectName("test");
+	QTest::newRow("classDisabled") << testObj
+								   << QJsonObject({
+													  {"objectName", "test"}
+												  })
+								   << QJsonSerializer::Disabled;
+
+	testObj = new TestPolyObject(10, this);
+	testObj->setObjectName("test");
+	testObj->setProperty("__qt_json_serializer_polymorphic", false);
+	QTest::newRow("classinfoProperty") << testObj
+									   << QJsonObject({
+														  {"objectName", "test"}
+													  })
+									   << QJsonSerializer::Enabled;
+}
+
+void ObjectSerializerTest::testPolySerialization()
+{
+	QFETCH(QObject*, data);
+	QFETCH(QJsonObject, result);
+	QFETCH(QJsonSerializer::Polymorphing, poly);
+
+	serializer->setKeepObjectName(true);
+	serializer->setPolymorphing(poly);
+
+	try {
+		QCOMPARE(serializer->serialize<QObject*>(data), result);
+	} catch(QException &e) {
+		QFAIL(e.what());
+	}
+
+	serializer->setPolymorphing(QJsonSerializer::Enabled);
+	serializer->setKeepObjectName(false);
+
+	data->deleteLater();
 }
 
 void ObjectSerializerTest::testDeviceSerialization_data()
