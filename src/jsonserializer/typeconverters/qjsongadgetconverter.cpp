@@ -18,9 +18,13 @@ QJsonValue QJsonGadgetConverter::serialize(int propertyType, const QVariant &val
 {
 	auto metaObject = QMetaType::metaObjectForType(propertyType);
 	if(!metaObject)
-		throw QJsonSerializationException(QByteArray("Unable to get metaobject for type") + QMetaType::typeName(propertyType));
+		throw QJsonSerializationException(QByteArray("Unable to get metaobject for type ") + QMetaType::typeName(propertyType));
 
-	auto gadget = value.constData();
+	auto gValue = value;
+	if(!gValue.convert(propertyType))
+		throw QJsonSerializationException(QByteArray("Gadget property is not convertible to gadget type ") + QMetaType::typeName(propertyType));
+	auto gadget = gValue.constData();
+
 	QJsonObject jsonObject;
 	//go through all properties and try to serialize them
 	for(auto i = 0; i < metaObject->propertyCount(); i++) {
