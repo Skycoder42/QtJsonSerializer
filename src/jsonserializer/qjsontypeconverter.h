@@ -30,9 +30,9 @@ public:
 		virtual QVariant getProperty(const char *name) const = 0;
 
 		virtual QJsonValue serializeSubtype(QMetaProperty property, const QVariant &value) const = 0;
-		virtual QJsonValue serializeSubtype(int propertyType, const QVariant &value) const = 0;
+		virtual QJsonValue serializeSubtype(int propertyType, const QVariant &value, const QByteArray &traceHint = {}) const = 0;
 		virtual QVariant deserializeSubtype(QMetaProperty property, const QJsonValue &value, QObject *parent) const = 0;
-		virtual QVariant deserializeSubtype(int propertyType, const QJsonValue &value, QObject *parent) const = 0;
+		virtual QVariant deserializeSubtype(int propertyType, const QJsonValue &value, QObject *parent, const QByteArray &traceHint = {}) const = 0;
 	};
 
 	QJsonTypeConverter();

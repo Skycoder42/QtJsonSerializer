@@ -1,5 +1,6 @@
 #include "qjsonserializer.h"
 #include "qjsonserializer_p.h"
+#include "qjsonexceptioncontext_p.h"
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDateTime>
@@ -149,6 +150,7 @@ QVariant QJsonSerializer::getProperty(const char *name) const
 
 QJsonValue QJsonSerializer::serializeSubtype(QMetaProperty property, const QVariant &value) const
 {
+	QJsonExceptionContext ctx(property);
 	if(property.isEnumType())
 		return serializeEnum(property.enumerator(), value);
 	else
@@ -157,19 +159,22 @@ QJsonValue QJsonSerializer::serializeSubtype(QMetaProperty property, const QVari
 
 QVariant QJsonSerializer::deserializeSubtype(QMetaProperty property, const QJsonValue &value, QObject *parent) const
 {
+	QJsonExceptionContext ctx(property);
 	if(property.isEnumType())
 		return deserializeEnum(property.enumerator(), value);
 	else
 		return deserializeVariant(property.userType(), value, parent);
 }
 
-QJsonValue QJsonSerializer::serializeSubtype(int propertyType, const QVariant &value) const
+QJsonValue QJsonSerializer::serializeSubtype(int propertyType, const QVariant &value, const QByteArray &traceHint) const
 {
+	QJsonExceptionContext ctx(propertyType, traceHint);
 	return serializeVariant(propertyType, value);
 }
 
-QVariant QJsonSerializer::deserializeSubtype(int propertyType, const QJsonValue &value, QObject *parent) const
+QVariant QJsonSerializer::deserializeSubtype(int propertyType, const QJsonValue &value, QObject *parent, const QByteArray &traceHint) const
 {
+	QJsonExceptionContext ctx(propertyType, traceHint);
 	return deserializeVariant(propertyType, value, parent);
 }
 

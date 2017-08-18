@@ -130,8 +130,8 @@ protected:
 	QVariant getProperty(const char *name) const override;
 	QJsonValue serializeSubtype(QMetaProperty property, const QVariant &value) const override;
 	QVariant deserializeSubtype(QMetaProperty property, const QJsonValue &value, QObject *parent) const override;
-	QJsonValue serializeSubtype(int propertyType, const QVariant &value) const override;
-	QVariant deserializeSubtype(int propertyType, const QJsonValue &value, QObject *parent) const override;
+	QJsonValue serializeSubtype(int propertyType, const QVariant &value, const QByteArray &traceHint) const override;
+	QVariant deserializeSubtype(int propertyType, const QJsonValue &value, QObject *parent, const QByteArray &traceHint) const override;
 
 private:
 	friend class QJsonSerializerPrivate;
