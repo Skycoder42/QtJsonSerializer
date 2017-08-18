@@ -39,50 +39,49 @@ QJsonValue QJsonObjectConverter::serialize(int propertyType, const QVariant &val
 	else
 	  Q_UNREACHABLE();
 
-	if(object) {
-		//get the metaobject, based on polymorphism
-		const QMetaObject *meta = nullptr;
-		auto poly = (QJsonSerializer::Polymorphing)helper->getProperty("polymorphing").toInt();
-		auto isPoly = false;
-		switch (poly) {
-		case QJsonSerializer::Disabled:
-			isPoly = false;
-			break;
-		case QJsonSerializer::Enabled:
-			isPoly = polyMetaObject(object);
-			break;
-		case QJsonSerializer::Forced:
-			isPoly = true;
-			break;
-		default:
-			Q_UNREACHABLE();
-			break;
-		}
-
-		QJsonObject jsonObject;
-
-		if(isPoly) {
-			meta = object->metaObject();
-			//first: pass the class name
-			jsonObject[QStringLiteral("@class")] = QString::fromUtf8(meta->className());
-		} else
-			meta = getMetaObject(propertyType);
-
-		//go through all properties and try to serialize them
-		auto keepObjectName = helper->getProperty("keepObjectName").toBool();
-		auto i = QObject::staticMetaObject.indexOfProperty("objectName");
-		if(!keepObjectName)
-		   i++;
-		for(; i < meta->propertyCount(); i++) {
-			auto property = meta->property(i);
-			if(property.isStored())
-				jsonObject[QString::fromUtf8(property.name())] = helper->serializeSubtype(property, property.read(object));
-		}
-
-		return jsonObject;
-	}
-	else
+	if(!object)
 		return QJsonValue();
+
+	//get the metaobject, based on polymorphism
+	const QMetaObject *meta = nullptr;
+	auto poly = (QJsonSerializer::Polymorphing)helper->getProperty("polymorphing").toInt();
+	auto isPoly = false;
+	switch (poly) {
+	case QJsonSerializer::Disabled:
+		isPoly = false;
+		break;
+	case QJsonSerializer::Enabled:
+		isPoly = polyMetaObject(object);
+		break;
+	case QJsonSerializer::Forced:
+		isPoly = true;
+		break;
+	default:
+		Q_UNREACHABLE();
+		break;
+	}
+
+	QJsonObject jsonObject;
+
+	if(isPoly) {
+		meta = object->metaObject();
+		//first: pass the class name
+		jsonObject[QStringLiteral("@class")] = QString::fromUtf8(meta->className());
+	} else
+		meta = getMetaObject(propertyType);
+
+	//go through all properties and try to serialize them
+	auto keepObjectName = helper->getProperty("keepObjectName").toBool();
+	auto i = QObject::staticMetaObject.indexOfProperty("objectName");
+	if(!keepObjectName)
+	   i++;
+	for(; i < meta->propertyCount(); i++) {
+		auto property = meta->property(i);
+		if(property.isStored())
+			jsonObject[QString::fromUtf8(property.name())] = helper->serializeSubtype(property, property.read(object));
+	}
+
+	return jsonObject;
 }
 
 QVariant QJsonObjectConverter::deserialize(int propertyType, const QJsonValue &value, QObject *parent, const QJsonTypeConverter::SerializationHelper *helper) const
@@ -152,7 +151,7 @@ QVariant QJsonObjectConverter::deserialize(int propertyType, const QJsonValue &v
 												it.key().toUtf8() +
 												" but extra properties are not allowed");
 		} else
-			value = helper->deserializeSubtype(QMetaType::UnknownType, it.value(), object);
+			value = helper->deserializeSubtype(QMetaType::UnknownType, it.value(), object, it.key().toUtf8());
 		object->setProperty(qUtf8Printable(it.key()), value);
 	}
 
@@ -196,11 +195,14 @@ const QMetaObject *QJsonObjectConverter::getMetaObject(int typeId)
 template<typename T>
 T QJsonObjectConverter::extract(QVariant variant)
 {
-  auto id = qMetaTypeId<T>();
-  if(variant.canConvert(id) && variant.convert(id))
-	return variant.value<T>();
-  else
-	throw QJsonSerializationException(QByteArray("unable to get QObject pointer from type ") + QMetaType::typeName(id));
+	auto id = qMetaTypeId<T>();
+	if(variant.canConvert(id) && variant.convert(id))
+		return variant.value<T>();
+	else {
+		throw QJsonSerializationException(QByteArray("unable to get QObject pointer from type ") +
+										  QMetaType::typeName(id) +
+										  QByteArray(". Make shure to register pointer converters via QJsonSerializer::registerPointerConverters"));
+	}
 }
 
 QVariant QJsonObjectConverter::toVariant(QObject *object, QMetaType::TypeFlags flags)

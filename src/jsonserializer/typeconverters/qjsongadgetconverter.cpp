@@ -22,7 +22,7 @@ QJsonValue QJsonGadgetConverter::serialize(int propertyType, const QVariant &val
 
 	auto gValue = value;
 	if(!gValue.convert(propertyType))
-		throw QJsonSerializationException(QByteArray("Gadget property is not convertible to gadget type ") + QMetaType::typeName(propertyType));
+		throw QJsonSerializationException(QByteArray("Data is not of the required gadget type ") + QMetaType::typeName(propertyType));
 	auto gadget = gValue.constData();
 
 	QJsonObject jsonObject;
@@ -42,12 +42,15 @@ QVariant QJsonGadgetConverter::deserialize(int propertyType, const QJsonValue &v
 
 	QVariant gadget(propertyType, nullptr);
 	auto gadgetPtr = gadget.data();
-	if(!gadgetPtr)
-		throw QJsonDeserializationException(QByteArray("Failed to construct gadget of type ") + QMetaType::typeName(propertyType));
+	if(!gadgetPtr) {
+		throw QJsonDeserializationException(QByteArray("Failed to construct gadget of type ") +
+											QMetaType::typeName(propertyType) +
+											QByteArray(". Does is have a default constructor?"));
+	}
 
 	auto metaObject = QMetaType::metaObjectForType(propertyType);
 	if(!metaObject)
-		throw QJsonDeserializationException(QByteArray("Unable to get metaobject for type") + QMetaType::typeName(propertyType));
+		throw QJsonDeserializationException(QByteArray("Unable to get metaobject for gadget type") + QMetaType::typeName(propertyType));
 
 	auto jsonObject = value.toObject();
 	auto validationFlags = helper->getProperty("validationFlags").value<QJsonSerializer::ValidationFlags>();

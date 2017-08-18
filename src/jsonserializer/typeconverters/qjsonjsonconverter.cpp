@@ -1,5 +1,4 @@
 #include "qjsonjsonconverter_p.h"
-#include "qjsonserializerexception.h"
 
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>

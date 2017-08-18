@@ -37,7 +37,7 @@ QJsonValue QJsonMapConverter::serialize(int propertyType, const QVariant &value,
 
 	QJsonObject object;
 	for(auto it = map.constBegin(); it != map.constEnd(); ++it)
-		object.insert(it.key(), helper->serializeSubtype(metaType, it.value()));
+		object.insert(it.key(), helper->serializeSubtype(metaType, it.value(), it.key().toUtf8()));
 	return object;
 }
 
@@ -49,7 +49,7 @@ QVariant QJsonMapConverter::deserialize(int propertyType, const QJsonValue &valu
 	QVariantMap map;
 	auto object = value.toObject();
 	for(auto it = object.constBegin(); it != object.constEnd(); ++it)
-		map.insert(it.key(), helper->deserializeSubtype(metaType, it.value(), parent));
+		map.insert(it.key(), helper->deserializeSubtype(metaType, it.value(), parent, it.key().toUtf8()));
 	return map;
 }
 

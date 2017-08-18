@@ -28,8 +28,8 @@ QJsonValue QJsonPairConverter::serialize(int propertyType, const QVariant &value
 
 	auto variant = cValue.value<QPair<QVariant, QVariant>>();
 	QJsonArray array;
-	array.append(helper->serializeSubtype(types.first, variant.first));
-	array.append(helper->serializeSubtype(types.second, variant.second));
+	array.append(helper->serializeSubtype(types.first, variant.first, "pair.first"));
+	array.append(helper->serializeSubtype(types.second, variant.second, "pair.second"));
 	return array;
 }
 
@@ -41,8 +41,8 @@ QVariant QJsonPairConverter::deserialize(int propertyType, const QJsonValue &val
 		throw QJsonDeserializationException("Json array must have exactly 2 elements to be read as a pair");
 
 	QPair<QVariant, QVariant> vPair;
-	vPair.first = helper->deserializeSubtype(types.first, array[0], parent);
-	vPair.second = helper->deserializeSubtype(types.second, array[1], parent);
+	vPair.first = helper->deserializeSubtype(types.first, array[0], parent, "pair.first");
+	vPair.second = helper->deserializeSubtype(types.second, array[1], parent, "pair.second");
 	return QVariant::fromValue(vPair);
 }
 

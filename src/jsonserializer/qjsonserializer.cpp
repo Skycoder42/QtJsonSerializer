@@ -229,7 +229,8 @@ QVariant QJsonSerializer::deserializeVariant(int propertyType, const QJsonValue 
 			throw QJsonDeserializationException(QByteArray("Failed to convert deserialized variant of type ") +
 												(vType ? vType : "<unknown>") +
 												QByteArray(" to property type ") +
-												QMetaType::typeName(propertyType));
+												QMetaType::typeName(propertyType) +
+												QByteArray(". Make shure to register converters with the QJsonSerializer::register* methods"));
 		}
 	} else
 		return variant;

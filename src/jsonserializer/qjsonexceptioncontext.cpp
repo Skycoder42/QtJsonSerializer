@@ -5,7 +5,7 @@ QThreadStorage<QJsonSerializationException::PropertyTrace> QJsonExceptionContext
 QJsonExceptionContext::QJsonExceptionContext(const QMetaProperty &property)
 {
 	contextStore.localData().enqueue({
-										 property.typeName(),
+										 property.name(),
 										 property.isEnumType() ?
 											property.enumerator().name() :
 											property.typeName()
@@ -18,7 +18,6 @@ QJsonExceptionContext::QJsonExceptionContext(int propertyType, const QByteArray 
 										 hint.isNull() ? QByteArray("<unnamed>") : hint,
 										 QMetaType::typeName(propertyType)
 									 });
-
 }
 
 QJsonExceptionContext::~QJsonExceptionContext()
