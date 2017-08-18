@@ -40,6 +40,8 @@ private Q_SLOTS:
 
 	void testPolySerialization_data();
 	void testPolySerialization();
+	void testPolyDeserialization_data();
+	void testPolyDeserialization();
 
 	void testDeviceSerialization_data();
 	void testDeviceSerialization();
@@ -621,6 +623,105 @@ void ObjectSerializerTest::testPolySerialization()
 	serializer->setKeepObjectName(false);
 
 	data->deleteLater();
+}
+
+void ObjectSerializerTest::testPolyDeserialization_data()
+{
+	QTest::addColumn<QJsonObject>("data");
+	QTest::addColumn<QObject*>("result");
+	QTest::addColumn<QJsonSerializer::Polymorphing>("poly");
+	QTest::addColumn<bool>("success");
+
+	QObject *testObj = new QObject(this);
+	testObj->setObjectName("test");
+	QTest::newRow("default") << QJsonObject({
+												{"objectName", "test"}
+											})
+							 << testObj
+							 << QJsonSerializer::Enabled
+							 << true;
+
+	testObj = new QObject(this);
+	QTest::newRow("forcedNotAvailable") << QJsonObject({
+														   {"objectName", "test"}
+													   })
+										<< testObj
+										<< QJsonSerializer::Forced
+										<< false;
+
+	testObj = new TestObject(this);
+	testObj->setObjectName("test");
+	QTest::newRow("enabled") << TestObject::createJson({
+														   {"@class", "TestObject"},
+														   {"objectName", "test"}
+													   })
+							 << testObj
+							 << QJsonSerializer::Enabled
+							 << true;
+
+	testObj = new TestObject(this);
+	testObj->setObjectName("test");
+	QTest::newRow("forced") << TestObject::createJson({
+														  {"@class", "TestObject"},
+														  {"objectName", "test"}
+													  })
+							<< testObj
+							<< QJsonSerializer::Forced
+							<< true;
+
+	testObj = new QObject(this);
+	testObj->setObjectName("test");
+	QTest::newRow("disabled") << TestObject::createJson({
+														  {"@class", "TestObject"},
+														  {"objectName", "test"}
+													  })
+							  << testObj
+							  << QJsonSerializer::Disabled
+							  << true;
+
+	testObj = new QObject(this);
+	QTest::newRow("unavailableType") << QJsonObject({
+														{"@class", "UnavailableObject"}
+													})
+									 << testObj
+									 << QJsonSerializer::Enabled
+									 << false;
+}
+
+void ObjectSerializerTest::testPolyDeserialization()
+{
+	QFETCH(QJsonObject, data);
+	QFETCH(QObject*, result);
+	QFETCH(QJsonSerializer::Polymorphing, poly);
+	QFETCH(bool, success);
+
+	serializer->setKeepObjectName(true);
+	serializer->setPolymorphing(poly);
+
+	try {
+		if(success) {
+			auto obj = serializer->deserialize<QObject*>(data, this);
+			QVERIFY(obj);
+
+			auto meta = result->metaObject();
+			QCOMPARE(meta->className(), obj->metaObject()->className());
+			auto i = QObject::staticMetaObject.indexOfProperty("objectName");
+			for(; i < meta->propertyCount(); i++) {
+				auto property = meta->property(i);
+				QCOMPARE(property.read(obj), property.read(result));
+			}
+
+			obj->deleteLater();
+		} else
+			QVERIFY_EXCEPTION_THROWN(serializer->deserialize<TestObject*>(data, this), QJsonDeserializationException);
+	} catch(QException &e) {
+		QFAIL(e.what());
+	}
+
+	serializer->setPolymorphing(QJsonSerializer::Enabled);
+	serializer->setKeepObjectName(false);
+
+	result->deleteLater();
 }
 
 void ObjectSerializerTest::testDeviceSerialization_data()

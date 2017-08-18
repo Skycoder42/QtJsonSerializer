@@ -102,7 +102,7 @@ QVariant QJsonObjectConverter::deserialize(int propertyType, const QJsonValue &v
 	auto jsonObject = value.toObject();
 	if(poly != QJsonSerializer::Disabled) {
 		if(jsonObject.contains(QStringLiteral("@class"))) {
-			auto classField = jsonObject[QStringLiteral("@class")].toString().toUtf8();
+			QByteArray classField = jsonObject[QStringLiteral("@class")].toString().toUtf8() + "*";//add the star
 			auto typeId = QMetaType::type(classField.constData());
 			auto nMeta = QMetaType::metaObjectForType(typeId);
 			if(!nMeta)
