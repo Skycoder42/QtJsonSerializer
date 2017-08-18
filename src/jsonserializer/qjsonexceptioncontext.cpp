@@ -4,7 +4,7 @@ QThreadStorage<QJsonSerializationException::PropertyTrace> QJsonExceptionContext
 
 QJsonExceptionContext::QJsonExceptionContext(const QMetaProperty &property)
 {
-	contextStore.localData().enqueue({
+	contextStore.localData().push({
 										 property.name(),
 										 property.isEnumType() ?
 											property.enumerator().name() :
@@ -14,7 +14,7 @@ QJsonExceptionContext::QJsonExceptionContext(const QMetaProperty &property)
 
 QJsonExceptionContext::QJsonExceptionContext(int propertyType, const QByteArray &hint)
 {
-	contextStore.localData().enqueue({
+	contextStore.localData().push({
 										 hint.isNull() ? QByteArray("<unnamed>") : hint,
 										 QMetaType::typeName(propertyType)
 									 });
@@ -26,7 +26,7 @@ QJsonExceptionContext::~QJsonExceptionContext()
 	if(context.isEmpty())
 		qWarning() << "Corrupted context store";
 	else
-		context.dequeue();
+		context.pop();
 }
 
 QJsonSerializationException::PropertyTrace QJsonExceptionContext::currentContext()

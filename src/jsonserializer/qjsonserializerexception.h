@@ -5,14 +5,14 @@
 #include <QtCore/qexception.h>
 #include <QtCore/qstring.h>
 #include <QtCore/qsharedpointer.h>
-#include <QtCore/qqueue.h>
+#include <QtCore/qstack.h>
 
 class QJsonSerializationExceptionPrivate;
 //! Exception thrown by QJsonSerializer if something goes wrong
 class Q_JSONSERIALIZER_EXPORT QJsonSerializerException : public QException
 {
 public:
-	typedef QQueue<QPair<QByteArray, QByteArray>> PropertyTrace;
+	typedef QStack<QPair<QByteArray, QByteArray>> PropertyTrace;
 
 	//! Constructor with error message
 	QJsonSerializerException(const QByteArray &what);
