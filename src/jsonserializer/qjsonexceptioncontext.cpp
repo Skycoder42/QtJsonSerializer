@@ -1,5 +1,7 @@
 #include "qjsonexceptioncontext_p.h"
 
+#include <QtCore/qdebug.h>
+
 QThreadStorage<QJsonSerializationException::PropertyTrace> QJsonExceptionContext::contextStore;
 
 QJsonExceptionContext::QJsonExceptionContext(const QMetaProperty &property)
