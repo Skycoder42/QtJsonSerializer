@@ -46,6 +46,8 @@ private Q_SLOTS:
 	void testDeviceSerialization_data();
 	void testDeviceSerialization();
 
+	void testExceptionTrace();
+
 private:
 	QJsonSerializer *serializer;
 
@@ -783,6 +785,26 @@ void ObjectSerializerTest::testDeviceSerialization()
 		tFile.close();
 	} catch(QException &e) {
 		QFAIL(e.what());
+	}
+}
+
+void ObjectSerializerTest::testExceptionTrace()
+{
+	try {
+		auto o = serializer->deserialize<TestObject*>(TestObject::createJson({
+																				 {"childObject", QJsonObject({
+																					  {"data", "test"}
+																				  })}
+																			 }));
+		o->deleteLater();
+		QFAIL("No exception thrown");
+	} catch (QJsonSerializerException &e) {
+		auto trace = e.propertyTrace();
+		QCOMPARE(trace.size(), 2);
+		QCOMPARE(trace[0].first, QByteArray("childObject"));
+		QCOMPARE(trace[0].second, QByteArray("ChildObject*"));
+		QCOMPARE(trace[1].first, QByteArray("data"));
+		QCOMPARE(trace[1].second, QByteArray("int"));
 	}
 }
 
