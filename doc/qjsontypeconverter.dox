@@ -145,7 +145,7 @@ The priority is important for cases where multiple converters can handle the sam
 priority wins. The default value is 0, and so are all converters internally used by the library. The property can be set
 either by your implementation (i.e. in the constructor), or dynamically before adding the converter to a serializer.
 
-@sa QJsonTypeConverter::Priority, QJsonTypeConverter::setPriority
+@sa QJsonTypeConverter::Priority, QJsonTypeConverter::setPriority, _qjsonserializer_helpertypes
 */
 
 /*!

@@ -323,7 +323,7 @@ This includes pairs with T1 == T2.
 */
 
 /*!
-@fn QJsonSerializer::deserialize(const typename _qjsonserializer_helpertypes::type_helper<T>::JsonType &, QObject*) const
+@fn QJsonSerializer::deserialize(const typename _qjsonserializer_helpertypes::json_type<T>::type &, QObject*) const
 
 @tparam T The type of the data to be deserialized
 @param json The data to be deserialized

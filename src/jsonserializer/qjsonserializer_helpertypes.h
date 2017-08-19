@@ -55,8 +55,10 @@ struct is_serializable<QPair<T1, T2>> : public std::conditional<is_serializable<
 template <class T, class Enable = void>
 struct gadget_helper
 {
+	//! Specify if T is a gadget
 	static constexpr bool value = false;
-	static inline  QJsonValue convert(const QJsonValue &value) {
+	//! Convert a json value to the required type
+	static inline QJsonValue convert(const QJsonValue &value) {
 		return value;
 	}
 };
@@ -65,7 +67,9 @@ struct gadget_helper
 template <class T>
 struct gadget_helper<T, typename T::QtGadgetHelper>
 {
+	//! @copydoc _qjsonserializer_helpertypes::value
 	static constexpr bool value = true;
+	//! @copydoc _qjsonserializer_helpertypes::convert
 	static inline QJsonObject convert(const QJsonValue &value) {
 		return value.toObject();
 	}
@@ -93,6 +97,7 @@ struct json_type : json_type_raw<T> {
 template <typename T>
 struct json_type<T*> {
 	static_assert(is_serializable<T*>::value, "Only QObject deriving classes can be serialized as pointer");
+	//! The json type
 	typedef QJsonObject type;
 
 	//! @copydoc _qjsonserializer_helpertypes::json_type::convert
@@ -105,6 +110,7 @@ struct json_type<T*> {
 template <typename T>
 struct json_type<QSharedPointer<T>> {
 	static_assert(is_serializable<QSharedPointer<T>>::value, "Only QObject deriving classes can be serialized as pointer");
+	//! The json type
 	typedef QJsonObject type;
 
 	//! @copydoc _qjsonserializer_helpertypes::json_type::convert
@@ -117,6 +123,7 @@ struct json_type<QSharedPointer<T>> {
 template <typename T>
 struct json_type<QPointer<T>> {
 	static_assert(is_serializable<QPointer<T>>::value, "Only QObject deriving classes can be serialized as pointer");
+	//! The json type
 	typedef QJsonObject type;
 
 	//! @copydoc _qjsonserializer_helpertypes::json_type::convert
@@ -129,6 +136,7 @@ struct json_type<QPointer<T>> {
 template <typename T>
 struct json_type<QList<T>> {
 	static_assert(is_serializable<QList<T>>::value, "Only QObject deriving classes can be serialized as pointer");
+	//! The json type
 	typedef QJsonArray type;
 
 	//! @copydoc _qjsonserializer_helpertypes::json_type::convert
@@ -141,6 +149,7 @@ struct json_type<QList<T>> {
 template <typename T>
 struct json_type<QMap<QString, T>> {
 	static_assert(is_serializable<QMap<QString, T>>::value, "Only QObject deriving classes can be serialized as pointer");
+	//! The json type
 	typedef QJsonObject type;
 
 	//! @copydoc _qjsonserializer_helpertypes::json_type::convert
@@ -154,6 +163,7 @@ struct json_type<QMap<QString, T>> {
 template <typename T>
 struct json_type<QHash<QString, T>> {
 	static_assert(is_serializable<QHash<QString, T>>::value, "Only QObject deriving classes can be serialized as pointer");
+	//! The json type
 	typedef QJsonObject type;
 
 	//! @copydoc _qjsonserializer_helpertypes::json_type::convert
@@ -167,6 +177,7 @@ struct json_type<QHash<QString, T>> {
 template <typename T1, typename T2>
 struct json_type<QPair<T1, T2>> {
 	static_assert(is_serializable<QPair<T1, T2>>::value, "Only QObject deriving classes can be serialized as pointer");
+	//! The json type
 	typedef QJsonArray type;
 
 	//! @copydoc _qjsonserializer_helpertypes::json_type::convert
