@@ -8,27 +8,12 @@ behavior, have a look at the properties.
 
 @section supported Supported types
 The serializer supports a bunch of types by default, but there are limitations. Check the main
-page Usage Hints for details about what is possible and what is not.
+page @ref qtjsonserializer_readme_label_4 "Usage Hints" for details about what is possible and what is not.
 
 @section extending Extending the serializer
-To extend the serializers functionality, the protected functions are the place to look. For
-both serialization and deserialization, there are 5 methods each, with the following functionality:
-- <b>...Variant (primary methods):</b> Decides, where to go next, by analysing the given type and data. Calls one of
-the other functions to perform the actual de/serialization, and verifies the resulted data meets
-the expectations
-- <b>...Object:</b> Performs `QObject <--> QJsonObject` conversions. Calls the variant method for
-each of it's properties
-- <b>...Gadget:</b> Performs `Q_GADGET <--> QJsonObject` conversions. Calls the variant method for
-each of it's properties. Basically the same as the object one, but for gadet types
-- <b>...List:</b> Performs `QList<T> <--> QJsonArray` conversions. Calls the variant method for
-each element in the list
-- <b>...Map:</b> Performs `QMap<QString, T> <--> QJsonObject` conversions. Calls the variant method for
-each element in the map
-- <b>...Enum:</b> Performs `enum/flags <--> int/string` conversions. Depending on QJsonSerializer::enumAsString,
-enums are serialized as int or string. The other way around is always enabled for both
-- <b>...Value:</b> Called for any other type, that does not match one of the three above. Tries to
-convert whatever comes by using the build-in `QVariant <--> QJsonValue` conversions. See QJsonValue::fromVariant
-and QJsonValue::toVariant for more details on the supported types
+To extend the serializers functionality, create a custom implementation of the QJsonTypeConverter class.
+Check it's documentation for more details and an example on how to. Once you've created a custom converter
+class, you can add it to a serializer instance by using QJsonSerializer::addJsonTypeConverter.
 */
 
 /*!
@@ -100,6 +85,68 @@ using defaults values etc.
 @accessors{
 	@readAc{validationFlags()}
 	@writeAc{setValidationFlags()}
+}
+
+@sa QJsonSerializer::ValidationFlag
+*/
+
+/*!
+@property QJsonSerializer::polymorphing
+
+@default{`QJsonSerialzer::Enabled`}
+
+@attention Only applicable for QObject deriving classes
+
+Depending on the set mode QObject deriving classes are de/serialized differently. Polymorphing in this
+context can be easily described with a simple example:
+
+@code{.cpp}
+class Foo : public QObject {
+//...
+	Q_PROPERTY(int foo MEMBER foo)
+//...
+};
+
+class Bar : public Foo {
+//...
+	Q_PROPERTY(int bar MEMBER bar)
+	Q_CLASS_INFO("polymorphic", "true")
+//...
+};
+@endcode
+
+Assuming you are de/serializing `Foo*`, but it actually is a `Bar*` object, for example: `serialize<Foo*>(new Bar());`
+
+For Serialization:<br/>
+With polymorphing `QJsonSerialzer::Disabled`, any additional information about a type is ignored. `Bar` is serialized as `Foo`, and
+the json would only contain the `foo` property. With it beeing `QJsonSerialzer::Enabled`, by default no polymorphic information
+is stored. However, if the type "declares" polymorphism (as in this example Bar does) it is stored. So here `Bar` is actually serialized
+as `Bar`. In order to make deserialization possible, an additional json value, @@class is created containing the actual class name, `Bar`.
+The json contains this property, the `foo` and the `bar` property. If polymorphism is `QJsonSerialzer::Forced`, any type is treated like `Bar`
+in the previous case, even if no polymorphism is specified. For all types, even simple QObjects, the @@class is added and the actual typed serialized.
+
+For Deserialization:<br/>
+With polymorphing `QJsonSerialzer::Disabled`, the @@class json property is ignored, and a value always deserialized as the given
+property type. So even if `@@class` is set to `Bar`, only a `Foo` object is created, and the `bar` property ignored. By using
+`QJsonSerialzer::Enabled`, if the json does contain the @@class property, the serializer creates an instance of the class named by
+this property. Here, a `Bar` object is created, with both the `foo` and the `bar` property correctly read. When set to `QJsonSerialzer::Forced`,
+every json object to be deserialized as QObject must have the @@class property, or otherwise an exception is thrown.
+
+<b>Declare objects polymorphic:</b><br/>
+There are to ways to make objects polymorphic. The first is static and uses `Q_CLASS_INFO`. Simply add the macro to the class
+that should be polymorphic as `Q_CLASS_INFO("polymorphic", "true")`. You can also set it to false, to disable polymorphism in
+case the class you inherit has this already set to true.
+
+The second way is to use a dynamic property. The property overrides the classinfo, but has to be set on an actual instance of
+the object to be serialized. Set the property by calling `setProperty("", true);`. Just like with class info, you can set it
+to false to disable it.
+
+@note This is only required for serialization. When deserializing, Polymorphism is determined by the @@class property. If it
+is present, the data is treated polymorphic.
+
+@accessors{
+	@readAc{polymorphing()}
+	@writeAc{setPolymorphing()}
 }
 */
 

@@ -16,7 +16,7 @@
 #include <QtCore/qpointer.h>
 
 class QJsonSerializerPrivate;
-//! A class to serializer and deserializer QObjects and Q_GADGETS to and from JSON
+//! A class to serializer and deserializer c++ classes to and from JSON
 class Q_JSONSERIALIZER_EXPORT QJsonSerializer : public QObject, protected QJsonTypeConverter::SerializationHelper
 {
 	Q_OBJECT
@@ -29,7 +29,7 @@ class Q_JSONSERIALIZER_EXPORT QJsonSerializer : public QObject, protected QJsonT
 	Q_PROPERTY(bool enumAsString READ enumAsString WRITE setEnumAsString)
 	//! Specify how strictly the serializer should verify data when deserializing
 	Q_PROPERTY(ValidationFlags validationFlags READ validationFlags WRITE setValidationFlags)
-	//! Specify how the serializer should treat polymorphy
+	//! Specify how the serializer should treat polymorphism for QObject classes
 	Q_PROPERTY(Polymorphing polymorphing READ polymorphing WRITE setPolymorphing)
 
 public:
