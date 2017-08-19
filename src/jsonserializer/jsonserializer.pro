@@ -22,6 +22,8 @@ include(typeconverters/typeconverters.pri)
 
 load(qt_module)
 
+CONFIG *= c++11 strict_c++ c++14 c++1z
+
 win32 {
 	QMAKE_TARGET_COMPANY = "Skycoder42"
 	QMAKE_TARGET_PRODUCT = "QtJsonSerializer"
