@@ -3,6 +3,7 @@ var searchData=
   ['scaledpixmapargument',['ScaledPixmapArgument',['https://doc.qt.io/qt-5/qiconengine-scaledpixmapargument.html',0,'QIconEngine']]],
   ['selection',['Selection',['https://doc.qt.io/qt-5/qabstracttextdocumentlayout-selection.html',0,'QAbstractTextDocumentLayout']]],
   ['sequence',['Sequence',['https://doc.qt.io/qt-5/qbluetoothserviceinfo-sequence.html',0,'QBluetoothServiceInfo']]],
+  ['serializationhelper',['SerializationHelper',['../class_q_json_type_converter_1_1_serialization_helper.html',1,'QJsonTypeConverter']]],
   ['setup',['Setup',['https://doc.qt.io/qt-5/class_qt_data_sync_1_1_setup.html',0,'QtDataSync']]],
   ['setupexception',['SetupException',['https://doc.qt.io/qt-5/class_qt_data_sync_1_1_setup_exception.html',0,'QtDataSync']]],
   ['setupexistsexception',['SetupExistsException',['https://doc.qt.io/qt-5/class_qt_data_sync_1_1_setup_exists_exception.html',0,'QtDataSync']]],

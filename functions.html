@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">QtJsonSerializer
-   &#160;<span id="projectnumber">2.2.1</span>
+   &#160;<span id="projectnumber">3.0.0</span>
    </div>
    <div id="projectbrief">A library to perform generic seralization and deserialization of QObjects</div>
   </td>
@@ -66,17 +66,10 @@ $(function() {
 <div class="contents">
 <div class="textblock">Here is a list of all documented class members with links to the class documentation for each member:</div>
 
-<h3><a id="index__"></a>- _ -</h3><ul>
-<li>_isDeser
-: <a class="el" href="class_q_json_serializer_exception.html#a42915bf5a162ff58498302dcbfd25af0">QJsonSerializerException</a>
-</li>
-<li>_what
-: <a class="el" href="class_q_json_serializer_exception.html#ac259c8dd25c565b9da8104c811052e61">QJsonSerializerException</a>
-</li>
-</ul>
-
-
 <h3><a id="index_a"></a>- a -</h3><ul>
+<li>addJsonTypeConverter()
+: <a class="el" href="class_q_json_serializer.html#a6b12ef3fa11387abd6bb260678b70965">QJsonSerializer</a>
+</li>
 <li>allowDefaultNull
 : <a class="el" href="class_q_json_serializer.html#acc7b17076756d1acd0d95e955614b289">QJsonSerializer</a>
 </li>
@@ -87,52 +80,53 @@ $(function() {
 
 
 <h3><a id="index_c"></a>- c -</h3><ul>
+<li>canConvert()
+: <a class="el" href="class_q_json_type_converter.html#a63168cc2f7e185f79cac9208a2e6d5e8">QJsonTypeConverter</a>
+</li>
 <li>clone()
-: <a class="el" href="class_q_json_deserialization_exception.html#ad4196cb826c8770beab48325bc3cbddf">QJsonDeserializationException</a>
-, <a class="el" href="class_q_json_serialization_exception.html#ad3e5187ba5a37ba5f171dc1472325779">QJsonSerializationException</a>
-, <a class="el" href="class_q_json_serializer_exception.html#aedc8fa4385bbbb0d34c6ad6c11e37378">QJsonSerializerException</a>
+: <a class="el" href="class_q_json_deserialization_exception.html#a069e07e1e91403acde35c2ce70566069">QJsonDeserializationException</a>
+, <a class="el" href="class_q_json_serialization_exception.html#a71fe42f32a5102faa57ca86ebbf57e3b">QJsonSerializationException</a>
+, <a class="el" href="class_q_json_serializer_exception.html#a04905f904440a1edeaef240a3e5b0970">QJsonSerializerException</a>
 </li>
 <li>convert()
-: <a class="el" href="struct__qjsonserializer__helpertypes_1_1type__helper.html#a4cb0fdb2171c0384a8489726dbe03768">_qjsonserializer_helpertypes::type_helper&lt; T &gt;</a>
-, <a class="el" href="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_list_3_01_t_01_4_01_4.html#a58aa32cbb0611a557057e2679929e0e4">_qjsonserializer_helpertypes::type_helper&lt; QList&lt; T &gt; &gt;</a>
-, <a class="el" href="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_map_3_01_q_string_00_01_t_01_4_01_4.html#adb10f03640df4bc67a6da730c7dd6756">_qjsonserializer_helpertypes::type_helper&lt; QMap&lt; QString, T &gt; &gt;</a>
-, <a class="el" href="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_variant_01_4.html#aae46b4e451ed1f77350bcd84f6634e09">_qjsonserializer_helpertypes::type_helper&lt; QVariant &gt;</a>
+: <a class="el" href="struct__qjsonserializer__helpertypes_1_1gadget__helper.html#ad0b94a571828f06720b5ee77e41daaa6">_qjsonserializer_helpertypes::gadget_helper&lt; T, Enable &gt;</a>
+, <a class="el" href="struct__qjsonserializer__helpertypes_1_1gadget__helper_3_01_t_00_01typename_01_t_1_1_qt_gadget_helper_01_4.html#ae6d195cf7524cbc43f8c706a73ed39a4">_qjsonserializer_helpertypes::gadget_helper&lt; T, typename T::QtGadgetHelper &gt;</a>
+, <a class="el" href="struct__qjsonserializer__helpertypes_1_1json__type.html#a17755c790639249cd1c0e73150357fd8">_qjsonserializer_helpertypes::json_type&lt; T &gt;</a>
+, <a class="el" href="struct__qjsonserializer__helpertypes_1_1json__type_3_01_q_list_3_01_t_01_4_01_4.html#a38c2654e2ab21489564540e3b9b89ff7">_qjsonserializer_helpertypes::json_type&lt; QList&lt; T &gt; &gt;</a>
+, <a class="el" href="struct__qjsonserializer__helpertypes_1_1json__type_3_01_q_map_3_01_q_string_00_01_t_01_4_01_4.html#a5f4e8688a44e442ac9a035e574d99695">_qjsonserializer_helpertypes::json_type&lt; QMap&lt; QString, T &gt; &gt;</a>
+, <a class="el" href="struct__qjsonserializer__helpertypes_1_1json__type_3_01_q_pair_3_01_t1_00_01_t2_01_4_01_4.html#af0ae2269a2507dde3d7d3e5eff58ee3b">_qjsonserializer_helpertypes::json_type&lt; QPair&lt; T1, T2 &gt; &gt;</a>
+, <a class="el" href="struct__qjsonserializer__helpertypes_1_1json__type_3_01_q_pointer_3_01_t_01_4_01_4.html#a9b55eb496a580c0df8dd72f729b74e04">_qjsonserializer_helpertypes::json_type&lt; QPointer&lt; T &gt; &gt;</a>
+, <a class="el" href="struct__qjsonserializer__helpertypes_1_1json__type_3_01_q_shared_pointer_3_01_t_01_4_01_4.html#a897aa4e87ec5c108811a8175da6c424d">_qjsonserializer_helpertypes::json_type&lt; QSharedPointer&lt; T &gt; &gt;</a>
+, <a class="el" href="struct__qjsonserializer__helpertypes_1_1json__type_3_01_t_01_5_01_4.html#a8017f6724d40ba84387c712be52cdc6b">_qjsonserializer_helpertypes::json_type&lt; T * &gt;</a>
 </li>
 </ul>
 
 
 <h3><a id="index_d"></a>- d -</h3><ul>
+<li>d
+: <a class="el" href="class_q_json_serializer_exception.html#a7a06c7f74f5baf9ce009344e8c2cfc27">QJsonSerializerException</a>
+</li>
 <li>deserialize()
 : <a class="el" href="class_q_json_serializer.html#ac2abe7502e5082e9e77ddc08e224840a">QJsonSerializer</a>
-</li>
-<li>deserializeEnum()
-: <a class="el" href="class_q_json_serializer.html#ab372af0004be21357bfd81139d241f4f">QJsonSerializer</a>
+, <a class="el" href="class_q_json_type_converter.html#af162ac051c8a5c9d168a1deecf5e0ae7">QJsonTypeConverter</a>
 </li>
 <li>deserializeFrom()
-: <a class="el" href="class_q_json_serializer.html#aafa3d1873bf297dca6a60ccc380415cc">QJsonSerializer</a>
+: <a class="el" href="class_q_json_serializer.html#a34800d922f12b1af0a016a5b06ecfb1b">QJsonSerializer</a>
 </li>
-<li>deserializeGadget()
-: <a class="el" href="class_q_json_serializer.html#a2764651e0a8236814d83f704f5f89751">QJsonSerializer</a>
+<li>deserializeSubtype()
+: <a class="el" href="class_q_json_serializer.html#aff36277293105f9560d3d4db0a38cdb2">QJsonSerializer</a>
+, <a class="el" href="class_q_json_type_converter_1_1_serialization_helper.html#ac6afd3cac07e7c59adacf8d39f9eee81">QJsonTypeConverter::SerializationHelper</a>
 </li>
-<li>deserializeList()
-: <a class="el" href="class_q_json_serializer.html#a16beee8729c68dcfaeebf56fdc16c924">QJsonSerializer</a>
-</li>
-<li>deserializeMap()
-: <a class="el" href="class_q_json_serializer.html#abd7c1223167f30699a51972036bd8a09">QJsonSerializer</a>
-</li>
-<li>deserializeObject()
-: <a class="el" href="class_q_json_serializer.html#a708c1375a8776cc38a94997b6b879d99">QJsonSerializer</a>
-</li>
-<li>deserializeValue()
-: <a class="el" href="class_q_json_serializer.html#ae767df019ead6232fc8c24a107f682f5">QJsonSerializer</a>
-</li>
-<li>deserializeVariant()
-: <a class="el" href="class_q_json_serializer.html#a26a9ab6826e95f9902f9b5f7daa12c4f">QJsonSerializer</a>
+<li>Disabled
+: <a class="el" href="class_q_json_serializer.html#aaf1235d174ee19e269d85a9a0d909e72a22919891b604cb7b35cfe91a463f5864">QJsonSerializer</a>
 </li>
 </ul>
 
 
 <h3><a id="index_e"></a>- e -</h3><ul>
+<li>Enabled
+: <a class="el" href="class_q_json_serializer.html#aaf1235d174ee19e269d85a9a0d909e72a176639071fbd8ac569fa3883a4ca3336">QJsonSerializer</a>
+</li>
 <li>enumAsString
 : <a class="el" href="class_q_json_serializer.html#ac430c1962106cc1d0efcbef4a11b03f3">QJsonSerializer</a>
 </li>
@@ -140,25 +134,30 @@ $(function() {
 
 
 <h3><a id="index_f"></a>- f -</h3><ul>
+<li>Forced
+: <a class="el" href="class_q_json_serializer.html#aaf1235d174ee19e269d85a9a0d909e72a24bfa9c0fdee3169ad224163356af85a">QJsonSerializer</a>
+</li>
+<li>fromVariant()
+: <a class="el" href="struct__qjsonserializer__helpertypes_1_1variant__helper.html#a30e427dc839f7d29c76e3c12ceea9193">_qjsonserializer_helpertypes::variant_helper&lt; T &gt;</a>
+, <a class="el" href="struct__qjsonserializer__helpertypes_1_1variant__helper_3_01_q_variant_01_4.html#aec93973e24214b33b91be268977d2dc7">_qjsonserializer_helpertypes::variant_helper&lt; QVariant &gt;</a>
+</li>
 <li>FullValidation
 : <a class="el" href="class_q_json_serializer.html#a0fb6dc294c5f0c2279e1e60c8bf19b37a78d3cfb1306be19cd4099429483dfd8f">QJsonSerializer</a>
 </li>
 </ul>
 
 
-<h3><a id="index_i"></a>- i -</h3><ul>
-<li>isDeserializationException()
-: <a class="el" href="class_q_json_serializer_exception.html#a363cc20cd7aaaf56f389a18be5836e63">QJsonSerializerException</a>
+<h3><a id="index_g"></a>- g -</h3><ul>
+<li>getProperty()
+: <a class="el" href="class_q_json_serializer.html#a2cba821c864602adb41c3c8b1325510e">QJsonSerializer</a>
+, <a class="el" href="class_q_json_type_converter_1_1_serialization_helper.html#ac96e469c2d5390ac700c9ac616f6d513">QJsonTypeConverter::SerializationHelper</a>
 </li>
 </ul>
 
 
 <h3><a id="index_j"></a>- j -</h3><ul>
-<li>JsonType
-: <a class="el" href="struct__qjsonserializer__helpertypes_1_1type__helper.html#a4b12f815d7ea7af56801088fefcc67e9">_qjsonserializer_helpertypes::type_helper&lt; T &gt;</a>
-, <a class="el" href="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_list_3_01_t_01_4_01_4.html#a91921e7acacb02943b492804eb387ffb">_qjsonserializer_helpertypes::type_helper&lt; QList&lt; T &gt; &gt;</a>
-, <a class="el" href="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_map_3_01_q_string_00_01_t_01_4_01_4.html#a1682e10ecd7fd54ccd6fbe92f5d6edf9">_qjsonserializer_helpertypes::type_helper&lt; QMap&lt; QString, T &gt; &gt;</a>
-, <a class="el" href="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_variant_01_4.html#a647d88720963f090836d04ee5b75a367">_qjsonserializer_helpertypes::type_helper&lt; QVariant &gt;</a>
+<li>jsonTypes()
+: <a class="el" href="class_q_json_type_converter.html#a1fd5c728302100b50b49bf47a3d213d5">QJsonTypeConverter</a>
 </li>
 </ul>
 
@@ -170,6 +169,13 @@ $(function() {
 </ul>
 
 
+<h3><a id="index_m"></a>- m -</h3><ul>
+<li>message()
+: <a class="el" href="class_q_json_serializer_exception.html#ab62a3950ba92a61ae4a77b4b4d6c119a">QJsonSerializerException</a>
+</li>
+</ul>
+
+
 <h3><a id="index_n"></a>- n -</h3><ul>
 <li>NoExtraProperties
 : <a class="el" href="class_q_json_serializer.html#a0fb6dc294c5f0c2279e1e60c8bf19b37ac8cb0e946f61b483209cb2484259bcf0">QJsonSerializer</a>
@@ -177,12 +183,24 @@ $(function() {
 </ul>
 
 
-<h3><a id="index_o"></a>- o -</h3><ul>
-<li>ObjectType
-: <a class="el" href="struct__qjsonserializer__helpertypes_1_1type__helper.html#acf5ab5da1d7ac57b9601adabaad1216e">_qjsonserializer_helpertypes::type_helper&lt; T &gt;</a>
-, <a class="el" href="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_list_3_01_t_01_4_01_4.html#a69ed8cac9ffd22669e6804089822ae60">_qjsonserializer_helpertypes::type_helper&lt; QList&lt; T &gt; &gt;</a>
-, <a class="el" href="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_map_3_01_q_string_00_01_t_01_4_01_4.html#a3244a65962fb7376544d22704fe28381">_qjsonserializer_helpertypes::type_helper&lt; QMap&lt; QString, T &gt; &gt;</a>
-, <a class="el" href="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_variant_01_4.html#a4df3f194269a9ac48a9d6795e5c5f761">_qjsonserializer_helpertypes::type_helper&lt; QVariant &gt;</a>
+<h3><a id="index_p"></a>- p -</h3><ul>
+<li>Polymorphing
+: <a class="el" href="class_q_json_serializer.html#aaf1235d174ee19e269d85a9a0d909e72">QJsonSerializer</a>
+</li>
+<li>polymorphing
+: <a class="el" href="class_q_json_serializer.html#ab3bf93ba232658e79a2a007d1f3d5239">QJsonSerializer</a>
+</li>
+<li>priority()
+: <a class="el" href="class_q_json_type_converter.html#ac40884acbfba06f74ce210de7aedf6ea">QJsonTypeConverter</a>
+</li>
+<li>Priority
+: <a class="el" href="class_q_json_type_converter.html#a9ac88a7b6e3e954b825afd56d1558b6d">QJsonTypeConverter</a>
+</li>
+<li>PropertyTrace
+: <a class="el" href="class_q_json_serializer_exception.html#a9a1de74f16f0dc2ba7717738e95c06f9">QJsonSerializerException</a>
+</li>
+<li>propertyTrace()
+: <a class="el" href="class_q_json_serializer_exception.html#a05006fd8c00f771834fe07a231d1de7e">QJsonSerializerException</a>
 </li>
 </ul>
 
@@ -198,7 +216,10 @@ $(function() {
 : <a class="el" href="class_q_json_serializer.html#ae0d46bea68e7abc4f0a7444a40c03017">QJsonSerializer</a>
 </li>
 <li>QJsonSerializerException()
-: <a class="el" href="class_q_json_serializer_exception.html#ab1746396d417b43bf2228dc62c706b1b">QJsonSerializerException</a>
+: <a class="el" href="class_q_json_serializer_exception.html#a5b40d9f001682cd43de78ec06b21b9a6">QJsonSerializerException</a>
+</li>
+<li>QJsonTypeConverter()
+: <a class="el" href="class_q_json_type_converter.html#a786af064dd2def05075386acf16d7bf6">QJsonTypeConverter</a>
 </li>
 </ul>
 
@@ -218,36 +239,26 @@ $(function() {
 <li>registerMapConverters()
 : <a class="el" href="class_q_json_serializer.html#a99a740629458388670ee7978e029ee33">QJsonSerializer</a>
 </li>
+<li>registerPairConverters()
+: <a class="el" href="class_q_json_serializer.html#ab643659186d5972a2bd7fd80bf5072b6">QJsonSerializer</a>
+</li>
+<li>registerPointerConverters()
+: <a class="el" href="class_q_json_serializer.html#a760ee7fa357f7090d82ad6974a7fe08b">QJsonSerializer</a>
+</li>
 </ul>
 
 
 <h3><a id="index_s"></a>- s -</h3><ul>
 <li>serialize()
 : <a class="el" href="class_q_json_serializer.html#ab68cf3a3dc0b5d8fecf85b729d0be0a9">QJsonSerializer</a>
+, <a class="el" href="class_q_json_type_converter.html#abeeba52f509cec3eb4c80b5b7dc07604">QJsonTypeConverter</a>
 </li>
-<li>serializeEnum()
-: <a class="el" href="class_q_json_serializer.html#af0db653b58dd5269fc3bf4dbd5d096a8">QJsonSerializer</a>
-</li>
-<li>serializeGadget()
-: <a class="el" href="class_q_json_serializer.html#ab247470405a303068400e77f1804666c">QJsonSerializer</a>
-</li>
-<li>serializeList()
-: <a class="el" href="class_q_json_serializer.html#a21c6c7088e7992207f40bd0d8b1a3f51">QJsonSerializer</a>
-</li>
-<li>serializeMap()
-: <a class="el" href="class_q_json_serializer.html#a4c899955f97b325ffc7f03d96ab79250">QJsonSerializer</a>
-</li>
-<li>serializeObject()
-: <a class="el" href="class_q_json_serializer.html#aa23c9ff8064d76e9a02ee6f685a73ce3">QJsonSerializer</a>
+<li>serializeSubtype()
+: <a class="el" href="class_q_json_serializer.html#a4c04b5da13864d0bb4e4a9236fcc1335">QJsonSerializer</a>
+, <a class="el" href="class_q_json_type_converter_1_1_serialization_helper.html#abdb0a1c4e75c057e9b836ee220742a6a">QJsonTypeConverter::SerializationHelper</a>
 </li>
 <li>serializeTo()
 : <a class="el" href="class_q_json_serializer.html#a163d6f5b77e0b8b874d49a2cd546c88d">QJsonSerializer</a>
-</li>
-<li>serializeValue()
-: <a class="el" href="class_q_json_serializer.html#a87cb2307625b39c10f46306b4aa585e7">QJsonSerializer</a>
-</li>
-<li>serializeVariant()
-: <a class="el" href="class_q_json_serializer.html#a125f14a7499788d9c7c7215e65268b1f">QJsonSerializer</a>
 </li>
 <li>setAllowDefaultNull()
 : <a class="el" href="class_q_json_serializer.html#ad807b89a053e8aac9930b2b6d8cf8cc4">QJsonSerializer</a>
@@ -257,6 +268,12 @@ $(function() {
 </li>
 <li>setKeepObjectName()
 : <a class="el" href="class_q_json_serializer.html#af4d083e88a88bec52b4951b2d8395767">QJsonSerializer</a>
+</li>
+<li>setPolymorphing()
+: <a class="el" href="class_q_json_serializer.html#a567a75ad4496ac2fade39cbb1a4cec74">QJsonSerializer</a>
+</li>
+<li>setPriority()
+: <a class="el" href="class_q_json_type_converter.html#a7ec07ecf9eddf8ab115735455c671def">QJsonTypeConverter</a>
 </li>
 <li>setValidationFlags()
 : <a class="el" href="class_q_json_serializer.html#a3441ff7a583a30f3f6d38bfc8b7bee39">QJsonSerializer</a>
@@ -268,11 +285,9 @@ $(function() {
 
 
 <h3><a id="index_t"></a>- t -</h3><ul>
-<li>Type
-: <a class="el" href="struct__qjsonserializer__helpertypes_1_1type__helper.html#aaf407ddc64babfc5fd442e9563fe8b9d">_qjsonserializer_helpertypes::type_helper&lt; T &gt;</a>
-, <a class="el" href="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_list_3_01_t_01_4_01_4.html#a2442fafc9940ca5445096507bdde28af">_qjsonserializer_helpertypes::type_helper&lt; QList&lt; T &gt; &gt;</a>
-, <a class="el" href="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_map_3_01_q_string_00_01_t_01_4_01_4.html#a7af1b9a695f96bc7d7b2cdbb4863b273">_qjsonserializer_helpertypes::type_helper&lt; QMap&lt; QString, T &gt; &gt;</a>
-, <a class="el" href="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_variant_01_4.html#a69c8f01a33021f62907969b8f892650b">_qjsonserializer_helpertypes::type_helper&lt; QVariant &gt;</a>
+<li>toVariant()
+: <a class="el" href="struct__qjsonserializer__helpertypes_1_1variant__helper.html#a519bfa6d5acc53c4ea9af61125852170">_qjsonserializer_helpertypes::variant_helper&lt; T &gt;</a>
+, <a class="el" href="struct__qjsonserializer__helpertypes_1_1variant__helper_3_01_q_variant_01_4.html#a8a6f6dc8c63535aa55bacf46b142e7d2">_qjsonserializer_helpertypes::variant_helper&lt; QVariant &gt;</a>
 </li>
 </ul>
 
@@ -284,18 +299,16 @@ $(function() {
 <li>validationFlags
 : <a class="el" href="class_q_json_serializer.html#a6baa7de9acfd41c1780ea90464b696e3">QJsonSerializer</a>
 </li>
-<li>variant()
-: <a class="el" href="struct__qjsonserializer__helpertypes_1_1type__helper.html#abe922153f145b6bd5cfad51ce35a4bd6">_qjsonserializer_helpertypes::type_helper&lt; T &gt;</a>
-, <a class="el" href="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_list_3_01_t_01_4_01_4.html#a51a090c599415eb18eb5bf99d17201f7">_qjsonserializer_helpertypes::type_helper&lt; QList&lt; T &gt; &gt;</a>
-, <a class="el" href="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_map_3_01_q_string_00_01_t_01_4_01_4.html#a75b347c0aec8812ba1ef60622e9920b1">_qjsonserializer_helpertypes::type_helper&lt; QMap&lt; QString, T &gt; &gt;</a>
-, <a class="el" href="struct__qjsonserializer__helpertypes_1_1type__helper_3_01_q_variant_01_4.html#ae1f00f15a217cedf2f191537555f55a9">_qjsonserializer_helpertypes::type_helper&lt; QVariant &gt;</a>
+<li>value
+: <a class="el" href="struct__qjsonserializer__helpertypes_1_1gadget__helper.html#a689729575d9a1c19cdebca83ca03bfcf">_qjsonserializer_helpertypes::gadget_helper&lt; T, Enable &gt;</a>
+, <a class="el" href="struct__qjsonserializer__helpertypes_1_1gadget__helper_3_01_t_00_01typename_01_t_1_1_qt_gadget_helper_01_4.html#a638176e785a3b278c8f1e325391b3deb">_qjsonserializer_helpertypes::gadget_helper&lt; T, typename T::QtGadgetHelper &gt;</a>
 </li>
 </ul>
 
 
 <h3><a id="index_w"></a>- w -</h3><ul>
 <li>what()
-: <a class="el" href="class_q_json_serializer_exception.html#a96fb501023ca0a13b43ee11182080c74">QJsonSerializerException</a>
+: <a class="el" href="class_q_json_serializer_exception.html#aa0c888addeffaf1c683a18876fc44c57">QJsonSerializerException</a>
 </li>
 </ul>
 
@@ -304,11 +317,17 @@ $(function() {
 <li>~QJsonSerializer()
 : <a class="el" href="class_q_json_serializer.html#aa6a590f7c89c651ca77555a1fec9c5bc">QJsonSerializer</a>
 </li>
+<li>~QJsonTypeConverter()
+: <a class="el" href="class_q_json_type_converter.html#adda9592006fdf93fe5ba3efed1b46e59">QJsonTypeConverter</a>
+</li>
+<li>~SerializationHelper()
+: <a class="el" href="class_q_json_type_converter_1_1_serialization_helper.html#aaf892eb7a271d9966eb19c4b5eec1e35">QJsonTypeConverter::SerializationHelper</a>
+</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Jun 17 2017 12:03:17 for QtJsonSerializer by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Aug 19 2017 19:22:02 for QtJsonSerializer by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.13
 </small></address>

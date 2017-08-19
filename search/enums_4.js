@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['remotestate',['RemoteState',['https://doc.qt.io/qt-5/class_qt_data_sync_1_1_remote_connector.html#a3559486872598c62e9cf7dafe0d393a2',0,'QtDataSync::RemoteConnector']]]
+  ['polymorphing',['Polymorphing',['../class_q_json_serializer.html#aaf1235d174ee19e269d85a9a0d909e72',1,'QJsonSerializer']]],
+  ['priority',['Priority',['../class_q_json_type_converter.html#a9ac88a7b6e3e954b825afd56d1558b6d',1,'QJsonTypeConverter']]]
 ];
