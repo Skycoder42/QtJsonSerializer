@@ -12,11 +12,11 @@ SOURCES += \
 	testobject.cpp \
 	brokentestobject.cpp \
 	tst_objectserializer.cpp \
-    testpolyobject.cpp
+	testpolyobject.cpp
 
 HEADERS += \
 	testobject.h \
 	brokentestobject.h \
-    testpolyobject.h
+	testpolyobject.h
 
 mac: QMAKE_LFLAGS += '-Wl,-rpath,\'$$OUT_PWD/../../../../lib\''
