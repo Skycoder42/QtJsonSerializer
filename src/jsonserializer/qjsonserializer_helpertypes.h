@@ -17,7 +17,7 @@ namespace _qjsonserializer_helpertypes {
 
 //! test if a type can be serialized
 template <typename T>
-struct is_serializable : public std::negation<std::is_pointer<T>> {};
+struct is_serializable : public std::integral_constant<bool, !std::is_pointer<T>::value> {}; //C++17 negation
 
 //! @copydoc _qjsonserializer_helpertypes::is_serializable
 template <typename T>
@@ -47,7 +47,7 @@ struct is_serializable<QHash<QString, T>> : public is_serializable<T> {};
 
 //! @copydoc _qjsonserializer_helpertypes::is_serializable
 template <typename T1, typename T2>
-struct is_serializable<QPair<T1, T2>> : public std::conjunction<is_serializable<T1>, is_serializable<T2>> {};
+struct is_serializable<QPair<T1, T2>> : public std::conditional<is_serializable<T1>::value && is_serializable<T2>::value, std::true_type, std::false_type>::type {}; //C++17 conjunction
 
 
 

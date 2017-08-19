@@ -4,8 +4,6 @@ QT = core jsonserializer testlib
 CONFIG   += console
 CONFIG   -= app_bundle
 
-CONFIG += c++11 strict_c++ c++14 c++1z
-
 TARGET = tst_gadgetserializer
 
 DEFINES -= QT_ASCII_CAST_WARNINGS
