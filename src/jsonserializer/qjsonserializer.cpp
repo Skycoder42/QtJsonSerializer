@@ -23,14 +23,14 @@ QJsonSerializer::QJsonSerializer(QObject *parent) :
 	QObject(parent),
 	d(new QJsonSerializerPrivate())
 {
-	registerConverter(new QJsonObjectConverter());
-	registerConverter(new QJsonGadgetConverter());
-	registerConverter(new QJsonMapConverter());
-	registerConverter(new QJsonListConverter());
-	registerConverter(new QJsonJsonValueConverter());
-	registerConverter(new QJsonJsonObjectConverter());
-	registerConverter(new QJsonJsonArrayConverter());
-	registerConverter(new QJsonPairConverter());
+	addJsonTypeConverter(new QJsonObjectConverter());
+	addJsonTypeConverter(new QJsonGadgetConverter());
+	addJsonTypeConverter(new QJsonMapConverter());
+	addJsonTypeConverter(new QJsonListConverter());
+	addJsonTypeConverter(new QJsonJsonValueConverter());
+	addJsonTypeConverter(new QJsonJsonObjectConverter());
+	addJsonTypeConverter(new QJsonJsonArrayConverter());
+	addJsonTypeConverter(new QJsonPairConverter());
 }
 
 QJsonSerializer::~QJsonSerializer() {}
@@ -94,7 +94,7 @@ QVariant QJsonSerializer::deserializeFrom(const QByteArray &data, int metaTypeId
 	return res;
 }
 
-void QJsonSerializer::registerConverter(QJsonTypeConverter *converter)
+void QJsonSerializer::addJsonTypeConverter(QJsonTypeConverter *converter)
 {
 	Q_ASSERT_X(converter, Q_FUNC_INFO, "converter must not be null!");
 

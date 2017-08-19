@@ -12,6 +12,7 @@ class QJsonSerializationExceptionPrivate;
 class Q_JSONSERIALIZER_EXPORT QJsonSerializerException : public QException
 {
 public:
+	//! The type of a stack of a property trace
 	typedef QStack<QPair<QByteArray, QByteArray>> PropertyTrace;
 
 	//! Constructor with error message
@@ -20,7 +21,9 @@ public:
 	//! @inherit{std::exception::what}
 	const char *what() const noexcept final;
 
+	//! Returns the error message, without the property trace
 	QByteArray message() const;
+	//! Returns the property trace
 	PropertyTrace propertyTrace() const;
 
 	//! @inherit{QException::raise}
@@ -29,6 +32,7 @@ public:
 	QException *clone() const override;
 
 protected:
+	//! Private implementation (internal)
 	QSharedPointer<QJsonSerializationExceptionPrivate> d;
 };
 

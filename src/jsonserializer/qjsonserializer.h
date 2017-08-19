@@ -29,6 +29,7 @@ class Q_JSONSERIALIZER_EXPORT QJsonSerializer : public QObject, protected QJsonT
 	Q_PROPERTY(bool enumAsString READ enumAsString WRITE setEnumAsString)
 	//! Specify how strictly the serializer should verify data when deserializing
 	Q_PROPERTY(ValidationFlags validationFlags READ validationFlags WRITE setValidationFlags)
+	//! Specify how the serializer should treat polymorphy
 	Q_PROPERTY(Polymorphing polymorphing READ polymorphing WRITE setPolymorphing)
 
 public:
@@ -42,10 +43,11 @@ public:
 	Q_DECLARE_FLAGS(ValidationFlags, ValidationFlag)
 	Q_FLAG(ValidationFlags)
 
+	//! Enum to specify the modes of polymorphism
 	enum Polymorphing {
-		Disabled,
-		Enabled,
-		Forced
+		Disabled,//!< Do not serialize polymorphic and ignore information about classes in json
+		Enabled,//!< Use polymorphism where declared by the classes/json
+		Forced//!< Treat every object polymorphic, and required the class information to be present in json
 	};
 	Q_ENUM(Polymorphing)
 
@@ -63,8 +65,10 @@ public:
 	//! Registers a custom type for list and map converisons
 	template<typename T>
 	static bool registerAllConverters();
+	//! Registers a custom type for QSharedPointer and QPointer converisons
 	template<typename T>
-	static bool registerPointerConverters(); //TODO include to all converters
+	static bool registerPointerConverters();
+	//! Registers two types for pair conversion
 	template<typename T, typename U>
 	static bool registerPairConverters();
 
@@ -76,6 +80,7 @@ public:
 	bool enumAsString() const;
 	//! @readAcFn{QJsonSerializer::validationFlags}
 	ValidationFlags validationFlags() const;
+	//! @readAcFn{QJsonSerializer::polymorphing}
 	Polymorphing polymorphing() const;
 
 	//! Serializers a QVariant value to a QJsonValue
@@ -112,7 +117,8 @@ public:
 	template <typename T>
 	T deserializeFrom(const QByteArray &data, QObject *parent = nullptr) const;
 
-	void registerConverter(QJsonTypeConverter *converter);
+	//! Adds a custom type converter to this serializer
+	void addJsonTypeConverter(QJsonTypeConverter *converter);
 
 public Q_SLOTS:
 	//! @writeAcFn{QJsonSerializer::allowDefaultNull}
@@ -123,6 +129,7 @@ public Q_SLOTS:
 	void setEnumAsString(bool enumAsString);
 	//! @writeAcFn{QJsonSerializer::validationFlags}
 	void setValidationFlags(ValidationFlags validationFlags);
+	//! @writeAcFn{QJsonSerializer::polymorphing}
 	void setPolymorphing(Polymorphing polymorphing);
 
 protected:
