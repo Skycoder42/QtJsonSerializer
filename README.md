@@ -7,13 +7,14 @@ With this small library, you are able to serialize any QObject or Q_GADGET class
 [![Appveyor Build status](https://ci.appveyor.com/api/projects/status/hj4rw0rikh8w1i4h/branch/master?svg=true)](https://ci.appveyor.com/project/Skycoder42/qjsonserializer/branch/master)
 
 ## Features
-- Serialize QObjects, Q_GADGETS, and lists of both to JSON, in a generic matter
+- Serialize QObjects, Q_GADGETS, lists, maps, etc. to JSON, in a generic matter
 - ... and of course deserialize JSON back as well
 - De/serialize any QVariant - as long as it contains only basic types or one of the above
-	- Works even with QJsonValue/Array/Object as propteries
+	- Works even with QJsonValue/Array/Object as properties
 - Serializes Q_PROPERTY elements
 - Enum de/serialization as integer or as string
 - Deserialization: Additional JSON-values will be stored as dynamic properties for QObjects
+- Supports polymorphism
 - Fully Unit-Tested
 - Thread-Safe
 - Easily extensible
@@ -109,7 +110,7 @@ In order for the serializer to properly work, there are a few things you have to
 
 1. Only Q_PROPERTY properties will be serialized, and of those only properties that are marked to be stored (see [The Property System](https://doc.qt.io/qt-5/properties.html#requirements-for-declaring-properties), STORED attribute)
 2. For deserialization of QObjects, they need an invokable constructor, that takes only a parent: `Q_INVOKABLE MyClass(QObject*);`
-3. Only properties with the following types can be serialized:
+3. Only the following types can be serialized:
 	- `QObject*` and deriving classes
 	- Classes/structs marked with `Q_GADGET` (as value types only!)
 	- `QList`, of any type that is serializable as well
@@ -118,9 +119,15 @@ In order for the serializer to properly work, there are a few things you have to
 	- `Q_ENUM` and `Q_FLAG` types, as integer or as string
 		- The string de/serialization of Q_ENUM and Q_FLAG types only works if used as a Q_PROPERTY. Integer will always work.
 	- `QJson...` types
+	- `QPair<T, T>`, of any types that are serializable as well
 	- Any type you add yourself by extending the serializer
-4. While simple list types (i.e. `QList<int>`) are supported out of the box, for custom types (like `QList<TestObject*>`) you will have to register converters from and to `QVariantList`
-	- This can be done by using [`QJsonSerializer::registerListConverters<TestObject*>()`](src/qjsonserializer.h#L27)
+4. While simple types (i.e. `QList<int>`) are supported out of the box, for custom types (like `QList<TestObject*>`) you will have to register converters. This goes for
+	- QList: use `QJsonSerializer::registerListConverters<T>()`
+	- QMap: use `QJsonSerializer::registerMapConverters<T>()`
+	- QPair: use `QJsonSerializer::registerPairConverters<T1, T2>()`
+	- QSharedPointer/QPointer: use `QJsonSerializer::registerPointerConverters<T>()`
+4. While simple list/map types (i.e. `QList<int>`) are supported out of the box, for custom types (like `QList<TestObject*>`) you will have to register converters from and to `QVariantList`
+	- This can be done by using [`QJsonSerializer::registerAllConverters<TestObject*>()`](src/qjsonserializer.h#L27)
 5. By default, the `objectName` property of QObjects is not serialized (See [keepObjectName](src/qjsonserializer.h#L20))
 6. By default, the JSON `null` can only be converted to QObjects/G_GADGETs. For other types the conversion fails (See [allowDefaultNull](src/qjsonserializer.h#L19))
 
