@@ -390,5 +390,8 @@ This includes pairs with T1 == T2.
 Adds a custom converter class to add additional serialization capabilities. Check
 the QJsonTypeConverter documentation for details.
 
+@warning The serializer takes ownership of the converter and may delete it any time after
+this methods has been called.
+
 @sa QJsonTypeConverter
 */

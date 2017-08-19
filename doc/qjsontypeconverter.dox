@@ -1,0 +1,226 @@
+/*!
+@class QJsonTypeConverter
+
+If you have a custom class, that cannot be serialized with the converters the library has built in,
+you will need to create a custom type converter in order to handle your type. Implement this interface
+for your custom type, and add it to a serializer instance by calling QJsonSerializer::addJsonTypeConverter.
+
+@attention Most types are already covered by the converters internally used by the library. To find out if
+you custom type is already supported by what the library provides, either try it out out check your class
+against the list found in the @ref qtjsonserializer_readme_label_4 "Usage Hints". You don't need a custom
+converter for most types.
+
+@section example Example
+To understand how it works, here is a small example for a custom type converter. First, the definition
+of the custom class.
+
+@note A class like this could be easily defined as Q_GADGET, and thus would not need a custom converter.
+It is only done without the gadget to demonstrate how a converter could look like.
+
+@subsection setup Setup
+@code{.cpp}
+class Foo
+{
+public:
+	Foo(int salt, QObject *object);
+
+	// destructor, other methods, etc...
+
+private:
+	int salt;
+	QObject *object;
+};
+
+Q_DECLARE_METATYPE(Foo) //important
+@endcode
+
+This class is neither a gadget nor an object, and thus be default not serializable. For this example, we
+want to get the following json out of the serializer for this type:
+
+@code{.json}
+{
+	"salt": <number>
+	"object": <whatever QObjects serialize to>
+}
+@endcode
+
+@subsection class The Converter class
+To do this, we implement our custom type converter:
+@code{.cpp}
+class QJsonFooConverter : public QJsonTypeConverter
+{
+public:
+	bool canConvert(int metaTypeId) const override;
+	QList<QJsonValue::Type> jsonTypes() const override;
+	QJsonValue serialize(int propertyType, const QVariant &value, const SerializationHelper *helper) const override;
+	QVariant deserialize(int propertyType, const QJsonValue &value, QObject *parent, const SerializationHelper *helper) const override;
+};
+@endcode
+
+There are 4 methods to be implemented. In addition to that, there is also the QJsonTypeConverter::priority. It is not relevant for this example,
+but might be for your special case.
+
+@subsubsection class_canConvert The `canConvert` method
+This method is called be the serializer to determine whether your converter can handle a specific type or not. In our case,
+all that needs to be done is to check if the passed type is our Foo type:
+@code{.cpp}
+bool QJsonFooConverter::canConvert(int metaTypeId) const
+{
+	return metaTypeId == qMetaTypeId<Foo>();
+}
+@endcode
+
+@subsubsection class_jsonTypes The `jsonTypes` method
+This method is called be the serializer to determine which json types your converter can deserialize. For the example, we serialize to
+a json object, and thus can only deserialize json objects as well.
+@code{.cpp}
+QList<QJsonValue::Type> QJsonFooConverter::jsonTypes() const
+{
+	return {QJsonValue::Object};
+}
+@endcode
+
+@subsubsection class_serialize The `serialize` method
+This method contains the actual code to convert our c++ Foo object into a json object.
+This is easy for the interger type `salt`, as json has numbers. But for the object, we
+want the QJsonSerializer to do the work for as. To do this, we make use of the SerializationHelper
+that is passed as last paremeter of the serialize method.
+@code{.cpp}
+QJsonValue QJsonFooConverter::serialize(int propertyType, const QVariant &value, const SerializationHelper *helper) const
+{
+	auto foo = value.value<Foo>(); //convert the QVariant parameter to our Foo type
+	QJsonObject fooJson;//create the json
+	fooJson["salt"] = foo.salt;
+	fooJson["object"] = helper->serializeSubtype(QMetaType::QObjectStar, QVariant::fromValue(foo.object), "object");
+	return fooJson;
+}
+@endcode
+
+We pass 3 arguments to the SerializationHelper::serializeSubtype method. The first one is the type
+of what we want to get serialized. In this case, a pointer to QObject. The second is the actual value,
+converted to QVariant. The third parameter is a hint in case of an exception. It basically means: If
+something goes wrong it was somewhere in the object field of the Foo class.
+
+@note If you need to do error handling, i.e. fail in case of an error, do so by throwing a QJsonSerializationException
+
+@subsubsection class_deserialize The `deserialize` method
+This method contains the actual code to convert a json object into our c++ Foo object.
+This is easy for the interger type `salt`, as json has numbers. But for the object, we
+want the QJsonSerializer to do the work for as. To do this, we make use of the SerializationHelper
+that is passed as last paremeter of the deserialize method.
+@code{.cpp}
+QVariant QJsonFooConverter::deserialize(int propertyType, const QJsonValue &value, QObject *parent, const SerializationHelper *helper) const
+{
+	Q_UNUSED(parent); //not used because we own the object
+	auto jsonFoo = value.toObject(); //convert json value to a json object
+
+	//check if salt is what you expect it to be
+	if(!jsonFoo["salt"].isDouble())
+		throw QJsonDeserializationException("No json valued named salt with number type");
+
+	auto object = helper->deserializeSubtype(QMetaType::QObjectStar, jsonFoo["object"], nullptr, "object");
+	Foo foo(jsonFoo["salt"].toInt(), object);
+	return QVariant::fromValue(foo);
+}
+@endcode
+
+We pass 4 arguments to the SerializationHelper::serializeSubtype method. The first one is the type
+of what we want to get deserialized. In this case, a pointer to QObject. The second is the actual
+json value. The third argument is parent for the QObject. In our case, the Foo class owns the object,
+and thus the object should not have a parent, and we pass nullptr. The fourth parameter is a hint in
+case of an exception. It basically means: If something goes wrong it was somewhere in the object
+field of the Foo class.
+
+@note If you need to do error handling, i.e. fail in case of an error, do so by throwing a QJsonDeserializationException
+
+@sa QJsonSerializer::addJsonTypeConverter
+*/
+
+/*!
+@fn QJsonTypeConverter::priority
+
+@returns The priority of the converter
+
+The priority is important for cases where multiple converters can handle the same type. The converter with the highest
+priority wins. The default value is 0, and so are all converters internally used by the library. The property can be set
+either by your implementation (i.e. in the constructor), or dynamically before adding the converter to a serializer.
+
+@sa QJsonTypeConverter::Priority, QJsonTypeConverter::setPriority
+*/
+
+/*!
+@fn QJsonTypeConverter::setPriority
+
+@param priority The priority of the converter
+
+The priority is important for cases where multiple converters can handle the same type. The converter with the highest
+priority wins. The default value is 0, and so are all converters internally used by the library. The property can be set
+either by your implementation (i.e. in the constructor), or dynamically before adding the converter to a serializer.
+
+@sa QJsonTypeConverter::Priority, QJsonTypeConverter::priority
+*/
+
+/*!
+@fn QJsonTypeConverter::canConvert
+
+@returns true, if this converter can convert the given type, false otherwise
+
+If you return true for this method, it is expected your implementation can successfully
+de/serialize any _valid_ instance for the given type. If you can't, serialization will fail,
+and no other converter get's a chance to try
+
+@sa @ref example Example, QJsonTypeConverter::jsonTypes
+*/
+
+/*!
+@fn QJsonTypeConverter::jsonTypes
+
+@returns A list of all supported json types for deserialization
+
+It is possible to return no or multiple types. Your implementation must be able to
+deserialize any combination of the returned types and the metatypes accepted by
+QJsonTypeConverter::canConvert. This is very important.
+
+In case only specific combinations are allowed, split your implementation up into
+multiple converters.
+
+@sa @ref example Example, QJsonTypeConverter::canConvert
+*/
+
+/*!
+@fn QJsonTypeConverter::serialize
+
+@param propertyType The type of the data to serialize
+@param value The value to serialize, wrapped as QVariant
+@param helper A SerializationHelper, in case you need to serialize subtypes
+@returns A json value with the serialized data of value
+@throws QJsonSerializationException In case something goes wrong, invalid data, etc.
+
+@sa @ref example Example, QJsonTypeConverter::deserialize, SerializationHelper
+*/
+
+/*!
+@fn QJsonTypeConverter::deserialize
+
+@param propertyType The type of the data to deserialize
+@param value The value to deserialize, as json value
+@param parent A parent object, in case you create a QObject class you can pass it as parent
+@param helper A SerializationHelper, in case you need to deserialize subtypes
+@returns The deserialized data, wrapped as QVariant
+@throws QJsonDeserializationException In case something goes wrong, invalid data, etc.
+
+@sa @ref example Example, QJsonTypeConverter::serialize, SerializationHelper
+*/
+
+
+
+/*!
+@class QJsonTypeConverter::SerializationHelper
+
+@warning Do not implement this class yourself. It is created internally, and only passed to your custom converter implementations
+
+For the de/serializeSubtype methods, always prefer the overload with the QMetaProperty parameter, in case you have one. If not,
+it is recommended to pass a "naming" string as last parameter, to help identifying errors.
+
+@sa QJsonTypeConverter, QJsonTypeConverter::serialize, QJsonTypeConverter::deserialize
+*/

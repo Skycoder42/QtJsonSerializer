@@ -20,3 +20,6 @@ docInst1.CONFIG += no_check_exist
 docInst2.path = $$[QT_INSTALL_DOCS]
 docInst2.files = $$OUT_PWD/qtjsonserializer
 INSTALLS += docInst1 docInst2
+
+DISTFILES += \
+    qjsontypeconverter.dox
