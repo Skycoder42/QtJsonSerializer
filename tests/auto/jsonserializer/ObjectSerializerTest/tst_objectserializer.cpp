@@ -74,6 +74,8 @@ void ObjectSerializerTest::initTestCase()
 	QJsonSerializer::registerPairConverters<ChildObject*, QList<int>>();
 	QJsonSerializer::registerListConverters<QPair<bool, bool>>();
 
+	QJsonSerializer::registerAllConverters<TestPolyObject*>();
+
 	//register list comparators, needed for test only!
 	QMetaType::registerComparators<QList<int>>();
 	QMetaType::registerComparators<QList<QList<int>>>();
@@ -94,8 +96,6 @@ void ObjectSerializerTest::initTestCase()
 	QMetaType::registerComparators<QList<QPair<bool, bool>>>();
 
 	serializer = new QJsonSerializer(this);
-
-	qMetaTypeId<TestObject*>();
 }
 
 void ObjectSerializerTest::cleanupTestCase()
@@ -651,32 +651,35 @@ void ObjectSerializerTest::testPolyDeserialization_data()
 										<< QJsonSerializer::Forced
 										<< false;
 
-	testObj = new TestObject(this);
+	testObj = new TestPolyObject(10, this);
 	testObj->setObjectName("test");
-	QTest::newRow("enabled") << TestObject::createJson({
-														   {"@class", "TestObject"},
-														   {"objectName", "test"}
-													   })
+	QTest::newRow("enabled") << QJsonObject({
+												{"@class", "TestPolyObject"},
+												{"objectName", "test"},
+												{"data", 10}
+											})
 							 << testObj
 							 << QJsonSerializer::Enabled
 							 << true;
 
-	testObj = new TestObject(this);
+	testObj = new TestPolyObject(11, this);
 	testObj->setObjectName("test");
-	QTest::newRow("forced") << TestObject::createJson({
-														  {"@class", "TestObject"},
-														  {"objectName", "test"}
-													  })
+	QTest::newRow("forced") << QJsonObject({
+											   {"@class", "TestPolyObject"},
+											   {"objectName", "test"},
+											   {"data", 11}
+										   })
 							<< testObj
 							<< QJsonSerializer::Forced
 							<< true;
 
 	testObj = new QObject(this);
 	testObj->setObjectName("test");
-	QTest::newRow("disabled") << TestObject::createJson({
-														  {"@class", "TestObject"},
-														  {"objectName", "test"}
-													  })
+	QTest::newRow("disabled") << QJsonObject({
+												 {"@class", "TestPolyObject"},
+												 {"objectName", "test"},
+												 {"data", 11}
+											 })
 							  << testObj
 							  << QJsonSerializer::Disabled
 							  << true;
