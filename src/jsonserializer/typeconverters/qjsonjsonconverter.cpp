@@ -20,16 +20,18 @@ QList<QJsonValue::Type> QJsonJsonValueConverter::jsonTypes() const
 	};
 }
 
-QJsonValue QJsonJsonValueConverter::serialize(int propertyType, const QVariant &value) const
+QJsonValue QJsonJsonValueConverter::serialize(int propertyType, const QVariant &value, const SerializationHelper *helper) const
 {
 	Q_UNUSED(propertyType)
+	Q_UNUSED(helper)
 	return value.toJsonValue();
 }
 
-QVariant QJsonJsonValueConverter::deserialize(int propertyType, const QJsonValue &value, QObject *parent) const
+QVariant QJsonJsonValueConverter::deserialize(int propertyType, const QJsonValue &value, QObject *parent, const SerializationHelper *helper) const
 {
 	Q_UNUSED(propertyType)
 	Q_UNUSED(parent)
+	Q_UNUSED(helper)
 	return QVariant::fromValue(value);
 }
 
@@ -43,16 +45,18 @@ QList<QJsonValue::Type> QJsonJsonObjectConverter::jsonTypes() const
 	return {QJsonValue::Object};
 }
 
-QJsonValue QJsonJsonObjectConverter::serialize(int propertyType, const QVariant &value) const
+QJsonValue QJsonJsonObjectConverter::serialize(int propertyType, const QVariant &value, const SerializationHelper *helper) const
 {
 	Q_UNUSED(propertyType)
+	Q_UNUSED(helper)
 	return value.toJsonObject();
 }
 
-QVariant QJsonJsonObjectConverter::deserialize(int propertyType, const QJsonValue &value, QObject *parent) const
+QVariant QJsonJsonObjectConverter::deserialize(int propertyType, const QJsonValue &value, QObject *parent, const SerializationHelper *helper) const
 {
 	Q_UNUSED(propertyType)
 	Q_UNUSED(parent)
+	Q_UNUSED(helper)
 	return QVariant::fromValue(value.toObject());
 }
 
@@ -66,15 +70,17 @@ QList<QJsonValue::Type> QJsonJsonArrayConverter::jsonTypes() const
 	return {QJsonValue::Array};
 }
 
-QJsonValue QJsonJsonArrayConverter::serialize(int propertyType, const QVariant &value) const
+QJsonValue QJsonJsonArrayConverter::serialize(int propertyType, const QVariant &value, const SerializationHelper *helper) const
 {
 	Q_UNUSED(propertyType)
+	Q_UNUSED(helper)
 	return value.toJsonArray();
 }
 
-QVariant QJsonJsonArrayConverter::deserialize(int propertyType, const QJsonValue &value, QObject *parent) const
+QVariant QJsonJsonArrayConverter::deserialize(int propertyType, const QJsonValue &value, QObject *parent, const SerializationHelper *helper) const
 {
 	Q_UNUSED(propertyType)
 	Q_UNUSED(parent)
+	Q_UNUSED(helper)
 	return QVariant::fromValue(value.toArray());
 }

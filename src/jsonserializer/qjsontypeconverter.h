@@ -68,18 +68,4 @@ private:
 	QScopedPointer<QJsonTypeConverterPrivate> d;
 };
 
-//! An interface to create custom serializer type converters, without any subtypes or properties
-class Q_JSONSERIALIZER_EXPORT QSimpleJsonTypeConverter : public QJsonTypeConverter
-{
-public:
-	//! @copybrief QJsonTypeConverter::serialize
-	virtual QJsonValue serialize(int propertyType, const QVariant &value) const = 0;
-	//! @copybrief QJsonTypeConverter::deserialize
-	virtual QVariant deserialize(int propertyType, const QJsonValue &value, QObject *parent) const = 0;
-
-	// QJsonTypeConverter interface
-	QJsonValue serialize(int propertyType, const QVariant &value, const SerializationHelper *helper) const final;
-	QVariant deserialize(int propertyType, const QJsonValue &value, QObject *parent, const SerializationHelper *helper) const final;
-};
-
 #endif // QJSONTYPECONVERTER_H
