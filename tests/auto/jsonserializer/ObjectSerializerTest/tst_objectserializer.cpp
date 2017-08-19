@@ -1049,6 +1049,12 @@ static void compile_test()
 	TestObject *t;
 	QList<TestObject*> l;
 	QMap<QString, TestObject*> m;
+	int i;
+	QString str;
+	QList<int> il;
+	QMap<QString, bool> bm;
+	QPair<double, bool> dbp;
+
 	QIODevice *d = nullptr;
 	QByteArray b;
 	QJsonValue jv;
@@ -1060,16 +1066,31 @@ static void compile_test()
 	jo = s.serialize(t);
 	ja = s.serialize(l);
 	jo = s.serialize(m);
+	jv = s.serialize(i);
+	jv = s.serialize(str);
+	ja = s.serialize(il);
+	jo = s.serialize(bm);
+	ja = s.serialize(dbp);
 
 	s.serializeTo(d, v);
 	s.serializeTo(d, t);
 	s.serializeTo(d, l);
 	s.serializeTo(d, m);
+	s.serializeTo(d, i);
+	s.serializeTo(d, str);
+	s.serializeTo(d, il);
+	s.serializeTo(d, bm);
+	s.serializeTo(d, dbp);
 
 	b = s.serializeTo(v);
 	b = s.serializeTo(t);
 	b = s.serializeTo(l);
 	b = s.serializeTo(m);
+	b = s.serializeTo(i);
+	b = s.serializeTo(str);
+	b = s.serializeTo(il);
+	b = s.serializeTo(bm);
+	b = s.serializeTo(dbp);
 
 	v = s.deserialize(jv, qMetaTypeId<TestObject*>());
 	v = s.deserialize(jv, qMetaTypeId<TestObject*>(), p);
@@ -1079,6 +1100,16 @@ static void compile_test()
 	l = s.deserialize<QList<TestObject*>>(ja, p);
 	m = s.deserialize<QMap<QString, TestObject*>>(jo);
 	m = s.deserialize<QMap<QString, TestObject*>>(jo, p);
+	i = s.deserialize<int>(jv);
+	i = s.deserialize<int>(jv, p);
+	str = s.deserialize<QString>(jv);
+	str = s.deserialize<QString>(jv, p);
+	il = s.deserialize<QList<int>>(ja);
+	il = s.deserialize<QList<int>>(ja, p);
+	bm = s.deserialize<QMap<QString, bool>>(jo);
+	bm = s.deserialize<QMap<QString, bool>>(jo, p);
+	dbp = s.deserialize<QPair<double, bool>>(ja);
+	dbp = s.deserialize<QPair<double, bool>>(ja, p);
 
 	v = s.deserializeFrom(d, qMetaTypeId<TestObject*>());
 	v = s.deserializeFrom(d, qMetaTypeId<TestObject*>(), p);
@@ -1088,6 +1119,16 @@ static void compile_test()
 	l = s.deserializeFrom<QList<TestObject*>>(d, p);
 	m = s.deserializeFrom<QMap<QString, TestObject*>>(d);
 	m = s.deserializeFrom<QMap<QString, TestObject*>>(d, p);
+	i = s.deserializeFrom<int>(d);
+	i = s.deserializeFrom<int>(d, p);
+	str = s.deserializeFrom<QString>(d);
+	str = s.deserializeFrom<QString>(d, p);
+	il = s.deserializeFrom<QList<int>>(d);
+	il = s.deserializeFrom<QList<int>>(d, p);
+	bm = s.deserializeFrom<QMap<QString, bool>>(d);
+	bm = s.deserializeFrom<QMap<QString, bool>>(d, p);
+	dbp = s.deserializeFrom<QPair<double, bool>>(d);
+	dbp = s.deserializeFrom<QPair<double, bool>>(d, p);
 
 	v = s.deserializeFrom(b, qMetaTypeId<TestObject*>());
 	v = s.deserializeFrom(b, qMetaTypeId<TestObject*>(), p);
@@ -1097,6 +1138,16 @@ static void compile_test()
 	l = s.deserializeFrom<QList<TestObject*>>(b, p);
 	m = s.deserializeFrom<QMap<QString, TestObject*>>(b);
 	m = s.deserializeFrom<QMap<QString, TestObject*>>(b, p);
+	i = s.deserializeFrom<int>(b);
+	i = s.deserializeFrom<int>(b, p);
+	str = s.deserializeFrom<QString>(b);
+	str = s.deserializeFrom<QString>(b, p);
+	il = s.deserializeFrom<QList<int>>(b);
+	il = s.deserializeFrom<QList<int>>(b, p);
+	bm = s.deserializeFrom<QMap<QString, bool>>(b);
+	bm = s.deserializeFrom<QMap<QString, bool>>(b, p);
+	dbp = s.deserializeFrom<QPair<double, bool>>(b);
+	dbp = s.deserializeFrom<QPair<double, bool>>(b, p);
 }
 
 QTEST_MAIN(ObjectSerializerTest)

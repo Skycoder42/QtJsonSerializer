@@ -5,6 +5,8 @@
 #include <QtCore/qobject.h>
 #include <QtCore/qlist.h>
 #include <QtCore/qvariant.h>
+#include <QtCore/qsharedpointer.h>
+#include <QtCore/qpointer.h>
 #include <QtCore/qjsonvalue.h>
 #include <QtCore/qjsonobject.h>
 #include <QtCore/qjsonarray.h>
@@ -13,97 +15,193 @@
 //! A collection of internally used type helpers
 namespace _qjsonserializer_helpertypes {
 
-//! Tests if a given type has a meta object
+//! test if a type can be serialized
 template <typename T>
-struct has_metaobject : public std::is_void<typename T::QtGadgetHelper> {};
-//! @copydoc _qjsonserializer_helpertypes::has_metaobject
+struct is_serializable : public std::negation<std::is_pointer<T>> {};
+
+//! @copydoc _qjsonserializer_helpertypes::is_serializable
 template <typename T>
-struct has_metaobject<T*> : public std::is_base_of<QObject, T> {};
-//! @copydoc _qjsonserializer_helpertypes::has_metaobject
-template <>
-struct has_metaobject<QVariant> : public std::true_type {};
+struct is_serializable<T*> : public std::is_base_of<QObject, T> {};
 
-//! The main type helper class
+//! @copydoc _qjsonserializer_helpertypes::is_serializable
 template <typename T>
-struct type_helper : public has_metaobject<T> {
-	//! The template type
-	typedef T Type;
-	//! The object type
-	typedef T ObjectType;
-	//! The matching json type
-	typedef QJsonObject JsonType;
+struct is_serializable<QSharedPointer<T>> : public std::is_base_of<QObject, T> {};
 
-	//! Converts json value to json type
-	static inline JsonType convert(const QJsonValue &value) {
-		return value.toObject();
-	}
-	//! Converts generic type to variant
-	static inline QVariant variant(const Type &data) {
-		return QVariant::fromValue(data);
-	}
-};
-
-//! @copydoc _qjsonserializer_helpertypes::type_helper
+//! @copydoc _qjsonserializer_helpertypes::is_serializable
 template <typename T>
-struct type_helper<QList<T>> : public has_metaobject<T> {
-	//! @copydoc _qjsonserializer_helpertypes::type_helper::Type
-	typedef QList<T> Type;
-	//! @copydoc _qjsonserializer_helpertypes::type_helper::ObjectType
-	typedef T ObjectType;
-	//! @copydoc _qjsonserializer_helpertypes::type_helper::JsonType
-	typedef QJsonArray JsonType;
+struct is_serializable<QPointer<T>> : public std::is_base_of<QObject, T> {};
 
-	//! @copydoc _qjsonserializer_helpertypes::type_helper::convert
-	static inline JsonType convert(const QJsonValue &value) {
-		return value.toArray();
-	}
-	//! @copydoc _qjsonserializer_helpertypes::type_helper::variant
-	static inline QVariant variant(const Type &data) {
-		return QVariant::fromValue(data);
-	}
-};
-
-//! @copydoc _qjsonserializer_helpertypes::type_helper
+//! @copydoc _qjsonserializer_helpertypes::is_serializable
 template <typename T>
-struct type_helper<QMap<QString, T>> : public has_metaobject<T> {
-	//! @copydoc _qjsonserializer_helpertypes::type_helper::Type
-	typedef QMap<QString, T> Type;
-	//! @copydoc _qjsonserializer_helpertypes::type_helper::ObjectType
-	typedef T ObjectType;
-	//! @copydoc _qjsonserializer_helpertypes::type_helper::JsonType
-	typedef QJsonObject JsonType;
+struct is_serializable<QList<T>> : public is_serializable<T> {};
 
-	//! @copydoc _qjsonserializer_helpertypes::type_helper::convert
-	static inline JsonType convert(const QJsonValue &value) {
-		return value.toObject();
-	}
-	//! @copydoc _qjsonserializer_helpertypes::type_helper::variant
-	static inline QVariant variant(const Type &data) {
-		return QVariant::fromValue(data);
-	}
-};
+//! @copydoc _qjsonserializer_helpertypes::is_serializable
+template <typename T>
+struct is_serializable<QMap<QString, T>> : public is_serializable<T> {};
 
-//! @copydoc _qjsonserializer_helpertypes::type_helper
-template <>
-struct type_helper<QVariant> : public has_metaobject<QVariant> {
-	//! @copydoc _qjsonserializer_helpertypes::type_helper::Type
-	typedef QVariant Type;
-	//! @copydoc _qjsonserializer_helpertypes::type_helper::ObjectType
-	typedef QVariant ObjectType;
-	//! @copydoc _qjsonserializer_helpertypes::type_helper::JsonType
-	typedef QJsonValue JsonType;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 9, 2)
+//! @copydoc _qjsonserializer_helpertypes::is_serializable
+template <typename T>
+struct is_serializable<QHash<QString, T>> : public is_serializable<T> {};
+#endif
 
-	//! @copydoc _qjsonserializer_helpertypes::type_helper::convert
-	static inline JsonType convert(const QJsonValue &value) {
+//! @copydoc _qjsonserializer_helpertypes::is_serializable
+template <typename T1, typename T2>
+struct is_serializable<QPair<T1, T2>> : public std::conjunction<is_serializable<T1>, is_serializable<T2>> {};
+
+
+
+//! helper to get the gadget information
+template <class T, class Enable = void>
+struct gadget_helper
+{
+	static constexpr bool value = false;
+	static inline  QJsonValue convert(const QJsonValue &value) {
 		return value;
 	}
-	//! @copydoc _qjsonserializer_helpertypes::type_helper::variant
-	static inline QVariant variant(const Type &data) {
+};
+
+//! @copydoc _qjsonserializer_helpertypes::gadget_helper
+template <class T>
+struct gadget_helper<T, typename T::QtGadgetHelper>
+{
+	static constexpr bool value = true;
+	static inline QJsonObject convert(const QJsonValue &value) {
+		return value.toObject();
+	}
+};
+
+//! class to get the json type based on gadget or not
+template <typename T>
+struct json_type_raw :
+		public std::conditional<gadget_helper<T>::value,
+			QJsonObject,
+			QJsonValue> {};
+
+//! Get the json type for any basic type
+template <typename T>
+struct json_type : json_type_raw<T> {
+	static_assert(is_serializable<T>::value, "Only QObject deriving classes can be serialized as pointer");
+
+	//! Converts json value to json type
+	static inline typename json_type_raw<T>::type convert(const QJsonValue &value) {
+		return gadget_helper<T>::convert(value);
+	}
+};
+
+//! @copydoc _qjsonserializer_helpertypes::json_type
+template <typename T>
+struct json_type<T*> {
+	static_assert(is_serializable<T*>::value, "Only QObject deriving classes can be serialized as pointer");
+	typedef QJsonObject type;
+
+	//! @copydoc _qjsonserializer_helpertypes::json_type::convert
+	static inline type convert(const QJsonValue &value) {
+		return value.toObject();
+	}
+};
+
+//! @copydoc _qjsonserializer_helpertypes::json_type
+template <typename T>
+struct json_type<QSharedPointer<T>> {
+	static_assert(is_serializable<QSharedPointer<T>>::value, "Only QObject deriving classes can be serialized as pointer");
+	typedef QJsonObject type;
+
+	//! @copydoc _qjsonserializer_helpertypes::json_type::convert
+	static inline type convert(const QJsonValue &value) {
+		return value.toObject();
+	}
+};
+
+//! @copydoc _qjsonserializer_helpertypes::json_type
+template <typename T>
+struct json_type<QPointer<T>> {
+	static_assert(is_serializable<QPointer<T>>::value, "Only QObject deriving classes can be serialized as pointer");
+	typedef QJsonObject type;
+
+	//! @copydoc _qjsonserializer_helpertypes::json_type::convert
+	static inline type convert(const QJsonValue &value) {
+		return value.toObject();
+	}
+};
+
+//! @copydoc _qjsonserializer_helpertypes::json_type
+template <typename T>
+struct json_type<QList<T>> {
+	static_assert(is_serializable<QList<T>>::value, "Only QObject deriving classes can be serialized as pointer");
+	typedef QJsonArray type;
+
+	//! @copydoc _qjsonserializer_helpertypes::json_type::convert
+	static inline type convert(const QJsonValue &value) {
+		return value.toArray();
+	}
+};
+
+//! @copydoc _qjsonserializer_helpertypes::json_type
+template <typename T>
+struct json_type<QMap<QString, T>> {
+	static_assert(is_serializable<QMap<QString, T>>::value, "Only QObject deriving classes can be serialized as pointer");
+	typedef QJsonObject type;
+
+	//! @copydoc _qjsonserializer_helpertypes::json_type::convert
+	static inline type convert(const QJsonValue &value) {
+		return value.toObject();
+	}
+};
+
+#if QT_VERSION >= QT_VERSION_CHECK(5, 9, 2)
+//! @copydoc _qjsonserializer_helpertypes::json_type
+template <typename T>
+struct json_type<QHash<QString, T>> {
+	static_assert(is_serializable<QHash<QString, T>>::value, "Only QObject deriving classes can be serialized as pointer");
+	typedef QJsonObject type;
+
+	//! @copydoc _qjsonserializer_helpertypes::json_type::convert
+	static inline type convert(const QJsonValue &value) {
+		return value.toObject();
+	}
+};
+#endif
+
+//! @copydoc _qjsonserializer_helpertypes::json_type
+template <typename T1, typename T2>
+struct json_type<QPair<T1, T2>> {
+	static_assert(is_serializable<QPair<T1, T2>>::value, "Only QObject deriving classes can be serialized as pointer");
+	typedef QJsonArray type;
+
+	//! @copydoc _qjsonserializer_helpertypes::json_type::convert
+	static inline type convert(const QJsonValue &value) {
+		return value.toArray();
+	}
+};
+
+
+
+//! helper to convert a type to variant
+template <typename T>
+struct variant_helper {
+	//! Converts generic type to variant
+	static inline QVariant toVariant(const T &data) {
+		return QVariant::fromValue<T>(data);
+	}
+	//! Converts variant to generic type
+	static inline T fromVariant(const QVariant &data) {
+		return data.template value<T>();
+	}
+};
+
+//! @copydoc _qjsonserializer_helpertypes::variant_helper
+template <>
+struct variant_helper<QVariant> {
+	//! @copydoc _qjsonserializer_helpertypes::variant_helper::toVariant
+	static inline QVariant toVariant(const QVariant &data) {
+		return data;
+	}
+	//! @copydoc _qjsonserializer_helpertypes::variant_helper::fromVariant
+	static inline QVariant fromVariant(const QVariant &data) {
 		return data;
 	}
 };
-
-
 
 }
 
