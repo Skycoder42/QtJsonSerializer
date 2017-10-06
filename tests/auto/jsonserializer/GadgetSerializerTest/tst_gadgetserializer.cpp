@@ -185,12 +185,22 @@ void GadgetSerializerTest::testVariantConversions_data()
 
 	QTest::newRow("QList<QPair<bool, bool>>") << QVariant::fromValue<QList<QPair<bool, bool>>>({{false, true}, {true, false}})
 											  << (int)QVariant::List;
+
+	QTest::newRow("QVariantHash") << QVariant(QVariantHash({{"baum", 42}}))
+								  << (int)QVariant::Map;
+	QTest::newRow("QVariantMap") << QVariant(QVariantMap({{"baum", 42}}))
+								 << (int)QVariant::Hash;
 }
 
 void GadgetSerializerTest::testVariantConversions()
 {
 	QFETCH(QVariant, data);
 	QFETCH(int, targetType);
+
+#if QT_VERSION < QT_VERSION_CHECK(5, 9, 2)
+	QEXPECT_FAIL("QVariantHash", "not until Qt 5.9.2", Abort);
+	QEXPECT_FAIL("QVariantMap", "not until Qt 5.9.2", Abort);
+#endif
 
 	auto origType = data.userType();
 	auto convData = data;

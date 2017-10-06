@@ -13,7 +13,7 @@ bool QJsonMapConverter::canConvert(int metaTypeId) const
 {
 	return metaTypeId == QMetaType::QVariantMap ||
 #if QT_VERSION >= QT_VERSION_CHECK(5, 9, 2)
-			QMetaType::QVariantHash ||
+			metaTypeId == QMetaType::QVariantHash ||
 #endif
 			mapTypeRegex.match(QString::fromUtf8(QMetaType::typeName(metaTypeId))).hasMatch();
 }
