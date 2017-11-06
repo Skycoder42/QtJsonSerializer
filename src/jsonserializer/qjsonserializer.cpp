@@ -255,12 +255,12 @@ QJsonValue QJsonSerializer::serializeValue(int propertyType, const QVariant &val
 			   value.userType() == QMetaType::QTime ||
 			   value.userType() == QMetaType::QDateTime)
 				return QString();//special case date: invalid date -> empty string -> interpreted as fail -> thus return empty string
-			else
+			else {
 				throw QJsonSerializationException(QByteArray("Failed to convert type ") +
 												  value.typeName() +
 												  QByteArray(" to a JSON representation"));
-		}
-		else
+			}
+		} else
 			return json;
 	}
 }
@@ -372,25 +372,32 @@ QJsonSerializerPrivate::QJsonSerializerPrivate() :
 
 static void qJsonSerializerStartup()
 {
+	//primitive types
 	QJsonSerializer::registerAllConverters<bool>();
 	QJsonSerializer::registerAllConverters<int>();
-	QJsonSerializer::registerAllConverters<unsigned int>();
+	QJsonSerializer::registerAllConverters<uint>();
+	QJsonSerializer::registerAllConverters<qlonglong>();
+	QJsonSerializer::registerAllConverters<qulonglong>();
 	QJsonSerializer::registerAllConverters<double>();
-	QJsonSerializer::registerAllConverters<QChar>();
-	QJsonSerializer::registerAllConverters<QString>();
-	QJsonSerializer::registerAllConverters<long long>();
+	QJsonSerializer::registerAllConverters<long>();
 	QJsonSerializer::registerAllConverters<short>();
 	QJsonSerializer::registerAllConverters<char>();
-	QJsonSerializer::registerAllConverters<unsigned long>();
-	QJsonSerializer::registerAllConverters<unsigned long long>();
-	QJsonSerializer::registerAllConverters<unsigned short>();
-	QJsonSerializer::registerAllConverters<signed char>();
-	QJsonSerializer::registerAllConverters<unsigned char>();
+	QJsonSerializer::registerAllConverters<ulong>();
+	QJsonSerializer::registerAllConverters<ushort>();
+	QJsonSerializer::registerAllConverters<uchar>();
 	QJsonSerializer::registerAllConverters<float>();
+	QJsonSerializer::registerAllConverters<signed char>();
+	QJsonSerializer::registerAllConverters<QObject*>();
+
+	//core types
+	QJsonSerializer::registerAllConverters<QChar>();
+	QJsonSerializer::registerAllConverters<QString>();
 	QJsonSerializer::registerAllConverters<QDate>();
 	QJsonSerializer::registerAllConverters<QTime>();
-	QJsonSerializer::registerAllConverters<QUrl>();
 	QJsonSerializer::registerAllConverters<QDateTime>();
+	QJsonSerializer::registerAllConverters<QUrl>();
 	QJsonSerializer::registerAllConverters<QUuid>();
-	QJsonSerializer::registerAllConverters<QObject*>();
+	QJsonSerializer::registerAllConverters<QJsonValue>();
+	QJsonSerializer::registerAllConverters<QJsonObject>();
+	QJsonSerializer::registerAllConverters<QJsonArray>();
 }
