@@ -10,6 +10,7 @@ TestGadget::TestGadget() :
 	doubleProperty(0.0),
 	normalEnumProperty(Normal0),
 	enumFlagsProperty(0),
+	datetime(),
 	simpleList(),
 	leveledList(),
 	simpleMap(),
@@ -35,6 +36,7 @@ bool TestGadget::operator==(const TestGadget &other) const
 			doubleProperty == other.doubleProperty &&
 			normalEnumProperty == other.normalEnumProperty &&
 			enumFlagsProperty == other.enumFlagsProperty &&
+			datetime == other.datetime &&
 			simpleList == other.simpleList &&
 			leveledList == other.leveledList &&
 			simpleMap == other.simpleMap &&
@@ -60,6 +62,7 @@ bool TestGadget::operator!=(const TestGadget &other) const
 			doubleProperty != other.doubleProperty ||
 			normalEnumProperty != other.normalEnumProperty ||
 			enumFlagsProperty != other.enumFlagsProperty ||
+			datetime != other.datetime ||
 			simpleList != other.simpleList ||
 			leveledList != other.leveledList ||
 			simpleMap != other.simpleMap ||
@@ -107,6 +110,13 @@ TestGadget TestGadget::createEnum(TestGadget::NormalEnum normalEnumProperty, Enu
 	TestGadget t;
 	t.normalEnumProperty = normalEnumProperty;
 	t.enumFlagsProperty = enumFlagsProperty;
+	return t;
+}
+
+TestGadget TestGadget::createExtra(QDateTime datetime)
+{
+	TestGadget t;
+	t.datetime = datetime;
 	return t;
 }
 
@@ -176,6 +186,7 @@ QJsonObject TestGadget::createJson(const QJsonObject &delta, const QString &rmKe
 								{"doubleProperty", 0},
 								{"normalEnumProperty", TestGadget::Normal0},
 								{"enumFlagsProperty", 0},
+								{"datetime", QString()},
 								{"simpleList", QJsonArray()},
 								{"leveledList", QJsonArray()},
 								{"simpleMap", QJsonObject()},

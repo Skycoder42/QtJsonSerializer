@@ -11,6 +11,7 @@ TestObject::TestObject(QObject *parent) :
 	doubleProperty(0.0),
 	normalEnumProperty(Normal0),
 	enumFlagsProperty(0x00),
+	datetime(),
 	simpleList(),
 	leveledList(),
 	simpleMap(),
@@ -45,6 +46,13 @@ TestObject *TestObject::createEnum(TestObject::NormalEnum normalEnumProperty, En
 	auto t = new TestObject(parent);
 	t->normalEnumProperty = normalEnumProperty;
 	t->enumFlagsProperty = enumFlagsProperty;
+	return t;
+}
+
+TestObject *TestObject::createExtra(QDateTime datetime, QObject *parent)
+{
+	auto t = new TestObject(parent);
+	t->datetime = datetime;
 	return t;
 }
 
@@ -147,6 +155,7 @@ QJsonObject TestObject::createJson(const QJsonObject &delta, const QString &rmKe
 								{"doubleProperty", 0},
 								{"normalEnumProperty", TestObject::Normal0},
 								{"enumFlagsProperty", 0},
+								{"datetime", QString()},
 								{"simpleList", QJsonArray()},
 								{"leveledList", QJsonArray()},
 								{"simpleMap", QJsonObject()},
@@ -196,6 +205,7 @@ bool TestObject::equals(const TestObject *other) const
 				  doubleProperty == other->doubleProperty &&
 				  normalEnumProperty == other->normalEnumProperty &&
 				  enumFlagsProperty == other->enumFlagsProperty &&
+				  datetime == other->datetime &&
 				  simpleList == other->simpleList &&
 				  leveledList == other->leveledList &&
 				  simpleMap == other->simpleMap &&

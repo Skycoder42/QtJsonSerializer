@@ -847,6 +847,17 @@ void ObjectSerializerTest::generateValidTestData()
 													 })
 						   << true;
 
+	{
+		QDate date(1111, 11, 11);
+		QTime time(22, 22, 22);
+		QDateTime dateTime(date, time);
+		QTest::newRow("datetime") << TestObject::createExtra(dateTime, this)
+								  << TestObject::createJson({
+																{"datetime", dateTime.toString(Qt::ISODate)}
+															})
+								  << true;
+	}
+
 	QTest::newRow("list") << TestObject::createList({3, 7, 13}, {}, this)
 						  << TestObject::createJson({
 														{"simpleList", QJsonArray({3, 7, 13})}

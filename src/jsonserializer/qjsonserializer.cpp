@@ -267,8 +267,25 @@ QJsonValue QJsonSerializer::serializeValue(int propertyType, const QVariant &val
 
 QVariant QJsonSerializer::deserializeValue(int propertyType, const QJsonValue &value) const
 {
-	Q_UNUSED(propertyType);
-	return value.toVariant();//all json can be converted to qvariant
+	//all json can be converted to qvariant, but not all variant to type conversions do work
+	switch (propertyType) {
+	case QMetaType::QDate: //date, time, datetime -> empty string to d/t/dt fails, but is considered "correct" in this context
+		if(value.toString().isEmpty())
+			return QDate();
+		break;
+	case QMetaType::QTime:
+		if(value.toString().isEmpty())
+			return QTime();
+		break;
+	case QMetaType::QDateTime:
+		if(value.toString().isEmpty())
+			return QDateTime();
+		break;
+	default:
+		break;
+	}
+
+	return value.toVariant();
 }
 
 QJsonValue QJsonSerializer::serializeEnum(const QMetaEnum &metaEnum, const QVariant &value) const

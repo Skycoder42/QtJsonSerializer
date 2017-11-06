@@ -582,6 +582,16 @@ void GadgetSerializerTest::generateValidTestData()
 														 {"enumFlagsProperty", TestGadget::FlagX}
 													 });
 
+	{
+		QDate date(1111, 11, 11);
+		QTime time(22, 22, 22);
+		QDateTime dateTime(date, time);
+		QTest::newRow("datetime") << TestGadget::createExtra(dateTime)
+								  << TestGadget::createJson({
+																{"datetime", dateTime.toString(Qt::ISODate)}
+															});
+	}
+
 	QTest::newRow("list") << TestGadget::createList({3, 7, 13}, {})
 						  << TestGadget::createJson({
 														{"simpleList", QJsonArray({3, 7, 13})}
