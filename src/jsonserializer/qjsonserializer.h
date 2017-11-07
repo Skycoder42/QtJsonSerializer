@@ -98,18 +98,12 @@ public:
 	//! Serializers a QObject, Q_GADGET or a list of one of those to json
 	template <typename T>
 	typename _qjsonserializer_helpertypes::json_type<T>::type serialize(const T &data) const;
-	//! @copydoc QJsonSerializer::serializeTo(QIODevice *, const T &, QJsonDocument::JsonFormat)
-	template <typename T>
-	void serializeTo(QIODevice *device, const T &data) const; //MAJOR join as overload
 	//! Serializers a QObject, Q_GADGET or a list of one of those to a device
 	template <typename T>
-	void serializeTo(QIODevice *device, const T &data, QJsonDocument::JsonFormat format) const;
-	//! @copydoc QJsonSerializer::serializeTo(const T &, QJsonDocument::JsonFormat)
-	template <typename T>
-	QByteArray serializeTo(const T &data) const; //MAJOR join as overload
+	void serializeTo(QIODevice *device, const T &data, QJsonDocument::JsonFormat format = QJsonDocument::Indented) const;
 	//! Serializers a QQObject, Q_GADGET or a list of one of those to a byte array
 	template <typename T>
-	QByteArray serializeTo(const T &data, QJsonDocument::JsonFormat format) const;
+	QByteArray serializeTo(const T &data, QJsonDocument::JsonFormat format = QJsonDocument::Indented) const;
 
 	//! Deserializes a QJsonValue to a QVariant value, based on the given type id
 	QVariant deserialize(const QJsonValue &json, int metaTypeId, QObject *parent = nullptr) const;
@@ -291,24 +285,10 @@ typename _qjsonserializer_helpertypes::json_type<T>::type QJsonSerializer::seria
 }
 
 template<typename T>
-void QJsonSerializer::serializeTo(QIODevice *device, const T &data) const
-{
-	static_assert(_qjsonserializer_helpertypes::is_serializable<T>::value, "T cannot be serialized");
-	serializeToImpl(device, _qjsonserializer_helpertypes::variant_helper<T>::toVariant(data), QJsonDocument::Indented);
-}
-
-template<typename T>
 void QJsonSerializer::serializeTo(QIODevice *device, const T &data, QJsonDocument::JsonFormat format) const
 {
 	static_assert(_qjsonserializer_helpertypes::is_serializable<T>::value, "T cannot be serialized");
 	serializeToImpl(device, _qjsonserializer_helpertypes::variant_helper<T>::toVariant(data), format);
-}
-
-template<typename T>
-QByteArray QJsonSerializer::serializeTo(const T &data) const
-{
-	static_assert(_qjsonserializer_helpertypes::is_serializable<T>::value, "T cannot be serialized");
-	return serializeToImpl(_qjsonserializer_helpertypes::variant_helper<T>::toVariant(data), QJsonDocument::Indented);
 }
 
 template<typename T>
