@@ -1,10 +1,10 @@
-# QJsonSerializer
+# QtJsonSerializer
 A library to perform generic seralization and deserialization of QObjects.
 
 With this small library, you are able to serialize any QObject or Q_GADGET class to JSON and back. This is done with help of Qt's meta system.
 
-[![Travis Build Status](https://travis-ci.org/Skycoder42/QJsonSerializer.svg?branch=master)](https://travis-ci.org/Skycoder42/QJsonSerializer)
-[![Appveyor Build status](https://ci.appveyor.com/api/projects/status/hj4rw0rikh8w1i4h/branch/master?svg=true)](https://ci.appveyor.com/project/Skycoder42/qjsonserializer/branch/master)
+[![Travis Build Status](https://travis-ci.org/Skycoder42/QtJsonSerializer.svg?branch=master)](https://travis-ci.org/Skycoder42/QtJsonSerializer)
+[![Appveyor Build status](https://ci.appveyor.com/api/projects/status/rbue7wwxk04eoka0/branch/master?svg=true)](https://ci.appveyor.com/project/Skycoder42/qtjsonserializer/branch/master)
 
 ## Features
 - Serialize QObjects, Q_GADGETS, lists, maps, etc. to JSON, in a generic matter
@@ -132,5 +132,5 @@ In order for the serializer to properly work, there are a few things you have to
 6. By default, the JSON `null` can only be converted to QObjects/G_GADGETs. For other types the conversion fails (See [allowDefaultNull](src/qjsonserializer.h#L19))
 
 ## Documentation
-The documentation is available on [github pages](https://skycoder42.github.io/QJsonSerializer/). It was created using [doxygen](http://www.doxygen.org/). The HTML-documentation and Qt-Help files are shipped
+The documentation is available on [github pages](https://skycoder42.github.io/QtJsonSerializer/). It was created using [doxygen](http://www.doxygen.org/). The HTML-documentation and Qt-Help files are shipped
 together with the module for both the custom repository and the package on the release page. Please note that doxygen docs do not perfectly integrate with QtCreator/QtAssistant.
