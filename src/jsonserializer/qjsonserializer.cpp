@@ -8,6 +8,10 @@
 #include <QtCore/QUrl>
 #include <QtCore/QVersionNumber>
 #include <QtCore/QBuffer>
+#include <QtCore/QLine>
+#include <QtCore/QPoint>
+#include <QtCore/QRect>
+#include <QtCore/QSize>
 
 #include "typeconverters/qjsonobjectconverter_p.h"
 #include "typeconverters/qjsongadgetconverter_p.h"
@@ -17,6 +21,7 @@
 #include "typeconverters/qjsonpairconverter_p.h"
 #include "typeconverters/qjsonbytearrayconverter_p.h"
 #include "typeconverters/qjsonversionnumberconverter_p.h"
+#include "typeconverters/qjsongeomconverter_p.h"
 
 static void qJsonSerializerStartup();
 Q_COREAPP_STARTUP_FUNCTION(qJsonSerializerStartup)
@@ -35,6 +40,10 @@ QJsonSerializer::QJsonSerializer(QObject *parent) :
 	addJsonTypeConverter(new QJsonPairConverter());
 	addJsonTypeConverter(new QJsonBytearrayConverter());
 	addJsonTypeConverter(new QJsonVersionNumberConverter());
+	addJsonTypeConverter(new QJsonSizeConverter());
+	addJsonTypeConverter(new QJsonPointConverter());
+	addJsonTypeConverter(new QJsonLineConverter());
+	addJsonTypeConverter(new QJsonRectConverter());
 }
 
 QJsonSerializer::~QJsonSerializer() {}
@@ -549,6 +558,10 @@ static void qJsonSerializerStartup()
 	REGISTER_DEFAULT_CONVERTERS(QJsonObject);
 	REGISTER_DEFAULT_CONVERTERS(QJsonArray);
 	REGISTER_DEFAULT_CONVERTERS(QVersionNumber);
+	REGISTER_DEFAULT_CONVERTERS(QSize);
+	REGISTER_DEFAULT_CONVERTERS(QPoint);
+	REGISTER_DEFAULT_CONVERTERS(QLine);
+	REGISTER_DEFAULT_CONVERTERS(QRect);
 
 	//extra: qbytearray
 	{
