@@ -9,6 +9,7 @@
 #include <QMap>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QVersionNumber>
 
 struct ChildGadget
 {
@@ -43,6 +44,7 @@ struct TestGadget
 	Q_PROPERTY(QDateTime datetime MEMBER datetime)
 	Q_PROPERTY(QUuid uuid MEMBER uuid)
 	Q_PROPERTY(QUrl url MEMBER url)
+	Q_PROPERTY(QVersionNumber version MEMBER version)
 
 	Q_PROPERTY(QList<int> simpleList MEMBER simpleList)
 	Q_PROPERTY(QList<QList<int>> leveledList MEMBER leveledList)
@@ -91,7 +93,7 @@ public:
 
 	static TestGadget createBasic(int intProperty, bool boolProperty, QString stringProperty, double doubleProperty);
 	static TestGadget createEnum(NormalEnum normalEnumProperty, EnumFlags enumFlagsProperty);
-	static TestGadget createExtra(QDateTime datetime, QUuid uuid, QUrl url);
+	static TestGadget createExtra(QDateTime datetime, QUuid uuid, QUrl url, QVersionNumber version);
 	static TestGadget createList(QList<int> simpleList, QList<QList<int>> leveledList);
 	static TestGadget createMap(QMap<QString, int> simpleMap, QMap<QString, QMap<QString, int>> leveledMap);
 	static TestGadget createPair(QPair<int, QString> pair, QPair<ChildGadget, QList<int>> extraPair, QList<QPair<bool, bool>> listPair);
@@ -113,6 +115,7 @@ public:
 	QDateTime datetime;
 	QUuid uuid;
 	QUrl url;
+	QVersionNumber version;
 
 	QList<int> simpleList;
 	QList<QList<int>> leveledList;

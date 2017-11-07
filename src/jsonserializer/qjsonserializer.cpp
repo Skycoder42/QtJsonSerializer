@@ -14,6 +14,7 @@
 #include "typeconverters/qjsonlistconverter_p.h"
 #include "typeconverters/qjsonjsonconverter_p.h"
 #include "typeconverters/qjsonpairconverter_p.h"
+#include "typeconverters/qjsonversionnumberconverter_p.h"
 
 static void qJsonSerializerStartup();
 Q_COREAPP_STARTUP_FUNCTION(qJsonSerializerStartup)
@@ -30,6 +31,7 @@ QJsonSerializer::QJsonSerializer(QObject *parent) :
 	addJsonTypeConverter(new QJsonJsonObjectConverter());
 	addJsonTypeConverter(new QJsonJsonArrayConverter());
 	addJsonTypeConverter(new QJsonPairConverter());
+	addJsonTypeConverter(new QJsonVersionNumberConverter());
 }
 
 QJsonSerializer::~QJsonSerializer() {}

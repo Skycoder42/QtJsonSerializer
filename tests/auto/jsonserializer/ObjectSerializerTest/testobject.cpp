@@ -14,6 +14,7 @@ TestObject::TestObject(QObject *parent) :
 	datetime(),
 	uuid(),
 	url(),
+	version(),
 	simpleList(),
 	leveledList(),
 	simpleMap(),
@@ -51,12 +52,13 @@ TestObject *TestObject::createEnum(TestObject::NormalEnum normalEnumProperty, En
 	return t;
 }
 
-TestObject *TestObject::createExtra(QDateTime datetime, QUuid uuid, QUrl url, QObject *parent)
+TestObject *TestObject::createExtra(QDateTime datetime, QUuid uuid, QUrl url, QVersionNumber version, QObject *parent)
 {
 	auto t = new TestObject(parent);
 	t->datetime = datetime;
 	t->uuid = uuid;
 	t->url = url;
+	t->version = version;
 	return t;
 }
 
@@ -162,6 +164,7 @@ QJsonObject TestObject::createJson(const QJsonObject &delta, const QString &rmKe
 								{"datetime", QString()},
 								{"uuid", QStringLiteral("{00000000-0000-0000-0000-000000000000}")},
 								{"url", QString()},
+								{"version", QString()},
 								{"simpleList", QJsonArray()},
 								{"leveledList", QJsonArray()},
 								{"simpleMap", QJsonObject()},
@@ -214,6 +217,7 @@ bool TestObject::equals(const TestObject *other) const
 				  datetime == other->datetime &&
 				  uuid == other->uuid &&
 				  url == other->url &&
+				  version == other->version &&
 				  simpleList == other->simpleList &&
 				  leveledList == other->leveledList &&
 				  simpleMap == other->simpleMap &&

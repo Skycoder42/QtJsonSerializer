@@ -12,6 +12,7 @@
 #include <QJsonArray>
 #include <QSharedPointer>
 #include <QPointer>
+#include <QVersionNumber>
 
 class ChildObject : public QObject
 {
@@ -47,6 +48,7 @@ class TestObject : public QObject
 	Q_PROPERTY(QDateTime datetime MEMBER datetime)
 	Q_PROPERTY(QUuid uuid MEMBER uuid)
 	Q_PROPERTY(QUrl url MEMBER url)
+	Q_PROPERTY(QVersionNumber version MEMBER version)
 
 	Q_PROPERTY(QList<int> simpleList MEMBER simpleList)
 	Q_PROPERTY(QList<QList<int>> leveledList MEMBER leveledList)
@@ -93,7 +95,7 @@ public:
 
 	static TestObject *createBasic(int intProperty, bool boolProperty, QString stringProperty, double doubleProperty, QObject *parent);
 	static TestObject *createEnum(NormalEnum normalEnumProperty, EnumFlags enumFlagsProperty, QObject *parent);
-	static TestObject *createExtra(QDateTime datetime, QUuid uuid, QUrl url, QObject *parent);
+	static TestObject *createExtra(QDateTime datetime, QUuid uuid, QUrl url, QVersionNumber version, QObject *parent);
 	static TestObject *createList(QList<int> simpleList, QList<QList<int>> leveledList, QObject *parent);
 	static TestObject *createMap(QMap<QString, int> simpleMap, QMap<QString, QMap<QString, int>> leveledMap, QObject *parent);
 	static TestObject *createPair(QPair<int, QString> pair, QPair<ChildObject*, QList<int>> extraPair, QList<QPair<bool, bool>> listPair, QObject *parent);
@@ -118,6 +120,7 @@ public:
 	QDateTime datetime;
 	QUuid uuid;
 	QUrl url;
+	QVersionNumber version;
 
 	QList<int> simpleList;
 	QList<QList<int>> leveledList;
