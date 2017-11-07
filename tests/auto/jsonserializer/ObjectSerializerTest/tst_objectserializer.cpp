@@ -32,6 +32,7 @@ private Q_SLOTS:
 	void testNullDeserialization();
 	void testDeserializationValidation_data();
 	void testDeserializationValidation();
+	void testBase64Validate();
 
 	void testEnumSpecialSerialization_data();
 	void testEnumSpecialSerialization();
@@ -422,6 +423,30 @@ void ObjectSerializerTest::testDeserializationValidation()
 
 	serializer->setValidationFlags(QJsonSerializer::StandardValidation);
 	t1->deleteLater();
+}
+
+void ObjectSerializerTest::testBase64Validate()
+{
+	auto cmp = new TestObject(this);
+
+	try {
+		auto json = TestObject::createJson({
+											   {"bytearray", QStringLiteral("some++invalid+base64!")}
+										   });
+
+		//validation enabled
+		QVERIFY_EXCEPTION_THROWN(serializer->deserialize<TestObject*>(json, this), QJsonDeserializationException);
+
+		//disable check
+		serializer->setValidateBase64(false);
+		auto deser = serializer->deserialize<TestObject*>(json, this);
+		QVERIFY(!deser->equals(cmp));//but not empty!
+	} catch (QException &e) {
+		QFAIL(e.what());
+	}
+
+	cmp->deleteLater();
+	serializer->setValidateBase64(true);
 }
 
 void ObjectSerializerTest::testEnumSpecialSerialization_data()

@@ -54,6 +54,11 @@ bool QJsonSerializer::enumAsString() const
 	return d->enumAsString;
 }
 
+bool QJsonSerializer::validateBase64() const
+{
+	return d->validateBase64;
+}
+
 QJsonSerializer::ValidationFlags QJsonSerializer::validationFlags() const
 {
 	return d->validationFlags;
@@ -153,6 +158,11 @@ void QJsonSerializer::setKeepObjectName(bool keepObjectName)
 void QJsonSerializer::setEnumAsString(bool enumAsString)
 {
 	d->enumAsString = enumAsString;
+}
+
+void QJsonSerializer::setValidateBase64(bool validateBase64)
+{
+	d->validateBase64 = validateBase64;
 }
 
 void QJsonSerializer::setValidationFlags(ValidationFlags validationFlags)
@@ -434,6 +444,7 @@ QJsonSerializerPrivate::QJsonSerializerPrivate() :
 	allowNull(false),
 	keepObjectName(false),
 	enumAsString(false),
+	validateBase64(true),
 	validationFlags(QJsonSerializer::StandardValidation),
 	polymorphing(QJsonSerializer::Enabled)
 {}

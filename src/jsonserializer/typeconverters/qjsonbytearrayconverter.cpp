@@ -2,6 +2,7 @@
 #include "qjsonserializerexception.h"
 
 #include <QtCore/QByteArray>
+#include <QtCore/QRegularExpression>
 
 bool QJsonBytearrayConverter::canConvert(int metaTypeId) const
 {
@@ -25,7 +26,16 @@ QVariant QJsonBytearrayConverter::deserialize(int propertyType, const QJsonValue
 {
 	Q_UNUSED(propertyType)
 	Q_UNUSED(parent)
-	Q_UNUSED(helper)
 
-	return QByteArray::fromBase64(value.toString().toUtf8());
+	auto validateBase64 = helper->getProperty("validateBase64").toBool();
+	auto strValue = value.toString();
+	if(validateBase64) {
+		if((strValue.size() % 4) != 0)
+			throw QJsonDeserializationException("String has invalid length for base64 encoding");
+		static const QRegularExpression regex(QStringLiteral(R"__(^[a-zA-Z0-9+\/]*(={0,2})$)__"));
+		if(!regex.match(strValue).hasMatch())
+			throw QJsonDeserializationException("String contains unallowed symbols for base64 encoding");
+	}
+
+	return QByteArray::fromBase64(strValue.toUtf8());
 }

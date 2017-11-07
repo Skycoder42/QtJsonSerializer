@@ -10,6 +10,7 @@ public:
 	bool allowNull;
 	bool keepObjectName;
 	bool enumAsString;
+	bool validateBase64;
 	QJsonSerializer::ValidationFlags validationFlags;
 	QJsonSerializer::Polymorphing polymorphing;
 
