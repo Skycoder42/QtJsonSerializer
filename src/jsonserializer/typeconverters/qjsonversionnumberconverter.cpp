@@ -2,6 +2,7 @@
 #include "qjsonserializerexception.h"
 
 #include <QtCore/QVersionNumber>
+#include <QtCore/QDebug>
 
 bool QJsonVersionNumberConverter::canConvert(int metaTypeId) const
 {
