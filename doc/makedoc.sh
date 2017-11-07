@@ -16,7 +16,7 @@ qtBins=$3
 qtHeaders=$4
 qtDocs=$5
 doxyTemplate="$srcDir/Doxyfile"
-doxyRes=doxy-cmp
+doxyRes=Doxyfile.generated
 readme="$destDir/README.md"
 doxme="$scriptDir/doxme.py"
 
