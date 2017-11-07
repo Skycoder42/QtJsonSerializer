@@ -13,6 +13,10 @@
 #include <QSharedPointer>
 #include <QPointer>
 #include <QVersionNumber>
+#include <QSize>
+#include <QPoint>
+#include <QLine>
+#include <QRect>
 
 class ChildObject : public QObject
 {
@@ -50,6 +54,11 @@ class TestObject : public QObject
 	Q_PROPERTY(QUrl url MEMBER url)
 	Q_PROPERTY(QVersionNumber version MEMBER version)
 	Q_PROPERTY(QByteArray bytearray MEMBER bytearray)
+
+	Q_PROPERTY(QSize size MEMBER size)
+	Q_PROPERTY(QPoint point MEMBER point)
+	Q_PROPERTY(QLine line MEMBER line)
+	Q_PROPERTY(QRect rect MEMBER rect)
 
 	Q_PROPERTY(QList<int> simpleList MEMBER simpleList)
 	Q_PROPERTY(QList<QList<int>> leveledList MEMBER leveledList)
@@ -97,6 +106,7 @@ public:
 	static TestObject *createBasic(int intProperty, bool boolProperty, QString stringProperty, double doubleProperty, QObject *parent);
 	static TestObject *createEnum(NormalEnum normalEnumProperty, EnumFlags enumFlagsProperty, QObject *parent);
 	static TestObject *createExtra(QDateTime datetime, QUuid uuid, QUrl url, QVersionNumber version, QByteArray bytearray, QObject *parent);
+	static TestObject *createGeom(QSize size, QPoint point, QLine line, QRect rect, QObject *parent);
 	static TestObject *createList(QList<int> simpleList, QList<QList<int>> leveledList, QObject *parent);
 	static TestObject *createMap(QMap<QString, int> simpleMap, QMap<QString, QMap<QString, int>> leveledMap, QObject *parent);
 	static TestObject *createPair(QPair<int, QString> pair, QPair<ChildObject*, QList<int>> extraPair, QList<QPair<bool, bool>> listPair, QObject *parent);
@@ -123,6 +133,11 @@ public:
 	QUrl url;
 	QVersionNumber version;
 	QByteArray bytearray;
+
+	QSize size;
+	QPoint point;
+	QLine line;
+	QRect rect;
 
 	QList<int> simpleList;
 	QList<QList<int>> leveledList;

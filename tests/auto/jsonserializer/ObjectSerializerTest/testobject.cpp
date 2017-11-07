@@ -16,6 +16,10 @@ TestObject::TestObject(QObject *parent) :
 	url(),
 	version(),
 	bytearray(),
+	size(),
+	point(),
+	line(),
+	rect(),
 	simpleList(),
 	leveledList(),
 	simpleMap(),
@@ -61,6 +65,16 @@ TestObject *TestObject::createExtra(QDateTime datetime, QUuid uuid, QUrl url, QV
 	t->url = url;
 	t->version = version;
 	t->bytearray = bytearray;
+	return t;
+}
+
+TestObject *TestObject::createGeom(QSize size, QPoint point, QLine line, QRect rect, QObject *parent)
+{
+	auto t = new TestObject(parent);
+	t->size = size;
+	t->point = point;
+	t->line = line;
+	t->rect = rect;
 	return t;
 }
 
@@ -168,6 +182,34 @@ QJsonObject TestObject::createJson(const QJsonObject &delta, const QString &rmKe
 								{"url", QString()},
 								{"version", QString()},
 								{"bytearray", QString()},
+								{"size", QJsonObject({
+									 {"width", -1},
+									 {"height", -1}
+								 })},
+								{"point", QJsonObject({
+									 {"x", 0},
+									 {"y", 0}
+								 })},
+								{"line", QJsonObject({
+									 {"p1", QJsonObject({
+										  {"x", 0},
+										  {"y", 0}
+									  })},
+									 {"p2", QJsonObject({
+										  {"x", 0},
+										  {"y", 0}
+									  })}
+								 })},
+								{"rect", QJsonObject({
+									 {"topLeft", QJsonObject({
+										  {"x", 0},
+										  {"y", 0}
+									  })},
+									 {"bottomRight", QJsonObject({
+										  {"x", -1},
+										  {"y", -1}
+									  })}
+								 })},
 								{"simpleList", QJsonArray()},
 								{"leveledList", QJsonArray()},
 								{"simpleMap", QJsonObject()},
@@ -222,6 +264,10 @@ bool TestObject::equals(const TestObject *other) const
 				  url == other->url &&
 				  version == other->version &&
 				  bytearray == other->bytearray &&
+				  size == other->size &&
+				  point == other->point &&
+				  line == other->line &&
+				  rect == other->rect &&
 				  simpleList == other->simpleList &&
 				  leveledList == other->leveledList &&
 				  simpleMap == other->simpleMap &&

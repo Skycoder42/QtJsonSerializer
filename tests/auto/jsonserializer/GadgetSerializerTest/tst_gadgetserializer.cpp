@@ -299,6 +299,10 @@ void GadgetSerializerTest::testNullDeserialization()
 									{"url", QJsonValue::Null},
 									{"version", QJsonValue::Null},
 									{"bytearray", QJsonValue::Null},
+									{"size", QJsonValue::Null},
+									{"point", QJsonValue::Null},
+									{"line", QJsonValue::Null},
+									{"rect", QJsonValue::Null},
 									{"leveledList", QJsonValue::Null},
 									{"simpleMap", QJsonValue::Null},
 									{"leveledMap", QJsonValue::Null},
@@ -637,6 +641,47 @@ void GadgetSerializerTest::generateValidTestData()
 																 {"bytearray", QString::fromUtf8(data.toBase64())}
 															 });
 	}
+
+	QTest::newRow("size") << TestGadget::createGeom({10, 30}, {}, {}, {})
+						  << TestGadget::createJson({
+														{"size", QJsonObject({
+															 {"width", 10},
+															 {"height", 30}
+														 })}
+													});
+	QTest::newRow("point") << TestGadget::createGeom({}, {42, 24}, {}, {})
+						   << TestGadget::createJson({
+														 {"point", QJsonObject({
+															  {"x", 42},
+															  {"y", 24}
+														  })}
+													 });
+	QTest::newRow("line") << TestGadget::createGeom({}, {}, {11, 22, 33, 44}, {})
+						  << TestGadget::createJson({
+														{"line", QJsonObject({
+															 {"p1", QJsonObject({
+																  {"x", 11},
+																  {"y", 22}
+															  })},
+															 {"p2", QJsonObject({
+																  {"x", 33},
+																  {"y", 44}
+															  })}
+														 })}
+													});
+	QTest::newRow("rect") << TestGadget::createGeom({}, {}, {}, {20, 25, 100, 75})
+						  << TestGadget::createJson({
+														{"rect", QJsonObject({
+															 {"topLeft", QJsonObject({
+																  {"x", 20},
+																  {"y", 25}
+															  })},
+															 {"bottomRight", QJsonObject({
+																  {"x", 119},
+																  {"y", 99}
+															  })}
+														 })}
+													});
 
 
 	QTest::newRow("list") << TestGadget::createList({3, 7, 13}, {})

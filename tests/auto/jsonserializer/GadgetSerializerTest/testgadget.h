@@ -10,6 +10,10 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QVersionNumber>
+#include <QSize>
+#include <QPoint>
+#include <QLine>
+#include <QRect>
 
 struct ChildGadget
 {
@@ -46,6 +50,11 @@ struct TestGadget
 	Q_PROPERTY(QUrl url MEMBER url)
 	Q_PROPERTY(QVersionNumber version MEMBER version)
 	Q_PROPERTY(QByteArray bytearray MEMBER bytearray)
+
+	Q_PROPERTY(QSize size MEMBER size)
+	Q_PROPERTY(QPoint point MEMBER point)
+	Q_PROPERTY(QLine line MEMBER line)
+	Q_PROPERTY(QRect rect MEMBER rect)
 
 	Q_PROPERTY(QList<int> simpleList MEMBER simpleList)
 	Q_PROPERTY(QList<QList<int>> leveledList MEMBER leveledList)
@@ -95,6 +104,7 @@ public:
 	static TestGadget createBasic(int intProperty, bool boolProperty, QString stringProperty, double doubleProperty);
 	static TestGadget createEnum(NormalEnum normalEnumProperty, EnumFlags enumFlagsProperty);
 	static TestGadget createExtra(QDateTime datetime, QUuid uuid, QUrl url, QVersionNumber version, QByteArray bytearray);
+	static TestGadget createGeom(QSize size, QPoint point, QLine line, QRect rect);
 	static TestGadget createList(QList<int> simpleList, QList<QList<int>> leveledList);
 	static TestGadget createMap(QMap<QString, int> simpleMap, QMap<QString, QMap<QString, int>> leveledMap);
 	static TestGadget createPair(QPair<int, QString> pair, QPair<ChildGadget, QList<int>> extraPair, QList<QPair<bool, bool>> listPair);
@@ -118,6 +128,11 @@ public:
 	QUrl url;
 	QVersionNumber version;
 	QByteArray bytearray;
+
+	QSize size;
+	QPoint point;
+	QLine line;
+	QRect rect;
 
 	QList<int> simpleList;
 	QList<QList<int>> leveledList;

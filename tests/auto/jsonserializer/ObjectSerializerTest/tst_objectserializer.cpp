@@ -343,6 +343,10 @@ void ObjectSerializerTest::testNullDeserialization()
 									{"url", QJsonValue::Null},
 									{"version", QJsonValue::Null},
 									{"bytearray", QJsonValue::Null},
+									{"size", QJsonValue::Null},
+									{"point", QJsonValue::Null},
+									{"line", QJsonValue::Null},
+									{"rect", QJsonValue::Null},
 									{"simpleList", QJsonValue::Null},
 									{"leveledList", QJsonValue::Null},
 									{"simpleMap", QJsonValue::Null},
@@ -910,6 +914,51 @@ void ObjectSerializerTest::generateValidTestData()
 															 })
 								   << true;
 	}
+
+	QTest::newRow("size") << TestObject::createGeom({10, 30}, {}, {}, {}, this)
+						  << TestObject::createJson({
+														{"size", QJsonObject({
+															 {"width", 10},
+															 {"height", 30}
+														 })}
+													})
+						  << true;
+	QTest::newRow("point") << TestObject::createGeom({}, {42, 24}, {}, {}, this)
+						   << TestObject::createJson({
+														 {"point", QJsonObject({
+															  {"x", 42},
+															  {"y", 24}
+														  })}
+													 })
+						   << true;
+	QTest::newRow("line") << TestObject::createGeom({}, {}, {11, 22, 33, 44}, {}, this)
+						  << TestObject::createJson({
+														{"line", QJsonObject({
+															 {"p1", QJsonObject({
+																  {"x", 11},
+																  {"y", 22}
+															  })},
+															 {"p2", QJsonObject({
+																  {"x", 33},
+																  {"y", 44}
+															  })}
+														 })}
+													})
+						  << true;
+	QTest::newRow("rect") << TestObject::createGeom({}, {}, {}, {20, 25, 100, 75}, this)
+						  << TestObject::createJson({
+														{"rect", QJsonObject({
+															 {"topLeft", QJsonObject({
+																  {"x", 20},
+																  {"y", 25}
+															  })},
+															 {"bottomRight", QJsonObject({
+																  {"x", 119},
+																  {"y", 99}
+															  })}
+														 })}
+													})
+						  << true;
 
 	QTest::newRow("list") << TestObject::createList({3, 7, 13}, {}, this)
 						  << TestObject::createJson({

@@ -15,6 +15,10 @@ TestGadget::TestGadget() :
 	url(),
 	version(),
 	bytearray(),
+	size(),
+	point(),
+	line(),
+	rect(),
 	simpleList(),
 	leveledList(),
 	simpleMap(),
@@ -45,6 +49,10 @@ bool TestGadget::operator==(const TestGadget &other) const
 			url == other.url &&
 			version == other.version &&
 			bytearray == other.bytearray &&
+			size == other.size &&
+			point == other.point &&
+			line == other.line &&
+			rect == other.rect &&
 			simpleList == other.simpleList &&
 			leveledList == other.leveledList &&
 			simpleMap == other.simpleMap &&
@@ -75,6 +83,10 @@ bool TestGadget::operator!=(const TestGadget &other) const
 			url != other.url ||
 			version != other.version ||
 			bytearray != other.bytearray ||
+			size != other.size ||
+			point != other.point ||
+			line != other.line ||
+			rect != other.rect ||
 			simpleList != other.simpleList ||
 			leveledList != other.leveledList ||
 			simpleMap != other.simpleMap ||
@@ -133,6 +145,16 @@ TestGadget TestGadget::createExtra(QDateTime datetime, QUuid uuid, QUrl url, QVe
 	t.url = url;
 	t.version = version;
 	t.bytearray = bytearray;
+	return t;
+}
+
+TestGadget TestGadget::createGeom(QSize size, QPoint point, QLine line, QRect rect)
+{
+	TestGadget t;
+	t.size = size;
+	t.point = point;
+	t.line = line;
+	t.rect = rect;
 	return t;
 }
 
@@ -207,6 +229,34 @@ QJsonObject TestGadget::createJson(const QJsonObject &delta, const QString &rmKe
 								{"url", QString()},
 								{"version", QString()},
 								{"bytearray", QString()},
+								{"size", QJsonObject({
+									 {"width", -1},
+									 {"height", -1}
+								 })},
+								{"point", QJsonObject({
+									 {"x", 0},
+									 {"y", 0}
+								 })},
+								{"line", QJsonObject({
+									 {"p1", QJsonObject({
+										  {"x", 0},
+										  {"y", 0}
+									  })},
+									 {"p2", QJsonObject({
+										  {"x", 0},
+										  {"y", 0}
+									  })}
+								 })},
+								{"rect", QJsonObject({
+									 {"topLeft", QJsonObject({
+										  {"x", 0},
+										  {"y", 0}
+									  })},
+									 {"bottomRight", QJsonObject({
+										  {"x", -1},
+										  {"y", -1}
+									  })}
+								 })},
 								{"simpleList", QJsonArray()},
 								{"leveledList", QJsonArray()},
 								{"simpleMap", QJsonObject()},
