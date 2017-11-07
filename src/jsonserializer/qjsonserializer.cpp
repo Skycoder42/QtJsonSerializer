@@ -6,6 +6,7 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QUuid>
 #include <QtCore/QUrl>
+#include <QtCore/QVersionNumber>
 #include <QtCore/QBuffer>
 
 #include "typeconverters/qjsonobjectconverter_p.h"
@@ -14,6 +15,7 @@
 #include "typeconverters/qjsonlistconverter_p.h"
 #include "typeconverters/qjsonjsonconverter_p.h"
 #include "typeconverters/qjsonpairconverter_p.h"
+#include "typeconverters/qjsonbytearrayconverter_p.h"
 #include "typeconverters/qjsonversionnumberconverter_p.h"
 
 static void qJsonSerializerStartup();
@@ -31,6 +33,7 @@ QJsonSerializer::QJsonSerializer(QObject *parent) :
 	addJsonTypeConverter(new QJsonJsonObjectConverter());
 	addJsonTypeConverter(new QJsonJsonArrayConverter());
 	addJsonTypeConverter(new QJsonPairConverter());
+	addJsonTypeConverter(new QJsonBytearrayConverter());
 	addJsonTypeConverter(new QJsonVersionNumberConverter());
 }
 
@@ -438,11 +441,8 @@ QJsonSerializerPrivate::QJsonSerializerPrivate() :
 // ------------- Startup function implementation -------------
 
 //use macro to register types to reduce number of symbols generated
-#ifdef Q_JSONSERIALIZER_NO_MACRO
-#define REGISTER_DEFAULT_CONVERTERS(T) QJsonSerializer::registerAllConverters<T>()
-#else
-#define REGISTER_DEFAULT_CONVERTERS(T) do { \
-	auto ok = QMetaType::registerConverter<QList<T>, QVariantList>([](const QList<T> &list) -> QVariantList { \
+#define REGISTER_DEFAULT_LIST(T) \
+	ok = QMetaType::registerConverter<QList<T>, QVariantList>([](const QList<T> &list) -> QVariantList { \
 		QVariantList l; \
 		foreach(auto v, list) \
 			l.append(QVariant::fromValue(v)); \
@@ -466,8 +466,9 @@ QJsonSerializerPrivate::QJsonSerializerPrivate() :
 		} \
 		return l; \
 	}); \
-	Q_ASSERT_X(ok, Q_FUNC_INFO, "Failed to register QVariantList -> QList<T> converter for type " #T); \
-	\
+	Q_ASSERT_X(ok, Q_FUNC_INFO, "Failed to register QVariantList -> QList<T> converter for type " #T);
+
+#define REGISTER_DEFAULT_MAP(T) \
 	ok = QMetaType::registerConverter<QMap<QString, T>, QVariantMap>([](const QMap<QString, T> &map) -> QVariantMap { \
 		QVariantMap m; \
 		for(auto it = map.constBegin(); it != map.constEnd(); ++it) \
@@ -493,7 +494,15 @@ QJsonSerializerPrivate::QJsonSerializerPrivate() :
 		} \
 		return m; \
 	}); \
-	Q_ASSERT_X(ok, Q_FUNC_INFO, "Failed to register QVariantMap -> QMap<QString, T> converter for type " #T); \
+	Q_ASSERT_X(ok, Q_FUNC_INFO, "Failed to register QVariantMap -> QMap<QString, T> converter for type " #T);
+
+#ifdef Q_JSONSERIALIZER_NO_MACRO
+#define REGISTER_DEFAULT_CONVERTERS(T) QJsonSerializer::registerAllConverters<T>()
+#else
+#define REGISTER_DEFAULT_CONVERTERS(T) do { \
+	bool ok = false; \
+	REGISTER_DEFAULT_LIST(T) \
+	REGISTER_DEFAULT_MAP(T) \
 } while(false)
 #endif
 
@@ -528,4 +537,12 @@ static void qJsonSerializerStartup()
 	REGISTER_DEFAULT_CONVERTERS(QJsonValue);
 	REGISTER_DEFAULT_CONVERTERS(QJsonObject);
 	REGISTER_DEFAULT_CONVERTERS(QJsonArray);
+	REGISTER_DEFAULT_CONVERTERS(QVersionNumber);
+
+	//extra: qbytearray
+	{
+		bool ok = false;
+//		REGISTER_DEFAULT_LIST(QByteArray)
+		REGISTER_DEFAULT_MAP(QByteArray)
+	}
 }

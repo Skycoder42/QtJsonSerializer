@@ -341,6 +341,7 @@ void ObjectSerializerTest::testNullDeserialization()
 									{"uuid", QJsonValue::Null},
 									{"url", QJsonValue::Null},
 									{"version", QJsonValue::Null},
+									{"bytearray", QJsonValue::Null},
 									{"simpleList", QJsonValue::Null},
 									{"leveledList", QJsonValue::Null},
 									{"simpleMap", QJsonValue::Null},
@@ -855,28 +856,34 @@ void ObjectSerializerTest::generateValidTestData()
 		QDate date(1111, 11, 11);
 		QTime time(22, 22, 22);
 		QDateTime dateTime(date, time);
-		QTest::newRow("datetime") << TestObject::createExtra(dateTime, {}, {}, {}, this)
+		QTest::newRow("datetime") << TestObject::createExtra(dateTime, {}, {}, {}, {}, this)
 								  << TestObject::createJson({
 																{"datetime", dateTime.toString(Qt::ISODate)}
 															})
 								  << true;
 		auto uuid = QUuid::createUuid();
-		QTest::newRow("uuid") << TestObject::createExtra({}, uuid, {}, {}, this)
+		QTest::newRow("uuid") << TestObject::createExtra({}, uuid, {}, {}, {}, this)
 							  << TestObject::createJson({
 															{"uuid", uuid.toString()}
 														})
 							  << true;
 		QUrl url(QStringLiteral("https://user:password@login.example.com:4711/in/some/file.txt?b=42&z=0#baum42"));
-		QTest::newRow("uuid") << TestObject::createExtra({}, {}, url, {}, this)
+		QTest::newRow("uuid") << TestObject::createExtra({}, {}, url, {}, {}, this)
 							  << TestObject::createJson({
 															{"url", url.toString()}
 														})
 							  << true;
-		QTest::newRow("version") << TestObject::createExtra({}, {}, {}, QVersionNumber(4, 2, 0), this)
+		QTest::newRow("version") << TestObject::createExtra({}, {}, {}, QVersionNumber(4, 2, 0), {}, this)
 								 << TestObject::createJson({
 															   {"version", "4.2.0"}
 														   })
 								 << true;
+		QByteArray data("hello world \xED");
+		QTest::newRow("bytearray") << TestObject::createExtra({}, {}, {}, {}, data, this)
+								   << TestObject::createJson({
+																 {"bytearray", QString::fromUtf8(data.toBase64())}
+															 })
+								   << true;
 	}
 
 	QTest::newRow("list") << TestObject::createList({3, 7, 13}, {}, this)

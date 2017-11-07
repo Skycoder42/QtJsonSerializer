@@ -14,6 +14,7 @@ TestGadget::TestGadget() :
 	uuid(),
 	url(),
 	version(),
+	bytearray(),
 	simpleList(),
 	leveledList(),
 	simpleMap(),
@@ -43,6 +44,7 @@ bool TestGadget::operator==(const TestGadget &other) const
 			uuid == other.uuid &&
 			url == other.url &&
 			version == other.version &&
+			bytearray == other.bytearray &&
 			simpleList == other.simpleList &&
 			leveledList == other.leveledList &&
 			simpleMap == other.simpleMap &&
@@ -72,6 +74,7 @@ bool TestGadget::operator!=(const TestGadget &other) const
 			uuid != other.uuid ||
 			url != other.url ||
 			version != other.version ||
+			bytearray != other.bytearray ||
 			simpleList != other.simpleList ||
 			leveledList != other.leveledList ||
 			simpleMap != other.simpleMap ||
@@ -122,13 +125,14 @@ TestGadget TestGadget::createEnum(TestGadget::NormalEnum normalEnumProperty, Enu
 	return t;
 }
 
-TestGadget TestGadget::createExtra(QDateTime datetime, QUuid uuid, QUrl url, QVersionNumber version)
+TestGadget TestGadget::createExtra(QDateTime datetime, QUuid uuid, QUrl url, QVersionNumber version, QByteArray bytearray)
 {
 	TestGadget t;
 	t.datetime = datetime;
 	t.uuid = uuid;
 	t.url = url;
 	t.version = version;
+	t.bytearray = bytearray;
 	return t;
 }
 
@@ -202,6 +206,7 @@ QJsonObject TestGadget::createJson(const QJsonObject &delta, const QString &rmKe
 								{"uuid", QStringLiteral("{00000000-0000-0000-0000-000000000000}")},
 								{"url", QString()},
 								{"version", QString()},
+								{"bytearray", QString()},
 								{"simpleList", QJsonArray()},
 								{"leveledList", QJsonArray()},
 								{"simpleMap", QJsonObject()},
