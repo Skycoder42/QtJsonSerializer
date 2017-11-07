@@ -6,7 +6,6 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QUuid>
 #include <QtCore/QUrl>
-#include <QtCore/QJsonDocument>
 #include <QtCore/QBuffer>
 
 #include "typeconverters/qjsonobjectconverter_p.h"
@@ -67,12 +66,30 @@ QJsonValue QJsonSerializer::serialize(const QVariant &data) const
 
 void QJsonSerializer::serializeTo(QIODevice *device, const QVariant &data) const
 {
-	serializeToImpl(device, data);
+#ifndef QT_NO_DEBUG
+	serializeToImpl(device, data, QJsonDocument::Indented);
+#else
+	serializeToImpl(device, data, QJsonDocument::Compact);
+#endif
+}
+
+void QJsonSerializer::serializeTo(QIODevice *device, const QVariant &data, QJsonDocument::JsonFormat format) const
+{
+	serializeToImpl(device, data, format);
 }
 
 QByteArray QJsonSerializer::serializeTo(const QVariant &data) const
 {
-	return serializeToImpl(data);
+#ifndef QT_NO_DEBUG
+	return serializeToImpl(data, QJsonDocument::Indented);
+#else
+	return serializeToImpl(data, QJsonDocument::Compact);
+#endif
+}
+
+QByteArray QJsonSerializer::serializeTo(const QVariant &data, QJsonDocument::JsonFormat format) const
+{
+	return serializeToImpl(data, format);
 }
 
 QVariant QJsonSerializer::deserialize(const QJsonValue &json, int metaTypeId, QObject *parent) const
@@ -345,7 +362,7 @@ QVariant QJsonSerializer::deserializeEnum(const QMetaEnum &metaEnum, const QJson
 	}
 }
 
-void QJsonSerializer::writeToDevice(const QJsonValue &data, QIODevice *device) const
+void QJsonSerializer::writeToDevice(const QJsonValue &data, QIODevice *device, QJsonDocument::JsonFormat format) const
 {
 	QJsonDocument doc;
 	if(data.isArray())
@@ -354,11 +371,7 @@ void QJsonSerializer::writeToDevice(const QJsonValue &data, QIODevice *device) c
 		doc = QJsonDocument(data.toObject());
 	else
 		throw QJsonSerializationException("Only objects or arrays can be written to a device!");
-#ifndef QT_NO_DEBUG
-	device->write(doc.toJson(QJsonDocument::Indented));
-#else
-	device->write(doc.toJson(QJsonDocument::Compact));
-#endif
+	device->write(doc.toJson(format));
 }
 
 QJsonValue QJsonSerializer::readFromDevice(QIODevice *device) const
@@ -380,14 +393,32 @@ QJsonValue QJsonSerializer::serializeImpl(const QVariant &data) const
 
 void QJsonSerializer::serializeToImpl(QIODevice *device, const QVariant &data) const
 {
-	writeToDevice(serializeVariant(data.userType(), data), device);
+#ifndef QT_NO_DEBUG
+	serializeToImpl(device, data, QJsonDocument::Indented);
+#else
+	serializeToImpl(device, data, QJsonDocument::Compact);
+#endif
+}
+
+void QJsonSerializer::serializeToImpl(QIODevice *device, const QVariant &data, QJsonDocument::JsonFormat format) const
+{
+	writeToDevice(serializeVariant(data.userType(), data), device, format);
 }
 
 QByteArray QJsonSerializer::serializeToImpl(const QVariant &data) const
 {
+#ifndef QT_NO_DEBUG
+	return serializeToImpl(data, QJsonDocument::Indented);
+#else
+	return serializeToImpl(data, QJsonDocument::Compact);
+#endif
+}
+
+QByteArray QJsonSerializer::serializeToImpl(const QVariant &data, QJsonDocument::JsonFormat format) const
+{
 	QBuffer buffer;
 	buffer.open(QIODevice::WriteOnly);
-	serializeToImpl(&buffer, data);
+	serializeToImpl(&buffer, data, format);
 	buffer.close();
 	return buffer.data();
 }
