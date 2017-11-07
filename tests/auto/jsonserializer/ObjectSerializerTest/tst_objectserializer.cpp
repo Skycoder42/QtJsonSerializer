@@ -337,6 +337,9 @@ void ObjectSerializerTest::testNullDeserialization()
 									{"doubleProperty", QJsonValue::Null},
 									{"normalEnumProperty", QJsonValue::Null},
 									{"enumFlagsProperty", QJsonValue::Null},
+									{"datetime", QJsonValue::Null},
+									{"uuid", QJsonValue::Null},
+									{"url", QJsonValue::Null},
 									{"simpleList", QJsonValue::Null},
 									{"leveledList", QJsonValue::Null},
 									{"simpleMap", QJsonValue::Null},
@@ -851,11 +854,29 @@ void ObjectSerializerTest::generateValidTestData()
 		QDate date(1111, 11, 11);
 		QTime time(22, 22, 22);
 		QDateTime dateTime(date, time);
-		QTest::newRow("datetime") << TestObject::createExtra(dateTime, this)
+		QTest::newRow("datetime") << TestObject::createExtra(dateTime, {}, {}, this)
 								  << TestObject::createJson({
 																{"datetime", dateTime.toString(Qt::ISODate)}
 															})
 								  << true;
+	}
+
+	{
+		auto uuid = QUuid::createUuid();
+		QTest::newRow("uuid") << TestObject::createExtra({}, uuid, {}, this)
+							  << TestObject::createJson({
+															{"uuid", uuid.toString()}
+														})
+							  << true;
+	}
+
+	{
+		QUrl url(QStringLiteral("https://user:password@login.example.com:4711/in/some/file.txt?b=42&z=0#baum42"));
+		QTest::newRow("uuid") << TestObject::createExtra({}, {}, url, this)
+							  << TestObject::createJson({
+															{"url", url.toString()}
+														})
+							  << true;
 	}
 
 	QTest::newRow("list") << TestObject::createList({3, 7, 13}, {}, this)

@@ -3,6 +3,8 @@
 
 #include <QObject>
 #include <QDateTime>
+#include <QUuid>
+#include <QUrl>
 #include <QList>
 #include <QMap>
 #include <QJsonObject>
@@ -39,7 +41,8 @@ struct TestGadget
 	Q_PROPERTY(EnumFlags enumFlagsProperty READ getEnumFlagsProperty WRITE setEnumFlagsProperty)
 
 	Q_PROPERTY(QDateTime datetime MEMBER datetime)
-	//TODO test: datetime, uuid, url
+	Q_PROPERTY(QUuid uuid MEMBER uuid)
+	Q_PROPERTY(QUrl url MEMBER url)
 
 	Q_PROPERTY(QList<int> simpleList MEMBER simpleList)
 	Q_PROPERTY(QList<QList<int>> leveledList MEMBER leveledList)
@@ -88,7 +91,7 @@ public:
 
 	static TestGadget createBasic(int intProperty, bool boolProperty, QString stringProperty, double doubleProperty);
 	static TestGadget createEnum(NormalEnum normalEnumProperty, EnumFlags enumFlagsProperty);
-	static TestGadget createExtra(QDateTime datetime);
+	static TestGadget createExtra(QDateTime datetime, QUuid uuid, QUrl url);
 	static TestGadget createList(QList<int> simpleList, QList<QList<int>> leveledList);
 	static TestGadget createMap(QMap<QString, int> simpleMap, QMap<QString, QMap<QString, int>> leveledMap);
 	static TestGadget createPair(QPair<int, QString> pair, QPair<ChildGadget, QList<int>> extraPair, QList<QPair<bool, bool>> listPair);
@@ -108,6 +111,8 @@ public:
 	EnumFlags enumFlagsProperty;
 
 	QDateTime datetime;
+	QUuid uuid;
+	QUrl url;
 
 	QList<int> simpleList;
 	QList<QList<int>> leveledList;

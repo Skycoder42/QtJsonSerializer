@@ -245,20 +245,37 @@ QJsonValue QJsonSerializer::serializeValue(int propertyType, const QVariant &val
 			return value.value<QJsonValue>();
 
 		auto json = QJsonValue::fromVariant(value);
-		if(json.isNull()) {
-			if(value.userType() == QMetaType::Nullptr)//std::nullptr_t is of course null
-				return json;
-			else if(propertyType == QMetaType::QDate ||
-			   propertyType == QMetaType::QTime ||
-			   propertyType == QMetaType::QDateTime ||
-			   value.userType() == QMetaType::QDate ||
-			   value.userType() == QMetaType::QTime ||
-			   value.userType() == QMetaType::QDateTime)
-				return QString();//special case date: invalid date -> empty string -> interpreted as fail -> thus return empty string
-			else {
+		if(json.isNull()) { //special types where a null json is valid, and corresponds to a different
+			static const QHash<int, QJsonValue::Type> nullTypes = {
+				{QMetaType::Nullptr, QJsonValue::Null},
+				{QMetaType::QDate, QJsonValue::String},
+				{QMetaType::QTime, QJsonValue::String},
+				{QMetaType::QDateTime, QJsonValue::String},
+				{QMetaType::QUrl, QJsonValue::String}
+			};
+
+			auto typeMapping = nullTypes.value(propertyType, QJsonValue::Undefined);
+			if(typeMapping == QJsonValue::Undefined)
+				typeMapping = nullTypes.value(value.userType(), QJsonValue::Undefined);
+			switch (typeMapping) {
+			case QJsonValue::Null:
+				return QJsonValue();
+			case QJsonValue::Bool:
+				return false;
+			case QJsonValue::Double:
+				return 0.0;
+			case QJsonValue::String:
+				return QString();
+			case QJsonValue::Array:
+				return QJsonArray();
+			case QJsonValue::Object:
+				return QJsonObject();
+			case QJsonValue::Undefined:
 				throw QJsonSerializationException(QByteArray("Failed to convert type ") +
 												  value.typeName() +
 												  QByteArray(" to a JSON representation"));
+			default:
+				Q_UNREACHABLE();
 			}
 		} else
 			return json;
