@@ -131,7 +131,12 @@ public:
 	T deserializeFrom(const QByteArray &data, QObject *parent = nullptr) const;
 
 	//! Adds a custom type converter to this serializer
-	void addJsonTypeConverter(QJsonTypeConverter *converter);
+	template <typename T>
+	void addJsonTypeConverter();
+	//! @copybrief QJsonSerializer::addJsonTypeConverter()
+	void addJsonTypeConverter(QSharedPointer<QJsonTypeConverter> converter);
+	//! @copybrief QJsonSerializer::addJsonTypeConverter()
+	QT_DEPRECATED void addJsonTypeConverter(QJsonTypeConverter *converter);
 
 public Q_SLOTS:
 	//! @writeAcFn{QJsonSerializer::allowDefaultNull}
@@ -329,6 +334,13 @@ T QJsonSerializer::deserializeFrom(const QByteArray &data, QObject *parent) cons
 {
 	static_assert(_qjsonserializer_helpertypes::is_serializable<T>::value, "T cannot be deserialized");
 	return _qjsonserializer_helpertypes::variant_helper<T>::fromVariant(deserializeFrom(data, qMetaTypeId<T>(), parent));
+}
+
+template<typename T>
+void QJsonSerializer::addJsonTypeConverter()
+{
+	static_assert(std::is_base_of<QJsonTypeConverter, T>::value, "T must implement QJsonTypeConverter");
+	addJsonTypeConverter(QSharedPointer<T>::create());
 }
 
 #endif // QJSONSERIALIZER_H

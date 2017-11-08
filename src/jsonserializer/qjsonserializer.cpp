@@ -2,16 +2,7 @@
 #include "qjsonserializer_p.h"
 #include "qjsonexceptioncontext_p.h"
 
-#include <QtCore/QCoreApplication>
 #include <QtCore/QDateTime>
-#include <QtCore/QUuid>
-#include <QtCore/QUrl>
-#include <QtCore/QVersionNumber>
-#include <QtCore/QBuffer>
-#include <QtCore/QLine>
-#include <QtCore/QPoint>
-#include <QtCore/QRect>
-#include <QtCore/QSize>
 
 #include "typeconverters/qjsonobjectconverter_p.h"
 #include "typeconverters/qjsongadgetconverter_p.h"
@@ -24,29 +15,10 @@
 #include "typeconverters/qjsongeomconverter_p.h"
 #include "typeconverters/qjsonlocaleconverter_p.h"
 
-static void qJsonSerializerStartup();
-Q_COREAPP_STARTUP_FUNCTION(qJsonSerializerStartup)
-
 QJsonSerializer::QJsonSerializer(QObject *parent) :
 	QObject(parent),
 	d(new QJsonSerializerPrivate())
-{
-	addJsonTypeConverter(new QJsonObjectConverter());
-	addJsonTypeConverter(new QJsonGadgetConverter());
-	addJsonTypeConverter(new QJsonMapConverter());
-	addJsonTypeConverter(new QJsonListConverter());
-	addJsonTypeConverter(new QJsonJsonValueConverter());
-	addJsonTypeConverter(new QJsonJsonObjectConverter());
-	addJsonTypeConverter(new QJsonJsonArrayConverter());
-	addJsonTypeConverter(new QJsonPairConverter());
-	addJsonTypeConverter(new QJsonBytearrayConverter());
-	addJsonTypeConverter(new QJsonVersionNumberConverter());
-	addJsonTypeConverter(new QJsonSizeConverter());
-	addJsonTypeConverter(new QJsonPointConverter());
-	addJsonTypeConverter(new QJsonLineConverter());
-	addJsonTypeConverter(new QJsonRectConverter());
-	addJsonTypeConverter(new QJsonLocaleConverter());
-}
+{}
 
 QJsonSerializer::~QJsonSerializer() {}
 
@@ -137,24 +109,27 @@ QVariant QJsonSerializer::deserializeFrom(const QByteArray &data, int metaTypeId
 	return res;
 }
 
-void QJsonSerializer::addJsonTypeConverter(QJsonTypeConverter *converter)
+void QJsonSerializer::addJsonTypeConverter(QSharedPointer<QJsonTypeConverter> converter)
 {
 	Q_ASSERT_X(converter, Q_FUNC_INFO, "converter must not be null!");
 
-	QSharedPointer<QJsonTypeConverter> sp(converter);
 	auto inserted = false;
-
 	for(auto it = d->typeConverters.begin(); it != d->typeConverters.end(); ++it) {
-		if((*it)->priority() <= sp->priority()) {
-			d->typeConverters.insert(it, sp);
+		if((*it)->priority() <= converter->priority()) {
+			d->typeConverters.insert(it, converter);
 			inserted = true;
 			break;
 		}
 	}
 	if(!inserted)
-		d->typeConverters.append(sp);
+		d->typeConverters.append(converter);
 
 	d->typeConverterTypeCache.clear();
+}
+
+void QJsonSerializer::addJsonTypeConverter(QJsonTypeConverter *converter)
+{
+	addJsonTypeConverter(QSharedPointer<QJsonTypeConverter>(converter));
 }
 
 void QJsonSerializer::setAllowDefaultNull(bool allowDefaultNull)
@@ -465,7 +440,28 @@ QJsonSerializerPrivate::QJsonSerializerPrivate() :
 	validateBase64(true),
 	useBcp47Locale(true),
 	validationFlags(QJsonSerializer::StandardValidation),
-	polymorphing(QJsonSerializer::Enabled)
+	polymorphing(QJsonSerializer::Enabled),
+	typeConverters({
+		//prio 1
+		QSharedPointer<QJsonLocaleConverter>::create(),
+		//prio 0
+		QSharedPointer<QJsonObjectConverter>::create(),
+		QSharedPointer<QJsonGadgetConverter>::create(),
+		QSharedPointer<QJsonMapConverter>::create(),
+		QSharedPointer<QJsonListConverter>::create(),
+		QSharedPointer<QJsonJsonValueConverter>::create(),
+		QSharedPointer<QJsonJsonObjectConverter>::create(),
+		QSharedPointer<QJsonJsonArrayConverter>::create(),
+		QSharedPointer<QJsonPairConverter>::create(),
+		QSharedPointer<QJsonBytearrayConverter>::create(),
+		QSharedPointer<QJsonVersionNumberConverter>::create(),
+		QSharedPointer<QJsonSizeConverter>::create(),
+		QSharedPointer<QJsonPointConverter>::create(),
+		QSharedPointer<QJsonLineConverter>::create(),
+		QSharedPointer<QJsonRectConverter>::create(),
+		QSharedPointer<QJsonRegularExpressionConverter>::create()
+	}),
+	typeConverterTypeCache()
 {}
 
 // ------------- Startup function implementation -------------

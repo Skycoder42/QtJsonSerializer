@@ -6,7 +6,8 @@ SOURCES += \
 	qjsonserializerexception.cpp \
 	qjsonserializer.cpp \
 	qjsontypeconverter.cpp \
-	qjsonexceptioncontext.cpp
+	qjsonexceptioncontext.cpp \
+    qtjsonserializer_global.cpp
 
 HEADERS += \
 	qjsonserializerexception.h \
