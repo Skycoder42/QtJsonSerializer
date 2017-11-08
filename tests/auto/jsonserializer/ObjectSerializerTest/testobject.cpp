@@ -21,6 +21,7 @@ TestObject::TestObject(QObject *parent) :
 	line(),
 	rect(),
 	locale(QLocale::c()),
+	regexp(),
 	simpleList(),
 	leveledList(),
 	simpleMap(),
@@ -79,10 +80,11 @@ TestObject *TestObject::createGeom(QSize size, QPoint point, QLine line, QRect r
 	return t;
 }
 
-TestObject *TestObject::createSpecial(QLocale locale, QObject *parent)
+TestObject *TestObject::createSpecial(QLocale locale, QRegularExpression regexp, QObject *parent)
 {
 	auto t = new TestObject(parent);
 	t->locale = locale;
+	t->regexp = regexp;
 	return t;
 }
 
@@ -219,6 +221,10 @@ QJsonObject TestObject::createJson(const QJsonObject &delta, const QString &rmKe
 									  })}
 								 })},
 								{"locale", QLocale::c().bcp47Name()},
+								{"regexp", QJsonObject({
+									 {"pattern", QString()},
+									 {"options", 0}
+								 })},
 								{"simpleList", QJsonArray()},
 								{"leveledList", QJsonArray()},
 								{"simpleMap", QJsonObject()},
@@ -278,6 +284,7 @@ bool TestObject::equals(const TestObject *other) const
 				  line == other->line &&
 				  rect == other->rect &&
 				  locale.bcp47Name() == other->locale.bcp47Name() &&
+				  regexp == other->regexp &&
 				  simpleList == other->simpleList &&
 				  leveledList == other->leveledList &&
 				  simpleMap == other->simpleMap &&

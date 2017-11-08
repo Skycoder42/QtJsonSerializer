@@ -15,6 +15,7 @@
 #include <QLine>
 #include <QRect>
 #include <QLocale>
+#include <QRegularExpression>
 
 struct ChildGadget
 {
@@ -58,6 +59,7 @@ struct TestGadget
 	Q_PROPERTY(QRect rect MEMBER rect)
 
 	Q_PROPERTY(QLocale locale MEMBER locale)
+	Q_PROPERTY(QRegularExpression regexp MEMBER regexp)
 
 	Q_PROPERTY(QList<int> simpleList MEMBER simpleList)
 	Q_PROPERTY(QList<QList<int>> leveledList MEMBER leveledList)
@@ -108,7 +110,7 @@ public:
 	static TestGadget createEnum(NormalEnum normalEnumProperty, EnumFlags enumFlagsProperty);
 	static TestGadget createExtra(QDateTime datetime, QUuid uuid, QUrl url, QVersionNumber version, QByteArray bytearray);
 	static TestGadget createGeom(QSize size, QPoint point, QLine line, QRect rect);
-	static TestGadget createSpecial(QLocale locale);
+	static TestGadget createSpecial(QLocale locale, QRegularExpression regexp);
 	static TestGadget createList(QList<int> simpleList, QList<QList<int>> leveledList);
 	static TestGadget createMap(QMap<QString, int> simpleMap, QMap<QString, QMap<QString, int>> leveledMap);
 	static TestGadget createPair(QPair<int, QString> pair, QPair<ChildGadget, QList<int>> extraPair, QList<QPair<bool, bool>> listPair);
@@ -139,6 +141,7 @@ public:
 	QRect rect;
 
 	QLocale locale;
+	QRegularExpression regexp;
 
 	QList<int> simpleList;
 	QList<QList<int>> leveledList;

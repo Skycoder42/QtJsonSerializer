@@ -33,7 +33,8 @@ private Q_SLOTS:
 	void testDeserializationValidation_data();
 	void testDeserializationValidation();
 	void testBase64Validate();
-	void testLocaleName();
+	void testLocaleNameSerialization();
+	void testRegexPatternDeserialization();
 
 	void testEnumSpecialSerialization_data();
 	void testEnumSpecialSerialization();
@@ -350,6 +351,7 @@ void ObjectSerializerTest::testNullDeserialization()
 									{"line", QJsonValue::Null},
 									{"rect", QJsonValue::Null},
 									{"locale", QJsonValue::Null},
+									{"regexp", QJsonValue::Null},
 									{"simpleList", QJsonValue::Null},
 									{"leveledList", QJsonValue::Null},
 									{"simpleMap", QJsonValue::Null},
@@ -456,10 +458,10 @@ void ObjectSerializerTest::testBase64Validate()
 	serializer->setValidateBase64(true);
 }
 
-void ObjectSerializerTest::testLocaleName()
+void ObjectSerializerTest::testLocaleNameSerialization()
 {
 	QLocale extraLocale(QLocale::English, QLocale::LatinScript, QLocale::UnitedKingdom);
-	auto obj = TestObject::createSpecial(extraLocale, this);
+	auto obj = TestObject::createSpecial(extraLocale, {}, this);
 
 	try {
 		auto json = TestObject::createJson({
@@ -482,6 +484,25 @@ void ObjectSerializerTest::testLocaleName()
 	}
 
 	serializer->setUseBcp47Locale(true);
+	obj->deleteLater();
+}
+
+void ObjectSerializerTest::testRegexPatternDeserialization()
+{
+	QRegularExpression regex(QStringLiteral(R"__(^pattern\s*only$)__"));
+	auto obj = TestObject::createSpecial(QLocale::c(), regex, this);
+
+	try {
+		auto json = TestObject::createJson({
+											   {"regexp", regex.pattern()}
+										   });
+
+		auto deser = serializer->deserialize<TestObject*>(json, this);
+		QVERIFY(deser->equals(obj));
+	} catch (QException &e) {
+		QFAIL(e.what());
+	}
+
 	obj->deleteLater();
 }
 
@@ -994,9 +1015,19 @@ void ObjectSerializerTest::generateValidTestData()
 
 	{
 		QLocale locale(QLocale::German, QLocale::Austria);
-		QTest::newRow("locale") << TestObject::createSpecial(locale, this)
+		QTest::newRow("locale") << TestObject::createSpecial(locale, {}, this)
 								<< TestObject::createJson({
 															  {"locale", locale.bcp47Name()}
+														  })
+								<< true;
+		QRegularExpression regex(QStringLiteral(R"__(^\w*_\d{3,5})__"),
+								 QRegularExpression::CaseInsensitiveOption | QRegularExpression::DontCaptureOption);
+		QTest::newRow("regexp") << TestObject::createSpecial(QLocale::c(), regex, this)
+								<< TestObject::createJson({
+															  {"regexp", QJsonObject({
+																   {"pattern", regex.pattern()},
+																   {"options", (int)regex.patternOptions()}
+															   })}
 														  })
 								<< true;
 	}

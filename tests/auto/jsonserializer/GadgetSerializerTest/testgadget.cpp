@@ -20,6 +20,7 @@ TestGadget::TestGadget() :
 	line(),
 	rect(),
 	locale(QLocale::c()),
+	regexp(),
 	simpleList(),
 	leveledList(),
 	simpleMap(),
@@ -55,6 +56,7 @@ bool TestGadget::operator==(const TestGadget &other) const
 			line == other.line &&
 			rect == other.rect &&
 			locale.bcp47Name() == other.locale.bcp47Name() &&
+			regexp == other.regexp &&
 			simpleList == other.simpleList &&
 			leveledList == other.leveledList &&
 			simpleMap == other.simpleMap &&
@@ -90,6 +92,7 @@ bool TestGadget::operator!=(const TestGadget &other) const
 			line != other.line ||
 			rect != other.rect ||
 			locale.bcp47Name() != other.locale.bcp47Name() ||
+			regexp != other.regexp ||
 			simpleList != other.simpleList ||
 			leveledList != other.leveledList ||
 			simpleMap != other.simpleMap ||
@@ -161,10 +164,11 @@ TestGadget TestGadget::createGeom(QSize size, QPoint point, QLine line, QRect re
 	return t;
 }
 
-TestGadget TestGadget::createSpecial(QLocale locale)
+TestGadget TestGadget::createSpecial(QLocale locale, QRegularExpression regexp)
 {
 	TestGadget t;
 	t.locale = locale;
+	t.regexp = regexp;
 	return t;
 }
 
@@ -268,6 +272,10 @@ QJsonObject TestGadget::createJson(const QJsonObject &delta, const QString &rmKe
 									  })}
 								 })},
 								{"locale", QLocale::c().bcp47Name()},
+								{"regexp", QJsonObject({
+									 {"pattern", QString()},
+									 {"options", 0}
+								 })},
 								{"simpleList", QJsonArray()},
 								{"leveledList", QJsonArray()},
 								{"simpleMap", QJsonObject()},

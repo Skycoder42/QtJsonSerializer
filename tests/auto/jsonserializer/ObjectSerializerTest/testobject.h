@@ -18,6 +18,7 @@
 #include <QLine>
 #include <QRect>
 #include <QLocale>
+#include <QRegularExpression>
 
 class ChildObject : public QObject
 {
@@ -62,6 +63,7 @@ class TestObject : public QObject
 	Q_PROPERTY(QRect rect MEMBER rect)
 
 	Q_PROPERTY(QLocale locale MEMBER locale)
+	Q_PROPERTY(QRegularExpression regexp MEMBER regexp)
 
 	Q_PROPERTY(QList<int> simpleList MEMBER simpleList)
 	Q_PROPERTY(QList<QList<int>> leveledList MEMBER leveledList)
@@ -110,7 +112,7 @@ public:
 	static TestObject *createEnum(NormalEnum normalEnumProperty, EnumFlags enumFlagsProperty, QObject *parent);
 	static TestObject *createExtra(QDateTime datetime, QUuid uuid, QUrl url, QVersionNumber version, QByteArray bytearray, QObject *parent);
 	static TestObject *createGeom(QSize size, QPoint point, QLine line, QRect rect, QObject *parent);
-	static TestObject *createSpecial(QLocale locale, QObject *parent);
+	static TestObject *createSpecial(QLocale locale, QRegularExpression regexp, QObject *parent);
 	static TestObject *createList(QList<int> simpleList, QList<QList<int>> leveledList, QObject *parent);
 	static TestObject *createMap(QMap<QString, int> simpleMap, QMap<QString, QMap<QString, int>> leveledMap, QObject *parent);
 	static TestObject *createPair(QPair<int, QString> pair, QPair<ChildObject*, QList<int>> extraPair, QList<QPair<bool, bool>> listPair, QObject *parent);
@@ -144,6 +146,7 @@ public:
 	QRect rect;
 
 	QLocale locale;
+	QRegularExpression regexp;
 
 	QList<int> simpleList;
 	QList<QList<int>> leveledList;
