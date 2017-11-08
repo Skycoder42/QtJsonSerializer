@@ -131,8 +131,12 @@ In order for the serializer to properly work, there are a few things you have to
 	- QMap only: use `QJsonSerializer::registerMapConverters<T>()`
 	- QPair: use `QJsonSerializer::registerPairConverters<T1, T2>()`
 	- QSharedPointer/QPointer: use `QJsonSerializer::registerPointerConverters<T>()`
-5. By default, the `objectName` property of QObjects is not serialized (See [keepObjectName](src/qjsonserializer.h#L20))
-6. By default, the JSON `null` can only be converted to QObjects. For other types the conversion fails (See [allowDefaultNull](src/qjsonserializer.h#L19))
+5. Polymorphic QObjects are supported. This is done by the serializer via adding a special `@class` json property. To make a class polymorphic you can:
+	- Add `Q_CLASSINFO("polymorphic", "true")` to its definition
+	- Globally force polyphormism (See QJsonSerializer::polymorphing in the doc)
+	- Set a dynamic property: `setProperty("__qt_json_serializer_polymorphic", true);`
+6. By default, the `objectName` property of QObjects is not serialized (See [keepObjectName](src/qjsonserializer.h#L20))
+7. By default, the JSON `null` can only be converted to QObjects. For other types the conversion fails (See [allowDefaultNull](src/qjsonserializer.h#L19))
 
 ## Documentation
 The documentation is available on [github pages](https://skycoder42.github.io/QtJsonSerializer/). It was created using [doxygen](http://www.doxygen.org/). The HTML-documentation and Qt-Help files are shipped

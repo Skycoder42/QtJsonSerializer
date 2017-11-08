@@ -145,7 +145,7 @@ class Foo : public QObject {
 class Bar : public Foo {
 //...
 	Q_PROPERTY(int bar MEMBER bar)
-	Q_CLASS_INFO("polymorphic", "true")
+	Q_CLASSINFO("polymorphic", "true")
 //...
 };
 @endcode
@@ -168,12 +168,12 @@ this property. Here, a `Bar` object is created, with both the `foo` and the `bar
 every json object to be deserialized as QObject must have the @@class property, or otherwise an exception is thrown.
 
 <b>Declare objects polymorphic:</b><br/>
-There are to ways to make objects polymorphic. The first is static and uses `Q_CLASS_INFO`. Simply add the macro to the class
-that should be polymorphic as `Q_CLASS_INFO("polymorphic", "true")`. You can also set it to false, to disable polymorphism in
+There are to ways to make objects polymorphic. The first is static and uses `Q_CLASSINFO`. Simply add the macro to the class
+that should be polymorphic as `Q_CLASSINFO("polymorphic", "true")`. You can also set it to false, to disable polymorphism in
 case the class you inherit has this already set to true.
 
 The second way is to use a dynamic property. The property overrides the classinfo, but has to be set on an actual instance of
-the object to be serialized. Set the property by calling `setProperty("", true);`. Just like with class info, you can set it
+the object to be serialized. Set the property by calling `setProperty("__qt_json_serializer_polymorphic", true);`. Just like with class info, you can set it
 to false to disable it.
 
 @note This is only required for serialization. When deserializing, Polymorphism is determined by the @@class property. If it
