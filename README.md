@@ -131,7 +131,6 @@ In order for the serializer to properly work, there are a few things you have to
 	- QMap only: use `QJsonSerializer::registerMapConverters<T>()`
 	- QPair: use `QJsonSerializer::registerPairConverters<T1, T2>()`
 	- QSharedPointer/QPointer: use `QJsonSerializer::registerPointerConverters<T>()`
-	- QHash: Since **Qt 5.9.2**, QHash and QMap are convertible, which means you can use QHash as well
 5. By default, the `objectName` property of QObjects is not serialized (See [keepObjectName](src/qjsonserializer.h#L20))
 6. By default, the JSON `null` can only be converted to QObjects. For other types the conversion fails (See [allowDefaultNull](src/qjsonserializer.h#L19))
 

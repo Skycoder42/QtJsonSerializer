@@ -39,12 +39,6 @@ struct is_serializable<QList<T>> : public is_serializable<T> {};
 template <typename T>
 struct is_serializable<QMap<QString, T>> : public is_serializable<T> {};
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 9, 2)
-//! @copydoc _qjsonserializer_helpertypes::is_serializable
-template <typename T>
-struct is_serializable<QHash<QString, T>> : public is_serializable<T> {};
-#endif
-
 //! @copydoc _qjsonserializer_helpertypes::is_serializable
 template <typename T1, typename T2>
 struct is_serializable<QPair<T1, T2>> : public std::conditional<is_serializable<T1>::value && is_serializable<T2>::value, std::true_type, std::false_type>::type {}; //C++17 conjunction
@@ -157,21 +151,6 @@ struct json_type<QMap<QString, T>> {
 		return value.toObject();
 	}
 };
-
-#if QT_VERSION >= QT_VERSION_CHECK(5, 9, 2)
-//! @copydoc _qjsonserializer_helpertypes::json_type
-template <typename T>
-struct json_type<QHash<QString, T>> {
-	static_assert(is_serializable<QHash<QString, T>>::value, "Only QObject deriving classes can be serialized as pointer");
-	//! The json type
-	typedef QJsonObject type;
-
-	//! @copydoc _qjsonserializer_helpertypes::json_type::convert
-	static inline type convert(const QJsonValue &value) {
-		return value.toObject();
-	}
-};
-#endif
 
 //! @copydoc _qjsonserializer_helpertypes::json_type
 template <typename T1, typename T2>
