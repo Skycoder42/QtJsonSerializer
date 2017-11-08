@@ -3,6 +3,7 @@
 #include "qjsonexceptioncontext_p.h"
 
 #include <QtCore/QDateTime>
+#include <QtCore/QBuffer>
 
 #include "typeconverters/qjsonobjectconverter_p.h"
 #include "typeconverters/qjsongadgetconverter_p.h"
