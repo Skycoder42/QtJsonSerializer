@@ -73,6 +73,41 @@ to serialize them as a string, the "name" of each value, enable this propterty.
 */
 
 /*!
+@property QJsonSerializer::validateBase64
+
+@default{`true`}
+
+Applies to deserialization only.<br/>
+If active, the date is checked first to verify it is actually a base64 encoded string. If thats not the case
+an exception will be thrown. When disabled, invalid characters are silently discarded, so no error is reported
+
+@accessors{
+	@readAc{validateBase64()}
+	@writeAc{setValidateBase64()}
+}
+*/
+
+/*!
+@property QJsonSerializer::useBcp47Locale
+
+@default{`true`}
+
+Applies to serialization only.<br/>
+The property can be used to change how QLocale is serialized. If active, a bcp47 local string is created (See QLocale::bcp47Name()).
+That string is able to encode all information contained in the locale, but is not as wide spread as the "simple name format". That one
+is used if set to false (See QLocale::name())
+
+Both formats are accepted for deserialization
+
+@accessors{
+	@readAc{useBcp47Locale()}
+	@writeAc{setUseBcp47Locale()}
+}
+
+@sa QLocale::bcp47Name, QLocale::name
+*/
+
+/*!
 @property QJsonSerializer::validationFlags
 
 @default{`QJsonSerialzer::StandardValidation`}
@@ -287,9 +322,9 @@ This includes pairs with T1 == T2.
 */
 
 /*!
-@fn QJsonSerializer::serializeTo(QIODevice *, const T &) const
+@fn QJsonSerializer::serializeTo(QIODevice *, const QVariant &, QJsonDocument::JsonFormat) const
 
-@tparam T The type of the data to be serialized
+@param format The formatting for the generated json (compact or intended)
 @copydetails QJsonSerializer::serializeTo(QIODevice *, const QVariant &) const
 */
 
@@ -304,10 +339,24 @@ This includes pairs with T1 == T2.
 */
 
 /*!
-@fn QJsonSerializer::serializeTo(const T &) const
+@fn QJsonSerializer::serializeTo(const QVariant &, QJsonDocument::JsonFormat) const
+
+@param format The formatting for the generated json (compact or intended)
+@copydetails QJsonSerializer::serializeTo(const QVariant &) const
+*/
+
+/*!
+@fn QJsonSerializer::serializeTo(QIODevice *, const T &, QJsonDocument::JsonFormat) const
 
 @tparam T The type of the data to be serialized
-@copydetails QJsonSerializer::serializeTo(const QVariant &) const
+@copydetails QJsonSerializer::serializeTo(QIODevice *, const QVariant &, QJsonDocument::JsonFormat) const
+*/
+
+/*!
+@fn QJsonSerializer::serializeTo(const T &, QJsonDocument::JsonFormat) const
+
+@tparam T The type of the data to be serialized
+@copydetails QJsonSerializer::serializeTo(const QVariant &, QJsonDocument::JsonFormat) const
 */
 
 /*!
@@ -383,7 +432,18 @@ This includes pairs with T1 == T2.
 */
 
 /*!
-@fn QJsonSerializer::addJsonTypeConverter
+@fn QJsonSerializer::addJsonTypeConverter()
+
+@tparam T The converter-class to add
+
+Adds a custom converter class to add additional serialization capabilities. Check
+the QJsonTypeConverter documentation for details.
+
+@sa QJsonTypeConverter
+*/
+
+/*!
+@fn QJsonSerializer::addJsonTypeConverter(QSharedPointer<QJsonTypeConverter>)
 
 @param converter The converter to add
 

@@ -94,13 +94,13 @@ public:
 
 	//! Serializers a QVariant value to a QJsonValue
 	QJsonValue serialize(const QVariant &data) const;
-	//! @copydoc QJsonSerializer::serializeTo(QIODevice *, const QVariant &, QJsonDocument::JsonFormat)
-	void serializeTo(QIODevice *device, const QVariant &data) const; //MAJOR join as overload
 	//! Serializers a QVariant value to a device
+	void serializeTo(QIODevice *device, const QVariant &data) const; //MAJOR join as overload
+	//! @copybrief QJsonSerializer::serializeTo(QIODevice *, const QVariant &) const
 	void serializeTo(QIODevice *device, const QVariant &data, QJsonDocument::JsonFormat format) const;
-	//! @copydoc QJsonSerializer::serializeTo(const QVariant &, QJsonDocument::JsonFormat)
-	QByteArray serializeTo(const QVariant &data) const; //MAJOR join as overload
 	//! Serializers a QVariant value to a byte array
+	QByteArray serializeTo(const QVariant &data) const; //MAJOR join as overload
+	//! @copybrief QJsonSerializer::serializeTo(const QVariant &) const
 	QByteArray serializeTo(const QVariant &data, QJsonDocument::JsonFormat format) const;
 
 	//! Serializers a QObject, Q_GADGET or a list of one of those to json
@@ -135,7 +135,6 @@ public:
 	void addJsonTypeConverter();
 	//! @copybrief QJsonSerializer::addJsonTypeConverter()
 	void addJsonTypeConverter(QSharedPointer<QJsonTypeConverter> converter);
-	//! @copybrief QJsonSerializer::addJsonTypeConverter()
 	QT_DEPRECATED void addJsonTypeConverter(QJsonTypeConverter *converter);
 
 public Q_SLOTS:

@@ -22,7 +22,10 @@ With this small library, you are able to serialize any QObject or Q_GADGET class
 ## Download/Installation
 There are multiple ways to install the Qt module, sorted by preference:
 
-1. **Arch-Linux only:** If you are building against your system Qt, you can use my AUR-Repository: [qt5-jsonserializer](https://aur.archlinux.org/packages/qt5-jsonserializer/)
+1. Package Managers: The library is available via:
+	- **Arch-Linux:** AUR-Repository: [qt5-jsonserializer](https://aur.archlinux.org/packages/qt5-jsonserializer/)
+	- **Ubuntu:** Launchpad-PPA: [ppa:skycoder42/qt-modules](https://launchpad.net/~skycoder42/+archive/ubuntu/qt-modules), package libqt5jsonserializer[3/-dev]
+	- **MacOs:** Brew package in construction…
 2. Simply add my repository to your Qt MaintenanceTool (Image-based How-To here: [Add custom repository](https://github.com/Skycoder42/QtModules/blob/master/README.md#add-my-repositories-to-qt-maintenancetool)):
 	1. Open the MaintenanceTool, located in your Qt install directory (e.g. `~/Qt/MaintenanceTool`)
 	2. Select `Add or remove components` and click on the `Settings` button
@@ -43,7 +46,7 @@ There are multiple ways to install the Qt module, sorted by preference:
 	- `make install`
 
 ## Usage
-The serializer is provided as a Qt module. Thus, all you have to do is add the module, and then, in your project, add `QT += jsonserializer` to your `.pro` file!
+The serializer is provided as a Qt module. Thus, all you have to do is install the module, and then, in your project, add `QT += jsonserializer` to your `.pro` file!
 
 ### Example
 Both serialization and desertialization are rather simple. Create an object, and then use the serializer as follows:
@@ -120,16 +123,17 @@ In order for the serializer to properly work, there are a few things you have to
 		- The string de/serialization of Q_ENUM and Q_FLAG types only works if used as a Q_PROPERTY. Integer will always work.
 	- `QJson...` types
 	- `QPair<T, T>`, of any types that are serializable as well
+	- Standard QtCore types (e.g. QPoint, QSize, QVersionNumber, ...)
 	- Any type you add yourself by extending the serializer
 4. While simple types (i.e. `QList<int>`) are supported out of the box, for custom types (like `QList<TestObject*>`) you will have to register converters. This goes for
-	- QList: use `QJsonSerializer::registerListConverters<T>()`
-	- QMap: use `QJsonSerializer::registerMapConverters<T>()`
+	- QList and QMap: use `QJsonSerializer::registerAllConverters<T>()`
+	- QList only: use `QJsonSerializer::registerListConverters<T>()`
+	- QMap only: use `QJsonSerializer::registerMapConverters<T>()`
 	- QPair: use `QJsonSerializer::registerPairConverters<T1, T2>()`
 	- QSharedPointer/QPointer: use `QJsonSerializer::registerPointerConverters<T>()`
-4. While simple list/map types (i.e. `QList<int>`) are supported out of the box, for custom types (like `QList<TestObject*>`) you will have to register converters from and to `QVariantList`
-	- This can be done by using [`QJsonSerializer::registerAllConverters<TestObject*>()`](src/qjsonserializer.h#L27)
+	- QHash: Since **Qt 5.9.2**, QHash and QMap are convertible, which means you can use QHash as well
 5. By default, the `objectName` property of QObjects is not serialized (See [keepObjectName](src/qjsonserializer.h#L20))
-6. By default, the JSON `null` can only be converted to QObjects/G_GADGETs. For other types the conversion fails (See [allowDefaultNull](src/qjsonserializer.h#L19))
+6. By default, the JSON `null` can only be converted to QObjects. For other types the conversion fails (See [allowDefaultNull](src/qjsonserializer.h#L19))
 
 ## Documentation
 The documentation is available on [github pages](https://skycoder42.github.io/QtJsonSerializer/). It was created using [doxygen](http://www.doxygen.org/). The HTML-documentation and Qt-Help files are shipped
