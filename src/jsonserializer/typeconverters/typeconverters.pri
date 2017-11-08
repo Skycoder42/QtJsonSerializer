@@ -7,7 +7,8 @@ HEADERS += \
     $$PWD/qjsonpairconverter_p.h \
     $$PWD/qjsonversionnumberconverter_p.h \
     $$PWD/qjsonbytearrayconverter_p.h \
-    $$PWD/qjsongeomconverter_p.h
+    $$PWD/qjsongeomconverter_p.h \
+    $$PWD/qjsonlocaleconverter_p.h
 
 SOURCES += \
 	$$PWD/qjsonlistconverter.cpp \
@@ -18,4 +19,5 @@ SOURCES += \
     $$PWD/qjsonpairconverter.cpp \
     $$PWD/qjsonversionnumberconverter.cpp \
     $$PWD/qjsonbytearrayconverter.cpp \
-    $$PWD/qjsongeomconverter.cpp
+    $$PWD/qjsongeomconverter.cpp \
+    $$PWD/qjsonlocaleconverter.cpp

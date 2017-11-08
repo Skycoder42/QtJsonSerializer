@@ -11,6 +11,7 @@ public:
 	bool keepObjectName;
 	bool enumAsString;
 	bool validateBase64;
+	bool useBcp47Locale;
 	QJsonSerializer::ValidationFlags validationFlags;
 	QJsonSerializer::Polymorphing polymorphing;
 

@@ -683,6 +683,14 @@ void GadgetSerializerTest::generateValidTestData()
 														 })}
 													});
 
+	{
+		QLocale locale(QLocale::German, QLocale::Austria);
+		QTest::newRow("locale") << TestGadget::createSpecial(locale)
+								<< TestGadget::createJson({
+															  {"locale", locale.bcp47Name()}
+														  });
+	}
+
 
 	QTest::newRow("list") << TestGadget::createList({3, 7, 13}, {})
 						  << TestGadget::createJson({

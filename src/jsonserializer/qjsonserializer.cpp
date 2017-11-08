@@ -22,6 +22,7 @@
 #include "typeconverters/qjsonbytearrayconverter_p.h"
 #include "typeconverters/qjsonversionnumberconverter_p.h"
 #include "typeconverters/qjsongeomconverter_p.h"
+#include "typeconverters/qjsonlocaleconverter_p.h"
 
 static void qJsonSerializerStartup();
 Q_COREAPP_STARTUP_FUNCTION(qJsonSerializerStartup)
@@ -44,6 +45,7 @@ QJsonSerializer::QJsonSerializer(QObject *parent) :
 	addJsonTypeConverter(new QJsonPointConverter());
 	addJsonTypeConverter(new QJsonLineConverter());
 	addJsonTypeConverter(new QJsonRectConverter());
+	addJsonTypeConverter(new QJsonLocaleConverter());
 }
 
 QJsonSerializer::~QJsonSerializer() {}
@@ -66,6 +68,11 @@ bool QJsonSerializer::enumAsString() const
 bool QJsonSerializer::validateBase64() const
 {
 	return d->validateBase64;
+}
+
+bool QJsonSerializer::useBcp47Locale() const
+{
+	return d->useBcp47Locale;
 }
 
 QJsonSerializer::ValidationFlags QJsonSerializer::validationFlags() const
@@ -174,6 +181,11 @@ void QJsonSerializer::setValidateBase64(bool validateBase64)
 	d->validateBase64 = validateBase64;
 }
 
+void QJsonSerializer::setUseBcp47Locale(bool useBcp47Locale)
+{
+	d->useBcp47Locale = useBcp47Locale;
+}
+
 void QJsonSerializer::setValidationFlags(ValidationFlags validationFlags)
 {
 	d->validationFlags = validationFlags;
@@ -223,7 +235,7 @@ QJsonValue QJsonSerializer::serializeVariant(int propertyType, const QVariant &v
 {
 	auto converter = d->typeConverterTypeCache.value(propertyType, nullptr);
 	if(!converter){
-		foreach(auto cList, d->typeConverters) {
+		foreach(auto cList, d->typeConverters) {//TODO grouping by json types breaks priority
 			foreach (auto c, cList) {
 				if(c && c->canConvert(propertyType)) {
 					converter = c;
@@ -454,6 +466,7 @@ QJsonSerializerPrivate::QJsonSerializerPrivate() :
 	keepObjectName(false),
 	enumAsString(false),
 	validateBase64(true),
+	useBcp47Locale(true),
 	validationFlags(QJsonSerializer::StandardValidation),
 	polymorphing(QJsonSerializer::Enabled)
 {}
@@ -562,6 +575,7 @@ static void qJsonSerializerStartup()
 	REGISTER_DEFAULT_CONVERTERS(QPoint);
 	REGISTER_DEFAULT_CONVERTERS(QLine);
 	REGISTER_DEFAULT_CONVERTERS(QRect);
+	REGISTER_DEFAULT_CONVERTERS(QLocale);
 
 	//extra: qbytearray
 	{

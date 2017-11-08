@@ -19,6 +19,7 @@ TestGadget::TestGadget() :
 	point(),
 	line(),
 	rect(),
+	locale(),
 	simpleList(),
 	leveledList(),
 	simpleMap(),
@@ -53,6 +54,7 @@ bool TestGadget::operator==(const TestGadget &other) const
 			point == other.point &&
 			line == other.line &&
 			rect == other.rect &&
+			locale.bcp47Name() == other.locale.bcp47Name() &&
 			simpleList == other.simpleList &&
 			leveledList == other.leveledList &&
 			simpleMap == other.simpleMap &&
@@ -87,6 +89,7 @@ bool TestGadget::operator!=(const TestGadget &other) const
 			point != other.point ||
 			line != other.line ||
 			rect != other.rect ||
+			locale.bcp47Name() != other.locale.bcp47Name() ||
 			simpleList != other.simpleList ||
 			leveledList != other.leveledList ||
 			simpleMap != other.simpleMap ||
@@ -155,6 +158,13 @@ TestGadget TestGadget::createGeom(QSize size, QPoint point, QLine line, QRect re
 	t.point = point;
 	t.line = line;
 	t.rect = rect;
+	return t;
+}
+
+TestGadget TestGadget::createSpecial(QLocale locale)
+{
+	TestGadget t;
+	t.locale = locale;
 	return t;
 }
 
@@ -257,6 +267,7 @@ QJsonObject TestGadget::createJson(const QJsonObject &delta, const QString &rmKe
 										  {"y", -1}
 									  })}
 								 })},
+								{"locale", QLocale().bcp47Name()},
 								{"simpleList", QJsonArray()},
 								{"leveledList", QJsonArray()},
 								{"simpleMap", QJsonObject()},

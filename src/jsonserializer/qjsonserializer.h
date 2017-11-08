@@ -28,8 +28,10 @@ class Q_JSONSERIALIZER_EXPORT QJsonSerializer : public QObject, protected QJsonT
 	Q_PROPERTY(bool keepObjectName READ keepObjectName WRITE setKeepObjectName)
 	//! Specifies, whether enums should be serialized as integer or as string
 	Q_PROPERTY(bool enumAsString READ enumAsString WRITE setEnumAsString)
-	//! Specify whether reading a QByteArray should verify the data as base64 instead of silent discarding
+	//! Specify whether deserializing a QByteArray should verify the data as base64 instead of silent discarding
 	Q_PROPERTY(bool validateBase64 READ validateBase64 WRITE setValidateBase64)
+	//! Specify whether serializing a QLocale should use the bcp47 format
+	Q_PROPERTY(bool useBcp47Locale READ useBcp47Locale WRITE setUseBcp47Locale)
 	//! Specify how strictly the serializer should verify data when deserializing
 	Q_PROPERTY(ValidationFlags validationFlags READ validationFlags WRITE setValidationFlags)
 	//! Specify how the serializer should treat polymorphism for QObject classes
@@ -83,6 +85,8 @@ public:
 	bool enumAsString() const;
 	//! @readAcFn{QJsonSerializer::validateBase64}
 	bool validateBase64() const;
+	//! @readAcFn{QJsonSerializer::useBcp47Locale}
+	bool useBcp47Locale() const;
 	//! @readAcFn{QJsonSerializer::validationFlags}
 	ValidationFlags validationFlags() const;
 	//! @readAcFn{QJsonSerializer::polymorphing}
@@ -138,6 +142,8 @@ public Q_SLOTS:
 	void setEnumAsString(bool enumAsString);
 	//! @writeAcFn{QJsonSerializer::validateBase64}
 	void setValidateBase64(bool validateBase64);
+	//! @writeAcFn{QJsonSerializer::useBcp47Locale}
+	void setUseBcp47Locale(bool useBcp47Locale);
 	//! @writeAcFn{QJsonSerializer::validationFlags}
 	void setValidationFlags(ValidationFlags validationFlags);
 	//! @writeAcFn{QJsonSerializer::polymorphing}
