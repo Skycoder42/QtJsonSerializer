@@ -142,21 +142,17 @@ void QJsonSerializer::addJsonTypeConverter(QJsonTypeConverter *converter)
 	Q_ASSERT_X(converter, Q_FUNC_INFO, "converter must not be null!");
 
 	QSharedPointer<QJsonTypeConverter> sp(converter);
-	foreach(auto jsonType, sp->jsonTypes()) {
-		auto &convList = d->typeConverters[jsonType];
-		auto inserted = false;
+	auto inserted = false;
 
-		for(auto i = 0; i < convList.size(); i++) {
-			if(convList[i]->priority() <= sp->priority()) {
-				convList.insert(i, sp);
-				inserted = true;
-				break;
-			}
+	for(auto it = d->typeConverters.begin(); it != d->typeConverters.end(); ++it) {
+		if((*it)->priority() <= sp->priority()) {
+			d->typeConverters.insert(it, sp);
+			inserted = true;
+			break;
 		}
-
-		if(!inserted)
-			convList.append(sp);
 	}
+	if(!inserted)
+		d->typeConverters.append(sp);
 
 	d->typeConverterTypeCache.clear();
 }
@@ -235,13 +231,11 @@ QJsonValue QJsonSerializer::serializeVariant(int propertyType, const QVariant &v
 {
 	auto converter = d->typeConverterTypeCache.value(propertyType, nullptr);
 	if(!converter){
-		foreach(auto cList, d->typeConverters) {//TODO grouping by json types breaks priority
-			foreach (auto c, cList) {
-				if(c && c->canConvert(propertyType)) {
-					converter = c;
-					d->typeConverterTypeCache.insert(propertyType, converter);
-					break;
-				}
+		foreach (auto c, d->typeConverters) {
+			if(c && c->canConvert(propertyType)) {
+				converter = c;
+				d->typeConverterTypeCache.insert(propertyType, converter);
+				break;
 			}
 		}
 	}
@@ -257,8 +251,11 @@ QVariant QJsonSerializer::deserializeVariant(int propertyType, const QJsonValue 
 	auto converter = d->typeConverterTypeCache.value(propertyType, nullptr);
 	if(!converter || !converter->jsonTypes().contains(value.type())) {
 		converter = nullptr; //in case json type did not match
-		foreach (auto c, d->typeConverters.value(value.type())) {
-			if(c && c->canConvert(propertyType)) {
+		auto valueType = value.type();
+		foreach (auto c, d->typeConverters) {
+			if(c &&
+			   c->jsonTypes().contains(valueType) &&
+			   c->canConvert(propertyType)) {
 				converter = c;
 				d->typeConverterTypeCache.insert(propertyType, converter);
 				break;

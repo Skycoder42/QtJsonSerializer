@@ -15,7 +15,7 @@ public:
 	QJsonSerializer::ValidationFlags validationFlags;
 	QJsonSerializer::Polymorphing polymorphing;
 
-	QHash<QJsonValue::Type, QList<QSharedPointer<QJsonTypeConverter>>> typeConverters;
+	QList<QSharedPointer<QJsonTypeConverter>> typeConverters;
 	mutable QHash<int, QSharedPointer<QJsonTypeConverter>> typeConverterTypeCache;
 
 	QJsonSerializerPrivate();
