@@ -33,6 +33,7 @@ private Q_SLOTS:
 	void testDeserializationValidation_data();
 	void testDeserializationValidation();
 	void testBase64Validate();
+	void testLocaleName();
 
 	void testEnumSpecialSerialization_data();
 	void testEnumSpecialSerialization();
@@ -331,6 +332,7 @@ void ObjectSerializerTest::testObjectNameSerialization()
 void ObjectSerializerTest::testNullDeserialization()
 {
 	auto testObj = new TestObject(this);
+	testObj->locale = QLocale();
 	auto testJson = QJsonObject({
 									{"intProperty", QJsonValue::Null},
 									{"boolProperty", QJsonValue::Null},
@@ -347,6 +349,7 @@ void ObjectSerializerTest::testNullDeserialization()
 									{"point", QJsonValue::Null},
 									{"line", QJsonValue::Null},
 									{"rect", QJsonValue::Null},
+									{"locale", QJsonValue::Null},
 									{"simpleList", QJsonValue::Null},
 									{"leveledList", QJsonValue::Null},
 									{"simpleMap", QJsonValue::Null},
@@ -451,6 +454,35 @@ void ObjectSerializerTest::testBase64Validate()
 
 	cmp->deleteLater();
 	serializer->setValidateBase64(true);
+}
+
+void ObjectSerializerTest::testLocaleName()
+{
+	QLocale extraLocale(QLocale::English, QLocale::LatinScript, QLocale::UnitedKingdom);
+	auto obj = TestObject::createSpecial(extraLocale, this);
+
+	try {
+		auto json = TestObject::createJson({
+											   {"locale", extraLocale.bcp47Name()}
+										   });
+
+		//bcp47
+		serializer->setUseBcp47Locale(true);
+		QCOMPARE(serializer->serialize(obj), json);
+
+		//name only
+		json = TestObject::createJson({
+										  {"locale", extraLocale.name()}
+									  });
+
+		serializer->setUseBcp47Locale(false);
+		QCOMPARE(serializer->serialize(obj), json);
+	} catch (QException &e) {
+		QFAIL(e.what());
+	}
+
+	serializer->setUseBcp47Locale(true);
+	obj->deleteLater();
 }
 
 void ObjectSerializerTest::testEnumSpecialSerialization_data()
@@ -959,6 +991,15 @@ void ObjectSerializerTest::generateValidTestData()
 														 })}
 													})
 						  << true;
+
+	{
+		QLocale locale(QLocale::German, QLocale::Austria);
+		QTest::newRow("locale") << TestObject::createSpecial(locale, this)
+								<< TestObject::createJson({
+															  {"locale", locale.bcp47Name()}
+														  })
+								<< true;
+	}
 
 	QTest::newRow("list") << TestObject::createList({3, 7, 13}, {}, this)
 						  << TestObject::createJson({

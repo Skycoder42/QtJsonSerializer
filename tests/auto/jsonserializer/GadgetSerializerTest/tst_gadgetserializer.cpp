@@ -34,6 +34,7 @@ private Q_SLOTS:
 	void testDeserializationValidation_data();
 	void testDeserializationValidation();
 	void testBase64Validate();
+	void testLocaleName();
 
 	void testEnumSpecialSerialization_data();
 	void testEnumSpecialSerialization();
@@ -303,6 +304,7 @@ void GadgetSerializerTest::testNullDeserialization()
 									{"point", QJsonValue::Null},
 									{"line", QJsonValue::Null},
 									{"rect", QJsonValue::Null},
+									{"locale", QJsonValue::Null},
 									{"leveledList", QJsonValue::Null},
 									{"simpleMap", QJsonValue::Null},
 									{"leveledMap", QJsonValue::Null},
@@ -321,7 +323,9 @@ void GadgetSerializerTest::testNullDeserialization()
 		QVERIFY_EXCEPTION_THROWN(serializer->deserialize<TestGadget>(testJson), QJsonSerializerException);
 
 		serializer->setAllowDefaultNull(true);
-		QCOMPARE(serializer->deserialize<TestGadget>(testJson), TestGadget());
+		TestGadget res;
+		res.locale = QLocale();
+		QCOMPARE(serializer->deserialize<TestGadget>(testJson), res);
 	} catch(QException &e) {
 		QFAIL(e.what());
 	}
@@ -401,6 +405,33 @@ void GadgetSerializerTest::testBase64Validate()
 	}
 
 	serializer->setValidateBase64(true);
+}
+
+void GadgetSerializerTest::testLocaleName()
+{
+	try {
+		QLocale extraLocale(QLocale::English, QLocale::LatinScript, QLocale::UnitedKingdom);
+		auto gadget = TestGadget::createSpecial(extraLocale);
+		auto json = TestGadget::createJson({
+											   {"locale", extraLocale.bcp47Name()}
+										   });
+
+		//bcp47
+		serializer->setUseBcp47Locale(true);
+		QCOMPARE(serializer->serialize(gadget), json);
+
+		//name only
+		json = TestGadget::createJson({
+										  {"locale", extraLocale.name()}
+									  });
+
+		serializer->setUseBcp47Locale(false);
+		QCOMPARE(serializer->serialize(gadget), json);
+	} catch (QException &e) {
+		QFAIL(e.what());
+	}
+
+	serializer->setUseBcp47Locale(true);
 }
 
 void GadgetSerializerTest::testEnumSpecialSerialization_data()

@@ -19,7 +19,7 @@ TestGadget::TestGadget() :
 	point(),
 	line(),
 	rect(),
-	locale(),
+	locale(QLocale::c()),
 	simpleList(),
 	leveledList(),
 	simpleMap(),
@@ -267,7 +267,7 @@ QJsonObject TestGadget::createJson(const QJsonObject &delta, const QString &rmKe
 										  {"y", -1}
 									  })}
 								 })},
-								{"locale", QLocale().bcp47Name()},
+								{"locale", QLocale::c().bcp47Name()},
 								{"simpleList", QJsonArray()},
 								{"leveledList", QJsonArray()},
 								{"simpleMap", QJsonObject()},
