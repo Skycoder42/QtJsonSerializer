@@ -5,6 +5,7 @@ With this small library, you are able to serialize any QObject or Q_GADGET class
 
 [![Travis Build Status](https://travis-ci.org/Skycoder42/QtJsonSerializer.svg?branch=master)](https://travis-ci.org/Skycoder42/QtJsonSerializer)
 [![Appveyor Build status](https://ci.appveyor.com/api/projects/status/rbue7wwxk04eoka0/branch/master?svg=true)](https://ci.appveyor.com/project/Skycoder42/qtjsonserializer/branch/master)
+[![AUR](https://img.shields.io/aur/version/qt5-jsonserializer.svg)](https://aur.archlinux.org/packages/qt5-jsonserializer/)
 
 ## Features
 - Serialize QObjects, Q_GADGETS, lists, maps, etc. to JSON, in a generic matter
