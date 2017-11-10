@@ -26,7 +26,10 @@ There are multiple ways to install the Qt module, sorted by preference:
 1. Package Managers: The library is available via:
 	- **Arch-Linux:** AUR-Repository: [qt5-jsonserializer](https://aur.archlinux.org/packages/qt5-jsonserializer/)
 	- **Ubuntu:** Launchpad-PPA: [ppa:skycoder42/qt-modules](https://launchpad.net/~skycoder42/+archive/ubuntu/qt-modules), package libqt5jsonserializer[3/-dev]
-	- **MacOs:** Brew package in construction...
+	- **MacOs:**
+		- Tap: [`brew tap Skycoder42/qt-modules`](https://github.com/Skycoder42/homebrew-qt-modules)
+		- Package: `brew install qtjsonserializer`
+		- **IMPORTANT:** Due to limitations of homebrew, you must run `source /usr/local/opt/qtjsonserializer/bashrc.sh` before you can use the module.
 2. Simply add my repository to your Qt MaintenanceTool (Image-based How-To here: [Add custom repository](https://github.com/Skycoder42/QtModules/blob/master/README.md#add-my-repositories-to-qt-maintenancetool)):
 	1. Open the MaintenanceTool, located in your Qt install directory (e.g. `~/Qt/MaintenanceTool`)
 	2. Select `Add or remove components` and click on the `Settings` button
