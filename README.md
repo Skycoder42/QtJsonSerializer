@@ -26,8 +26,8 @@ There are multiple ways to install the Qt module, sorted by preference:
 1. Package Managers: The library is available via:
 	- **Arch-Linux:** AUR-Repository: [`qt5-jsonserializer`](https://aur.archlinux.org/packages/qt5-jsonserializer/)
 	- **Ubuntu:** Launchpad-PPA:
-	    - Artful: [ppa:skycoder42/qt-modules](https://launchpad.net/~skycoder42/+archive/ubuntu/qt-modules), package `libqt5jsonserializer[3/-dev]`
-	    - Xenial: [ppa:skycoder42/qt-modules-opt](https://launchpad.net/~skycoder42/+archive/ubuntu/qt-modules-opt), package `qtjsonserializer`
+		- Artful: [ppa:skycoder42/qt-modules](https://launchpad.net/~skycoder42/+archive/ubuntu/qt-modules), package `libqt5jsonserializer[3/-dev]`
+		- Xenial: [ppa:skycoder42/qt-modules-opt](https://launchpad.net/~skycoder42/+archive/ubuntu/qt-modules-opt), package `qtjsonserializer`
 	- **MacOs:**
 		- Tap: [`brew tap Skycoder42/qt-modules`](https://github.com/Skycoder42/homebrew-qt-modules)
 		- Package: `qtjsonserializer`
@@ -137,7 +137,7 @@ In order for the serializer to properly work, there are a few things you have to
 	- QMap only: use `QJsonSerializer::registerMapConverters<T>()`
 	- QPair: use `QJsonSerializer::registerPairConverters<T1, T2>()`
 	- QSharedPointer/QPointer: use `QJsonSerializer::registerPointerConverters<T>()`
-5. Polymorphic QObjects are supported. This is done by the serializer via adding a special `@class` json property. To make a class polymorphic you can:
+5. Polymorphic QObjects are supported. This is done by the serializer via adding a special `@@class` json property. To make a class polymorphic you can:
 	- Add `Q_CLASSINFO("polymorphic", "true")` to its definition
 	- Globally force polyphormism (See QJsonSerializer::polymorphing in the doc)
 	- Set a dynamic property: `setProperty("__qt_json_serializer_polymorphic", true);`
