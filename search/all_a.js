@@ -19,7 +19,7 @@ var searchData=
   ['json_5ftype_3c_20t_20_2a_20_3e',['json_type&lt; T * &gt;',['../struct__qjsonserializer__helpertypes_1_1json__type_3_01_t_01_5_01_4.html',1,'_qjsonserializer_helpertypes']]],
   ['json_5ftype_5fraw',['json_type_raw',['../struct__qjsonserializer__helpertypes_1_1json__type__raw.html',1,'_qjsonserializer_helpertypes']]],
   ['jsonparseerror',['JsonParseError',['https://doc.qt.io/qt-5/class_qt_rest_client_1_1_rest_reply.html#a7ac2c77cd405dff6fd116eaf3073fe2aa727e9ee3637c3897bd7d736ede79bfc4',0,'QtRestClient::RestReply']]],
-  ['jsontypename',['jsonTypeName',['https://doc.qt.io/qt-5/class_qt_rest_client_1_1_rest_reply.html#a3a7c173594d798d607faeb7657d4bda7',0,'QtRestClient::RestReply']]],
+  ['jsontypename',['jsonTypeName',['https://doc.qt.io/qt-5/class_qt_rest_client_1_1_rest_reply.html#a537b991374e256c201a286be5e16a7d8',0,'QtRestClient::RestReply']]],
   ['jsontypes',['jsonTypes',['../class_q_json_type_converter.html#a1fd5c728302100b50b49bf47a3d213d5',1,'QJsonTypeConverter']]],
   ['jumptoframe',['jumpToFrame',['https://doc.qt.io/qt-5/qmovie.html#jumpToFrame',0,'QMovie']]],
   ['jumptoimage',['jumpToImage',['https://doc.qt.io/qt-5/qimageiohandler.html#jumpToImage',0,'QImageIOHandler::jumpToImage()'],['https://doc.qt.io/qt-5/qimagereader.html#jumpToImage',0,'QImageReader::jumpToImage()']]],

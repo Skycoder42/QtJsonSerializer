@@ -346,6 +346,20 @@
     </member>
     <member kind="slot">
       <type>void</type>
+      <name>setValidateBase64</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>aacb94bc9fc1274fff206e6882297956d</anchor>
+      <arglist>(bool validateBase64)</arglist>
+    </member>
+    <member kind="slot">
+      <type>void</type>
+      <name>setUseBcp47Locale</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>aff15d8d380247b1f77f761b1a831b02a</anchor>
+      <arglist>(bool useBcp47Locale)</arglist>
+    </member>
+    <member kind="slot">
+      <type>void</type>
       <name>setValidationFlags</name>
       <anchorfile>class_q_json_serializer.html</anchorfile>
       <anchor>a3441ff7a583a30f3f6d38bfc8b7bee39</anchor>
@@ -394,6 +408,20 @@
       <arglist>() const</arglist>
     </member>
     <member kind="function">
+      <type>bool</type>
+      <name>validateBase64</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>aef3827c288808f1ce1bd98ce26fb5b81</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>useBcp47Locale</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>a291ac1cf0ea66a66ee222223d5d0ffe5</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function">
       <type>ValidationFlags</type>
       <name>validationFlags</name>
       <anchorfile>class_q_json_serializer.html</anchorfile>
@@ -422,11 +450,25 @@
       <arglist>(QIODevice *device, const QVariant &amp;data) const</arglist>
     </member>
     <member kind="function">
+      <type>void</type>
+      <name>serializeTo</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>af11992fb722f5e85c0e6fbb660dc96f3</anchor>
+      <arglist>(QIODevice *device, const QVariant &amp;data, QJsonDocument::JsonFormat format) const</arglist>
+    </member>
+    <member kind="function">
       <type>QByteArray</type>
       <name>serializeTo</name>
       <anchorfile>class_q_json_serializer.html</anchorfile>
       <anchor>a1a7c606d60801923008752f43a16e0aa</anchor>
       <arglist>(const QVariant &amp;data) const</arglist>
+    </member>
+    <member kind="function">
+      <type>QByteArray</type>
+      <name>serializeTo</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>a66303f64edafb7b1e214e393b07af1f9</anchor>
+      <arglist>(const QVariant &amp;data, QJsonDocument::JsonFormat format) const</arglist>
     </member>
     <member kind="function">
       <type>_qjsonserializer_helpertypes::json_type&lt; T &gt;::type</type>
@@ -439,15 +481,15 @@
       <type>void</type>
       <name>serializeTo</name>
       <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a52fd1f06b32abf7b1e9eeffd61d1db0d</anchor>
-      <arglist>(QIODevice *device, const T &amp;data) const</arglist>
+      <anchor>aa4d9eb8bc4600c5f976bd6d5f1c2ff60</anchor>
+      <arglist>(QIODevice *device, const T &amp;data, QJsonDocument::JsonFormat format=QJsonDocument::Indented) const</arglist>
     </member>
     <member kind="function">
       <type>QByteArray</type>
       <name>serializeTo</name>
       <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a33fc0f752ad3b0d1cac08251a53bc5a8</anchor>
-      <arglist>(const T &amp;data) const</arglist>
+      <anchor>a43b93348b2f15f6b0791823fb7b27cd0</anchor>
+      <arglist>(const T &amp;data, QJsonDocument::JsonFormat format=QJsonDocument::Indented) const</arglist>
     </member>
     <member kind="function">
       <type>QVariant</type>
@@ -495,8 +537,15 @@
       <type>void</type>
       <name>addJsonTypeConverter</name>
       <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a6b12ef3fa11387abd6bb260678b70965</anchor>
-      <arglist>(QJsonTypeConverter *converter)</arglist>
+      <anchor>a812d2ba38850dc750a31a451bcbb8781</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>addJsonTypeConverter</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>a9b8d0f4bd6b64a7ac72a5a5bf6d79e98</anchor>
+      <arglist>(QSharedPointer&lt; QJsonTypeConverter &gt; converter)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static bool</type>
@@ -587,6 +636,20 @@
       <name>enumAsString</name>
       <anchorfile>class_q_json_serializer.html</anchorfile>
       <anchor>ac430c1962106cc1d0efcbef4a11b03f3</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="property">
+      <type>bool</type>
+      <name>validateBase64</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>a8de334ab602be6a05d70146222978ca9</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="property">
+      <type>bool</type>
+      <name>useBcp47Locale</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>a692f59d493de527e5373db2975a46cc2</anchor>
       <arglist></arglist>
     </member>
     <member kind="property">

@@ -3,7 +3,7 @@ var searchData=
   ['easing',['easing',['https://doc.qt.io/qt-5/qt3danimation-qkeyframeanimation.html#easing-prop',0,'Qt3DAnimation::QKeyframeAnimation::easing()'],['https://doc.qt.io/qt-5/qt3danimation-qmorphinganimation.html#easing-prop',0,'Qt3DAnimation::QMorphingAnimation::easing()']]],
   ['easingcurve',['easingCurve',['https://doc.qt.io/qt-5/qvariantanimation.html#easingCurve-prop',0,'QVariantAnimation::easingCurve()'],['https://doc.qt.io/qt-5/qtimeline.html#easingCurve-prop',0,'QTimeLine::easingCurve()']]],
   ['echomode',['echoMode',['https://doc.qt.io/qt-5/qlineedit.html#echoMode-prop',0,'QLineEdit']]],
-  ['editable',['editable',['https://doc.qt.io/qt-5/qcombobox.html#editable-prop',0,'QComboBox']]],
+  ['editable',['editable',['https://doc.qt.io/qt-5/class_qt_data_sync_1_1_data_store_model.html#ad0c82fb5089bb584b0a725d2153426a1',0,'QtDataSync::DataStoreModel::editable()'],['https://doc.qt.io/qt-5/qcombobox.html#editable-prop',0,'QComboBox::editable()']]],
   ['edittriggers',['editTriggers',['https://doc.qt.io/qt-5/qabstractitemview.html#editTriggers-prop',0,'QAbstractItemView']]],
   ['effect',['effect',['https://doc.qt.io/qt-5/qgraphicsobject.html#effect-prop',0,'QGraphicsObject::effect()'],['https://doc.qt.io/qt-5/qt3drender-qmaterial.html#effect-prop',0,'Qt3DRender::QMaterial::effect()']]],
   ['efficientbuffersize',['efficientBufferSize',['https://doc.qt.io/qt-5/qsensor.html#efficientBufferSize-prop',0,'QSensor']]],

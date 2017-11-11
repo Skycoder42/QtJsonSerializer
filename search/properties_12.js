@@ -72,5 +72,6 @@ var searchData=
   ['triangleindex',['triangleIndex',['https://doc.qt.io/qt-5/qt3drender-qpicktriangleevent.html#triangleIndex-prop',0,'Qt3DRender::QPickTriangleEvent']]],
   ['tristate',['tristate',['https://doc.qt.io/qt-5/qcheckbox.html#tristate-prop',0,'QCheckBox']]],
   ['type',['type',['https://doc.qt.io/qt-5/qgeoshape.html#type-prop',0,'QGeoShape::type()'],['https://doc.qt.io/qt-5/qqmlndefrecord.html#type-prop',0,'QQmlNdefRecord::type()'],['https://doc.qt.io/qt-5/qdnslookup.html#type-prop',0,'QDnsLookup::type()'],['https://doc.qt.io/qt-5/qsensor.html#type-prop',0,'QSensor::type()'],['https://doc.qt.io/qt-5/qt3drender-qbuffer.html#type-prop',0,'Qt3DRender::QBuffer::type()'],['https://doc.qt.io/qt-5/qt3drender-qabstractlight.html#type-prop',0,'Qt3DRender::QAbstractLight::type()']]],
+  ['typeid',['typeId',['https://doc.qt.io/qt-5/class_qt_data_sync_1_1_data_store_model.html#a8e2b82f456ec3bd0306814c77f0dd59e',0,'QtDataSync::DataStoreModel']]],
   ['typenameformat',['typeNameFormat',['https://doc.qt.io/qt-5/qqmlndefrecord.html#typeNameFormat-prop',0,'QQmlNdefRecord']]]
 ];

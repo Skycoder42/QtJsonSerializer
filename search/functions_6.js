@@ -41,7 +41,7 @@ var searchData=
   ['getcontentsmargins',['getContentsMargins',['https://doc.qt.io/qt-5/qgraphicslayout.html#getContentsMargins',0,'QGraphicsLayout::getContentsMargins()'],['https://doc.qt.io/qt-5/qgraphicslayoutitem.html#getContentsMargins',0,'QGraphicsLayoutItem::getContentsMargins()'],['https://doc.qt.io/qt-5/qgraphicswidget.html#getContentsMargins',0,'QGraphicsWidget::getContentsMargins()'],['https://doc.qt.io/qt-5/qlayout.html#getContentsMargins',0,'QLayout::getContentsMargins()'],['https://doc.qt.io/qt-5/qwidget.html#getContentsMargins',0,'QWidget::getContentsMargins()']]],
   ['getcoords',['getCoords',['https://doc.qt.io/qt-5/qrect.html#getCoords',0,'QRect::getCoords()'],['https://doc.qt.io/qt-5/qrectf.html#getCoords',0,'QRectF::getCoords()']]],
   ['getdate',['getDate',['https://doc.qt.io/qt-5/qdate.html#getDate',0,'QDate']]],
-  ['getdeviceid',['getDeviceId',['https://doc.qt.io/qt-5/class_qt_data_sync_1_1_remote_connector.html#ad14878b605f4ad5e96598431cb38a48a',0,'QtDataSync::RemoteConnector']]],
+  ['getdeviceid',['getDeviceId',['https://doc.qt.io/qt-5/class_qt_data_sync_1_1_remote_connector.html#aff0cff7ebe02863bef03493c48c9f31d',0,'QtDataSync::RemoteConnector']]],
   ['getdouble',['getDouble',['https://doc.qt.io/qt-5/qinputdialog.html#getDouble',0,'QInputDialog']]],
   ['geteulerangles',['getEulerAngles',['https://doc.qt.io/qt-5/qquaternion.html#getEulerAngles',0,'QQuaternion']]],
   ['getexistingdirectory',['getExistingDirectory',['https://doc.qt.io/qt-5/qfiledialog.html#getExistingDirectory',0,'QFileDialog']]],

@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <QtHelpProject version="1.0">
-  <namespace>de.skycoder42.qtjsonserializer.300</namespace>
+  <namespace>de.skycoder42.qtjsonserializer.310</namespace>
   <virtualFolder>doc_qtjsonserializer</virtualFolder>
-  <customFilter name="JsonSerializer 3.0.0">
+  <customFilter name="JsonSerializer 3.1.0">
     <filterAttribute>qtjsonserializer</filterAttribute>
-    <filterAttribute>3.0.0</filterAttribute>
+    <filterAttribute>3.1.0</filterAttribute>
   </customFilter>
   <filterSection>
     <filterAttribute>doxygen</filterAttribute>
     <toc>
-      <section title="QtJsonSerializer 3.0.0" ref="index.html">
+      <section title="QtJsonSerializer 3.1.0" ref="index.html">
         <section title="Features" ref="index.html#qtjsonserializer_readme_label_0" />
         <section title="Download/Installation" ref="index.html#qtjsonserializer_readme_label_1" />
         <section title="Usage" ref="index.html#qtjsonserializer_readme_label_2">
@@ -69,7 +69,9 @@
               </section>
               <section title="QJsonSerializer" ref="class_q_json_serializer.html#ae0d46bea68e7abc4f0a7444a40c03017" />
               <section title="~QJsonSerializer" ref="class_q_json_serializer.html#aa6a590f7c89c651ca77555a1fec9c5bc" />
-              <section title="addJsonTypeConverter" ref="class_q_json_serializer.html#a6b12ef3fa11387abd6bb260678b70965" />
+              <section title="addJsonTypeConverter" ref="class_q_json_serializer.html#a812d2ba38850dc750a31a451bcbb8781" />
+              <section title="addJsonTypeConverter" ref="class_q_json_serializer.html#a9b8d0f4bd6b64a7ac72a5a5bf6d79e98" />
+              <section title="addJsonTypeConverter" ref="class_q_json_serializer.html#ab84ee63cc2dc4fc7d7ec650df24d150a" />
               <section title="allowDefaultNull" ref="class_q_json_serializer.html#a194c09466f37e35a189c3e67df74f0b9" />
               <section title="deserialize" ref="class_q_json_serializer.html#ac2abe7502e5082e9e77ddc08e224840a" />
               <section title="deserialize" ref="class_q_json_serializer.html#aab838a93725225e6504c6e3f1f903095" />
@@ -88,20 +90,28 @@
               <section title="serializeSubtype" ref="class_q_json_serializer.html#a4c04b5da13864d0bb4e4a9236fcc1335" />
               <section title="serializeSubtype" ref="class_q_json_serializer.html#ae87d7195f7d2b6af7b2260c9f7c13b0c" />
               <section title="serializeTo" ref="class_q_json_serializer.html#a163d6f5b77e0b8b874d49a2cd546c88d" />
+              <section title="serializeTo" ref="class_q_json_serializer.html#af11992fb722f5e85c0e6fbb660dc96f3" />
               <section title="serializeTo" ref="class_q_json_serializer.html#a1a7c606d60801923008752f43a16e0aa" />
-              <section title="serializeTo" ref="class_q_json_serializer.html#a52fd1f06b32abf7b1e9eeffd61d1db0d" />
-              <section title="serializeTo" ref="class_q_json_serializer.html#a33fc0f752ad3b0d1cac08251a53bc5a8" />
+              <section title="serializeTo" ref="class_q_json_serializer.html#a66303f64edafb7b1e214e393b07af1f9" />
+              <section title="serializeTo" ref="class_q_json_serializer.html#aa4d9eb8bc4600c5f976bd6d5f1c2ff60" />
+              <section title="serializeTo" ref="class_q_json_serializer.html#a43b93348b2f15f6b0791823fb7b27cd0" />
               <section title="setAllowDefaultNull" ref="class_q_json_serializer.html#ad807b89a053e8aac9930b2b6d8cf8cc4" />
               <section title="setEnumAsString" ref="class_q_json_serializer.html#a46a707a369bfd1beb45e7506cb36b783" />
               <section title="setKeepObjectName" ref="class_q_json_serializer.html#af4d083e88a88bec52b4951b2d8395767" />
               <section title="setPolymorphing" ref="class_q_json_serializer.html#a567a75ad4496ac2fade39cbb1a4cec74" />
+              <section title="setUseBcp47Locale" ref="class_q_json_serializer.html#aff15d8d380247b1f77f761b1a831b02a" />
+              <section title="setValidateBase64" ref="class_q_json_serializer.html#aacb94bc9fc1274fff206e6882297956d" />
               <section title="setValidationFlags" ref="class_q_json_serializer.html#a3441ff7a583a30f3f6d38bfc8b7bee39" />
+              <section title="useBcp47Locale" ref="class_q_json_serializer.html#a291ac1cf0ea66a66ee222223d5d0ffe5" />
+              <section title="validateBase64" ref="class_q_json_serializer.html#aef3827c288808f1ce1bd98ce26fb5b81" />
               <section title="validationFlags" ref="class_q_json_serializer.html#a9d8a8113d3f0b32eb6821dbb6fc5a89a" />
               <section title="QJsonSerializerPrivate" ref="class_q_json_serializer.html#a723477228c126ffe85453de2c81582bd" />
               <section title="allowDefaultNull" ref="class_q_json_serializer.html#acc7b17076756d1acd0d95e955614b289" />
               <section title="enumAsString" ref="class_q_json_serializer.html#ac430c1962106cc1d0efcbef4a11b03f3" />
               <section title="keepObjectName" ref="class_q_json_serializer.html#a6c0d933bd43f30870c9379fb04f65f00" />
               <section title="polymorphing" ref="class_q_json_serializer.html#ab3bf93ba232658e79a2a007d1f3d5239" />
+              <section title="useBcp47Locale" ref="class_q_json_serializer.html#a692f59d493de527e5373db2975a46cc2" />
+              <section title="validateBase64" ref="class_q_json_serializer.html#a8de334ab602be6a05d70146222978ca9" />
               <section title="validationFlags" ref="class_q_json_serializer.html#a6baa7de9acfd41c1780ea90464b696e3" />
             </section>
             <section title="QJsonSerializerException" ref="class_q_json_serializer_exception.html">
@@ -234,6 +244,8 @@
       <keyword name="setAllowDefaultNull" id="QJsonSerializer::setAllowDefaultNull" ref="class_q_json_serializer.html#ad807b89a053e8aac9930b2b6d8cf8cc4" />
       <keyword name="setKeepObjectName" id="QJsonSerializer::setKeepObjectName" ref="class_q_json_serializer.html#af4d083e88a88bec52b4951b2d8395767" />
       <keyword name="setEnumAsString" id="QJsonSerializer::setEnumAsString" ref="class_q_json_serializer.html#a46a707a369bfd1beb45e7506cb36b783" />
+      <keyword name="setValidateBase64" id="QJsonSerializer::setValidateBase64" ref="class_q_json_serializer.html#aacb94bc9fc1274fff206e6882297956d" />
+      <keyword name="setUseBcp47Locale" id="QJsonSerializer::setUseBcp47Locale" ref="class_q_json_serializer.html#aff15d8d380247b1f77f761b1a831b02a" />
       <keyword name="setValidationFlags" id="QJsonSerializer::setValidationFlags" ref="class_q_json_serializer.html#a3441ff7a583a30f3f6d38bfc8b7bee39" />
       <keyword name="setPolymorphing" id="QJsonSerializer::setPolymorphing" ref="class_q_json_serializer.html#a567a75ad4496ac2fade39cbb1a4cec74" />
       <keyword name="QJsonSerializer" id="QJsonSerializer::QJsonSerializer" ref="class_q_json_serializer.html#ae0d46bea68e7abc4f0a7444a40c03017" />
@@ -241,21 +253,27 @@
       <keyword name="allowDefaultNull" id="QJsonSerializer::allowDefaultNull" ref="class_q_json_serializer.html#a194c09466f37e35a189c3e67df74f0b9" />
       <keyword name="keepObjectName" id="QJsonSerializer::keepObjectName" ref="class_q_json_serializer.html#afd4632ae8b3725d2c3d1568edd08a8f5" />
       <keyword name="enumAsString" id="QJsonSerializer::enumAsString" ref="class_q_json_serializer.html#a3c26e7a387e04a367813e10cb6b716f2" />
+      <keyword name="validateBase64" id="QJsonSerializer::validateBase64" ref="class_q_json_serializer.html#aef3827c288808f1ce1bd98ce26fb5b81" />
+      <keyword name="useBcp47Locale" id="QJsonSerializer::useBcp47Locale" ref="class_q_json_serializer.html#a291ac1cf0ea66a66ee222223d5d0ffe5" />
       <keyword name="validationFlags" id="QJsonSerializer::validationFlags" ref="class_q_json_serializer.html#a9d8a8113d3f0b32eb6821dbb6fc5a89a" />
       <keyword name="polymorphing" id="QJsonSerializer::polymorphing" ref="class_q_json_serializer.html#a7343ad9f15992eb0b5fe3f2defc61649" />
       <keyword name="serialize" id="QJsonSerializer::serialize" ref="class_q_json_serializer.html#ab68cf3a3dc0b5d8fecf85b729d0be0a9" />
       <keyword name="serializeTo" id="QJsonSerializer::serializeTo" ref="class_q_json_serializer.html#a163d6f5b77e0b8b874d49a2cd546c88d" />
+      <keyword name="serializeTo" id="QJsonSerializer::serializeTo" ref="class_q_json_serializer.html#af11992fb722f5e85c0e6fbb660dc96f3" />
       <keyword name="serializeTo" id="QJsonSerializer::serializeTo" ref="class_q_json_serializer.html#a1a7c606d60801923008752f43a16e0aa" />
+      <keyword name="serializeTo" id="QJsonSerializer::serializeTo" ref="class_q_json_serializer.html#a66303f64edafb7b1e214e393b07af1f9" />
       <keyword name="serialize" id="QJsonSerializer::serialize" ref="class_q_json_serializer.html#a36711cc64a6398add8d1d490f8e07cba" />
-      <keyword name="serializeTo" id="QJsonSerializer::serializeTo" ref="class_q_json_serializer.html#a52fd1f06b32abf7b1e9eeffd61d1db0d" />
-      <keyword name="serializeTo" id="QJsonSerializer::serializeTo" ref="class_q_json_serializer.html#a33fc0f752ad3b0d1cac08251a53bc5a8" />
+      <keyword name="serializeTo" id="QJsonSerializer::serializeTo" ref="class_q_json_serializer.html#aa4d9eb8bc4600c5f976bd6d5f1c2ff60" />
+      <keyword name="serializeTo" id="QJsonSerializer::serializeTo" ref="class_q_json_serializer.html#a43b93348b2f15f6b0791823fb7b27cd0" />
       <keyword name="deserialize" id="QJsonSerializer::deserialize" ref="class_q_json_serializer.html#ac2abe7502e5082e9e77ddc08e224840a" />
       <keyword name="deserializeFrom" id="QJsonSerializer::deserializeFrom" ref="class_q_json_serializer.html#aafa3d1873bf297dca6a60ccc380415cc" />
       <keyword name="deserializeFrom" id="QJsonSerializer::deserializeFrom" ref="class_q_json_serializer.html#a9a7ef54e33560eeb3dccb3054cb4d872" />
       <keyword name="deserialize" id="QJsonSerializer::deserialize" ref="class_q_json_serializer.html#aab838a93725225e6504c6e3f1f903095" />
       <keyword name="deserializeFrom" id="QJsonSerializer::deserializeFrom" ref="class_q_json_serializer.html#a34800d922f12b1af0a016a5b06ecfb1b" />
       <keyword name="deserializeFrom" id="QJsonSerializer::deserializeFrom" ref="class_q_json_serializer.html#afbca1b7d26866f48db10656e0284bbd6" />
-      <keyword name="addJsonTypeConverter" id="QJsonSerializer::addJsonTypeConverter" ref="class_q_json_serializer.html#a6b12ef3fa11387abd6bb260678b70965" />
+      <keyword name="addJsonTypeConverter" id="QJsonSerializer::addJsonTypeConverter" ref="class_q_json_serializer.html#a812d2ba38850dc750a31a451bcbb8781" />
+      <keyword name="addJsonTypeConverter" id="QJsonSerializer::addJsonTypeConverter" ref="class_q_json_serializer.html#a9b8d0f4bd6b64a7ac72a5a5bf6d79e98" />
+      <keyword name="addJsonTypeConverter" id="QJsonSerializer::addJsonTypeConverter" ref="class_q_json_serializer.html#ab84ee63cc2dc4fc7d7ec650df24d150a" />
       <keyword name="QObject" id="QObject::QObject" ref="class_q_object.html#QObject" />
       <keyword name="event" id="QObject::event" ref="class_q_object.html#event" />
       <keyword name="eventFilter" id="QObject::eventFilter" ref="class_q_object.html#eventFilter" />
@@ -328,6 +346,8 @@
       <keyword name="allowDefaultNull" id="QJsonSerializer::allowDefaultNull" ref="class_q_json_serializer.html#acc7b17076756d1acd0d95e955614b289" />
       <keyword name="keepObjectName" id="QJsonSerializer::keepObjectName" ref="class_q_json_serializer.html#a6c0d933bd43f30870c9379fb04f65f00" />
       <keyword name="enumAsString" id="QJsonSerializer::enumAsString" ref="class_q_json_serializer.html#ac430c1962106cc1d0efcbef4a11b03f3" />
+      <keyword name="validateBase64" id="QJsonSerializer::validateBase64" ref="class_q_json_serializer.html#a8de334ab602be6a05d70146222978ca9" />
+      <keyword name="useBcp47Locale" id="QJsonSerializer::useBcp47Locale" ref="class_q_json_serializer.html#a692f59d493de527e5373db2975a46cc2" />
       <keyword name="validationFlags" id="QJsonSerializer::validationFlags" ref="class_q_json_serializer.html#a6baa7de9acfd41c1780ea90464b696e3" />
       <keyword name="polymorphing" id="QJsonSerializer::polymorphing" ref="class_q_json_serializer.html#ab3bf93ba232658e79a2a007d1f3d5239" />
       <keyword name="objectName" id="QObject::objectName" ref="class_q_object.html#objectName-prop" />
@@ -514,6 +534,8 @@
       <file>functions.html</file>
       <file>functions.html</file>
       <file>functions.html</file>
+      <file>functions.html</file>
+      <file>functions_func.html</file>
       <file>functions_func.html</file>
       <file>functions_func.html</file>
       <file>functions_func.html</file>
@@ -542,6 +564,7 @@
       <file>functions_eval.html</file>
       <file>functions_eval.html</file>
       <file>functions_eval.html</file>
+      <file>functions_prop.html</file>
       <file>functions_prop.html</file>
       <file>functions_prop.html</file>
       <file>functions_prop.html</file>

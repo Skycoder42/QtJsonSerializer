@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>QtJsonSerializer: Class Members - Typedefs</title>
+<title>QtJsonSerializer: json Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -48,7 +48,6 @@ $(function() {
 });
 </script>
 <div id="main-nav"></div>
-</div><!-- top -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -63,16 +62,31 @@ $(function() {
 </iframe>
 </div>
 
+</div><!-- top -->
+<div class="header">
+  <div class="headertitle">
+<div class="title">json Class Reference</div>  </div>
+</div><!--header-->
 <div class="contents">
-&#160;<ul>
-<li>PropertyTrace
-: <a class="el" href="class_q_json_serializer_exception.html#a9a1de74f16f0dc2ba7717738e95c06f9">QJsonSerializerException</a>
-</li>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>make a class polymorphic you can:</p><ul>
+<li>Add <code>Q_CLASSINFO("polymorphic", "true")</code> to its definition</li>
+<li>Globally force polyphormism (See <a class="el" href="class_q_json_serializer.html#ab3bf93ba232658e79a2a007d1f3d5239" title="Specify how the serializer should treat polymorphism for QObject classes. ">QJsonSerializer::polymorphing</a> in the doc)</li>
+<li>Set a dynamic property: <code>setProperty("__qt_json_serializer_polymorphic", true);</code></li>
+</ul>
+<p>By default, the <code>objectName</code> property of QObjects is not serialized (See <a href="src/qjsonserializer.h#L20">keepObjectName</a>)</p><ol type="1">
+<li>By default, the JSON <code>null</code> can only be converted to QObjects. For other types the conversion fails (See <a href="src/qjsonserializer.h#L19">allowDefaultNull</a>)</li>
+</ol>
+<h1><a class="anchor" id="qtjsonserializer_readme_label_5"></a>
+Documentation</h1>
+<p>The documentation is available on <a href="https://skycoder42.github.io/QtJsonSerializer/">github pages</a>. It was created using <a href="http://www.doxygen.org/">doxygen</a>. The HTML-documentation and Qt-Help files are shipped together with the module for both the custom repository and the package on the release page. Please note that doxygen docs do not perfectly integrate with QtCreator/QtAssistant. </p>
+</div><hr/>The documentation for this class was generated from the following file:<ul>
+<li><a class="el" href="_r_e_a_d_m_e_8md_source.html">README.md</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Nov 11 2017 19:01:11 for QtJsonSerializer by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Nov 11 2017 19:00:35 for QtJsonSerializer by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.13
 </small></address>
