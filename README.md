@@ -144,6 +144,37 @@ In order for the serializer to properly work, there are a few things you have to
 6. By default, the `objectName` property of QObjects is not serialized (See [keepObjectName](src/qjsonserializer.h#L20))
 7. By default, the JSON `null` can only be converted to QObjects. For other types the conversion fails (See [allowDefaultNull](src/qjsonserializer.h#L19))
 
+### Support for alternative Containers
+Right now, only `QList` and `QMap` ar supported as containers. The reason is, that adding containers requires the registration of converters. Supporting all containers would explode the generated binary, which is why I only support the most common ones.
+
+If you need the other containers, you have 2 options:
+
+1. Implement a custom `QJsonTypeConverter` (You will still have to register all the converters).
+2. Create "converter" properties that are used for serialization only. This is the more simple version, but needs to be done for every occurance of that container, and adds some overhead.
+
+The following example shows how to do that to use `QVector` in code, but serialize as `QList`:
+```
+struct MyGadget {
+    Q_GADGET
+
+    Q_PROPERTY(QList<int> myIntVector READ getMyIntList WRITE setMyIntList) //normal property name, as this one appears in json
+    //Important: Add "STORED false":
+    Q_PROPERTY(QVector<int> myIntVectorInternal READ getMyIntVector WRITE setMyIntVector STORED false) //will not be serialized
+
+public:
+    QVector<int> getMyIntVector() const;
+    void setMyIntVector(const QVector<int> &vector) ;
+
+private:
+    QList<int> getMyIntList() const {
+        return getMyIntVector().toList();
+    }
+    void setMyIntList(const QList<int> &list) {
+        setMyIntVector(QVector<int>::fromList(list));
+    }
+};
+```
+
 ## Documentation
 The documentation is available on [github pages](https://skycoder42.github.io/QtJsonSerializer/). It was created using [doxygen](http://www.doxygen.org/). The HTML-documentation and Qt-Help files are shipped
 together with the module for both the custom repository and the package on the release page. Please note that doxygen docs do not perfectly integrate with QtCreator/QtAssistant.
