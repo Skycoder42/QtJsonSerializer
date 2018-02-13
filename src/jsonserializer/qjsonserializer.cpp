@@ -208,7 +208,7 @@ QJsonValue QJsonSerializer::serializeVariant(int propertyType, const QVariant &v
 {
 	auto converter = d->typeConverterTypeCache.value(propertyType, nullptr);
 	if(!converter){
-		foreach (auto c, d->typeConverters) {
+		for(auto c : d->typeConverters) {
 			if(c && c->canConvert(propertyType)) {
 				converter = c;
 				d->typeConverterTypeCache.insert(propertyType, converter);
@@ -229,7 +229,7 @@ QVariant QJsonSerializer::deserializeVariant(int propertyType, const QJsonValue 
 	if(!converter || !converter->jsonTypes().contains(value.type())) {
 		converter = nullptr; //in case json type did not match
 		auto valueType = value.type();
-		foreach (auto c, d->typeConverters) {
+		for(auto c : d->typeConverters) {
 			if(c &&
 			   c->jsonTypes().contains(valueType) &&
 			   c->canConvert(propertyType)) {

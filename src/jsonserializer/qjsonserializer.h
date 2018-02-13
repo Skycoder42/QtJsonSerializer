@@ -58,7 +58,6 @@ public:
 
 	//! Constructor
 	explicit QJsonSerializer(QObject *parent = nullptr);
-	//! Destructor
 	~QJsonSerializer();
 
 	//! Registers a custom type for list converisons
@@ -135,6 +134,7 @@ public:
 	void addJsonTypeConverter();
 	//! @copybrief QJsonSerializer::addJsonTypeConverter()
 	void addJsonTypeConverter(QSharedPointer<QJsonTypeConverter> converter);
+	//! @private
 	QT_DEPRECATED void addJsonTypeConverter(QJsonTypeConverter *converter);
 
 public Q_SLOTS:
@@ -192,14 +192,14 @@ template<typename T>
 bool QJsonSerializer::registerListConverters() {
 	auto ok1 = QMetaType::registerConverter<QList<T>, QVariantList>([](const QList<T> &list) -> QVariantList {
 		QVariantList l;
-		foreach(auto v, list)
+		for(auto v : list)
 			l.append(QVariant::fromValue(v));
 		return l;
 	});
 
 	auto ok2 = QMetaType::registerConverter<QVariantList, QList<T>>([](const QVariantList &list) -> QList<T> {
 		QList<T> l;
-		foreach(auto v, list) {
+		for(auto v : list) {
 			auto vt = v.type();
 			if(v.convert(qMetaTypeId<T>()))
 				l.append(v.value<T>());

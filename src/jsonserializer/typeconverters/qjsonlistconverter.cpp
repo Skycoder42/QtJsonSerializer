@@ -30,7 +30,7 @@ QJsonValue QJsonListConverter::serialize(int propertyType, const QVariant &value
 
 	QJsonArray array;
 	auto index = 0;
-	foreach(auto element, cValue.toList())
+	for(auto element : cValue.toList())
 		array.append(helper->serializeSubtype(metaType, element, "[" + QByteArray::number(index++) + "]"));
 	return array;
 }
@@ -42,7 +42,7 @@ QVariant QJsonListConverter::deserialize(int propertyType, const QJsonValue &val
 	//generate the list
 	QVariantList list;
 	auto index = 0;
-	foreach(auto element, value.toArray())
+	for(auto element : value.toArray())
 		list.append(helper->deserializeSubtype(metaType, element, parent, "[" + QByteArray::number(index++) + "]"));
 	return list;
 }

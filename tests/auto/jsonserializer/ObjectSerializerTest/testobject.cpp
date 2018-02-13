@@ -140,12 +140,12 @@ TestObject *TestObject::createChildren(QList<ChildObject *> simpleChildren, QLis
 	auto t = new TestObject(parent);
 
 	t->simpleChildren = simpleChildren;
-	foreach (auto child, t->simpleChildren)
+	for (auto child : t->simpleChildren)
 		child->setParent(t);
 
 	t->leveledChildren = leveledChildren;
-	foreach (auto children, t->leveledChildren) {
-		foreach (auto child, children)
+	for (auto children : t->leveledChildren) {
+		for (auto child : children)
 			child->setParent(t);
 	}
 
@@ -157,12 +157,12 @@ TestObject *TestObject::createRelatives(QMap<QString, ChildObject *> simpleRelat
 	auto t = new TestObject(parent);
 
 	t->simpleRelatives = simpleRelatives;
-	foreach (auto child, t->simpleRelatives)
+	for (auto child : t->simpleRelatives)
 		child->setParent(t);
 
 	t->leveledRelatives = leveledRelatives;
-	foreach (auto children, t->leveledRelatives) {
-		foreach (auto child, children)
+	for (auto children : t->leveledRelatives) {
+		for (auto child : children)
 			child->setParent(t);
 	}
 

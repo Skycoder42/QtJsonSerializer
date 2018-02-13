@@ -78,7 +78,7 @@ QJsonSerializationExceptionPrivate::QJsonSerializationExceptionPrivate(QByteArra
 	if(trace.isEmpty())
 		what += " <root element>";
 	else {
-		foreach(auto p, trace)
+		for(auto p : qAsConst(trace))
 			what += "\n\t" + p.first + " (Type: " + p.second + ")";
 	}
 }

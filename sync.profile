@@ -1,6 +1,5 @@
 %modules = (
-    "QtJsonSerializer" => "$basedir/src/jsonserializer",
+	"QtJsonSerializer" => "$basedir/src/jsonserializer",
 );
 
-%moduleheaders = (
-);
+$publicclassregexp = "^(?!_qjsonserializer_helpertypes::).+";

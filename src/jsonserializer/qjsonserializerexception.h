@@ -32,7 +32,7 @@ public:
 	QException *clone() const override;
 
 protected:
-	//! Private implementation (internal)
+	//! @private
 	QSharedPointer<QJsonSerializationExceptionPrivate> d;
 };
 

@@ -7,4 +7,5 @@ docTarget.CONFIG += recursive
 docTarget.recurse_target = doxygen
 QMAKE_EXTRA_TARGETS += docTarget
 
-DISTFILES += .qmake.conf
+DISTFILES += .qmake.conf \
+	sync.profile

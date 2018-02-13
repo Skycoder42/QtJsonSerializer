@@ -5,6 +5,7 @@ With this small library, you are able to serialize any QObject or Q_GADGET class
 
 [![Travis Build Status](https://travis-ci.org/Skycoder42/QtJsonSerializer.svg?branch=master)](https://travis-ci.org/Skycoder42/QtJsonSerializer)
 [![Appveyor Build status](https://ci.appveyor.com/api/projects/status/rbue7wwxk04eoka0/branch/master?svg=true)](https://ci.appveyor.com/project/Skycoder42/qtjsonserializer/branch/master)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/3f69dd82640e4e3b8526f1a54bec2264)](https://www.codacy.com/app/Skycoder42/QtJsonSerializer)
 [![AUR](https://img.shields.io/aur/version/qt5-jsonserializer.svg)](https://aur.archlinux.org/packages/qt5-jsonserializer/)
 
 ## Features
@@ -155,23 +156,23 @@ If you need the other containers, you have 2 options:
 The following example shows how to do that to use `QVector` in code, but serialize as `QList`:
 ```
 struct MyGadget {
-    Q_GADGET
+	Q_GADGET
 
-    Q_PROPERTY(QList<int> myIntVector READ getMyIntList WRITE setMyIntList) //normal property name, as this one appears in json
-    //Important: Add "STORED false":
-    Q_PROPERTY(QVector<int> myIntVectorInternal READ getMyIntVector WRITE setMyIntVector STORED false) //will not be serialized
+	Q_PROPERTY(QList<int> myIntVector READ getMyIntList WRITE setMyIntList) //normal property name, as this one appears in json
+	//Important: Add "STORED false":
+	Q_PROPERTY(QVector<int> myIntVectorInternal READ getMyIntVector WRITE setMyIntVector STORED false) //will not be serialized
 
 public:
-    QVector<int> getMyIntVector() const;
-    void setMyIntVector(const QVector<int> &vector) ;
+	QVector<int> getMyIntVector() const;
+	void setMyIntVector(const QVector<int> &vector) ;
 
 private:
-    QList<int> getMyIntList() const {
-        return getMyIntVector().toList();
-    }
-    void setMyIntList(const QList<int> &list) {
-        setMyIntVector(QVector<int>::fromList(list));
-    }
+	QList<int> getMyIntList() const {
+		return getMyIntVector().toList();
+	}
+	void setMyIntList(const QList<int> &list) {
+		setMyIntVector(QVector<int>::fromList(list));
+	}
 };
 ```
 

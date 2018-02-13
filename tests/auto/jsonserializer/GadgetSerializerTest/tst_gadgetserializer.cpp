@@ -56,7 +56,8 @@ private:
 void GadgetSerializerTest::initTestCase()
 {
 #ifdef Q_OS_LINUX
-	Q_ASSERT(qgetenv("LD_PRELOAD").contains("Qt5JsonSerializer"));
+	if(!qgetenv("LD_PRELOAD").contains("Qt5JsonSerializer"))
+		qWarning() << "No LD_PRELOAD set - this may fail on systems with multiple version of the modules";
 #endif
 	QJsonSerializer::registerListConverters<QList<int>>();
 	QJsonSerializer::registerMapConverters<QMap<QString, int>>();
