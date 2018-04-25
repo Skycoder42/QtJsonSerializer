@@ -279,7 +279,7 @@ void ObjectSerializerTest::testDeserialization()
 		if(works) {
 			auto obj = serializer->deserialize<TestObject*>(data, this);
 			QVERIFY(obj);
-			QVERIFY(result->equals(obj));
+			QVERIFY(TestObject::equals(result, obj));
 			obj->deleteLater();
 		} else {
 			auto broken2 = qobject_cast<BrokenTestObject2*>(result);
@@ -361,7 +361,7 @@ void ObjectSerializerTest::testNullDeserialization()
 		serializer->setAllowDefaultNull(true);
 		auto obj = serializer->deserialize<TestObject*>(testJson, this);
 		QVERIFY(obj);
-		QVERIFY(testObj->equals(obj));
+		QVERIFY(TestObject::equals(testObj, obj));
 		obj->deleteLater();
 	} catch(QException &e) {
 		QFAIL(e.what());
@@ -413,7 +413,7 @@ void ObjectSerializerTest::testDeserializationValidation()
 	try {
 		if(success) {
 			auto deser = serializer->deserialize<TestObject*>(data, this);
-			QVERIFY(t1->equals(deser));
+			QVERIFY(TestObject::equals(t1, deser));
 			deser->deleteLater();
 		} else
 			QVERIFY_EXCEPTION_THROWN(serializer->deserialize<TestObject*>(data, this), QJsonDeserializationException);
@@ -440,7 +440,7 @@ void ObjectSerializerTest::testBase64Validate()
 		//disable check
 		serializer->setValidateBase64(false);
 		auto deser = serializer->deserialize<TestObject*>(json, this);
-		QVERIFY(!deser->equals(cmp));//but not empty!
+		QVERIFY(!TestObject::equals(deser, cmp));//but not empty!
 	} catch (QException &e) {
 		QFAIL(e.what());
 	}
@@ -489,7 +489,7 @@ void ObjectSerializerTest::testRegexPatternDeserialization()
 										   });
 
 		auto deser = serializer->deserialize<TestObject*>(json, this);
-		QVERIFY(deser->equals(obj));
+		QVERIFY(TestObject::equals(deser, obj));
 	} catch (QException &e) {
 		QFAIL(e.what());
 	}
@@ -603,7 +603,7 @@ void ObjectSerializerTest::testEnumSpecialDeserialization()
 		if(success) {
 			auto obj = serializer->deserialize<TestObject*>(data, this);
 			QVERIFY(obj);
-			QVERIFY(result->equals(obj));
+			QVERIFY(TestObject::equals(result, obj));
 			obj->deleteLater();
 		} else
 			QVERIFY_EXCEPTION_THROWN(serializer->deserialize<TestObject*>(data, this), QJsonDeserializationException);
@@ -866,7 +866,7 @@ void ObjectSerializerTest::testDeviceSerialization()
 			QVERIFY(tFile.open());
 			auto res = serializer->deserializeFrom(&tFile, data.userType(), this);
 			if(data.userType() == qMetaTypeId<TestObject*>())
-				QVERIFY(res.value<TestObject*>()->equals(data.value<TestObject*>()));
+				QVERIFY(TestObject::equals(res.value<TestObject*>(), data.value<TestObject*>()));
 			else if(data.userType() == qMetaTypeId<QList<TestObject*>>())
 				QCOMPARE(res.value<QList<TestObject*>>().size(), data.value<QList<TestObject*>>().size());
 			else

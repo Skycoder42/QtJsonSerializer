@@ -10,8 +10,6 @@ struct BrokenTestGadget : public TestGadget
 	Q_PROPERTY(BrokenTestGadget::Broken broken MEMBER broken)//unserializable type
 
 public:
-	BrokenTestGadget();
-
 	struct Broken {
 		bool operator !=(const Broken &) {
 			return false;

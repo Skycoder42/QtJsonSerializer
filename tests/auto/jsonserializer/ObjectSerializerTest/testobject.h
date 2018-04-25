@@ -34,9 +34,12 @@ public:
 	explicit ChildObject(int data, QObject *parent = nullptr);
 	Q_INVOKABLE ChildObject(QObject *parent);
 
-	bool equals(const ChildObject *other) const;
-
 	static QJsonObject createJson(const int &data = 0);
+
+	static bool equals(const ChildObject *left, const ChildObject *right);
+
+private:
+	bool equals(const ChildObject *other) const;
 };
 
 class TestObject : public QObject
@@ -124,7 +127,6 @@ public:
 	static QJsonObject createJson(const QJsonObject &delta = QJsonObject(), const QString &rmKey = {});
 
 	static bool equals(const TestObject *left, const TestObject *right);
-	bool equals(const TestObject *other) const;
 
 	int intProperty;
 	bool boolProperty;
@@ -174,6 +176,9 @@ public:
 
 	EnumFlags getEnumFlagsProperty() const;
 	void setEnumFlagsProperty(const EnumFlags &value);
+
+private:
+	bool equals(const TestObject *other) const;
 };
 
 Q_DECLARE_METATYPE(TestObject*)

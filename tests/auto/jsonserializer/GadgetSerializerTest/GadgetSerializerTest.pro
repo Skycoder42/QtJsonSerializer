@@ -1,8 +1,8 @@
 TEMPLATE = app
 
 QT = core jsonserializer testlib
-CONFIG   += console
-CONFIG   -= app_bundle
+CONFIG += console
+CONFIG -= app_bundle
 
 TARGET = tst_gadgetserializer
 

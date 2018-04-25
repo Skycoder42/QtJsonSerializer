@@ -10,7 +10,7 @@ TestObject::TestObject(QObject *parent) :
 	stringProperty(),
 	doubleProperty(0.0),
 	normalEnumProperty(Normal0),
-	enumFlagsProperty(0x00),
+	enumFlagsProperty(),
 	datetime(),
 	uuid(),
 	url(),
@@ -263,7 +263,7 @@ bool TestObject::equals(const TestObject *other) const
 {
 	if(this == other)
 		return true;
-	else if(!other || !this)
+	else if(!other)
 		return false;
 	else if(metaObject()->className() != other->metaObject()->className())
 		return false;
@@ -271,7 +271,7 @@ bool TestObject::equals(const TestObject *other) const
 		auto ok = intProperty == other->intProperty &&
 				  boolProperty == other->boolProperty &&
 				  stringProperty == other->stringProperty &&
-				  doubleProperty == other->doubleProperty &&
+				  qFuzzyCompare(doubleProperty, other->doubleProperty) &&
 				  normalEnumProperty == other->normalEnumProperty &&
 				  enumFlagsProperty == other->enumFlagsProperty &&
 				  datetime == other->datetime &&
@@ -302,17 +302,17 @@ bool TestObject::equals(const TestObject *other) const
 		if(!ok)
 			return false;
 
-		if(!childObject->equals(other->childObject))
+		if(!ChildObject::equals(childObject, other->childObject))
 			return false;
-		if(!sharedChildObject.data()->equals(other->sharedChildObject.data()))
+		if(!ChildObject::equals(sharedChildObject.data(), other->sharedChildObject.data()))
 			return false;
-		if(!trackedChildObject.data()->equals(other->trackedChildObject.data()))
+		if(!ChildObject::equals(trackedChildObject.data(), other->trackedChildObject.data()))
 			return false;
-		if(!extraPair.first->equals(other->extraPair.first))
+		if(!ChildObject::equals(extraPair.first, other->extraPair.first))
 			return false;
 
 		for(auto i = 0; i < simpleChildren.size(); i++) {
-			if(!simpleChildren[i]->equals(other->simpleChildren[i]))
+			if(!ChildObject::equals(simpleChildren[i], other->simpleChildren[i]))
 				return false;
 		}
 
@@ -320,13 +320,13 @@ bool TestObject::equals(const TestObject *other) const
 			if(leveledChildren[i].size() != other->leveledChildren[i].size())
 				return false;
 			for(auto j = 0; j < leveledChildren[i].size(); j++) {
-				if(!leveledChildren[i][j]->equals(other->leveledChildren[i][j]))
+				if(!ChildObject::equals(leveledChildren[i][j], other->leveledChildren[i][j]))
 					return false;
 			}
 		}
 
 		for(auto it = simpleRelatives.constBegin(); it != simpleRelatives.constEnd(); ++it) {
-			if(!it.value()->equals(other->simpleRelatives[it.key()]))
+			if(!ChildObject::equals(it.value(), other->simpleRelatives[it.key()]))
 				return false;
 		}
 
@@ -335,7 +335,7 @@ bool TestObject::equals(const TestObject *other) const
 			if(it->size() != otherMap.size())
 				return false;
 			for(auto jt = it->constBegin(); jt != it->constEnd(); ++jt) {
-				if(!jt.value()->equals(otherMap[jt.key()]))
+				if(!ChildObject::equals(jt.value(), otherMap[jt.key()]))
 					return false;
 			}
 		}
@@ -366,11 +366,21 @@ ChildObject::ChildObject(QObject *parent) :
 	child(nullptr)
 {}
 
+bool ChildObject::equals(const ChildObject *left, const ChildObject *right)
+{
+	if(left) {
+		if(!left->equals(right))
+			return false;
+	} else if(left != right)
+		return false;
+	return true;
+}
+
 bool ChildObject::equals(const ChildObject *other) const
 {
 	if(this == other)
 		return true;
-	else if(!other || !this)
+	else if(!other)
 		return false;
 	else if(metaObject()->className() != other->metaObject()->className())
 		return false;

@@ -9,7 +9,7 @@ TestGadget::TestGadget() :
 	stringProperty(),
 	doubleProperty(0.0),
 	normalEnumProperty(Normal0),
-	enumFlagsProperty(0),
+	enumFlagsProperty(),
 	datetime(),
 	uuid(),
 	url(),
@@ -43,7 +43,7 @@ bool TestGadget::operator==(const TestGadget &other) const
 	return intProperty == other.intProperty &&
 			boolProperty == other.boolProperty &&
 			stringProperty == other.stringProperty &&
-			doubleProperty == other.doubleProperty &&
+			qFuzzyCompare(doubleProperty, other.doubleProperty) &&
 			normalEnumProperty == other.normalEnumProperty &&
 			enumFlagsProperty == other.enumFlagsProperty &&
 			datetime == other.datetime &&
@@ -79,7 +79,7 @@ bool TestGadget::operator!=(const TestGadget &other) const
 	return intProperty != other.intProperty ||
 			boolProperty != other.boolProperty ||
 			stringProperty != other.stringProperty ||
-			doubleProperty != other.doubleProperty ||
+			!qFuzzyCompare(doubleProperty, other.doubleProperty) ||
 			normalEnumProperty != other.normalEnumProperty ||
 			enumFlagsProperty != other.enumFlagsProperty ||
 			datetime != other.datetime ||
