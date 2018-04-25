@@ -3,9 +3,18 @@
 #include "qjsonserializer_p.h"
 
 #include <QtCore/QMetaProperty>
+#include <QtCore/QSet>
 
 bool QJsonGadgetConverter::canConvert(int metaTypeId) const
 {
+	// exclude a few Qt gadgets that have no properties and thus need to be handelt as normal strings
+	static const QSet<int> gadgetExceptions {
+		QMetaType::QKeySequence,
+		QMetaType::QFont
+	};
+	if(gadgetExceptions.contains(metaTypeId))
+		return false;
+
 	return QMetaType::typeFlags(metaTypeId).testFlag(QMetaType::IsGadget);
 }
 
