@@ -25,7 +25,7 @@ QJsonValue QJsonRegularExpressionConverter::serialize(int propertyType, const QV
 	auto regex = value.toRegularExpression();
 	QJsonObject object;
 	object[QStringLiteral("pattern")] = regex.pattern();
-	object[QStringLiteral("options")] = (int)regex.patternOptions();
+	object[QStringLiteral("options")] = static_cast<int>(regex.patternOptions());
 	return object;
 }
 
@@ -36,7 +36,7 @@ QVariant QJsonRegularExpressionConverter::deserialize(int propertyType, const QJ
 	Q_UNUSED(helper)
 
 	QString pattern;
-	QRegularExpression::PatternOptions options = 0;
+	QRegularExpression::PatternOptions options;
 	if(value.type() == QJsonValue::Object) {
 		auto object = value.toObject();
 		if(object.keys().size() != 2 ||
@@ -45,7 +45,7 @@ QVariant QJsonRegularExpressionConverter::deserialize(int propertyType, const QJ
 			throw QJsonDeserializationException("Json object has no pattern or options properties or does have extra properties");
 
 		pattern = object.value(QStringLiteral("pattern")).toString();
-		options = (QRegularExpression::PatternOptions)object.value(QStringLiteral("options")).toInt();
+		options = static_cast<QRegularExpression::PatternOptions>(object.value(QStringLiteral("options")).toInt());
 	} else if(value.type() == QJsonValue::String)
 		pattern = value.toString();
 	else

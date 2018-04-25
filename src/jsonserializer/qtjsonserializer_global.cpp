@@ -30,7 +30,7 @@ Q_COREAPP_STARTUP_FUNCTION(qJsonSerializerStartup)
 	ok = QMetaType::registerConverter<QVariantList, QList<T>>([](const QVariantList &list) -> QList<T> { \
 		QList<T> l; \
 		for(auto v : list) { \
-			auto vt = v.type(); \
+			auto vt = v.userType(); \
 			if(v.convert(qMetaTypeId<T>())) \
 				l.append(v.value<T>()); \
 			else { \
@@ -58,7 +58,7 @@ Q_COREAPP_STARTUP_FUNCTION(qJsonSerializerStartup)
 		QMap<QString, T> m; \
 		for(auto it = map.constBegin(); it != map.constEnd(); ++it) { \
 			auto v = it.value(); \
-			auto vt = v.type(); \
+			auto vt = v.userType(); \
 			if(v.convert(qMetaTypeId<T>())) \
 				m.insert(it.key(), v.value<T>()); \
 			else { \

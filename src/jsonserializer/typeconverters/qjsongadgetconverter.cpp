@@ -70,8 +70,8 @@ QVariant QJsonGadgetConverter::deserialize(int propertyType, const QJsonValue &v
 		auto propIndex = metaObject->indexOfProperty(qUtf8Printable(it.key()));
 		if(propIndex != -1) {
 			auto property = metaObject->property(propIndex);
-			auto value = helper->deserializeSubtype(property, it.value(), nullptr);
-			property.writeOnGadget(gadgetPtr, value);
+			auto subValue = helper->deserializeSubtype(property, it.value(), nullptr);
+			property.writeOnGadget(gadgetPtr, subValue);
 			reqProps.remove(property.name());
 		} else if(validationFlags.testFlag(QJsonSerializer::NoExtraProperties)) {
 			throw QJsonDeserializationException("Found extra property " +

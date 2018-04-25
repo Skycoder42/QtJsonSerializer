@@ -2,10 +2,10 @@ load(qt_parts)
 
 SUBDIRS += doc
 
-docTarget.target = doxygen
-docTarget.CONFIG += recursive
-docTarget.recurse_target = doxygen
-QMAKE_EXTRA_TARGETS += docTarget
+doxygen.target = doxygen
+doxygen.CONFIG += recursive
+doxygen.recurse_target = doxygen
+QMAKE_EXTRA_TARGETS += doxygen
 
 DISTFILES += .qmake.conf \
 	sync.profile

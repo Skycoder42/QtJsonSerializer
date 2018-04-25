@@ -44,7 +44,7 @@ QJsonValue QJsonObjectConverter::serialize(int propertyType, const QVariant &val
 
 	//get the metaobject, based on polymorphism
 	const QMetaObject *meta = nullptr;
-	auto poly = (QJsonSerializer::Polymorphing)helper->getProperty("polymorphing").toInt();
+	auto poly = static_cast<QJsonSerializer::Polymorphing>(helper->getProperty("polymorphing").toInt());
 	auto isPoly = false;
 	switch (poly) {
 	case QJsonSerializer::Disabled:
@@ -91,7 +91,7 @@ QVariant QJsonObjectConverter::deserialize(int propertyType, const QJsonValue &v
 
 	auto validationFlags = helper->getProperty("validationFlags").value<QJsonSerializer::ValidationFlags>();
 	auto keepObjectName = helper->getProperty("keepObjectName").toBool();
-	auto poly = (QJsonSerializer::Polymorphing)helper->getProperty("polymorphing").toInt();
+	auto poly = static_cast<QJsonSerializer::Polymorphing>(helper->getProperty("polymorphing").toInt());
 
 	auto metaObject = getMetaObject(propertyType);
 	if(!metaObject)
@@ -141,18 +141,18 @@ QVariant QJsonObjectConverter::deserialize(int propertyType, const QJsonValue &v
 	//now deserialize all json properties
 	for(auto it = jsonObject.constBegin(); it != jsonObject.constEnd(); it++) {
 		auto propIndex = metaObject->indexOfProperty(qUtf8Printable(it.key()));
-		QVariant value;
+		QVariant subValue;
 		if(propIndex != -1) {
 			auto property = metaObject->property(propIndex);
-			value = helper->deserializeSubtype(property, it.value(), object);
+			subValue = helper->deserializeSubtype(property, it.value(), object);
 			reqProps.remove(property.name());
 		} else if(validationFlags.testFlag(QJsonSerializer::NoExtraProperties)) {
 			throw QJsonDeserializationException("Found extra property " +
 												it.key().toUtf8() +
 												" but extra properties are not allowed");
 		} else
-			value = helper->deserializeSubtype(QMetaType::UnknownType, it.value(), object, it.key().toUtf8());
-		object->setProperty(qUtf8Printable(it.key()), value);
+			subValue = helper->deserializeSubtype(QMetaType::UnknownType, it.value(), object, it.key().toUtf8());
+		object->setProperty(qUtf8Printable(it.key()), subValue);
 	}
 
 	//make shure all required properties have been read

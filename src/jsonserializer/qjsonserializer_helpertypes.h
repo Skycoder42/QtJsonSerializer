@@ -41,8 +41,8 @@ template <class T, class Enable = void>
 struct gadget_helper
 {
 	static constexpr bool value = false;
-	static inline QJsonValue convert(const QJsonValue &value) {
-		return value;
+	static inline QJsonValue convert(const QJsonValue &jsonValue) {
+		return jsonValue;
 	}
 };
 
@@ -50,8 +50,8 @@ template <class T>
 struct gadget_helper<T, typename T::QtGadgetHelper>
 {
 	static constexpr bool value = true;
-	static inline QJsonObject convert(const QJsonValue &value) {
-		return value.toObject();
+	static inline QJsonObject convert(const QJsonValue &jsonValue) {
+		return jsonValue.toObject();
 	}
 };
 
@@ -65,68 +65,68 @@ template <typename T>
 struct json_type : json_type_raw<T> {
 	static_assert(is_serializable<T>::value, "Only QObject deriving classes can be serialized as pointer");
 
-	static inline typename json_type_raw<T>::type convert(const QJsonValue &value) {
-		return gadget_helper<T>::convert(value);
+	static inline typename json_type_raw<T>::type convert(const QJsonValue &jsonValue) {
+		return gadget_helper<T>::convert(jsonValue);
 	}
 };
 
 template <typename T>
 struct json_type<T*> {
 	static_assert(is_serializable<T*>::value, "Only QObject deriving classes can be serialized as pointer");
-	typedef QJsonObject type;
+	using type = QJsonObject;
 
-	static inline type convert(const QJsonValue &value) {
-		return value.toObject();
+	static inline type convert(const QJsonValue &jsonValue) {
+		return jsonValue.toObject();
 	}
 };
 
 template <typename T>
 struct json_type<QSharedPointer<T>> {
 	static_assert(is_serializable<QSharedPointer<T>>::value, "Only QObject deriving classes can be serialized as pointer");
-	typedef QJsonObject type;
+	using type = QJsonObject;
 
-	static inline type convert(const QJsonValue &value) {
-		return value.toObject();
+	static inline type convert(const QJsonValue &jsonValue) {
+		return jsonValue.toObject();
 	}
 };
 
 template <typename T>
 struct json_type<QPointer<T>> {
 	static_assert(is_serializable<QPointer<T>>::value, "Only QObject deriving classes can be serialized as pointer");
-	typedef QJsonObject type;
+	using type = QJsonObject;
 
-	static inline type convert(const QJsonValue &value) {
-		return value.toObject();
+	static inline type convert(const QJsonValue &jsonValue) {
+		return jsonValue.toObject();
 	}
 };
 
 template <typename T>
 struct json_type<QList<T>> {
 	static_assert(is_serializable<QList<T>>::value, "Only QObject deriving classes can be serialized as pointer");
-	typedef QJsonArray type;
+	using type = QJsonArray;
 
-	static inline type convert(const QJsonValue &value) {
-		return value.toArray();
+	static inline type convert(const QJsonValue &jsonValue) {
+		return jsonValue.toArray();
 	}
 };
 
 template <typename T>
 struct json_type<QMap<QString, T>> {
 	static_assert(is_serializable<QMap<QString, T>>::value, "Only QObject deriving classes can be serialized as pointer");
-	typedef QJsonObject type;
+	using type = QJsonObject;
 
-	static inline type convert(const QJsonValue &value) {
-		return value.toObject();
+	static inline type convert(const QJsonValue &jsonValue) {
+		return jsonValue.toObject();
 	}
 };
 
 template <typename T1, typename T2>
 struct json_type<QPair<T1, T2>> {
 	static_assert(is_serializable<QPair<T1, T2>>::value, "Only QObject deriving classes can be serialized as pointer");
-	typedef QJsonArray type;
+	using type = QJsonArray;
 
-	static inline type convert(const QJsonValue &value) {
-		return value.toArray();
+	static inline type convert(const QJsonValue &jsonValue) {
+		return jsonValue.toArray();
 	}
 };
 

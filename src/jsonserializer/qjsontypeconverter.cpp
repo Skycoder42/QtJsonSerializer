@@ -3,9 +3,7 @@
 class QJsonTypeConverterPrivate
 {
 public:
-	QJsonTypeConverterPrivate();
-
-	int priority;
+	int priority = QJsonTypeConverter::Standard;
 };
 
 QJsonTypeConverter::QJsonTypeConverter() :
@@ -27,9 +25,3 @@ void QJsonTypeConverter::setPriority(int priority)
 
 
 QJsonTypeConverter::SerializationHelper::~SerializationHelper() = default;
-
-
-
-QJsonTypeConverterPrivate::QJsonTypeConverterPrivate() :
-	priority(QJsonTypeConverter::Standard)
-{}

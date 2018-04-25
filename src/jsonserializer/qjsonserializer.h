@@ -58,7 +58,7 @@ public:
 
 	//! Constructor
 	explicit QJsonSerializer(QObject *parent = nullptr);
-	~QJsonSerializer();
+	~QJsonSerializer() override;
 
 	//! Registers a custom type for list converisons
 	template<typename T>

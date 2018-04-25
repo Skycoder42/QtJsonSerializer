@@ -25,7 +25,7 @@ public:
 	};
 
 	//! Helper class passed to the type converter by the serializer. Do not implement yourself
-	class SerializationHelper
+	class Q_JSONSERIALIZER_EXPORT SerializationHelper
 	{
 	public:
 		//! Destructor

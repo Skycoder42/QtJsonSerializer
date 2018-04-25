@@ -2,6 +2,8 @@
 #include "qjsonserializer_p.h"
 #include "qjsonexceptioncontext_p.h"
 
+#include <cmath>
+
 #include <QtCore/QDateTime>
 #include <QtCore/QBuffer>
 
@@ -22,7 +24,7 @@ QJsonSerializer::QJsonSerializer(QObject *parent) :
 	d(new QJsonSerializerPrivate())
 {}
 
-QJsonSerializer::~QJsonSerializer() {}
+QJsonSerializer::~QJsonSerializer() = default;
 
 bool QJsonSerializer::allowDefaultNull() const
 {
@@ -360,7 +362,8 @@ QVariant QJsonSerializer::deserializeEnum(const QMetaEnum &metaEnum, const QJson
 			throw QJsonDeserializationException("Invalid value for enum type found: " + value.toString().toUtf8());
 	} else {
 		auto intValue = value.toInt();
-		if(value.toDouble() != (double)intValue) {
+		double intpart;
+		if(std::modf(value.toDouble(), &intpart) != 0.0) {
 			throw QJsonDeserializationException("Invalid value (double) for enum type found: " +
 												QByteArray::number(value.toDouble()));
 		}

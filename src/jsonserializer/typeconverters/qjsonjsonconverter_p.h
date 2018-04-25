@@ -4,7 +4,7 @@
 #include "qtjsonserializer_global.h"
 #include "qjsontypeconverter.h"
 
-class QJsonJsonValueConverter : public QJsonTypeConverter
+class Q_JSONSERIALIZER_EXPORT QJsonJsonValueConverter : public QJsonTypeConverter
 {
 public:
 	bool canConvert(int metaTypeId) const override;
@@ -13,7 +13,7 @@ public:
 	QVariant deserialize(int propertyType, const QJsonValue &value, QObject *parent, const SerializationHelper *helper) const override;
 };
 
-class QJsonJsonObjectConverter : public QJsonTypeConverter
+class Q_JSONSERIALIZER_EXPORT QJsonJsonObjectConverter : public QJsonTypeConverter
 {
 public:
 	bool canConvert(int metaTypeId) const override;
@@ -22,7 +22,7 @@ public:
 	QVariant deserialize(int propertyType, const QJsonValue &value, QObject *parent, const SerializationHelper *helper) const override;
 };
 
-class QJsonJsonArrayConverter : public QJsonTypeConverter
+class Q_JSONSERIALIZER_EXPORT QJsonJsonArrayConverter : public QJsonTypeConverter
 {
 public:
 	bool canConvert(int metaTypeId) const override;

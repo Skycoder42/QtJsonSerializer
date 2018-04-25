@@ -6,7 +6,7 @@
 
 #include <QtCore/QRegularExpression>
 
-class QJsonPairConverter : public QJsonTypeConverter
+class Q_JSONSERIALIZER_EXPORT QJsonPairConverter : public QJsonTypeConverter
 {
 public:
 	bool canConvert(int metaTypeId) const override;
