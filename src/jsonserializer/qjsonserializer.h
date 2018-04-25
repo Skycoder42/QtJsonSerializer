@@ -72,6 +72,9 @@ public:
 	//! Registers a custom type for QSharedPointer and QPointer converisons
 	template<typename T>
 	static bool registerPointerConverters();
+	//! Registers a custom type for QSharedPointer and QPointer converisons, including lists of those pointer types
+	template<typename T>
+	static bool registerPointerListConverters();
 	//! Registers two types for pair conversion
 	template<typename T, typename U>
 	static bool registerPairConverters();
@@ -273,6 +276,16 @@ bool QJsonSerializer::registerPointerConverters()
 		return static_cast<QObject*>(object.data());
 	});
 	return ok1 && ok2 && ok3 && ok4;
+}
+
+template<typename T>
+bool QJsonSerializer::registerPointerListConverters()
+{
+	static_assert(std::is_base_of<QObject, T>::value, "T must inherit QObject");
+	auto ok1 = registerPointerConverters<T>();
+	auto ok2 = registerAllConverters<QSharedPointer<T>>();
+	auto ok3 = registerAllConverters<QPointer<T>>();
+	return ok1 && ok2 && ok3;
 }
 
 template<typename T1, typename T2>
