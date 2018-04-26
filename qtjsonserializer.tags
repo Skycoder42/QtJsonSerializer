@@ -1,10 +1,6 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
 <tagfile>
   <compound kind="class">
-    <name>QException</name>
-    <filename>class_q_exception.html</filename>
-  </compound>
-  <compound kind="class">
     <name>QJsonDeserializationException</name>
     <filename>class_q_json_deserialization_exception.html</filename>
     <base>QJsonSerializerException</base>
@@ -14,6 +10,20 @@
       <anchorfile>class_q_json_deserialization_exception.html</anchorfile>
       <anchor>ad37e36ebc35f0812018106e1a65895b1</anchor>
       <arglist>(const QByteArray &amp;what)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>raise</name>
+      <anchorfile>class_q_json_deserialization_exception.html</anchorfile>
+      <anchor>a48291abca66222ed578833a1c1c169c0</anchor>
+      <arglist>() const override</arglist>
+    </member>
+    <member kind="function">
+      <type>QException *</type>
+      <name>clone</name>
+      <anchorfile>class_q_json_deserialization_exception.html</anchorfile>
+      <anchor>a069e07e1e91403acde35c2ce70566069</anchor>
+      <arglist>() const override</arglist>
     </member>
   </compound>
   <compound kind="class">
@@ -26,6 +36,20 @@
       <anchorfile>class_q_json_serialization_exception.html</anchorfile>
       <anchor>aebbceb6fd83077b2b7aa2413d326e994</anchor>
       <arglist>(const QByteArray &amp;what)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>raise</name>
+      <anchorfile>class_q_json_serialization_exception.html</anchorfile>
+      <anchor>a1f2c5dc5b525da2d02c51fbb093fad2c</anchor>
+      <arglist>() const override</arglist>
+    </member>
+    <member kind="function">
+      <type>QException *</type>
+      <name>clone</name>
+      <anchorfile>class_q_json_serialization_exception.html</anchorfile>
+      <anchor>a71fe42f32a5102faa57ca86ebbf57e3b</anchor>
+      <arglist>() const override</arglist>
     </member>
   </compound>
   <compound kind="class">
@@ -605,10 +629,6 @@
     <docanchor file="class_q_json_type_converter" title="The `jsonTypes` method">class_jsonTypes</docanchor>
     <docanchor file="class_q_json_type_converter" title="The `serialize` method">class_serialize</docanchor>
     <docanchor file="class_q_json_type_converter" title="The `deserialize` method">class_deserialize</docanchor>
-  </compound>
-  <compound kind="class">
-    <name>QObject</name>
-    <filename>class_q_object.html</filename>
   </compound>
   <compound kind="class">
     <name>QJsonTypeConverter::SerializationHelper</name>

@@ -1,6 +1,10 @@
 var searchData=
 [
-  ['addjsontypeconverter',['addJsonTypeConverter',['../class_q_json_serializer.html#a812d2ba38850dc750a31a451bcbb8781',1,'QJsonSerializer::addJsonTypeConverter()'],['../class_q_json_serializer.html#a9b8d0f4bd6b64a7ac72a5a5bf6d79e98',1,'QJsonSerializer::addJsonTypeConverter(QSharedPointer&lt; QJsonTypeConverter &gt; converter)']]],
-  ['allowdefaultnull',['allowDefaultNull',['../class_q_json_serializer.html#acc7b17076756d1acd0d95e955614b289',1,'QJsonSerializer::allowDefaultNull()'],['../class_q_json_serializer.html#a194c09466f37e35a189c3e67df74f0b9',1,'QJsonSerializer::allowDefaultNull() const']]],
-  ['allproperties',['AllProperties',['../class_q_json_serializer.html#a0fb6dc294c5f0c2279e1e60c8bf19b37aa598894025ccd81d3ed66d3e379c9f7e',1,'QJsonSerializer']]]
+  ['_5fclearitems',['_clearItems',['https://doc.qt.io/qt-5/class_presenting_stack_view.html#aebc99d065b84623f4d7fed681927d684',0,'PresentingStackView']]],
+  ['_5ffilecomponent',['_fileComponent',['https://doc.qt.io/qt-5/class_dialog_presenter.html#a1adab411de0452df18e6dd58d481a348',0,'DialogPresenter']]],
+  ['_5ffoldercomponent',['_folderComponent',['https://doc.qt.io/qt-5/class_dialog_presenter.html#a550e363d8a430ca795b831325539e767',0,'DialogPresenter']]],
+  ['_5finputcomponent',['_inputComponent',['https://doc.qt.io/qt-5/class_dialog_presenter.html#ad15245761c44efe58fef1cd759f1696a',0,'DialogPresenter']]],
+  ['_5fmainchild',['_mainChild',['https://doc.qt.io/qt-5/class_presenting_drawer.html#a9a5ab566d76fe6ca8b5d84f6f2cd998f',0,'PresentingDrawer']]],
+  ['_5fmsgboxcomponent',['_msgBoxComponent',['https://doc.qt.io/qt-5/class_dialog_presenter.html#acb19d2db77b0d270cf6c3c65cfc8c8a4',0,'DialogPresenter']]],
+  ['_5fpopups',['_popups',['https://doc.qt.io/qt-5/class_dialog_presenter.html#ad3c1ae1771252aa4bbc9232c4a4e2391',0,'DialogPresenter::_popups()'],['https://doc.qt.io/qt-5/class_popup_presenter.html#a865a3f42e492622a2558373e5cd93c89',0,'PopupPresenter::_popups()']]]
 ];

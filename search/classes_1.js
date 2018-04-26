@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['serializationhelper',['SerializationHelper',['../class_q_json_type_converter_1_1_serialization_helper.html',1,'QJsonTypeConverter']]]
+  ['binder',['Binder',['https://doc.qt.io/qt-5/qopenglvertexarrayobject-binder.html',0,'QOpenGLVertexArrayObject']]],
+  ['binding',['Binding',['https://doc.qt.io/qt-5/class_qt_mvvm_1_1_binding.html',0,'QtMvvm']]]
 ];
