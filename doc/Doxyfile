@@ -924,7 +924,9 @@ EXCLUDE_PATTERNS       = moc_* \
 # Note that the wildcards are matched against the file with absolute path, so to
 # exclude all test directories use the pattern */test/*
 
-EXCLUDE_SYMBOLS        = QAbstractAspect \
+EXCLUDE_SYMBOLS        = _qjsonserializer_helpertypes \
+						 \
+						 QAbstractAspect \
 						 QBasicAtomicInteger \
 						 QBasicAtomicPointer \
 						 QComponent \

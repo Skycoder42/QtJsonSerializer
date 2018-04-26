@@ -276,6 +276,19 @@ methods for the given type:
 */
 
 /*!
+@fn QJsonSerializer::registerPointerListConverters
+
+@tparam T The type to register converters for
+
+A shortcut for all the container registrations QJsonSerializer provides. The method internally calls:
+- `QJsonSerializer::registerPointerConverters<T>()`
+- `QJsonSerializer::registerAllConverters<QSharedPointer<T>>()`
+- `QJsonSerializer::registerAllConverters<QPointer<T>>()`
+
+@sa QJsonSerializer::registerAllConverters, QJsonSerializer::registerPointerConverters
+*/
+
+/*!
 @fn QJsonSerializer::registerPairConverters
 
 @tparam T1 The first type to register converters for
