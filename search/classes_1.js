@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['binder',['Binder',['https://doc.qt.io/qt-5/qopenglvertexarrayobject-binder.html',0,'QOpenGLVertexArrayObject']]]
+  ['serializationhelper',['SerializationHelper',['../class_q_json_type_converter_1_1_serialization_helper.html',1,'QJsonTypeConverter']]]
 ];

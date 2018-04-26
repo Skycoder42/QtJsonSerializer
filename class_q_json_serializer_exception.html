@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">QtJsonSerializer
-   &#160;<span id="projectnumber">3.1.0</span>
+   &#160;<span id="projectnumber">3.1.2</span>
    </div>
    <div id="projectbrief">A library to perform generic seralization and deserialization of QObjects</div>
   </td>
@@ -67,7 +67,6 @@ $(function() {
   <div class="summary">
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="class_q_json_serializer_exception-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">QJsonSerializerException Class Reference</div>  </div>
@@ -86,7 +85,7 @@ $(function() {
  <div class="center">
   <img src="class_q_json_serializer_exception.png" usemap="#QJsonSerializerException_map" alt=""/>
   <map id="QJsonSerializerException_map" name="QJsonSerializerException_map">
-<area target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9.2/qtdatasync/qtdatasync.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/class_q_exception.html" alt="QException" shape="rect" coords="98,0,285,24"/>
+<area href="class_q_exception.html" alt="QException" shape="rect" coords="98,0,285,24"/>
 <area href="class_q_json_deserialization_exception.html" title="Exception thrown by QJsonSerializer if something goes wrong while deserializing. " alt="QJsonDeserializationException" shape="rect" coords="0,112,187,136"/>
 <area href="class_q_json_serialization_exception.html" title="Exception thrown by QJsonSerializer if something goes wrong while serializing. " alt="QJsonSerializationException" shape="rect" coords="197,112,384,136"/>
 </map>
@@ -94,15 +93,15 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:a9a1de74f16f0dc2ba7717738e95c06f9"><td class="memItemLeft" align="right" valign="top"><a id="a9a1de74f16f0dc2ba7717738e95c06f9"></a>
-typedef <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9.2/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qstack.html">QStack</a>&lt; <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9.2/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qpair.html">QPair</a>&lt; <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9.2/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qbytearray.html">QByteArray</a>, <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9.2/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qbytearray.html">QByteArray</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_q_json_serializer_exception.html#a9a1de74f16f0dc2ba7717738e95c06f9">PropertyTrace</a></td></tr>
-<tr class="memdesc:a9a1de74f16f0dc2ba7717738e95c06f9"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type of a stack of a property trace. <br /></td></tr>
-<tr class="separator:a9a1de74f16f0dc2ba7717738e95c06f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1ffa5287297555aeb1244bfdecb792c2"><td class="memItemLeft" align="right" valign="top"><a id="a1ffa5287297555aeb1244bfdecb792c2"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_q_json_serializer_exception.html#a1ffa5287297555aeb1244bfdecb792c2">PropertyTrace</a> = QStack&lt; QPair&lt; QByteArray, QByteArray &gt; &gt;</td></tr>
+<tr class="memdesc:a1ffa5287297555aeb1244bfdecb792c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type of a stack of a property trace. <br /></td></tr>
+<tr class="separator:a1ffa5287297555aeb1244bfdecb792c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a5b40d9f001682cd43de78ec06b21b9a6"><td class="memItemLeft" align="right" valign="top"><a id="a5b40d9f001682cd43de78ec06b21b9a6"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_q_json_serializer_exception.html#a5b40d9f001682cd43de78ec06b21b9a6">QJsonSerializerException</a> (const <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9.2/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qbytearray.html">QByteArray</a> &amp;<a class="el" href="class_q_json_serializer_exception.html#aa0c888addeffaf1c683a18876fc44c57">what</a>)</td></tr>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_q_json_serializer_exception.html#a5b40d9f001682cd43de78ec06b21b9a6">QJsonSerializerException</a> (const QByteArray &amp;<a class="el" href="class_q_json_serializer_exception.html#aa0c888addeffaf1c683a18876fc44c57">what</a>)</td></tr>
 <tr class="memdesc:a5b40d9f001682cd43de78ec06b21b9a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor with error message. <br /></td></tr>
 <tr class="separator:a5b40d9f001682cd43de78ec06b21b9a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa0c888addeffaf1c683a18876fc44c57"><td class="memItemLeft" align="right" valign="top"><a id="aa0c888addeffaf1c683a18876fc44c57"></a>
@@ -110,11 +109,11 @@ const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <tr class="memdesc:aa0c888addeffaf1c683a18876fc44c57"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inherits 1. <br /></td></tr>
 <tr class="separator:aa0c888addeffaf1c683a18876fc44c57"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab62a3950ba92a61ae4a77b4b4d6c119a"><td class="memItemLeft" align="right" valign="top"><a id="ab62a3950ba92a61ae4a77b4b4d6c119a"></a>
-<a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9.2/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qbytearray.html">QByteArray</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_q_json_serializer_exception.html#ab62a3950ba92a61ae4a77b4b4d6c119a">message</a> () const</td></tr>
+QByteArray&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_q_json_serializer_exception.html#ab62a3950ba92a61ae4a77b4b4d6c119a">message</a> () const</td></tr>
 <tr class="memdesc:ab62a3950ba92a61ae4a77b4b4d6c119a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the error message, without the property trace. <br /></td></tr>
 <tr class="separator:ab62a3950ba92a61ae4a77b4b4d6c119a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a05006fd8c00f771834fe07a231d1de7e"><td class="memItemLeft" align="right" valign="top"><a id="a05006fd8c00f771834fe07a231d1de7e"></a>
-<a class="el" href="class_q_json_serializer_exception.html#a9a1de74f16f0dc2ba7717738e95c06f9">PropertyTrace</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_q_json_serializer_exception.html#a05006fd8c00f771834fe07a231d1de7e">propertyTrace</a> () const</td></tr>
+<a class="el" href="class_q_json_serializer_exception.html#a1ffa5287297555aeb1244bfdecb792c2">PropertyTrace</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_q_json_serializer_exception.html#a05006fd8c00f771834fe07a231d1de7e">propertyTrace</a> () const</td></tr>
 <tr class="memdesc:a05006fd8c00f771834fe07a231d1de7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the property trace. <br /></td></tr>
 <tr class="separator:a05006fd8c00f771834fe07a231d1de7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a89e25e81483b7f0712a99a11c2fe1f9e"><td class="memItemLeft" align="right" valign="top"><a id="a89e25e81483b7f0712a99a11c2fe1f9e"></a>
@@ -122,16 +121,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memdesc:a89e25e81483b7f0712a99a11c2fe1f9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inherits 1. <br /></td></tr>
 <tr class="separator:a89e25e81483b7f0712a99a11c2fe1f9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a04905f904440a1edeaef240a3e5b0970"><td class="memItemLeft" align="right" valign="top"><a id="a04905f904440a1edeaef240a3e5b0970"></a>
-<a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9.2/qtdatasync/qtdatasync.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/class_q_exception.html">QException</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_q_json_serializer_exception.html#a04905f904440a1edeaef240a3e5b0970">clone</a> () const override</td></tr>
+<a class="el" href="class_q_exception.html">QException</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_q_json_serializer_exception.html#a04905f904440a1edeaef240a3e5b0970">clone</a> () const override</td></tr>
 <tr class="memdesc:a04905f904440a1edeaef240a3e5b0970"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inherits 1. <br /></td></tr>
 <tr class="separator:a04905f904440a1edeaef240a3e5b0970"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
-Protected Attributes</h2></td></tr>
-<tr class="memitem:a7a06c7f74f5baf9ce009344e8c2cfc27"><td class="memItemLeft" align="right" valign="top"><a id="a7a06c7f74f5baf9ce009344e8c2cfc27"></a>
-<a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9.2/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qsharedpointer.html">QSharedPointer</a>&lt; QJsonSerializationExceptionPrivate &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_q_json_serializer_exception.html#a7a06c7f74f5baf9ce009344e8c2cfc27">d</a></td></tr>
-<tr class="memdesc:a7a06c7f74f5baf9ce009344e8c2cfc27"><td class="mdescLeft">&#160;</td><td class="mdescRight">Private implementation (internal) <br /></td></tr>
-<tr class="separator:a7a06c7f74f5baf9ce009344e8c2cfc27"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Exception thrown by <a class="el" href="class_q_json_serializer.html" title="A class to serializer and deserializer c++ classes to and from JSON. ">QJsonSerializer</a> if something goes wrong. </p>
@@ -143,7 +135,7 @@ Protected Attributes</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Nov 11 2017 19:01:11 for QtJsonSerializer by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Apr 26 2018 12:55:05 for QtJsonSerializer by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.13
 </small></address>

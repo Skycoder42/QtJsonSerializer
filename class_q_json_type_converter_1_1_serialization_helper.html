@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">QtJsonSerializer
-   &#160;<span id="projectnumber">3.1.0</span>
+   &#160;<span id="projectnumber">3.1.2</span>
    </div>
    <div id="projectbrief">A library to perform generic seralization and deserialization of QObjects</div>
   </td>
@@ -99,30 +99,30 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <tr class="memdesc:aaf892eb7a271d9966eb19c4b5eec1e35"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor. <br /></td></tr>
 <tr class="separator:aaf892eb7a271d9966eb19c4b5eec1e35"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac96e469c2d5390ac700c9ac616f6d513"><td class="memItemLeft" align="right" valign="top"><a id="ac96e469c2d5390ac700c9ac616f6d513"></a>
-virtual <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9.2/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qvariant.html">QVariant</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_q_json_type_converter_1_1_serialization_helper.html#ac96e469c2d5390ac700c9ac616f6d513">getProperty</a> (const char *name) const =0</td></tr>
+virtual QVariant&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_q_json_type_converter_1_1_serialization_helper.html#ac96e469c2d5390ac700c9ac616f6d513">getProperty</a> (const char *name) const =0</td></tr>
 <tr class="memdesc:ac96e469c2d5390ac700c9ac616f6d513"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a property from the serializer. <br /></td></tr>
 <tr class="separator:ac96e469c2d5390ac700c9ac616f6d513"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abdb0a1c4e75c057e9b836ee220742a6a"><td class="memItemLeft" align="right" valign="top"><a id="abdb0a1c4e75c057e9b836ee220742a6a"></a>
-virtual <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9.2/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qjsonvalue.html">QJsonValue</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_q_json_type_converter_1_1_serialization_helper.html#abdb0a1c4e75c057e9b836ee220742a6a">serializeSubtype</a> (<a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9.2/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qmetaproperty.html">QMetaProperty</a> property, const <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9.2/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qvariant.html">QVariant</a> &amp;value) const =0</td></tr>
+virtual QJsonValue&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_q_json_type_converter_1_1_serialization_helper.html#abdb0a1c4e75c057e9b836ee220742a6a">serializeSubtype</a> (QMetaProperty property, const QVariant &amp;value) const =0</td></tr>
 <tr class="memdesc:abdb0a1c4e75c057e9b836ee220742a6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Serialize a subvalue, represented by a meta property. <br /></td></tr>
 <tr class="separator:abdb0a1c4e75c057e9b836ee220742a6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aadc05a33b997e0a68fd10888df6ab4c7"><td class="memItemLeft" align="right" valign="top"><a id="aadc05a33b997e0a68fd10888df6ab4c7"></a>
-virtual <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9.2/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qjsonvalue.html">QJsonValue</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_q_json_type_converter_1_1_serialization_helper.html#aadc05a33b997e0a68fd10888df6ab4c7">serializeSubtype</a> (int propertyType, const <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9.2/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qvariant.html">QVariant</a> &amp;value, const <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9.2/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qbytearray.html">QByteArray</a> &amp;traceHint={}) const =0</td></tr>
+virtual QJsonValue&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_q_json_type_converter_1_1_serialization_helper.html#aadc05a33b997e0a68fd10888df6ab4c7">serializeSubtype</a> (int propertyType, const QVariant &amp;value, const QByteArray &amp;traceHint={}) const =0</td></tr>
 <tr class="memdesc:aadc05a33b997e0a68fd10888df6ab4c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Serialize a subvalue, represented by a type id. <br /></td></tr>
 <tr class="separator:aadc05a33b997e0a68fd10888df6ab4c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac6afd3cac07e7c59adacf8d39f9eee81"><td class="memItemLeft" align="right" valign="top"><a id="ac6afd3cac07e7c59adacf8d39f9eee81"></a>
-virtual <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9.2/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qvariant.html">QVariant</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_q_json_type_converter_1_1_serialization_helper.html#ac6afd3cac07e7c59adacf8d39f9eee81">deserializeSubtype</a> (<a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9.2/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qmetaproperty.html">QMetaProperty</a> property, const <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9.2/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qjsonvalue.html">QJsonValue</a> &amp;value, <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9.2/qtautoupdater/qtautoupdater.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/class_q_object.html">QObject</a> *parent) const =0</td></tr>
+virtual QVariant&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_q_json_type_converter_1_1_serialization_helper.html#ac6afd3cac07e7c59adacf8d39f9eee81">deserializeSubtype</a> (QMetaProperty property, const QJsonValue &amp;value, <a class="el" href="class_q_object.html">QObject</a> *parent) const =0</td></tr>
 <tr class="memdesc:ac6afd3cac07e7c59adacf8d39f9eee81"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deserialize a subvalue, represented by a meta property. <br /></td></tr>
 <tr class="separator:ac6afd3cac07e7c59adacf8d39f9eee81"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a02b0b416e329ab219dbb83b1e69ef2e4"><td class="memItemLeft" align="right" valign="top"><a id="a02b0b416e329ab219dbb83b1e69ef2e4"></a>
-virtual <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9.2/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qvariant.html">QVariant</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_q_json_type_converter_1_1_serialization_helper.html#a02b0b416e329ab219dbb83b1e69ef2e4">deserializeSubtype</a> (int propertyType, const <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9.2/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qjsonvalue.html">QJsonValue</a> &amp;value, <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9.2/qtautoupdater/qtautoupdater.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/class_q_object.html">QObject</a> *parent, const <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9.2/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qbytearray.html">QByteArray</a> &amp;traceHint={}) const =0</td></tr>
+virtual QVariant&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_q_json_type_converter_1_1_serialization_helper.html#a02b0b416e329ab219dbb83b1e69ef2e4">deserializeSubtype</a> (int propertyType, const QJsonValue &amp;value, <a class="el" href="class_q_object.html">QObject</a> *parent, const QByteArray &amp;traceHint={}) const =0</td></tr>
 <tr class="memdesc:a02b0b416e329ab219dbb83b1e69ef2e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deserialize a subvalue, represented by a type id. <br /></td></tr>
 <tr class="separator:a02b0b416e329ab219dbb83b1e69ef2e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Helper class passed to the type converter by the serializer. Do not implement yourself. </p>
 <dl class="section warning"><dt>Warning</dt><dd>Do not implement this class yourself. It is created internally, and only passed to your custom converter implementations</dd></dl>
-<p>For the de/serializeSubtype methods, always prefer the overload with the <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9.2/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qmetaproperty.html">QMetaProperty</a> parameter, in case you have one. If not, it is recommended to pass a "naming" string as last parameter, to help identifying errors.</p>
+<p>For the de/serializeSubtype methods, always prefer the overload with the QMetaProperty parameter, in case you have one. If not, it is recommended to pass a "naming" string as last parameter, to help identifying errors.</p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="class_q_json_type_converter.html" title="An interface to create custom serializer type converters. ">QJsonTypeConverter</a>, <a class="el" href="class_q_json_type_converter.html#abeeba52f509cec3eb4c80b5b7dc07604" title="Called by the serializer to serializer your given type. ">QJsonTypeConverter::serialize</a>, <a class="el" href="class_q_json_type_converter.html#af162ac051c8a5c9d168a1deecf5e0ae7" title="Called by the deserializer to serializer your given type. ">QJsonTypeConverter::deserialize</a> </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="qjsontypeconverter_8h_source.html#l00028">28</a> of file <a class="el" href="qjsontypeconverter_8h_source.html">qjsontypeconverter.h</a>.</p>
@@ -132,7 +132,7 @@ virtual <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.9.2/qtc
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Nov 11 2017 19:01:11 for QtJsonSerializer by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Apr 26 2018 12:55:05 for QtJsonSerializer by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.13
 </small></address>
