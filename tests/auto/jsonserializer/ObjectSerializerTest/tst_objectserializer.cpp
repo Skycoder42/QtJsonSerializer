@@ -931,21 +931,21 @@ void ObjectSerializerTest::generateValidTestData()
 		QDateTime dateTime(date, time);
 		QTest::newRow("datetime") << TestObject::createExtra(dateTime, {}, {}, {}, {}, this)
 								  << TestObject::createJson({
-																{"datetime", dateTime.toString(Qt::ISODate)}
+																{"datetime", dateTime.toString(Qt::ISODateWithMs)}
 															})
 								  << true;
 		auto uuid = QUuid::createUuid();
 		QTest::newRow("uuid") << TestObject::createExtra({}, uuid, {}, {}, {}, this)
 							  << TestObject::createJson({
-															{"uuid", uuid.toString()}
+															{"uuid", uuid.toString(QUuid::WithoutBraces)}
 														})
 							  << true;
 		QUrl url(QStringLiteral("https://user:password@login.example.com:4711/in/some/file.txt?b=42&z=0#baum42"));
-		QTest::newRow("uuid") << TestObject::createExtra({}, {}, url, {}, {}, this)
-							  << TestObject::createJson({
-															{"url", url.toString()}
-														})
-							  << true;
+		QTest::newRow("url") << TestObject::createExtra({}, {}, url, {}, {}, this)
+							 << TestObject::createJson({
+														   {"url", url.toString()}
+													   })
+							 << true;
 		QTest::newRow("version") << TestObject::createExtra({}, {}, {}, QVersionNumber(4, 2, 0), {}, this)
 								 << TestObject::createJson({
 															   {"version", "4.2.0"}

@@ -239,7 +239,7 @@ QJsonObject TestGadget::createJson(const QJsonObject &delta, const QString &rmKe
 								{"normalEnumProperty", TestGadget::Normal0},
 								{"enumFlagsProperty", 0},
 								{"datetime", QString()},
-								{"uuid", QStringLiteral("{00000000-0000-0000-0000-000000000000}")},
+								{"uuid", QStringLiteral("00000000-0000-0000-0000-000000000000")},
 								{"url", QString()},
 								{"version", QString()},
 								{"bytearray", QString()},

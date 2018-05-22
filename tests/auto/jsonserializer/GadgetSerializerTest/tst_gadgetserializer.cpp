@@ -658,18 +658,18 @@ void GadgetSerializerTest::generateValidTestData()
 		QDateTime dateTime(date, time);
 		QTest::newRow("datetime") << TestGadget::createExtra(dateTime, {}, {}, {}, {})
 								  << TestGadget::createJson({
-																{"datetime", dateTime.toString(Qt::ISODate)}
+																{"datetime", dateTime.toString(Qt::ISODateWithMs)}
 															});
 		auto uuid = QUuid::createUuid();
 		QTest::newRow("uuid") << TestGadget::createExtra({}, uuid, {}, {}, {})
 							  << TestGadget::createJson({
-															{"uuid", uuid.toString()}
+															{"uuid", uuid.toString(QUuid::WithoutBraces)}
 														});
 		QUrl url(QStringLiteral("https://user:password@login.example.com:4711/in/some/file.txt?b=42&z=0#baum42"));
-		QTest::newRow("uuid") << TestGadget::createExtra({}, {}, url, {}, {})
-							  << TestGadget::createJson({
-															{"url", url.toString()}
-														});
+		QTest::newRow("url") << TestGadget::createExtra({}, {}, url, {}, {})
+							 << TestGadget::createJson({
+														   {"url", url.toString()}
+													   });
 		QTest::newRow("version") << TestGadget::createExtra({}, {}, {}, QVersionNumber(4, 2, 0), {})
 								 << TestGadget::createJson({
 															   {"version", "4.2.0"}
