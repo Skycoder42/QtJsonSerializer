@@ -3,7 +3,7 @@
 	"description": "A library to perform generic seralization and deserialization of QObjects.",
 	"modules": [ "QtJsonSerializer" ],
 	"dependencies": [],
-	"excludes": [ "static" ],
+	"excludes": [],
 	"license": {
 		"name": "BSD-3-Clause",
 		"path": "LICENSE"
