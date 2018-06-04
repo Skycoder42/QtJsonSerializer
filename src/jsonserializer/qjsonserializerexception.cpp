@@ -7,7 +7,7 @@ QJsonSerializerException::QJsonSerializerException(const QByteArray &what) :
 	d(new QJsonSerializationExceptionPrivate(what))
 {}
 
-const char *QJsonSerializerException::what() const noexcept
+const char *QJsonSerializerException::what() const NOEXCEPT
 {
 	return d->what.constData();
 }

@@ -19,7 +19,7 @@ public:
 	QJsonSerializerException(const QByteArray &what);
 
 	//! @inherit{std::exception::what}
-	const char *what() const noexcept final;
+	const char *what() const NOEXCEPT final;
 
 	//! Returns the error message, without the property trace
 	QByteArray message() const;
