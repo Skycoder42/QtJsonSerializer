@@ -1,15 +1,22 @@
 #ifndef QJSONSERIALIZER_H
 #define QJSONSERIALIZER_H
 
-#include "QtJsonSerializer/qtjsonserializer_global.h"
-#include "QtJsonSerializer/qjsonserializerexception.h"
+#ifdef NO_QT_MODULE
+    #include "qtjsonserializer_global.h"
+    #include "qjsonserializerexception.h"
+    #include "qjsontypeconverter.h"
+#else
+    #include "QtJsonSerializer/qtjsonserializer_global.h"
+    #include "QtJsonSerializer/qjsonserializerexception.h"
+    #include "QtJsonSerializer/qjsontypeconverter.h"
+#endif
 
 //Visual Studio 2015.2 and newer for C++17 features
 #if !defined (_MSC_FULL_VER) || (_MSC_FULL_VER >= 190023918)
     #include "QtJsonSerializer/qjsonserializer_helpertypes.h"
 #endif
 
-#include "QtJsonSerializer/qjsontypeconverter.h"
+
 
 #include <QtCore/qjsonobject.h>
 #include <QtCore/qjsonarray.h>

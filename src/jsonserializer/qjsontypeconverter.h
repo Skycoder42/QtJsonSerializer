@@ -1,7 +1,12 @@
 #ifndef QJSONTYPECONVERTER_H
 #define QJSONTYPECONVERTER_H
 
-#include "QtJsonSerializer/qtjsonserializer_global.h"
+#ifdef NO_QT_MODULE
+    #include "qtjsonserializer_global.h"
+#else
+    #include "QtJsonSerializer/qtjsonserializer_global.h"
+#endif
+
 
 #include <QtCore/qmetatype.h>
 #include <QtCore/qmetaobject.h>

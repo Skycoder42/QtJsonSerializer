@@ -2,6 +2,7 @@
 #include "qjsonserializerexception_p.h"
 #include "qjsonexceptioncontext_p.h"
 
+
 QJsonSerializerException::QJsonSerializerException(const QByteArray &what) :
 	QException(),
 	d(new QJsonSerializationExceptionPrivate(what))

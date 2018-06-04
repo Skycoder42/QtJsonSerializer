@@ -1,11 +1,18 @@
 #ifndef QJSONSERIALIZEREXCEPTION_H
 #define QJSONSERIALIZEREXCEPTION_H
 
+#ifdef NO_QT_MODULE
+#include "qtjsonserializer_global.h"
+#else
 #include "QtJsonSerializer/qtjsonserializer_global.h"
+#endif
+
+
 #include <QtCore/qexception.h>
 #include <QtCore/qstring.h>
 #include <QtCore/qsharedpointer.h>
 #include <QtCore/qstack.h>
+
 
 class QJsonSerializationExceptionPrivate;
 //! Exception thrown by QJsonSerializer if something goes wrong
@@ -19,7 +26,7 @@ public:
 	QJsonSerializerException(const QByteArray &what);
 
 	//! @inherit{std::exception::what}
-	const char *what() const NOEXCEPT final;
+    const char *what() const NOEXCEPT final;
 
 	//! Returns the error message, without the property trace
 	QByteArray message() const;

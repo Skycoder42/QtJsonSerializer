@@ -3,10 +3,14 @@
 
 #include <QtCore/qglobal.h>
 
-#if defined(QT_BUILD_JSONSERIALIZER_LIB)
-#	define Q_JSONSERIALIZER_EXPORT Q_DECL_EXPORT
+#if defined(STATIC_LIB)
+    #define Q_JSONSERIALIZER_EXPORT
 #else
-#	define Q_JSONSERIALIZER_EXPORT Q_DECL_IMPORT
+    #if defined(QT_BUILD_JSONSERIALIZER_LIB)
+        #define Q_JSONSERIALIZER_EXPORT Q_DECL_EXPORT
+    #else
+        #define Q_JSONSERIALIZER_EXPORT Q_DECL_IMPORT
+    #endif
 #endif
 
 #if !defined(HAS_NOEXCEPT)
@@ -27,6 +31,12 @@
         #define NOEXCEPT
     #endif
 
+#endif
+
+#ifndef _MSC_VER
+#define NOEXCEPT noexcept
+#else
+#define NOEXCEPT
 #endif
 
 #endif // QTJSONSERIALIZER_GLOBAL_H

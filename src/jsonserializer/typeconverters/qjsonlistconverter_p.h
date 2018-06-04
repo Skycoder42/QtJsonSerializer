@@ -1,8 +1,13 @@
 #ifndef QJSONLISTCONVERTER_P_H
 #define QJSONLISTCONVERTER_P_H
 
-#include "QtJsonSerializer/qtjsonserializer_global.h"
-#include "QtJsonSerializer/qjsontypeconverter.h"
+#ifdef NO_QT_MODULE
+    #include "qtjsonserializer_global.h"
+    #include "qjsontypeconverter.h"
+#else
+    #include "QtJsonSerializer/qtjsonserializer_global.h"
+    #include "QtJsonSerializer/qjsontypeconverter.h"
+#endif
 
 #include <QtCore/QRegularExpression>
 
