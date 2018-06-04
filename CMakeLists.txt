@@ -55,25 +55,17 @@ src/jsonserializer/typeconverters/qjsonregularexpressionconverter.cpp
 src/jsonserializer/typeconverters/qjsonversionnumberconverter.cpp
 )
 
-if (QT_MAJOR_VER EQUAL 4)
-    set (QT_DONT_USE_QTGUI TRUE)
-    find_package (Qt4 COMPONENTS QTCORE)
-    include (${QT_USE_FILE})
-    qt4_wrap_cpp (MOC_SOURCES ${HEADERS})
-elseif (QT_MAJOR_VER EQUAL 5)
-    # Find includes in corresponding build directories
-    set(CMAKE_INCLUDE_CURRENT_DIR ON)
-    # Instruct CMake to run moc automatically when needed.
-    set(CMAKE_AUTOMOC ON)
-    # Instruct CMake to run uic automatically when needed.
-    set(CMAKE_AUTOUIC ON)
-    set(CMAKE_AUTORCC ON)
-    find_package(Qt5Core)
-endif()
+# Find includes in corresponding build directories
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+# Instruct CMake to run moc automatically when needed.
+set(CMAKE_AUTOMOC ON)
+# Instruct CMake to run uic automatically when needed.
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
+find_package(Qt5Core)
 
 
 option(STATIC_LIB "Build static lib instead of dynamic" OFF)
-
 
 
 if (MSVC)
@@ -87,20 +79,10 @@ endif ()
 source_group ("Header Files" FILES ${HEADERS})
 source_group ("Source Files" FILES ${SOURCES})
 
-if (NOT DEFINED QT_MAJOR_VER)
-	message(FATAL_ERROR "QT_MAJOR_VER is not defined, CMake will exit. Please, set QT_MAJOR_VER=4 or QT_MAJOR_VER=5" )
-endif()
 
-set(HEADERS_SOURCES ${HEADERS} ${SOURCES} ${MOC_SOURCES})
-
-if (QT_MAJOR_VER EQUAL 4)
-	source_group ("Generated Files" FILES ${MOC_SOURCES})	
-elseif (QT_MAJOR_VER EQUAL 5)
-
-endif()
+set(HEADERS_SOURCES ${HEADERS} ${SOURCES})
 
 add_definitions(-DNO_QT_MODULE)
-
 
 if (STATIC_LIB)
     add_definitions(-DSTATIC_LIB)
@@ -110,9 +92,9 @@ else()
     add_library (${PROJECT_NAME} SHARED ${HEADERS_SOURCES})
 endif()
 
-if (QT_MAJOR_VER EQUAL 5)
-	target_link_libraries (${PROJECT_NAME}  Qt5::Core)	
-endif()
+
+target_link_libraries (${PROJECT_NAME}  Qt5::Core)
+
 
 if(NOT MSVC)
 include(CheckCXXCompilerFlag)
