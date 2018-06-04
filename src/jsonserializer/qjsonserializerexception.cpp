@@ -2,12 +2,13 @@
 #include "qjsonserializerexception_p.h"
 #include "qjsonexceptioncontext_p.h"
 
+
 QJsonSerializerException::QJsonSerializerException(const QByteArray &what) :
 	QException(),
 	d(new QJsonSerializationExceptionPrivate(what))
 {}
 
-const char *QJsonSerializerException::what() const noexcept
+const char *QJsonSerializerException::what() const NOEXCEPT
 {
 	return d->what.constData();
 }

@@ -1,10 +1,22 @@
 #ifndef QJSONSERIALIZER_H
 #define QJSONSERIALIZER_H
 
-#include "QtJsonSerializer/qtjsonserializer_global.h"
-#include "QtJsonSerializer/qjsonserializerexception.h"
-#include "QtJsonSerializer/qjsonserializer_helpertypes.h"
-#include "QtJsonSerializer/qjsontypeconverter.h"
+#ifdef NO_QT_MODULE
+    #include "qtjsonserializer_global.h"
+    #include "qjsonserializerexception.h"
+    #include "qjsontypeconverter.h"
+#else
+    #include "QtJsonSerializer/qtjsonserializer_global.h"
+    #include "QtJsonSerializer/qjsonserializerexception.h"
+    #include "QtJsonSerializer/qjsontypeconverter.h"
+#endif
+
+//Visual Studio 2015.2 and newer for C++17 features
+#if !defined (_MSC_FULL_VER) || (_MSC_FULL_VER >= 190023918)
+    #include "QtJsonSerializer/qjsonserializer_helpertypes.h"
+#endif
+
+
 
 #include <QtCore/qjsonobject.h>
 #include <QtCore/qjsonarray.h>
@@ -105,9 +117,11 @@ public:
 	//! @copybrief QJsonSerializer::serializeTo(const QVariant &) const
 	QByteArray serializeTo(const QVariant &data, QJsonDocument::JsonFormat format) const;
 
-	//! Serializers a QObject, Q_GADGET or a list of one of those to json
-	template <typename T>
-	typename _qjsonserializer_helpertypes::json_type<T>::type serialize(const T &data) const;
+#if !defined (_MSC_FULL_VER) || (_MSC_FULL_VER >= 190023918)
+    //! Serializers a QObject, Q_GADGET or a list of one of those to json
+    template <typename T>
+    typename _qjsonserializer_helpertypes::json_type<T>::type serialize(const T &data) const;
+#endif
 	//! Serializers a QObject, Q_GADGET or a list of one of those to a device
 	template <typename T>
 	void serializeTo(QIODevice *device, const T &data, QJsonDocument::JsonFormat format = QJsonDocument::Indented) const;
@@ -122,9 +136,12 @@ public:
 	//! Deserializes data from a device to a QVariant value, based on the given type id
 	QVariant deserializeFrom(const QByteArray &data, int metaTypeId, QObject *parent = nullptr) const;
 
-	//! Deserializes a json to the given QObject type, Q_GADGET type or a list of one of those types
-	template <typename T>
-	T deserialize(const typename _qjsonserializer_helpertypes::json_type<T>::type &json, QObject *parent = nullptr) const;
+#if !defined (_MSC_FULL_VER) || (_MSC_FULL_VER >= 190023918)
+    //! Deserializes a json to the given QObject type, Q_GADGET type or a list of one of those types
+    template <typename T>
+    T deserialize(const typename _qjsonserializer_helpertypes::json_type<T>::type &json, QObject *parent = nullptr) const;
+#endif
+
 	//! Deserializes data from a device to the given QObject type, Q_GADGET type or a list of one of those types
 	template <typename T>
 	T deserializeFrom(QIODevice *device, QObject *parent = nullptr) const;
@@ -306,19 +323,22 @@ bool QJsonSerializer::registerPairConverters()
 	return ok1 && ok2;
 }
 
+#if !defined (_MSC_FULL_VER) || (_MSC_FULL_VER >= 190023918)
 template<typename T>
 typename _qjsonserializer_helpertypes::json_type<T>::type QJsonSerializer::serialize(const T &data) const
 {
-	static_assert(_qjsonserializer_helpertypes::is_serializable<T>::value, "T cannot be serialized");
-	return _qjsonserializer_helpertypes::json_type<T>::convert(serializeImpl(_qjsonserializer_helpertypes::variant_helper<T>::toVariant(data)));
+    static_assert(_qjsonserializer_helpertypes::is_serializable<T>::value, "T cannot be serialized");
+    return _qjsonserializer_helpertypes::json_type<T>::convert(serializeImpl(_qjsonserializer_helpertypes::variant_helper<T>::toVariant(data)));
 }
 
 template<typename T>
 void QJsonSerializer::serializeTo(QIODevice *device, const T &data, QJsonDocument::JsonFormat format) const
 {
-	static_assert(_qjsonserializer_helpertypes::is_serializable<T>::value, "T cannot be serialized");
-	serializeToImpl(device, _qjsonserializer_helpertypes::variant_helper<T>::toVariant(data), format);
+    static_assert(_qjsonserializer_helpertypes::is_serializable<T>::value, "T cannot be serialized");
+    serializeToImpl(device, _qjsonserializer_helpertypes::variant_helper<T>::toVariant(data), format);
 }
+#endif
+
 
 template<typename T>
 QByteArray QJsonSerializer::serializeTo(const T &data, QJsonDocument::JsonFormat format) const
@@ -327,12 +347,15 @@ QByteArray QJsonSerializer::serializeTo(const T &data, QJsonDocument::JsonFormat
 	return serializeToImpl(_qjsonserializer_helpertypes::variant_helper<T>::toVariant(data), format);
 }
 
+#if !defined (_MSC_FULL_VER) || (_MSC_FULL_VER >= 190023918)
 template<typename T>
 T QJsonSerializer::deserialize(const typename _qjsonserializer_helpertypes::json_type<T>::type &json, QObject *parent) const
 {
-	static_assert(_qjsonserializer_helpertypes::is_serializable<T>::value, "T cannot be deserialized");
-	return _qjsonserializer_helpertypes::variant_helper<T>::fromVariant(deserialize(json, qMetaTypeId<T>(), parent));
+    static_assert(_qjsonserializer_helpertypes::is_serializable<T>::value, "T cannot be deserialized");
+    return _qjsonserializer_helpertypes::variant_helper<T>::fromVariant(deserialize(json, qMetaTypeId<T>(), parent));
 }
+#endif
+
 
 template<typename T>
 T QJsonSerializer::deserializeFrom(QIODevice *device, QObject *parent) const
