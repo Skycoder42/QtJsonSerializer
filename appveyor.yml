@@ -26,11 +26,11 @@ matrix:
       image: Visual Studio 2015
     - PLATFORM: winrt_armv7_msvc2017
       image: Visual Studio 2015
+    - PLATFORM: mingw53_32
+      image: Visual Studio 2015
     - PLATFORM: msvc2015_64
       image: Visual Studio 2017
     - PLATFORM: msvc2015
-      image: Visual Studio 2017
-    - PLATFORM: mingw53_32
       image: Visual Studio 2017
 
 install:
