@@ -27,17 +27,17 @@ public:
 
 	Q_INVOKABLE SampleObject(QObject *parent = nullptr);
 
-	int id;
+	int id = 0;
 	QString title;
-	SuperFlags flags;
+	SuperFlags flags = nullptr;
 	QList<double> scores;
-	SampleObject *child;
+	SampleObject *child = nullptr;
 	SampleGadget gadget;
 	QString secret;
 
 private:
 	SuperFlags getFlags() const;
-	void setFlags(const SuperFlags &value);
+	void setFlags(SampleObject::SuperFlags value);
 };
 
 class SuperSampleObject : public SampleObject

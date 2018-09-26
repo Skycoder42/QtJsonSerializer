@@ -3,8 +3,7 @@
 #include "qjsonexceptioncontext_p.h"
 
 QJsonSerializerException::QJsonSerializerException(const QByteArray &what) :
-	QException(),
-	d(new QJsonSerializationExceptionPrivate(what))
+	d{new QJsonSerializationExceptionPrivate{what}}
 {}
 
 const char *QJsonSerializerException::what() const noexcept
@@ -35,7 +34,7 @@ QException *QJsonSerializerException::clone() const
 }
 
 QJsonSerializationException::QJsonSerializationException(const QByteArray &what) :
-	QJsonSerializerException("Failed to serialize with error: " + what)
+	QJsonSerializerException{"Failed to serialize with error: " + what}
 {}
 
 void QJsonSerializationException::raise() const
@@ -51,7 +50,7 @@ QException *QJsonSerializationException::clone() const
 }
 
 QJsonDeserializationException::QJsonDeserializationException(const QByteArray &what) :
-	QJsonSerializerException("Failed to deserialize with error: " + what)
+	QJsonSerializerException{"Failed to deserialize with error: " + what}
 {}
 
 void QJsonDeserializationException::raise() const
@@ -68,17 +67,16 @@ QException *QJsonDeserializationException::clone() const
 
 
 
-QJsonSerializationExceptionPrivate::QJsonSerializationExceptionPrivate(QByteArray message) :
-	message(message),
-	trace(QJsonExceptionContext::currentContext()),
-	what()
+QJsonSerializationExceptionPrivate::QJsonSerializationExceptionPrivate(QByteArray msg) :
+	message{std::move(msg)},
+	trace{QJsonExceptionContext::currentContext()}
 {
 	//construct the whole trace
 	what = "what: " + message + "\nProperty Trace:";
 	if(trace.isEmpty())
 		what += " <root element>";
 	else {
-		for(auto p : qAsConst(trace))
+		for(const auto &p : qAsConst(trace))
 			what += "\n\t" + p.first + " (Type: " + p.second + ")";
 	}
 }

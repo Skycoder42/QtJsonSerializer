@@ -30,7 +30,7 @@ QJsonValue QJsonListConverter::serialize(int propertyType, const QVariant &value
 
 	QJsonArray array;
 	auto index = 0;
-	for(auto element : cValue.toList())
+	for(const auto &element : cValue.toList())
 		array.append(helper->serializeSubtype(metaType, element, "[" + QByteArray::number(index++) + "]"));
 	return array;
 }

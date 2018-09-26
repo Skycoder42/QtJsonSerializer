@@ -21,7 +21,8 @@ Q_COREAPP_STARTUP_FUNCTION(qJsonSerializerStartup)
 #define REGISTER_DEFAULT_LIST(T) \
 	ok = QMetaType::registerConverter<QList<T>, QVariantList>([](const QList<T> &list) -> QVariantList { \
 		QVariantList l; \
-		for(auto v : list) \
+		l.reserve(list.size()); \
+		for(const auto &v : list) \
 			l.append(QVariant::fromValue(v)); \
 		return l; \
 	}); \
@@ -29,6 +30,7 @@ Q_COREAPP_STARTUP_FUNCTION(qJsonSerializerStartup)
 	\
 	ok = QMetaType::registerConverter<QVariantList, QList<T>>([](const QVariantList &list) -> QList<T> { \
 		QList<T> l; \
+		l.reserve(list.size()); \
 		for(auto v : list) { \
 			auto vt = v.userType(); \
 			if(v.convert(qMetaTypeId<T>())) \
