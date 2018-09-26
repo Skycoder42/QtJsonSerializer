@@ -3,41 +3,6 @@
 #include <QMetaObject>
 #include <QMetaProperty>
 
-TestGadget::TestGadget() :
-	intProperty(0),
-	boolProperty(false),
-	stringProperty(),
-	doubleProperty(0.0),
-	normalEnumProperty(Normal0),
-	enumFlagsProperty(),
-	datetime(),
-	uuid(),
-	url(),
-	version(),
-	bytearray(),
-	size(),
-	point(),
-	line(),
-	rect(),
-	locale(QLocale::c()),
-	regexp(),
-	simpleList(),
-	leveledList(),
-	simpleMap(),
-	leveledMap(),
-	pair(),
-	extraPair(),
-	listPair(),
-	childGadget(),
-	simpleChildren(),
-	leveledChildren(),
-	simpleRelatives(),
-	leveledRelatives(),
-	object(),
-	array(),
-	value(QJsonValue::Null)
-{}
-
 bool TestGadget::operator==(const TestGadget &other) const
 {
 	return intProperty == other.intProperty &&
@@ -71,7 +36,8 @@ bool TestGadget::operator==(const TestGadget &other) const
 			leveledRelatives == other.leveledRelatives &&
 			object == other.object &&
 			array == other.array &&
-			value == other.value;
+			value == other.value &&
+			ChildGadget::equals(gadgetPtr, other.gadgetPtr);
 }
 
 bool TestGadget::operator!=(const TestGadget &other) const
@@ -107,7 +73,8 @@ bool TestGadget::operator!=(const TestGadget &other) const
 			leveledRelatives != other.leveledRelatives ||
 			object != other.object ||
 			array != other.array ||
-			value != other.value;
+			value != other.value ||
+			!ChildGadget::equals(gadgetPtr, other.gadgetPtr);
 }
 
 bool TestGadget::operator<(const TestGadget &) const
@@ -130,7 +97,7 @@ TestGadget TestGadget::createBasic(int intProperty, bool boolProperty, QString s
 	TestGadget t;
 	t.intProperty = intProperty;
 	t.boolProperty = boolProperty;
-	t.stringProperty = stringProperty;
+	t.stringProperty = std::move(stringProperty);
 	t.doubleProperty = doubleProperty;
 	return t;
 }
@@ -146,11 +113,11 @@ TestGadget TestGadget::createEnum(TestGadget::NormalEnum normalEnumProperty, Enu
 TestGadget TestGadget::createExtra(QDateTime datetime, QUuid uuid, QUrl url, QVersionNumber version, QByteArray bytearray)
 {
 	TestGadget t;
-	t.datetime = datetime;
+	t.datetime = std::move(datetime);
 	t.uuid = uuid;
-	t.url = url;
-	t.version = version;
-	t.bytearray = bytearray;
+	t.url = std::move(url);
+	t.version = std::move(version);
+	t.bytearray = std::move(bytearray);
 	return t;
 }
 
@@ -167,33 +134,33 @@ TestGadget TestGadget::createGeom(QSize size, QPoint point, QLine line, QRect re
 TestGadget TestGadget::createSpecial(QLocale locale, QRegularExpression regexp)
 {
 	TestGadget t;
-	t.locale = locale;
-	t.regexp = regexp;
+	t.locale = std::move(locale);
+	t.regexp = std::move(regexp);
 	return t;
 }
 
 TestGadget TestGadget::createList(QList<int> simpleList, QList<QList<int> > leveledList)
 {
 	TestGadget t;
-	t.simpleList = simpleList;
-	t.leveledList = leveledList;
+	t.simpleList = std::move(simpleList);
+	t.leveledList = std::move(leveledList);
 	return t;
 }
 
 TestGadget TestGadget::createMap(QMap<QString, int> simpleMap, QMap<QString, QMap<QString, int> > leveledMap)
 {
 	TestGadget t;
-	t.simpleMap = simpleMap;
-	t.leveledMap = leveledMap;
+	t.simpleMap = std::move(simpleMap);
+	t.leveledMap = std::move(leveledMap);
 	return t;
 }
 
 TestGadget TestGadget::createPair(QPair<int, QString> pair, QPair<ChildGadget, QList<int> > extraPair, QList<QPair<bool, bool> > listPair)
 {
 	TestGadget t;
-	t.pair = pair;
-	t.extraPair = extraPair;
-	t.listPair = listPair;
+	t.pair = std::move(pair);
+	t.extraPair = std::move(extraPair);
+	t.listPair = std::move(listPair);
 	return t;
 }
 
@@ -207,25 +174,32 @@ TestGadget TestGadget::createChild(ChildGadget childGadget)
 TestGadget TestGadget::createChildren(QList<ChildGadget> simpleChildren, QList<QList<ChildGadget> > leveledChildren)
 {
 	TestGadget t;
-	t.simpleChildren = simpleChildren;
-	t.leveledChildren = leveledChildren;
+	t.simpleChildren = std::move(simpleChildren);
+	t.leveledChildren = std::move(leveledChildren);
 	return t;
 }
 
 TestGadget TestGadget::createRelatives(QMap<QString, ChildGadget> simpleRelatives, QMap<QString, QMap<QString, ChildGadget> > leveledRelatives)
 {
 	TestGadget t;
-	t.simpleRelatives = simpleRelatives;
-	t.leveledRelatives = leveledRelatives;
+	t.simpleRelatives = std::move(simpleRelatives);
+	t.leveledRelatives = std::move(leveledRelatives);
 	return t;
 }
 
 TestGadget TestGadget::createEmbedded(QJsonObject object, QJsonArray array, QJsonValue value)
 {
 	TestGadget t;
-	t.object = object;
-	t.array = array;
-	t.value = value;
+	t.object = std::move(object);
+	t.array = std::move(array);
+	t.value = std::move(value);
+	return t;
+}
+
+TestGadget TestGadget::createGadgetPtr(ChildGadget *gadgetPtr)
+{
+	TestGadget t;
+	t.gadgetPtr = gadgetPtr;
 	return t;
 }
 
@@ -292,7 +266,8 @@ QJsonObject TestGadget::createJson(const QJsonObject &delta, const QString &rmKe
 								{"leveledRelatives", QJsonObject()},
 								{"object", QJsonObject()},
 								{"array", QJsonArray()},
-								{"value", QJsonValue::Null}
+								{"value", QJsonValue::Null},
+								{"gadgetPtr", QJsonValue::Null}
 							});
 	for(auto it = delta.constBegin(); it != delta.constEnd(); ++it)
 		base[it.key()] = it.value();
@@ -324,4 +299,14 @@ QJsonObject ChildGadget::createJson(const int &data)
 	return QJsonObject({
 						   {"data", data},
 					   });
+}
+
+bool ChildGadget::equals(ChildGadget *lhs, ChildGadget *rhs)
+{
+	if(lhs == rhs)
+		return true;
+	if(lhs && rhs)
+		return *lhs == *rhs;
+	else
+		return false;
 }

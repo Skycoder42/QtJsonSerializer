@@ -267,12 +267,20 @@ void GadgetSerializerTest::testInvalidDeserialization()
 
 void GadgetSerializerTest::testNullChild()
 {
-	auto testJson = TestGadget::createJson({
-									{"childGadget", QJsonValue::Null}
-								});
+	try {
+		auto testJson = TestGadget::createJson({
+										{"childGadget", QJsonValue::Null}
+									});
+		QVERIFY_EXCEPTION_THROWN(serializer->deserialize<TestGadget>(testJson), QJsonSerializerException);
+	} catch(QException &e) {
+		QFAIL(e.what());
+	}
 
 	try {
-		QVERIFY_EXCEPTION_THROWN(serializer->deserialize<TestGadget>(testJson), QJsonSerializerException);
+		auto testJson = TestGadget::createJson({
+										{"gadgetPtr", QJsonValue::Null}
+									});
+		serializer->deserialize<TestGadget>(testJson);
 	} catch(QException &e) {
 		QFAIL(e.what());
 	}
@@ -308,7 +316,8 @@ void GadgetSerializerTest::testNullDeserialization()
 									{"leveledRelatives", QJsonValue::Null},
 									{"object", QJsonValue::Null},
 									{"array", QJsonValue::Null},
-									{"value", QJsonValue::Null}
+									{"value", QJsonValue::Null},
+									{"gadgetPtr", QJsonValue::Null}
 								});
 
 	try {
@@ -903,6 +912,11 @@ void GadgetSerializerTest::generateValidTestData()
 							<< TestGadget::createJson({
 														  {"value", 42}
 													  });
+
+	QTest::newRow("gadgetPtr") << TestGadget::createGadgetPtr(new ChildGadget{11})
+							   << TestGadget::createJson({
+															 {"gadgetPtr", ChildGadget::createJson(11)}
+														 });
 }
 
 static void compile_test()

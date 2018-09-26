@@ -33,6 +33,8 @@ public:
 	bool operator<(const ChildGadget &other) const;
 
 	static QJsonObject createJson(const int &data = 0);
+
+	static bool equals(ChildGadget *lhs, ChildGadget *rhs);
 };
 
 struct TestGadget
@@ -64,24 +66,26 @@ struct TestGadget
 	Q_PROPERTY(QList<int> simpleList MEMBER simpleList)
 	Q_PROPERTY(QList<QList<int>> leveledList MEMBER leveledList)
 
-	Q_PROPERTY(QMap<QString, int> simpleMap MEMBER simpleMap)
-	Q_PROPERTY(QMap<QString, QMap<QString, int>> leveledMap MEMBER leveledMap)
+	Q_PROPERTY(QMap<QString, int> simpleMap MEMBER simpleMap);
+	Q_PROPERTY(QMap<QString, QMap<QString, int>> leveledMap MEMBER leveledMap);
 
-	Q_PROPERTY(QPair<int, QString> pair MEMBER pair)
-	Q_PROPERTY(QPair<ChildGadget, QList<int>> extraPair MEMBER extraPair)
-	Q_PROPERTY(QList<QPair<bool, bool>> listPair MEMBER listPair)
+	Q_PROPERTY(QPair<int, QString> pair MEMBER pair);
+	Q_PROPERTY(QPair<ChildGadget, QList<int>> extraPair MEMBER extraPair);
+	Q_PROPERTY(QList<QPair<bool, bool>> listPair MEMBER listPair);
 
 	Q_PROPERTY(ChildGadget childGadget MEMBER childGadget)
 
 	Q_PROPERTY(QList<ChildGadget> simpleChildren MEMBER simpleChildren)
 	Q_PROPERTY(QList<QList<ChildGadget>> leveledChildren MEMBER leveledChildren)
 
-	Q_PROPERTY(QMap<QString, ChildGadget> simpleRelatives MEMBER simpleRelatives)
-	Q_PROPERTY(QMap<QString, QMap<QString, ChildGadget>> leveledRelatives MEMBER leveledRelatives)
+	Q_PROPERTY(QMap<QString, ChildGadget> simpleRelatives MEMBER simpleRelatives);
+	Q_PROPERTY(QMap<QString, QMap<QString, ChildGadget>> leveledRelatives MEMBER leveledRelatives);
 
 	Q_PROPERTY(QJsonObject object MEMBER object)
 	Q_PROPERTY(QJsonArray array MEMBER array)
 	Q_PROPERTY(QJsonValue value MEMBER value)
+
+	Q_PROPERTY(ChildGadget* gadgetPtr MEMBER gadgetPtr)
 
 public:
 	enum NormalEnum {
@@ -100,8 +104,6 @@ public:
 	Q_DECLARE_FLAGS(EnumFlags, EnumFlag)
 	Q_FLAG(EnumFlags)
 
-	TestGadget();
-
 	bool operator==(const TestGadget &other) const;
 	bool operator!=(const TestGadget &other) const;
 	bool operator<(const TestGadget &other) const;
@@ -118,15 +120,16 @@ public:
 	static TestGadget createChildren(QList<ChildGadget> simpleChildren, QList<QList<ChildGadget>> leveledChildren);
 	static TestGadget createRelatives(QMap<QString, ChildGadget> simpleRelatives, QMap<QString, QMap<QString, ChildGadget>> leveledRelatives);
 	static TestGadget createEmbedded(QJsonObject object, QJsonArray array, QJsonValue value);
+	static TestGadget createGadgetPtr(ChildGadget *childGadget);
 
 	static QJsonObject createJson(const QJsonObject &delta = QJsonObject(), const QString &rmKey = {});
 
-	int intProperty;
-	bool boolProperty;
+	int intProperty = 0;
+	bool boolProperty = false;
 	QString stringProperty;
-	double doubleProperty;
+	double doubleProperty = 0.0;
 
-	NormalEnum normalEnumProperty;
+	NormalEnum normalEnumProperty = Normal0;
 	EnumFlags enumFlagsProperty;
 
 	QDateTime datetime;
@@ -140,7 +143,7 @@ public:
 	QLine line;
 	QRect rect;
 
-	QLocale locale;
+	QLocale locale = QLocale::c();
 	QRegularExpression regexp;
 
 	QList<int> simpleList;
@@ -163,11 +166,16 @@ public:
 
 	QJsonObject object;
 	QJsonArray array;
-	QJsonValue value;
+	QJsonValue value = QJsonValue::Null;
+
+	ChildGadget* gadgetPtr = nullptr;
 
 	EnumFlags getEnumFlagsProperty() const;
 	void setEnumFlagsProperty(const EnumFlags &value);
 };
+
+Q_DECLARE_METATYPE(ChildGadget)
+Q_DECLARE_METATYPE(ChildGadget*)
 
 Q_DECLARE_METATYPE(TestGadget)
 Q_DECLARE_OPERATORS_FOR_FLAGS(TestGadget::EnumFlags)

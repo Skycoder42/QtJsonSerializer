@@ -15,24 +15,36 @@ bool QJsonGadgetConverter::canConvert(int metaTypeId) const
 	if(gadgetExceptions.contains(metaTypeId))
 		return false;
 
-	return QMetaType::typeFlags(metaTypeId).testFlag(QMetaType::IsGadget);
+	const auto flags = QMetaType::typeFlags(metaTypeId);
+	return flags.testFlag(QMetaType::IsGadget) ||
+			flags.testFlag(QMetaType::PointerToGadget);
 }
 
 QList<QJsonValue::Type> QJsonGadgetConverter::jsonTypes() const
 {
-	return {QJsonValue::Object};
+	return {QJsonValue::Object, QJsonValue::Null};
 }
 
 QJsonValue QJsonGadgetConverter::serialize(int propertyType, const QVariant &value, const QJsonTypeConverter::SerializationHelper *helper) const
 {
-	auto metaObject = QMetaType::metaObjectForType(propertyType);
+	const auto metaObject = QMetaType::metaObjectForType(propertyType);
 	if(!metaObject)
 		throw QJsonSerializationException(QByteArray("Unable to get metaobject for type ") + QMetaType::typeName(propertyType));
+	const auto isPtr = QMetaType::typeFlags(propertyType).testFlag(QMetaType::PointerToGadget);
 
 	auto gValue = value;
 	if(!gValue.convert(propertyType))
 		throw QJsonSerializationException(QByteArray("Data is not of the required gadget type ") + QMetaType::typeName(propertyType));
-	auto gadget = gValue.constData();
+	const void *gadget = nullptr;
+	if(isPtr) {
+		// with pointers, null gadgets are allowed
+		gadget = *reinterpret_cast<const void* const *>(gValue.constData());
+		if(!gadget)
+			return QJsonValue::Null;
+	} else
+		gadget = gValue.constData();
+	if(!gadget)
+		throw QJsonSerializationException(QByteArray("Unable to get address of gadget ") + QMetaType::typeName(propertyType));
 
 	QJsonObject jsonObject;
 	//go through all properties and try to serialize them
@@ -48,18 +60,34 @@ QJsonValue QJsonGadgetConverter::serialize(int propertyType, const QVariant &val
 QVariant QJsonGadgetConverter::deserialize(int propertyType, const QJsonValue &value, QObject *parent, const QJsonTypeConverter::SerializationHelper *helper) const
 {
 	Q_UNUSED(parent)//gadgets neither have nor serve as parent
+	const auto isPtr = QMetaType::typeFlags(propertyType).testFlag(QMetaType::PointerToGadget);
 
-	QVariant gadget(propertyType, nullptr);
-	auto gadgetPtr = gadget.data();
+	auto metaObject = QMetaType::metaObjectForType(propertyType);
+	if(!metaObject)
+		throw QJsonDeserializationException(QByteArray("Unable to get metaobject for gadget type") + QMetaType::typeName(propertyType));
+
+	QVariant gadget;
+	void *gadgetPtr = nullptr;
+	if(isPtr) {
+		if(value.isNull())
+			return QVariant{propertyType, nullptr}; //initialize an empty (nullptr) variant
+		const auto gadgetType = QMetaType::type(metaObject->className());
+		if(gadgetType == QMetaType::UnknownType)
+			throw QJsonDeserializationException(QByteArray("Unable to type of gadget from gadget pointer type") + QMetaType::typeName(propertyType));
+		gadgetPtr = QMetaType::create(gadgetType);
+		gadget = QVariant{propertyType, &gadgetPtr};
+	} else {
+		if(value.isNull())
+			return QVariant{}; //will trigger a fail next stage as nullptr is not convertible to a gadget
+		gadget = QVariant{propertyType, nullptr};
+		gadgetPtr = gadget.data();
+	}
+
 	if(!gadgetPtr) {
 		throw QJsonDeserializationException(QByteArray("Failed to construct gadget of type ") +
 											QMetaType::typeName(propertyType) +
 											QByteArray(". Does is have a default constructor?"));
 	}
-
-	auto metaObject = QMetaType::metaObjectForType(propertyType);
-	if(!metaObject)
-		throw QJsonDeserializationException(QByteArray("Unable to get metaobject for gadget type") + QMetaType::typeName(propertyType));
 
 	auto jsonObject = value.toObject();
 	auto validationFlags = helper->getProperty("validationFlags").value<QJsonSerializer::ValidationFlags>();
