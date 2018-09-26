@@ -16,4 +16,4 @@ HEADERS += \
 	testgadget.h \
 	brokentestgadget.h
 
-mac: QMAKE_LFLAGS += '-Wl,-rpath,\'$$OUT_PWD/../../../../lib\''
+include(../../testrun.pri)

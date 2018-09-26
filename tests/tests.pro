@@ -4,5 +4,5 @@ CONFIG += no_docs_target
 
 SUBDIRS += auto
 
-docTarget.target = doxygen
-QMAKE_EXTRA_TARGETS += docTarget
+prepareRecursiveTarget(run-tests)
+QMAKE_EXTRA_TARGETS += run-tests

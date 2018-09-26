@@ -19,4 +19,4 @@ SOURCES += \
 	tst_objectserializer.cpp \
 	testpolyobject.cpp
 
-mac: QMAKE_LFLAGS += '-Wl,-rpath,\'$$OUT_PWD/../../../../lib\''
+include(../../testrun.pri)

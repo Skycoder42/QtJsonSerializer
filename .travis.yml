@@ -12,6 +12,7 @@ env:
     - QPMX_CACHE_DIR=$HOME/.qpmx-cache
     - QT_VER=5.11.2
     - DOCKER_IMAGE=base
+    - MAKE_RUN_TESTS=true
 
 matrix:
   include:
