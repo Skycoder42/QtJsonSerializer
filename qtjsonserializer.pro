@@ -5,6 +5,7 @@ SUBDIRS += doc
 doxygen.target = doxygen
 doxygen.CONFIG += recursive
 doxygen.recurse_target = doxygen
+doxygen.recurse += doc
 QMAKE_EXTRA_TARGETS += doxygen lrelease
 
 runtests.target = run-tests
