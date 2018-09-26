@@ -20,8 +20,8 @@
 #include "typeconverters/qjsonregularexpressionconverter_p.h"
 
 QJsonSerializer::QJsonSerializer(QObject *parent) :
-	QObject(parent),
-	d(new QJsonSerializerPrivate())
+	QObject{parent},
+	d{new QJsonSerializerPrivate{}}
 {}
 
 QJsonSerializer::~QJsonSerializer() = default;
@@ -439,14 +439,7 @@ QByteArray QJsonSerializer::serializeToImpl(const QVariant &data, QJsonDocument:
 
 
 QJsonSerializerPrivate::QJsonSerializerPrivate() :
-	allowNull(false),
-	keepObjectName(false),
-	enumAsString(false),
-	validateBase64(true),
-	useBcp47Locale(true),
-	validationFlags(QJsonSerializer::StandardValidation),
-	polymorphing(QJsonSerializer::Enabled),
-	typeConverters({
+	typeConverters{
 		//prio 1
 		QSharedPointer<QJsonLocaleConverter>::create(),
 		//prio 0
@@ -465,6 +458,5 @@ QJsonSerializerPrivate::QJsonSerializerPrivate() :
 		QSharedPointer<QJsonLineConverter>::create(),
 		QSharedPointer<QJsonRectConverter>::create(),
 		QSharedPointer<QJsonRegularExpressionConverter>::create()
-	}),
-	typeConverterTypeCache()
+	}
 {}

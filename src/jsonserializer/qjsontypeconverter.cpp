@@ -7,7 +7,7 @@ public:
 };
 
 QJsonTypeConverter::QJsonTypeConverter() :
-	d(new QJsonTypeConverterPrivate())
+	d{new QJsonTypeConverterPrivate{}}
 {}
 
 QJsonTypeConverter::~QJsonTypeConverter() = default;
@@ -23,5 +23,7 @@ void QJsonTypeConverter::setPriority(int priority)
 }
 
 
+
+QJsonTypeConverter::SerializationHelper::SerializationHelper() = default;
 
 QJsonTypeConverter::SerializationHelper::~SerializationHelper() = default;

@@ -6,14 +6,15 @@
 
 class Q_JSONSERIALIZER_EXPORT QJsonSerializerPrivate
 {
+	Q_DISABLE_COPY(QJsonSerializerPrivate)
 public:
-	bool allowNull;
-	bool keepObjectName;
-	bool enumAsString;
-	bool validateBase64;
-	bool useBcp47Locale;
-	QJsonSerializer::ValidationFlags validationFlags;
-	QJsonSerializer::Polymorphing polymorphing;
+	bool allowNull = false;
+	bool keepObjectName = false;
+	bool enumAsString = false;
+	bool validateBase64 = true;
+	bool useBcp47Locale = true;
+	QJsonSerializer::ValidationFlags validationFlags = QJsonSerializer::StandardValidation;
+	QJsonSerializer::Polymorphing polymorphing = QJsonSerializer::Enabled;
 
 	QList<QSharedPointer<QJsonTypeConverter>> typeConverters;
 	mutable QHash<int, QSharedPointer<QJsonTypeConverter>> typeConverterTypeCache;

@@ -12,6 +12,7 @@ class QJsonTypeConverterPrivate;
 //! An interface to create custom serializer type converters
 class Q_JSONSERIALIZER_EXPORT QJsonTypeConverter
 {
+	Q_DISABLE_COPY(QJsonTypeConverter)
 public:
 	//! Sample values for a priority value
 	enum Priority : qint32 {
@@ -27,8 +28,9 @@ public:
 	//! Helper class passed to the type converter by the serializer. Do not implement yourself
 	class Q_JSONSERIALIZER_EXPORT SerializationHelper
 	{
+		Q_DISABLE_COPY(SerializationHelper)
 	public:
-		//! Destructor
+		SerializationHelper();
 		virtual ~SerializationHelper();
 
 		//! Returns a property from the serializer

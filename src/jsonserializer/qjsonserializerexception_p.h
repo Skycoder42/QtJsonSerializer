@@ -6,6 +6,7 @@
 
 class Q_JSONSERIALIZER_EXPORT QJsonSerializationExceptionPrivate
 {
+	Q_DISABLE_COPY(QJsonSerializationExceptionPrivate)
 public:
 	QJsonSerializationExceptionPrivate(QByteArray message);
 
