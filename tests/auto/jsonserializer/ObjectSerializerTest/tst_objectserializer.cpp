@@ -1256,112 +1256,43 @@ void ObjectSerializerTest::generateValidTestData()
 							   << true;
 }
 
+template<typename Type, typename Json>
+static void test_type() {
+	QJsonSerializer s;
+	Type v;
+	Json j;
+	static_assert(std::is_same<Json, decltype(s.serialize(v))>::value, "Wrong value returned by expression");
+	s.serializeTo(nullptr, v);
+	s.serializeTo(v);
+	s.deserialize(QJsonValue{}, qMetaTypeId<Type>());
+	s.deserialize(QJsonValue{}, qMetaTypeId<Type>(), nullptr);
+	s.deserialize<Type>(j);
+	s.deserialize<Type>(j, nullptr);
+	s.deserializeFrom(nullptr, qMetaTypeId<Type>());
+	s.deserializeFrom(nullptr, qMetaTypeId<Type>(), nullptr);
+	s.deserializeFrom(QByteArray{}, qMetaTypeId<Type>());
+	s.deserializeFrom(QByteArray{}, qMetaTypeId<Type>(), nullptr);
+	s.deserializeFrom<Type>(nullptr);
+	s.deserializeFrom<Type>(nullptr, nullptr);
+	s.deserializeFrom<Type>(QByteArray{});
+	s.deserializeFrom<Type>(QByteArray{}, nullptr);
+}
+
 static void compile_test()
 {
-	QJsonSerializer s;
-	QVariant v;
-	TestObject *t;
-	QList<TestObject*> l;
-	QMap<QString, TestObject*> m;
-	int i;
-	QString str;
-	QList<int> il;
-	QMap<QString, bool> bm;
-	QPair<double, bool> dbp;
-
-	QIODevice *d = nullptr;
-	QByteArray b;
-	QJsonValue jv;
-	QJsonObject jo;
-	QJsonArray ja;
-	QObject *p = nullptr;
-
-	jv = s.serialize(v);
-	jo = s.serialize(t);
-	ja = s.serialize(l);
-	jo = s.serialize(m);
-	jv = s.serialize(i);
-	jv = s.serialize(str);
-	ja = s.serialize(il);
-	jo = s.serialize(bm);
-	ja = s.serialize(dbp);
-
-	s.serializeTo(d, v);
-	s.serializeTo(d, t);
-	s.serializeTo(d, l);
-	s.serializeTo(d, m);
-	s.serializeTo(d, i);
-	s.serializeTo(d, str);
-	s.serializeTo(d, il);
-	s.serializeTo(d, bm);
-	s.serializeTo(d, dbp);
-
-	b = s.serializeTo(v);
-	b = s.serializeTo(t);
-	b = s.serializeTo(l);
-	b = s.serializeTo(m);
-	b = s.serializeTo(i);
-	b = s.serializeTo(str);
-	b = s.serializeTo(il);
-	b = s.serializeTo(bm);
-	b = s.serializeTo(dbp);
-
-	v = s.deserialize(jv, qMetaTypeId<TestObject*>());
-	v = s.deserialize(jv, qMetaTypeId<TestObject*>(), p);
-	t = s.deserialize<TestObject*>(jo);
-	t = s.deserialize<TestObject*>(jo, p);
-	l = s.deserialize<QList<TestObject*>>(ja);
-	l = s.deserialize<QList<TestObject*>>(ja, p);
-	m = s.deserialize<QMap<QString, TestObject*>>(jo);
-	m = s.deserialize<QMap<QString, TestObject*>>(jo, p);
-	i = s.deserialize<int>(jv);
-	i = s.deserialize<int>(jv, p);
-	str = s.deserialize<QString>(jv);
-	str = s.deserialize<QString>(jv, p);
-	il = s.deserialize<QList<int>>(ja);
-	il = s.deserialize<QList<int>>(ja, p);
-	bm = s.deserialize<QMap<QString, bool>>(jo);
-	bm = s.deserialize<QMap<QString, bool>>(jo, p);
-	dbp = s.deserialize<QPair<double, bool>>(ja);
-	dbp = s.deserialize<QPair<double, bool>>(ja, p);
-
-	v = s.deserializeFrom(d, qMetaTypeId<TestObject*>());
-	v = s.deserializeFrom(d, qMetaTypeId<TestObject*>(), p);
-	t = s.deserializeFrom<TestObject*>(d);
-	t = s.deserializeFrom<TestObject*>(d, p);
-	l = s.deserializeFrom<QList<TestObject*>>(d);
-	l = s.deserializeFrom<QList<TestObject*>>(d, p);
-	m = s.deserializeFrom<QMap<QString, TestObject*>>(d);
-	m = s.deserializeFrom<QMap<QString, TestObject*>>(d, p);
-	i = s.deserializeFrom<int>(d);
-	i = s.deserializeFrom<int>(d, p);
-	str = s.deserializeFrom<QString>(d);
-	str = s.deserializeFrom<QString>(d, p);
-	il = s.deserializeFrom<QList<int>>(d);
-	il = s.deserializeFrom<QList<int>>(d, p);
-	bm = s.deserializeFrom<QMap<QString, bool>>(d);
-	bm = s.deserializeFrom<QMap<QString, bool>>(d, p);
-	dbp = s.deserializeFrom<QPair<double, bool>>(d);
-	dbp = s.deserializeFrom<QPair<double, bool>>(d, p);
-
-	v = s.deserializeFrom(b, qMetaTypeId<TestObject*>());
-	v = s.deserializeFrom(b, qMetaTypeId<TestObject*>(), p);
-	t = s.deserializeFrom<TestObject*>(b);
-	t = s.deserializeFrom<TestObject*>(b, p);
-	l = s.deserializeFrom<QList<TestObject*>>(b);
-	l = s.deserializeFrom<QList<TestObject*>>(b, p);
-	m = s.deserializeFrom<QMap<QString, TestObject*>>(b);
-	m = s.deserializeFrom<QMap<QString, TestObject*>>(b, p);
-	i = s.deserializeFrom<int>(b);
-	i = s.deserializeFrom<int>(b, p);
-	str = s.deserializeFrom<QString>(b);
-	str = s.deserializeFrom<QString>(b, p);
-	il = s.deserializeFrom<QList<int>>(b);
-	il = s.deserializeFrom<QList<int>>(b, p);
-	bm = s.deserializeFrom<QMap<QString, bool>>(b);
-	bm = s.deserializeFrom<QMap<QString, bool>>(b, p);
-	dbp = s.deserializeFrom<QPair<double, bool>>(b);
-	dbp = s.deserializeFrom<QPair<double, bool>>(b, p);
+	test_type<QVariant, QJsonValue>();
+	test_type<TestObject*, QJsonObject>();
+	test_type<QPointer<TestObject>, QJsonObject>();
+	test_type<QSharedPointer<TestObject>, QJsonObject>();
+	test_type<QList<TestObject*>, QJsonArray>();
+	test_type<QMap<QString, TestObject*>, QJsonObject>();
+	test_type<int, QJsonValue>();
+	test_type<QString, QJsonValue>();
+	test_type<QList<int>, QJsonArray>();
+	test_type<QMap<QString, bool>, QJsonObject>();
+	test_type<QPair<double, bool>, QJsonArray>();
+	test_type<TestTuple, QJsonArray>();
+	test_type<TestPair, QJsonArray>();
 }
 
 QTEST_MAIN(ObjectSerializerTest)

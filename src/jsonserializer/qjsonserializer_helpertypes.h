@@ -37,6 +37,16 @@ struct is_serializable<QMap<QString, T>> : public is_serializable<T> {};
 template <typename T1, typename T2>
 struct is_serializable<QPair<T1, T2>> : public std::conditional<is_serializable<T1>::value && is_serializable<T2>::value, std::true_type, std::false_type>::type {}; //C++17 conjunction
 
+template <typename T1, typename T2>
+struct is_serializable<std::pair<T1, T2>> : public std::conditional<is_serializable<T1>::value && is_serializable<T2>::value, std::true_type, std::false_type>::type {}; //C++17 conjunction
+
+template <typename T>
+struct is_serializable<std::tuple<T>> : public is_serializable<T> {};
+
+template <typename T1, typename T2, typename... TArgs>
+struct is_serializable<std::tuple<T1, T2, TArgs...>> : public std::conditional<is_serializable<T1>::value && is_serializable<std::tuple<T2, TArgs...>>::value, std::true_type, std::false_type>::type {}; //C++17 conjunction
+
+
 
 
 template <class T, class Enable = void>
@@ -104,7 +114,7 @@ struct json_type<QPointer<T>> {
 
 template <typename T>
 struct json_type<QList<T>> {
-	static_assert(is_serializable<QList<T>>::value, "Only QObject deriving classes can be serialized as pointer");
+	static_assert(is_serializable<QList<T>>::value, "The value type of a QList must be serializable for it to also be serializable");
 	using type = QJsonArray;
 
 	static inline type convert(const QJsonValue &jsonValue) {
@@ -114,7 +124,7 @@ struct json_type<QList<T>> {
 
 template <typename T>
 struct json_type<QMap<QString, T>> {
-	static_assert(is_serializable<QMap<QString, T>>::value, "Only QObject deriving classes can be serialized as pointer");
+	static_assert(is_serializable<QMap<QString, T>>::value, "The value type of a QMap must be serializable for it to also be serializable");
 	using type = QJsonObject;
 
 	static inline type convert(const QJsonValue &jsonValue) {
@@ -124,7 +134,27 @@ struct json_type<QMap<QString, T>> {
 
 template <typename T1, typename T2>
 struct json_type<QPair<T1, T2>> {
-	static_assert(is_serializable<QPair<T1, T2>>::value, "Only QObject deriving classes can be serialized as pointer");
+	static_assert(is_serializable<QPair<T1, T2>>::value, "All elements of a QPair must be serializable for it to also be serializable");
+	using type = QJsonArray;
+
+	static inline type convert(const QJsonValue &jsonValue) {
+		return jsonValue.toArray();
+	}
+};
+
+template <typename T1, typename T2>
+struct json_type<std::pair<T1, T2>> {
+	static_assert(is_serializable<std::pair<T1, T2>>::value, "All elements of a std::pair must be serializable for it to also be serializable");
+	using type = QJsonArray;
+
+	static inline type convert(const QJsonValue &jsonValue) {
+		return jsonValue.toArray();
+	}
+};
+
+template <typename... TArgs>
+struct json_type<std::tuple<TArgs...>> {
+	static_assert(is_serializable<std::tuple<TArgs...>>::value, "All elements of a std::tuple must be serializable for it to also be serializable");
 	using type = QJsonArray;
 
 	static inline type convert(const QJsonValue &jsonValue) {
