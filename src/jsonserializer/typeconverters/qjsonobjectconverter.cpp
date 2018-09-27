@@ -166,7 +166,7 @@ QVariant QJsonObjectConverter::deserialize(int propertyType, const QJsonValue &v
 	return toVariant(object, QMetaType::typeFlags(propertyType));
 }
 
-const QMetaObject *QJsonObjectConverter::getMetaObject(int typeId)
+const QMetaObject *QJsonObjectConverter::getMetaObject(int typeId) const
 {
 	auto flags = QMetaType::typeFlags(typeId);
 	if(flags.testFlag(QMetaType::PointerToQObject))
@@ -183,7 +183,7 @@ const QMetaObject *QJsonObjectConverter::getMetaObject(int typeId)
 		}
 
 		//extract template type, and if found, add the pointer star and find the meta type
-		auto match = regex.match(QString::fromUtf8(QMetaType::typeName(typeId)));
+		auto match = regex.match(QString::fromUtf8(getCanonicalTypeName(typeId)));
 		if(match.hasMatch()) {
 			auto type = QMetaType::type(match.captured(1).toUtf8().trimmed() + "*");
 			return QMetaType::metaObjectForType(type);
@@ -193,7 +193,7 @@ const QMetaObject *QJsonObjectConverter::getMetaObject(int typeId)
 }
 
 template<typename T>
-T QJsonObjectConverter::extract(QVariant variant)
+T QJsonObjectConverter::extract(QVariant variant) const
 {
 	auto id = qMetaTypeId<T>();
 	if(variant.canConvert(id) && variant.convert(id))
@@ -205,7 +205,7 @@ T QJsonObjectConverter::extract(QVariant variant)
 	}
 }
 
-QVariant QJsonObjectConverter::toVariant(QObject *object, QMetaType::TypeFlags flags)
+QVariant QJsonObjectConverter::toVariant(QObject *object, QMetaType::TypeFlags flags) const
 {
 	if(flags.testFlag(QMetaType::PointerToQObject))
 		return QVariant::fromValue(object);
@@ -222,7 +222,7 @@ QVariant QJsonObjectConverter::toVariant(QObject *object, QMetaType::TypeFlags f
 	}
 }
 
-bool QJsonObjectConverter::polyMetaObject(QObject *object)
+bool QJsonObjectConverter::polyMetaObject(QObject *object) const
 {
 	auto meta = object->metaObject();
 

@@ -17,7 +17,7 @@ public:
 private:
 	static const QRegularExpression listTypeRegex;
 
-	static int getSubtype(int listType);
+	int getSubtype(int listType) const;
 };
 
 #endif // QJSONLISTCONVERTER_P_H

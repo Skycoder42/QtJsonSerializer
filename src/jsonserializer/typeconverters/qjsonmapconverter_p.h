@@ -17,7 +17,7 @@ public:
 private:
 	static const QRegularExpression mapTypeRegex;
 
-	static int getSubtype(int mapType);
+	int getSubtype(int mapType) const;
 };
 
 #endif // QJSONMAPCONVERTER_P_H

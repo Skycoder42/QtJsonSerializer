@@ -1,4 +1,5 @@
 #include "qjsontypeconverter.h"
+#include "qjsonserializer_p.h"
 
 class QJsonTypeConverterPrivate
 {
@@ -20,6 +21,11 @@ int QJsonTypeConverter::priority() const
 void QJsonTypeConverter::setPriority(int priority)
 {
 	d->priority = priority;
+}
+
+QByteArray QJsonTypeConverter::getCanonicalTypeName(int propertyType) const
+{
+	return QJsonSerializerPrivate::getTypeName(propertyType);
 }
 
 

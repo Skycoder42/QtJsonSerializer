@@ -17,7 +17,7 @@ public:
 private:
 	static const QRegularExpression pairTypeRegex;
 
-	static QPair<int, int> getPairTypes(int metaType);
+	QPair<int, int> getPairTypes(int metaType) const;
 };
 
 #endif // QJSONPAIRCONVERTER_P_H

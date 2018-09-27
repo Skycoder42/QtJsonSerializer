@@ -4,10 +4,21 @@
 #include "qtjsonserializer_global.h"
 #include "qjsonserializer.h"
 
+#include <QtCore/QReadWriteLock>
+#include <QtCore/QHash>
+
 class Q_JSONSERIALIZER_EXPORT QJsonSerializerPrivate
 {
 	Q_DISABLE_COPY(QJsonSerializerPrivate)
 public:
+	static QByteArray getTypeName(int propertyType);
+
+private:
+	friend class QJsonSerializer;
+
+	static QReadWriteLock typedefLock;
+	static QHash<int, QByteArray> typedefMapping;
+
 	bool allowNull = false;
 	bool keepObjectName = false;
 	bool enumAsString = false;

@@ -60,6 +60,9 @@ public:
 	explicit QJsonSerializer(QObject *parent = nullptr);
 	~QJsonSerializer() override;
 
+	template<typename T>
+	static void registerInverseTypedef(const char *typeName);
+
 	//! Registers a custom type for list converisons
 	template<typename T>
 	static bool registerListConverters();
@@ -185,11 +188,20 @@ private:
 	void serializeToImpl(QIODevice *device, const QVariant &data, QJsonDocument::JsonFormat format) const;
 	QT_DEPRECATED QByteArray serializeToImpl(const QVariant &data) const; //MAJOR remove
 	QByteArray serializeToImpl(const QVariant &data, QJsonDocument::JsonFormat format) const;
+
+	static void registerInverseTypedefImpl(int typeId, const char *normalizedTypeName);
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QJsonSerializer::ValidationFlags)
 
 // ------------- Generic Implementation -------------
+
+template<typename T>
+void QJsonSerializer::registerInverseTypedef(const char *typeName)
+{
+	qRegisterMetaType<T>(typeName);
+	registerInverseTypedefImpl(qMetaTypeId<T>(), QMetaObject::normalizedType(typeName));
+}
 
 template<typename T>
 bool QJsonSerializer::registerListConverters() {
@@ -291,13 +303,13 @@ bool QJsonSerializer::registerPointerListConverters()
 template<typename T1, typename T2>
 bool QJsonSerializer::registerPairConverters()
 {
-	auto ok2 = QMetaType::registerConverter<QPair<T1, T2>, QPair<QVariant, QVariant>>([](const QPair<T1, T2> &pair) -> QPair<QVariant, QVariant> {
+	auto ok1 = QMetaType::registerConverter<QPair<T1, T2>, QPair<QVariant, QVariant>>([](const QPair<T1, T2> &pair) -> QPair<QVariant, QVariant> {
 		return {
 			QVariant::fromValue(pair.first),
 			QVariant::fromValue(pair.second)
 		};
 	});
-	auto ok1 = QMetaType::registerConverter<QPair<QVariant, QVariant>, QPair<T1, T2>>([](const QPair<QVariant, QVariant> &pair) -> QPair<T1, T2> {
+	auto ok2 = QMetaType::registerConverter<QPair<QVariant, QVariant>, QPair<T1, T2>>([](const QPair<QVariant, QVariant> &pair) -> QPair<T1, T2> {
 		return {
 			pair.first.value<T1>(),
 			pair.second.value<T2>()

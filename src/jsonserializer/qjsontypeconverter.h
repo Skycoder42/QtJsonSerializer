@@ -66,6 +66,9 @@ public:
 	//! Called by the deserializer to serializer your given type
 	virtual QVariant deserialize(int propertyType, const QJsonValue &value, QObject *parent, const SerializationHelper *helper) const = 0;
 
+protected:
+	QByteArray getCanonicalTypeName(int propertyType) const;
+
 private:
 	QScopedPointer<QJsonTypeConverterPrivate> d;
 };

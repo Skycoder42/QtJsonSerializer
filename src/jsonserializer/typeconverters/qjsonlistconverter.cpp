@@ -9,7 +9,7 @@ bool QJsonListConverter::canConvert(int metaTypeId) const
 {
 	return metaTypeId == QMetaType::QVariantList ||
 			metaTypeId == QMetaType::QStringList ||
-			listTypeRegex.match(QString::fromUtf8(QMetaType::typeName(metaTypeId))).hasMatch();
+			listTypeRegex.match(QString::fromUtf8(getCanonicalTypeName(metaTypeId))).hasMatch();
 }
 
 QList<QJsonValue::Type> QJsonListConverter::jsonTypes() const
@@ -47,13 +47,13 @@ QVariant QJsonListConverter::deserialize(int propertyType, const QJsonValue &val
 	return list;
 }
 
-int QJsonListConverter::getSubtype(int listType)
+int QJsonListConverter::getSubtype(int listType) const
 {
 	int metaType = QMetaType::UnknownType;
 	if(listType == QMetaType::QStringList)
 		metaType = QMetaType::QString;
 	else {
-		auto match = listTypeRegex.match(QString::fromUtf8(QMetaType::typeName(listType)));
+		auto match = listTypeRegex.match(QString::fromUtf8(getCanonicalTypeName(listType)));
 		if(match.hasMatch())
 			metaType = QMetaType::type(match.captured(1).toUtf8().trimmed());
 	}

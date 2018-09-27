@@ -8,7 +8,7 @@ const QRegularExpression QJsonMapConverter::mapTypeRegex(QStringLiteral(R"__(^QM
 bool QJsonMapConverter::canConvert(int metaTypeId) const
 {
 	return metaTypeId == QMetaType::QVariantMap ||
-			mapTypeRegex.match(QString::fromUtf8(QMetaType::typeName(metaTypeId))).hasMatch();
+			mapTypeRegex.match(QString::fromUtf8(getCanonicalTypeName(metaTypeId))).hasMatch();
 }
 
 QList<QJsonValue::Type> QJsonMapConverter::jsonTypes() const
@@ -46,10 +46,10 @@ QVariant QJsonMapConverter::deserialize(int propertyType, const QJsonValue &valu
 	return map;
 }
 
-int QJsonMapConverter::getSubtype(int mapType)
+int QJsonMapConverter::getSubtype(int mapType) const
 {
 	int metaType = QMetaType::UnknownType;
-	auto match = mapTypeRegex.match(QString::fromUtf8(QMetaType::typeName(mapType)));
+	auto match = mapTypeRegex.match(QString::fromUtf8(getCanonicalTypeName(mapType)));
 	if(match.hasMatch())
 		metaType = QMetaType::type(match.captured(1).toUtf8().trimmed());
 	return metaType;

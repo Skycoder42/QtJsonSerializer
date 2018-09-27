@@ -17,10 +17,10 @@ private:
 	static const QRegularExpression trackingTypeRegex;
 
 	template<typename T>
-	static T extract(QVariant variant);
-	static const QMetaObject *getMetaObject(int typeId);
-	static QVariant toVariant(QObject *object, QMetaType::TypeFlags flags);
-	static bool polyMetaObject(QObject *object);
+	T extract(QVariant variant) const;
+	const QMetaObject *getMetaObject(int typeId) const;
+	QVariant toVariant(QObject *object, QMetaType::TypeFlags flags) const;
+	bool polyMetaObject(QObject *object) const;
 };
 
 #endif // QJSONOBJECTCONVERTER_P_H

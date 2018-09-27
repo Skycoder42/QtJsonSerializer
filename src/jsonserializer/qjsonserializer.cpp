@@ -436,7 +436,22 @@ QByteArray QJsonSerializer::serializeToImpl(const QVariant &data, QJsonDocument:
 	return buffer.data();
 }
 
+void QJsonSerializer::registerInverseTypedefImpl(int typeId, const char *normalizedTypeName)
+{
+	QWriteLocker lock{&QJsonSerializerPrivate::typedefLock};
+	QJsonSerializerPrivate::typedefMapping.insert(typeId, normalizedTypeName);
+}
 
+
+
+QReadWriteLock QJsonSerializerPrivate::typedefLock;
+QHash<int, QByteArray> QJsonSerializerPrivate::typedefMapping;
+
+QByteArray QJsonSerializerPrivate::getTypeName(int propertyType)
+{
+	QReadLocker lock{&typedefLock};
+	return typedefMapping.value(propertyType, QMetaType::typeName(propertyType));
+}
 
 QJsonSerializerPrivate::QJsonSerializerPrivate() :
 	typeConverters{
