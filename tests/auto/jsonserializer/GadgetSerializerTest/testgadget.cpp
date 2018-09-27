@@ -37,7 +37,8 @@ bool TestGadget::operator==(const TestGadget &other) const
 			object == other.object &&
 			array == other.array &&
 			value == other.value &&
-			ChildGadget::equals(gadgetPtr, other.gadgetPtr);
+			ChildGadget::equals(gadgetPtr, other.gadgetPtr) &&
+			stdTuple == other.stdTuple;
 }
 
 bool TestGadget::operator!=(const TestGadget &other) const
@@ -74,7 +75,8 @@ bool TestGadget::operator!=(const TestGadget &other) const
 			object != other.object ||
 			array != other.array ||
 			value != other.value ||
-			!ChildGadget::equals(gadgetPtr, other.gadgetPtr);
+			!ChildGadget::equals(gadgetPtr, other.gadgetPtr) ||
+			stdTuple != other.stdTuple;
 }
 
 bool TestGadget::operator<(const TestGadget &) const
@@ -203,6 +205,13 @@ TestGadget TestGadget::createGadgetPtr(ChildGadget *gadgetPtr)
 	return t;
 }
 
+TestGadget TestGadget::createStdTuple(int v1, QString v2, QList<int> v3)
+{
+	TestGadget t;
+	t.stdTuple = std::make_tuple(v1, std::move(v2), std::move(v3));
+	return t;
+}
+
 QJsonObject TestGadget::createJson(const QJsonObject &delta, const QString &rmKey)
 {
 	auto base = QJsonObject({
@@ -267,7 +276,8 @@ QJsonObject TestGadget::createJson(const QJsonObject &delta, const QString &rmKe
 								{"object", QJsonObject()},
 								{"array", QJsonArray()},
 								{"value", QJsonValue::Null},
-								{"gadgetPtr", QJsonValue::Null}
+								{"gadgetPtr", QJsonValue::Null},
+								{"stdTuple", QJsonArray{0, QString{}, QJsonArray{}}}
 							});
 	for(auto it = delta.constBegin(); it != delta.constEnd(); ++it)
 		base[it.key()] = it.value();

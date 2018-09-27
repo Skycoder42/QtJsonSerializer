@@ -5,6 +5,9 @@
 #include <QString>
 #include <QtTest>
 
+using TestTuple = std::tuple<int, QString, QList<int>>;
+Q_DECLARE_METATYPE(TestTuple)
+
 template <typename T>
 bool operator <(const QMap<QString, T> &m1, const QMap<QString, T> &m2)
 {
@@ -55,10 +58,6 @@ private:
 
 void GadgetSerializerTest::initTestCase()
 {
-#ifdef Q_OS_LINUX
-	if(!qgetenv("LD_PRELOAD").contains("Qt5JsonSerializer"))
-		qWarning() << "No LD_PRELOAD set - this may fail on systems with multiple version of the modules";
-#endif
 	QJsonSerializer::registerListConverters<QList<int>>();
 	QJsonSerializer::registerMapConverters<QMap<QString, int>>();
 
@@ -72,6 +71,8 @@ void GadgetSerializerTest::initTestCase()
 	QJsonSerializer::registerPairConverters<bool, bool>();
 	QJsonSerializer::registerPairConverters<ChildGadget, QList<int>>();
 	QJsonSerializer::registerListConverters<QPair<bool, bool>>();
+
+	QJsonSerializer::registerTupleConverters<int, QString, QList<int>>("std::tuple<int, QString, QList<int>>");
 
 	//register list comparators, needed for test only!
 	QMetaType::registerComparators<QList<int>>();
@@ -91,6 +92,8 @@ void GadgetSerializerTest::initTestCase()
 	QMetaType::registerComparators<QPair<int, QString>>();
 	QMetaType::registerComparators<QPair<ChildGadget, QList<int>>>();
 	QMetaType::registerComparators<QList<QPair<bool, bool>>>();
+
+	QMetaType::registerComparators<std::tuple<int, QString, QList<int>>>();
 
 	serializer = new QJsonSerializer(this);
 }
@@ -189,6 +192,9 @@ void GadgetSerializerTest::testVariantConversions_data()
 
 	QTest::newRow("QList<QPair<bool, bool>>") << QVariant::fromValue<QList<QPair<bool, bool>>>({{false, true}, {true, false}})
 											  << (int)QVariant::List;
+
+	QTest::newRow("std::tuple<int, QString, QList<int>>") << QVariant::fromValue<TestTuple>({42, QStringLiteral("Hello World"), {1, 2, 3}})
+														  << (int)QVariant::List;
 }
 
 void GadgetSerializerTest::testVariantConversions()
@@ -217,6 +223,7 @@ void GadgetSerializerTest::testSerialization()
 	QFETCH(QJsonObject, result);
 
 	try {
+		auto data = serializer->serialize(gadget);
 		QCOMPARE(serializer->serialize(gadget), result);
 	} catch(QException &e) {
 		QFAIL(e.what());
@@ -317,7 +324,8 @@ void GadgetSerializerTest::testNullDeserialization()
 									{"object", QJsonValue::Null},
 									{"array", QJsonValue::Null},
 									{"value", QJsonValue::Null},
-									{"gadgetPtr", QJsonValue::Null}
+									{"gadgetPtr", QJsonValue::Null},
+									{"stdTuple", QJsonValue::Null}
 								});
 
 	try {
@@ -917,6 +925,11 @@ void GadgetSerializerTest::generateValidTestData()
 							   << TestGadget::createJson({
 															 {"gadgetPtr", ChildGadget::createJson(11)}
 														 });
+
+	QTest::newRow("std::tuple") << TestGadget::createStdTuple(34, QStringLiteral("Testree"), {10, 20, 30})
+								<< TestGadget::createJson({
+															  {"stdTuple", QJsonArray{34, QStringLiteral("Testree"), QJsonArray{10, 20, 30}}}
+														  });
 }
 
 static void compile_test()
