@@ -4,41 +4,7 @@
 #include <QMetaProperty>
 
 TestObject::TestObject(QObject *parent) :
-	QObject(parent),
-	intProperty(0),
-	boolProperty(false),
-	stringProperty(),
-	doubleProperty(0.0),
-	normalEnumProperty(Normal0),
-	enumFlagsProperty(),
-	datetime(),
-	uuid(),
-	url(),
-	version(),
-	bytearray(),
-	size(),
-	point(),
-	line(),
-	rect(),
-	locale(QLocale::c()),
-	regexp(),
-	simpleList(),
-	leveledList(),
-	simpleMap(),
-	leveledMap(),
-	pair(),
-	extraPair(),
-	listPair(),
-	childObject(nullptr),
-	sharedChildObject(),
-	trackedChildObject(),
-	simpleChildren(),
-	leveledChildren(),
-	simpleRelatives(),
-	leveledRelatives(),
-	object(),
-	array(),
-	value(QJsonValue::Null)
+	QObject{parent}
 {}
 
 TestObject *TestObject::createBasic(int intProperty, bool boolProperty, QString stringProperty, double doubleProperty, QObject *parent)
@@ -46,7 +12,7 @@ TestObject *TestObject::createBasic(int intProperty, bool boolProperty, QString 
 	auto t = new TestObject(parent);
 	t->intProperty = intProperty;
 	t->boolProperty = boolProperty;
-	t->stringProperty = stringProperty;
+	t->stringProperty = std::move(stringProperty);
 	t->doubleProperty = doubleProperty;
 	return t;
 }
@@ -62,11 +28,11 @@ TestObject *TestObject::createEnum(TestObject::NormalEnum normalEnumProperty, En
 TestObject *TestObject::createExtra(QDateTime datetime, QUuid uuid, QUrl url, QVersionNumber version, QByteArray bytearray, QObject *parent)
 {
 	auto t = new TestObject(parent);
-	t->datetime = datetime;
+	t->datetime = std::move(datetime);
 	t->uuid = uuid;
-	t->url = url;
-	t->version = version;
-	t->bytearray = bytearray;
+	t->url = std::move(url);
+	t->version = std::move(version);
+	t->bytearray = std::move(bytearray);
 	return t;
 }
 
@@ -83,35 +49,35 @@ TestObject *TestObject::createGeom(QSize size, QPoint point, QLine line, QRect r
 TestObject *TestObject::createSpecial(QLocale locale, QRegularExpression regexp, QObject *parent)
 {
 	auto t = new TestObject(parent);
-	t->locale = locale;
-	t->regexp = regexp;
+	t->locale = std::move(locale);
+	t->regexp = std::move(regexp);
 	return t;
 }
 
 TestObject *TestObject::createList(QList<int> simpleList, QList<QList<int> > leveledList, QObject *parent)
 {
 	auto t = new TestObject(parent);
-	t->simpleList = simpleList;
-	t->leveledList = leveledList;
+	t->simpleList = std::move(simpleList);
+	t->leveledList = std::move(leveledList);
 	return t;
 }
 
 TestObject *TestObject::createMap(QMap<QString, int> simpleMap, QMap<QString, QMap<QString, int> > leveledMap, QObject *parent)
 {
 	auto t = new TestObject(parent);
-	t->simpleMap = simpleMap;
-	t->leveledMap = leveledMap;
+	t->simpleMap = std::move(simpleMap);
+	t->leveledMap = std::move(leveledMap);
 	return t;
 }
 
 TestObject *TestObject::createPair(QPair<int, QString> pair, QPair<ChildObject *, QList<int> > extraPair, QList<QPair<bool, bool> > listPair, QObject *parent)
 {
 	auto t = new TestObject(parent);
-	t->pair = pair;
-	t->extraPair = extraPair;
+	t->pair = std::move(pair);
+	t->extraPair = std::move(extraPair);
 	if(t->extraPair.first)
 		t->extraPair.first->setParent(t);
-	t->listPair = listPair;
+	t->listPair = std::move(listPair);
 	return t;
 }
 
@@ -139,11 +105,11 @@ TestObject *TestObject::createChildren(QList<ChildObject *> simpleChildren, QLis
 {
 	auto t = new TestObject(parent);
 
-	t->simpleChildren = simpleChildren;
+	t->simpleChildren = std::move(simpleChildren);
 	for (auto child : t->simpleChildren)
 		child->setParent(t);
 
-	t->leveledChildren = leveledChildren;
+	t->leveledChildren = std::move(leveledChildren);
 	for (auto children : t->leveledChildren) {
 		for (auto child : children)
 			child->setParent(t);
@@ -156,12 +122,12 @@ TestObject *TestObject::createRelatives(QMap<QString, ChildObject *> simpleRelat
 {
 	auto t = new TestObject(parent);
 
-	t->simpleRelatives = simpleRelatives;
+	t->simpleRelatives = std::move(simpleRelatives);
 	for (auto child : t->simpleRelatives)
 		child->setParent(t);
 
-	t->leveledRelatives = leveledRelatives;
-	for (auto children : t->leveledRelatives) {
+	t->leveledRelatives = std::move(leveledRelatives);
+	for (const auto &children : qAsConst(t->leveledRelatives)) {
 		for (auto child : children)
 			child->setParent(t);
 	}
@@ -172,9 +138,16 @@ TestObject *TestObject::createRelatives(QMap<QString, ChildObject *> simpleRelat
 TestObject *TestObject::createEmbedded(QJsonObject object, QJsonArray array, QJsonValue value, QObject *parent)
 {
 	auto t = new TestObject(parent);
-	t->object = object;
-	t->array = array;
-	t->value = value;
+	t->object = std::move(object);
+	t->array = std::move(array);
+	t->value = std::move(value);
+	return t;
+}
+
+TestObject *TestObject::createStdTuple(int v1, QString v2, QList<int> v3, QObject *parent)
+{
+	auto t = new TestObject(parent);
+	t->stdTuple = std::make_tuple(v1, std::move(v2), std::move(v3));
 	return t;
 }
 
@@ -241,7 +214,8 @@ QJsonObject TestObject::createJson(const QJsonObject &delta, const QString &rmKe
 								{"leveledRelatives", QJsonObject()},
 								{"object", QJsonObject()},
 								{"array", QJsonArray()},
-								{"value", QJsonValue::Null}
+								{"value", QJsonValue::Null},
+								{"stdTuple", QJsonArray{0, QString{}, QJsonArray{}}}
 							});
 	for(auto it = delta.constBegin(); it != delta.constEnd(); ++it)
 		base[it.key()] = it.value();
@@ -298,7 +272,8 @@ bool TestObject::equals(const TestObject *other) const
 				  leveledRelatives.size() == other->leveledRelatives.size() &&
 				  object == other->object &&
 				  array == other->array &&
-				  value == other->value;
+				  value == other->value &&
+				  stdTuple == other->stdTuple;
 		if(!ok)
 			return false;
 

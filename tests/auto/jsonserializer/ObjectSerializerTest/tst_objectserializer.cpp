@@ -6,6 +6,9 @@
 #include <QtTest>
 #include <QtJsonSerializer/qjsonserializer.h>
 
+using TestTuple = std::tuple<int, QString, QList<int>>;
+Q_DECLARE_METATYPE(TestTuple)
+
 template <typename T>
 bool operator <(const QMap<QString, T> &m1, const QMap<QString, T> &m2)
 {
@@ -59,10 +62,6 @@ private:
 
 void ObjectSerializerTest::initTestCase()
 {
-#ifdef Q_OS_LINUX
-	if(!qgetenv("LD_PRELOAD").contains("Qt5JsonSerializer"))
-		qWarning() << "No LD_PRELOAD set - this may fail on systems with multiple version of the modules";
-#endif
 	QJsonSerializer::registerListConverters<QList<int>>();
 	QJsonSerializer::registerMapConverters<QMap<QString, int>>();
 
@@ -79,6 +78,8 @@ void ObjectSerializerTest::initTestCase()
 	QJsonSerializer::registerListConverters<QPair<bool, bool>>();
 
 	QJsonSerializer::registerAllConverters<TestPolyObject*>();
+
+	QJsonSerializer::registerTupleConverters<int, QString, QList<int>>("std::tuple<int, QString, QList<int>>");
 
 	//register list comparators, needed for test only!
 	QMetaType::registerComparators<QList<int>>();
@@ -98,6 +99,8 @@ void ObjectSerializerTest::initTestCase()
 	QMetaType::registerComparators<QPair<int, QString>>();
 	QMetaType::registerComparators<QPair<ChildObject*, QList<int>>>();
 	QMetaType::registerComparators<QList<QPair<bool, bool>>>();
+
+	QMetaType::registerComparators<std::tuple<int, QString, QList<int>>>();
 
 	serializer = new QJsonSerializer(this);
 }
@@ -205,6 +208,9 @@ void ObjectSerializerTest::testVariantConversions_data()
 
 	QTest::newRow("QList<QPair<bool, bool>>") << QVariant::fromValue<QList<QPair<bool, bool>>>({{false, true}, {true, false}})
 											  << (int)QVariant::List;
+
+	QTest::newRow("std::tuple<int, QString, QList<int>>") << QVariant::fromValue<TestTuple>({42, QStringLiteral("Hello World"), {1, 2, 3}})
+														  << (int)QVariant::List;
 }
 
 void ObjectSerializerTest::testVariantConversions()
@@ -351,7 +357,8 @@ void ObjectSerializerTest::testNullDeserialization()
 									{"simpleChildren", QJsonValue::Null},
 									{"leveledChildren", QJsonValue::Null},
 									{"simpleRelatives", QJsonValue::Null},
-									{"leveledRelatives", QJsonValue::Null}
+									{"leveledRelatives", QJsonValue::Null},
+									{"stdTuple", QJsonValue::Null}
 								});
 
 	try {
@@ -1229,6 +1236,12 @@ void ObjectSerializerTest::generateValidTestData()
 														  {"value", 42}
 													  })
 							<< true;
+
+	QTest::newRow("std::tuple") << TestObject::createStdTuple(34, QStringLiteral("Testree"), {10, 20, 30}, this)
+								<< TestObject::createJson({
+															  {"stdTuple", QJsonArray{34, QStringLiteral("Testree"), QJsonArray{10, 20, 30}}}
+														  })
+								<< true;
 }
 
 static void compile_test()

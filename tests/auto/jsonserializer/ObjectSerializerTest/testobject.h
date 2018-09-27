@@ -71,12 +71,12 @@ class TestObject : public QObject
 	Q_PROPERTY(QList<int> simpleList MEMBER simpleList)
 	Q_PROPERTY(QList<QList<int>> leveledList MEMBER leveledList)
 
-	Q_PROPERTY(QMap<QString, int> simpleMap MEMBER simpleMap)
-	Q_PROPERTY(QMap<QString, QMap<QString, int>> leveledMap MEMBER leveledMap)
+	Q_PROPERTY(QMap<QString, int> simpleMap MEMBER simpleMap);
+	Q_PROPERTY(QMap<QString, QMap<QString, int>> leveledMap MEMBER leveledMap);
 
-	Q_PROPERTY(QPair<int, QString> pair MEMBER pair)
-	Q_PROPERTY(QPair<ChildObject*, QList<int>> extraPair MEMBER extraPair)
-	Q_PROPERTY(QList<QPair<bool, bool>> listPair MEMBER listPair)
+	Q_PROPERTY(QPair<int, QString> pair MEMBER pair);
+	Q_PROPERTY(QPair<ChildObject*, QList<int>> extraPair MEMBER extraPair);
+	Q_PROPERTY(QList<QPair<bool, bool>> listPair MEMBER listPair);
 
 	Q_PROPERTY(ChildObject* childObject MEMBER childObject)
 	Q_PROPERTY(QSharedPointer<ChildObject> sharedChildObject MEMBER sharedChildObject)
@@ -85,12 +85,14 @@ class TestObject : public QObject
 	Q_PROPERTY(QList<ChildObject*> simpleChildren MEMBER simpleChildren)
 	Q_PROPERTY(QList<QList<ChildObject*>> leveledChildren MEMBER leveledChildren)
 
-	Q_PROPERTY(QMap<QString, ChildObject*> simpleRelatives MEMBER simpleRelatives)
-	Q_PROPERTY(QMap<QString, QMap<QString, ChildObject*>> leveledRelatives MEMBER leveledRelatives)
+	Q_PROPERTY(QMap<QString, ChildObject*> simpleRelatives MEMBER simpleRelatives);
+	Q_PROPERTY(QMap<QString, QMap<QString, ChildObject*>> leveledRelatives MEMBER leveledRelatives);
 
 	Q_PROPERTY(QJsonObject object MEMBER object)
 	Q_PROPERTY(QJsonArray array MEMBER array)
 	Q_PROPERTY(QJsonValue value MEMBER value)
+
+	Q_PROPERTY(std::tuple<int, QString, QList<int>> stdTuple MEMBER stdTuple);
 
 public:
 	enum NormalEnum {
@@ -123,17 +125,18 @@ public:
 	static TestObject *createChildren(QList<ChildObject*> simpleChildren, QList<QList<ChildObject*>> leveledChildren, QObject *parent);
 	static TestObject *createRelatives(QMap<QString, ChildObject*> simpleRelatives, QMap<QString, QMap<QString, ChildObject*>> leveledRelatives, QObject *parent);
 	static TestObject *createEmbedded(QJsonObject object, QJsonArray array, QJsonValue value, QObject *parent);
+	static TestObject *createStdTuple(int v1, QString v2, QList<int> v3, QObject *parent);
 
 	static QJsonObject createJson(const QJsonObject &delta = QJsonObject(), const QString &rmKey = {});
 
 	static bool equals(const TestObject *left, const TestObject *right);
 
-	int intProperty;
-	bool boolProperty;
+	int intProperty = 0;
+	bool boolProperty = false;
 	QString stringProperty;
-	double doubleProperty;
+	double doubleProperty = 0.0;
 
-	NormalEnum normalEnumProperty;
+	NormalEnum normalEnumProperty = Normal0;
 	EnumFlags enumFlagsProperty;
 
 	QDateTime datetime;
@@ -147,7 +150,7 @@ public:
 	QLine line;
 	QRect rect;
 
-	QLocale locale;
+	QLocale locale = QLocale::c();
 	QRegularExpression regexp;
 
 	QList<int> simpleList;
@@ -160,7 +163,7 @@ public:
 	QPair<ChildObject*, QList<int>> extraPair;
 	QList<QPair<bool, bool>> listPair;
 
-	ChildObject* childObject;
+	ChildObject* childObject = nullptr;
 	QSharedPointer<ChildObject> sharedChildObject;
 	QPointer<ChildObject> trackedChildObject;
 
@@ -172,7 +175,9 @@ public:
 
 	QJsonObject object;
 	QJsonArray array;
-	QJsonValue value;
+	QJsonValue value = QJsonValue::Null;
+
+	std::tuple<int, QString, QList<int>> stdTuple {0, {}, {}};
 
 	EnumFlags getEnumFlagsProperty() const;
 	void setEnumFlagsProperty(const EnumFlags &value);
