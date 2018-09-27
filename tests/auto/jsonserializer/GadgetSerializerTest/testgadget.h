@@ -88,6 +88,7 @@ struct TestGadget
 	Q_PROPERTY(ChildGadget* gadgetPtr MEMBER gadgetPtr)
 
 	Q_PROPERTY(std::tuple<int, QString, QList<int>> stdTuple MEMBER stdTuple);
+	Q_PROPERTY(std::pair<bool, int> stdPair MEMBER stdPair);
 
 public:
 	enum NormalEnum {
@@ -124,6 +125,7 @@ public:
 	static TestGadget createEmbedded(QJsonObject object, QJsonArray array, QJsonValue value);
 	static TestGadget createGadgetPtr(ChildGadget *childGadget);
 	static TestGadget createStdTuple(int v1, QString v2, QList<int> v3);
+	static TestGadget createStdPair(bool first, int second);
 
 	static QJsonObject createJson(const QJsonObject &delta = QJsonObject(), const QString &rmKey = {});
 
@@ -174,6 +176,7 @@ public:
 	ChildGadget* gadgetPtr = nullptr;
 
 	std::tuple<int, QString, QList<int>> stdTuple {0, {}, {}};
+	std::pair<bool, int> stdPair {false, 0};
 
 	EnumFlags getEnumFlagsProperty() const;
 	void setEnumFlagsProperty(const EnumFlags &value);

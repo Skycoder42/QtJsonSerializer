@@ -6,7 +6,9 @@
 #include <QtTest>
 
 using TestTuple = std::tuple<int, QString, QList<int>>;
+using TestPair = std::pair<bool, int>;
 Q_DECLARE_METATYPE(TestTuple)
+Q_DECLARE_METATYPE(TestPair)
 
 template <typename T>
 bool operator <(const QMap<QString, T> &m1, const QMap<QString, T> &m2)
@@ -73,6 +75,7 @@ void GadgetSerializerTest::initTestCase()
 	QJsonSerializer::registerListConverters<QPair<bool, bool>>();
 
 	QJsonSerializer::registerTupleConverters<int, QString, QList<int>>("std::tuple<int, QString, QList<int>>");
+	QJsonSerializer::registerPairConverters<bool, int>("std::pair<bool, int>");
 
 	//register list comparators, needed for test only!
 	QMetaType::registerComparators<QList<int>>();
@@ -93,7 +96,8 @@ void GadgetSerializerTest::initTestCase()
 	QMetaType::registerComparators<QPair<ChildGadget, QList<int>>>();
 	QMetaType::registerComparators<QList<QPair<bool, bool>>>();
 
-	QMetaType::registerComparators<std::tuple<int, QString, QList<int>>>();
+	QMetaType::registerComparators<TestTuple>();
+	QMetaType::registerComparators<TestPair>();
 
 	serializer = new QJsonSerializer(this);
 }
@@ -193,8 +197,10 @@ void GadgetSerializerTest::testVariantConversions_data()
 	QTest::newRow("QList<QPair<bool, bool>>") << QVariant::fromValue<QList<QPair<bool, bool>>>({{false, true}, {true, false}})
 											  << (int)QVariant::List;
 
-	QTest::newRow("std::tuple<int, QString, QList<int>>") << QVariant::fromValue<TestTuple>({42, QStringLiteral("Hello World"), {1, 2, 3}})
+	QTest::newRow("std::tuple<int, QString, QList<int>>") << QVariant::fromValue<TestTuple>(std::make_tuple(42, QStringLiteral("Hello World"), QList<int>{1, 2, 3}))
 														  << (int)QVariant::List;
+	QTest::newRow("std::pair<bool, int>>") << QVariant::fromValue<TestPair>(std::make_pair(true, 20))
+										   << qMetaTypeId<QPair<QVariant, QVariant>>();
 }
 
 void GadgetSerializerTest::testVariantConversions()
@@ -325,7 +331,8 @@ void GadgetSerializerTest::testNullDeserialization()
 									{"array", QJsonValue::Null},
 									{"value", QJsonValue::Null},
 									{"gadgetPtr", QJsonValue::Null},
-									{"stdTuple", QJsonValue::Null}
+									{"stdTuple", QJsonValue::Null},
+									{"stdPair", QJsonValue::Null}
 								});
 
 	try {
@@ -930,6 +937,10 @@ void GadgetSerializerTest::generateValidTestData()
 								<< TestGadget::createJson({
 															  {"stdTuple", QJsonArray{34, QStringLiteral("Testree"), QJsonArray{10, 20, 30}}}
 														  });
+	QTest::newRow("std::pair") << TestGadget::createStdPair(true, 42)
+							   << TestGadget::createJson({
+															 {"stdPair", QJsonArray{true, 42}}
+														 });
 }
 
 static void compile_test()

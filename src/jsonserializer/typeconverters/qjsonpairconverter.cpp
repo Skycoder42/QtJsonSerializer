@@ -3,7 +3,7 @@
 
 #include <QtCore/QJsonArray>
 
-const QRegularExpression QJsonPairConverter::pairTypeRegex(QStringLiteral(R"__(^QPair<\s*(.*?)\s*,\s*(.*?)\s*>$)__"));
+const QRegularExpression QJsonPairConverter::pairTypeRegex(QStringLiteral(R"__(^(?:QPair|std::pair)<\s*(.*?)\s*,\s*(.*?)\s*>$)__"));
 
 bool QJsonPairConverter::canConvert(int metaTypeId) const
 {

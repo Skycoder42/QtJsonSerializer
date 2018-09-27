@@ -93,6 +93,7 @@ class TestObject : public QObject
 	Q_PROPERTY(QJsonValue value MEMBER value)
 
 	Q_PROPERTY(std::tuple<int, QString, QList<int>> stdTuple MEMBER stdTuple);
+	Q_PROPERTY(std::pair<bool, int> stdPair MEMBER stdPair);
 
 public:
 	enum NormalEnum {
@@ -126,6 +127,7 @@ public:
 	static TestObject *createRelatives(QMap<QString, ChildObject*> simpleRelatives, QMap<QString, QMap<QString, ChildObject*>> leveledRelatives, QObject *parent);
 	static TestObject *createEmbedded(QJsonObject object, QJsonArray array, QJsonValue value, QObject *parent);
 	static TestObject *createStdTuple(int v1, QString v2, QList<int> v3, QObject *parent);
+	static TestObject *createStdPair(bool first, int second, QObject *parent);
 
 	static QJsonObject createJson(const QJsonObject &delta = QJsonObject(), const QString &rmKey = {});
 
@@ -178,6 +180,7 @@ public:
 	QJsonValue value = QJsonValue::Null;
 
 	std::tuple<int, QString, QList<int>> stdTuple {0, {}, {}};
+	std::pair<bool, int> stdPair {false, 0};
 
 	EnumFlags getEnumFlagsProperty() const;
 	void setEnumFlagsProperty(const EnumFlags &value);

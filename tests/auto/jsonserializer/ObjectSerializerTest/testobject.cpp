@@ -151,6 +151,14 @@ TestObject *TestObject::createStdTuple(int v1, QString v2, QList<int> v3, QObjec
 	return t;
 }
 
+TestObject *TestObject::createStdPair(bool first, int second, QObject *parent)
+{
+	auto t = new TestObject(parent);
+	t->stdPair.first = first;
+	t->stdPair.second = second;
+	return t;
+}
+
 QJsonObject TestObject::createJson(const QJsonObject &delta, const QString &rmKey)
 {
 	auto base = QJsonObject({
@@ -215,7 +223,8 @@ QJsonObject TestObject::createJson(const QJsonObject &delta, const QString &rmKe
 								{"object", QJsonObject()},
 								{"array", QJsonArray()},
 								{"value", QJsonValue::Null},
-								{"stdTuple", QJsonArray{0, QString{}, QJsonArray{}}}
+								{"stdTuple", QJsonArray{0, QString{}, QJsonArray{}}},
+								{"stdPair", QJsonArray{false, 0}}
 							});
 	for(auto it = delta.constBegin(); it != delta.constEnd(); ++it)
 		base[it.key()] = it.value();
@@ -273,7 +282,8 @@ bool TestObject::equals(const TestObject *other) const
 				  object == other->object &&
 				  array == other->array &&
 				  value == other->value &&
-				  stdTuple == other->stdTuple;
+				  stdTuple == other->stdTuple &&
+				  stdPair == other->stdPair;
 		if(!ok)
 			return false;
 

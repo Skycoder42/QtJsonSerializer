@@ -80,7 +80,7 @@ public:
 	static bool registerPointerListConverters();
 	//! Registers two types for pair conversion
 	template<typename T, typename U>
-	static bool registerPairConverters();
+	static bool registerPairConverters(const char *originalTypeName = nullptr);
 	template<typename... TArgs>
 	static bool registerTupleConverters(const char *originalTypeName = nullptr);
 
@@ -303,8 +303,10 @@ bool QJsonSerializer::registerPointerListConverters()
 }
 
 template<typename T1, typename T2>
-bool QJsonSerializer::registerPairConverters()
+bool QJsonSerializer::registerPairConverters(const char *originalTypeName)
 {
+	if(originalTypeName)
+		registerInverseTypedef<std::pair<T1, T2>>(originalTypeName);
 	auto ok1 = QMetaType::registerConverter<QPair<T1, T2>, QPair<QVariant, QVariant>>([](const QPair<T1, T2> &pair) -> QPair<QVariant, QVariant> {
 		return {
 			QVariant::fromValue(pair.first),
@@ -317,7 +319,19 @@ bool QJsonSerializer::registerPairConverters()
 			pair.second.value<T2>()
 		};
 	});
-	return ok1 && ok2;
+	auto ok3 = QMetaType::registerConverter<std::pair<T1, T2>, QPair<QVariant, QVariant>>([](const std::pair<T1, T2> &pair) -> QPair<QVariant, QVariant> {
+		return {
+			QVariant::fromValue(pair.first),
+			QVariant::fromValue(pair.second)
+		};
+	});
+	auto ok4 = QMetaType::registerConverter<QPair<QVariant, QVariant>, std::pair<T1, T2>>([](const QPair<QVariant, QVariant> &pair) -> std::pair<T1, T2> {
+		return {
+			pair.first.value<T1>(),
+			pair.second.value<T2>()
+		};
+	});
+	return ok1 && ok2 && ok3 && ok4;
 }
 
 template<typename... TArgs>
