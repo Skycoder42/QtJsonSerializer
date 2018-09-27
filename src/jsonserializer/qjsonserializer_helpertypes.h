@@ -10,7 +10,9 @@
 #include <QtCore/qjsonvalue.h>
 #include <QtCore/qjsonobject.h>
 #include <QtCore/qjsonarray.h>
+
 #include <type_traits>
+#include <tuple>
 
 namespace _qjsonserializer_helpertypes {
 
@@ -151,6 +153,52 @@ struct variant_helper<QVariant> {
 		return data;
 	}
 };
+
+
+
+namespace tuple_helpers {
+
+template<size_t... Is>
+struct seq { };
+
+template<size_t N, size_t... Is>
+struct gen_seq : gen_seq<N - 1, N - 1, Is...> { };
+
+template<size_t... Is>
+struct gen_seq<0, Is...> : seq<Is...> { };
+
+
+
+template<typename TTuple, size_t... Is>
+void for_each_to_list(TTuple&& tpl, QVariantList &list, seq<Is...>)
+{
+	auto l = { (list.append(QVariant::fromValue(std::get<Is>(tpl))), 0)... };
+	Q_UNUSED(l);
+}
+
+template<typename TTuple, size_t... Is>
+void for_each_from_list(TTuple&& tpl, const QVariantList &list, seq<Is...>)
+{
+	auto l = { (std::get<Is>(tpl) = list[Is].value<typename std::tuple_element<Is, typename std::decay<TTuple>::type>::type>(), 0)... };
+	Q_UNUSED(l);
+}
+
+}
+
+template <typename... TArgs>
+QVariantList tplToList(const std::tuple<TArgs...> &tpl) {
+	QVariantList list;
+	list.reserve(sizeof...(TArgs));
+	tuple_helpers::for_each_to_list(tpl, list, tuple_helpers::gen_seq<sizeof...(TArgs)>{});
+	return list;
+}
+
+template <typename... TArgs>
+std::tuple<TArgs...> listToTpl(const QVariantList &list) {
+	std::tuple<TArgs...> tpl;
+	tuple_helpers::for_each_from_list(tpl, list, tuple_helpers::gen_seq<sizeof...(TArgs)>{});
+	return tpl;
+}
 
 }
 

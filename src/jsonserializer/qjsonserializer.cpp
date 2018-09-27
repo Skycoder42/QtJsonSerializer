@@ -18,6 +18,7 @@
 #include "typeconverters/qjsongeomconverter_p.h"
 #include "typeconverters/qjsonlocaleconverter_p.h"
 #include "typeconverters/qjsonregularexpressionconverter_p.h"
+#include "typeconverters/qjsonstdtupleconverter_p.h"
 
 QJsonSerializer::QJsonSerializer(QObject *parent) :
 	QObject{parent},
@@ -472,6 +473,7 @@ QJsonSerializerPrivate::QJsonSerializerPrivate() :
 		QSharedPointer<QJsonPointConverter>::create(),
 		QSharedPointer<QJsonLineConverter>::create(),
 		QSharedPointer<QJsonRectConverter>::create(),
-		QSharedPointer<QJsonRegularExpressionConverter>::create()
+		QSharedPointer<QJsonRegularExpressionConverter>::create(),
+		QSharedPointer<QJsonStdTupleConverter>::create()
 	}
 {}

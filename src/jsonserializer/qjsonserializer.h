@@ -81,6 +81,8 @@ public:
 	//! Registers two types for pair conversion
 	template<typename T, typename U>
 	static bool registerPairConverters();
+	template<typename... TArgs>
+	static bool registerTupleConverters(const char *originalTypeName = nullptr);
 
 	//! @readAcFn{QJsonSerializer::allowDefaultNull}
 	bool allowDefaultNull() const;
@@ -315,6 +317,16 @@ bool QJsonSerializer::registerPairConverters()
 			pair.second.value<T2>()
 		};
 	});
+	return ok1 && ok2;
+}
+
+template<typename... TArgs>
+bool QJsonSerializer::registerTupleConverters(const char *originalTypeName)
+{
+	if(originalTypeName)
+		registerInverseTypedef<std::tuple<TArgs...>>(originalTypeName);
+	auto ok1 = QMetaType::registerConverter<std::tuple<TArgs...>, QVariantList>(&_qjsonserializer_helpertypes::tplToList<TArgs...>);
+	auto ok2 = QMetaType::registerConverter<QVariantList, std::tuple<TArgs...>>(&_qjsonserializer_helpertypes::listToTpl<TArgs...>);
 	return ok1 && ok2;
 }
 
