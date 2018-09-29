@@ -8,6 +8,7 @@
 #include <QtJsonSerializer/private/qjsonjsonconverter_p.h>
 #include <QtJsonSerializer/private/qjsonlocaleconverter_p.h>
 #include <QtJsonSerializer/private/qjsonregularexpressionconverter_p.h>
+#include <QtJsonSerializer/private/qjsonversionnumberconverter_p.h>
 
 Q_DECLARE_METATYPE(QSharedPointer<QJsonTypeConverter>)
 Q_DECLARE_METATYPE(QJsonValue::Type)
@@ -45,6 +46,7 @@ private:
 	QSharedPointer<QJsonTypeConverter> jArrConverter;
 	QSharedPointer<QJsonTypeConverter> localeConverter;
 	QSharedPointer<QJsonTypeConverter> regexConverter;
+	QSharedPointer<QJsonTypeConverter> versionConverter;
 
 	void addCommonSerData();
 };
@@ -63,6 +65,7 @@ void TypeConverterTest::initTestCase()
 	jArrConverter.reset(new QJsonJsonArrayConverter{});
 	localeConverter.reset(new QJsonLocaleConverter{});
 	regexConverter.reset(new QJsonRegularExpressionConverter{});
+	versionConverter.reset(new QJsonVersionNumberConverter{});
 }
 
 void TypeConverterTest::cleanupTestCase()
@@ -115,6 +118,10 @@ void TypeConverterTest::testConverterMeta_data()
 	QTest::newRow("regex") << regexConverter
 						   << static_cast<int>(QJsonTypeConverter::Standard)
 						   << QList<QJsonValue::Type>{QJsonValue::Object, QJsonValue::String};
+
+	QTest::newRow("version") << versionConverter
+							 << static_cast<int>(QJsonTypeConverter::Standard)
+							 << QList<QJsonValue::Type>{QJsonValue::String};
 }
 
 void TypeConverterTest::testConverterMeta()
@@ -220,6 +227,13 @@ void TypeConverterTest::testMetaTypeDetection_data()
 	QTest::newRow("regex.invalid") << regexConverter
 								   << static_cast<int>(QMetaType::QString)
 								   << false;
+
+	QTest::newRow("version.version") << versionConverter
+									 << qMetaTypeId<QVersionNumber>()
+									 << true;
+	QTest::newRow("version.invalid") << versionConverter
+									 << static_cast<int>(QMetaType::QString)
+									 << false;
 }
 
 void TypeConverterTest::testMetaTypeDetection()
@@ -362,6 +376,19 @@ void TypeConverterTest::testDeserialization_data()
 								  << static_cast<int>(QMetaType::QRegularExpression)
 								  << QVariant{QRegularExpression{QStringLiteral("just\\sa\\sstring")}}
 								  << QJsonValue{QStringLiteral("just\\sa\\sstring")};
+
+	QTest::newRow("version.suffixed") << versionConverter
+									  << QVariantHash{}
+									  << TestQ{}
+									  << qMetaTypeId<QVersionNumber>()
+									  << QVariant::fromValue(QVersionNumber{1, 2, 3})
+									  << QJsonValue{QStringLiteral("1.2.3-r1")};
+	QTest::newRow("version.invalid") << versionConverter
+									 << QVariantHash{}
+									 << TestQ{}
+									 << qMetaTypeId<QVersionNumber>()
+									 << QVariant{}
+									 << QJsonValue{QStringLiteral("A1.4.5")};
 }
 
 void TypeConverterTest::testDeserialization()
@@ -549,6 +576,19 @@ void TypeConverterTest::addCommonSerData()
 										  {QStringLiteral("pattern"), QStringLiteral("^\\w*m$")},
 										  {QStringLiteral("options"), static_cast<int>(QRegularExpression::OptimizeOnFirstUsageOption | QRegularExpression::CaseInsensitiveOption)}
 									  }};
+
+	QTest::newRow("version.simple") << versionConverter
+									<< QVariantHash{}
+									<< TestQ{}
+									<< qMetaTypeId<QVersionNumber>()
+									<< QVariant::fromValue(QVersionNumber{1, 2, 3})
+									<< QJsonValue{QStringLiteral("1.2.3")};
+	QTest::newRow("version.long") << versionConverter
+								  << QVariantHash{}
+								  << TestQ{}
+								  << qMetaTypeId<QVersionNumber>()
+								  << QVariant::fromValue(QVersionNumber{1, 2, 3, 4, 5})
+								  << QJsonValue{QStringLiteral("1.2.3.4.5")};
 }
 
 QTEST_MAIN(TypeConverterTest)
