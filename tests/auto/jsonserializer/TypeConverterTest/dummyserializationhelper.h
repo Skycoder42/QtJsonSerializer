@@ -19,13 +19,14 @@ public:
 
 	QVariantHash properties;
 	struct SerInfo {
+		int typeId;
 		QVariant variant;
 		QJsonValue json;
 	};
-	mutable QQueue<SerInfo> serData;
-	mutable QQueue<SerInfo> deserData;
+	mutable QList<SerInfo> serData;
+	mutable QList<SerInfo> deserData;
 };
 
-Q_DECLARE_METATYPE(QQueue<DummySerializationHelper::SerInfo>)
+Q_DECLARE_METATYPE(QList<DummySerializationHelper::SerInfo>)
 
 #endif // DUMMYSERIALIZATIONHELPER_H

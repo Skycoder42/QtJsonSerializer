@@ -23,9 +23,10 @@ QJsonValue DummySerializationHelper::serializeSubtype(int propertyType, const QV
 	if(serData.isEmpty())
 		throw QJsonSerializationException{"No more data to serialize was expected"};
 
-	auto data = serData.dequeue();
+	auto data = serData.takeFirst();
 	auto ok = false;
 	[&](){
+		QCOMPARE(propertyType, data.typeId);
 		QCOMPARE(value, data.variant);
 		ok = true;
 	}();
@@ -46,9 +47,10 @@ QVariant DummySerializationHelper::deserializeSubtype(int propertyType, const QJ
 	if(deserData.isEmpty())
 		throw QJsonDeserializationException{"No more data to deserialize was expected"};
 
-	auto data = deserData.dequeue();
+	auto data = deserData.takeFirst();
 	auto ok = false;
 	[&](){
+		QCOMPARE(propertyType, data.typeId);
 		QCOMPARE(value, data.json);
 		QCOMPARE(parent, this->parent());
 		ok = true;
