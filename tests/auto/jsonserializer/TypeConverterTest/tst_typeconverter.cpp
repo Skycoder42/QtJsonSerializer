@@ -7,6 +7,7 @@
 #include <QtJsonSerializer/private/qjsongeomconverter_p.h>
 #include <QtJsonSerializer/private/qjsonjsonconverter_p.h>
 #include <QtJsonSerializer/private/qjsonlocaleconverter_p.h>
+#include <QtJsonSerializer/private/qjsonregularexpressionconverter_p.h>
 
 Q_DECLARE_METATYPE(QSharedPointer<QJsonTypeConverter>)
 Q_DECLARE_METATYPE(QJsonValue::Type)
@@ -43,6 +44,7 @@ private:
 	QSharedPointer<QJsonTypeConverter> jObjConverter;
 	QSharedPointer<QJsonTypeConverter> jArrConverter;
 	QSharedPointer<QJsonTypeConverter> localeConverter;
+	QSharedPointer<QJsonTypeConverter> regexConverter;
 
 	void addCommonSerData();
 };
@@ -60,6 +62,7 @@ void TypeConverterTest::initTestCase()
 	jObjConverter.reset(new QJsonJsonObjectConverter{});
 	jArrConverter.reset(new QJsonJsonArrayConverter{});
 	localeConverter.reset(new QJsonLocaleConverter{});
+	regexConverter.reset(new QJsonRegularExpressionConverter{});
 }
 
 void TypeConverterTest::cleanupTestCase()
@@ -108,6 +111,10 @@ void TypeConverterTest::testConverterMeta_data()
 	QTest::newRow("locale") << localeConverter
 							<< static_cast<int>(QJsonTypeConverter::Standard)
 							<< QList<QJsonValue::Type>{QJsonValue::String};
+
+	QTest::newRow("regex") << regexConverter
+						   << static_cast<int>(QJsonTypeConverter::Standard)
+						   << QList<QJsonValue::Type>{QJsonValue::Object, QJsonValue::String};
 }
 
 void TypeConverterTest::testConverterMeta()
@@ -206,6 +213,13 @@ void TypeConverterTest::testMetaTypeDetection_data()
 	QTest::newRow("locale.invalid") << localeConverter
 									<< static_cast<int>(QMetaType::QString)
 									<< false;
+
+	QTest::newRow("regex.regex") << regexConverter
+								 << static_cast<int>(QMetaType::QRegularExpression)
+								 << true;
+	QTest::newRow("regex.invalid") << regexConverter
+								   << static_cast<int>(QMetaType::QString)
+								   << false;
 }
 
 void TypeConverterTest::testMetaTypeDetection()
@@ -341,6 +355,13 @@ void TypeConverterTest::testDeserialization_data()
 									<< static_cast<int>(QMetaType::QLocale)
 									<< QVariant{}
 									<< QJsonValue{QStringLiteral("some random text")};
+
+	QTest::newRow("regex.string") << regexConverter
+								  << QVariantHash{}
+								  << TestQ{}
+								  << static_cast<int>(QMetaType::QRegularExpression)
+								  << QVariant{QRegularExpression{QStringLiteral("just\\sa\\sstring")}}
+								  << QJsonValue{QStringLiteral("just\\sa\\sstring")};
 }
 
 void TypeConverterTest::testDeserialization()
@@ -509,6 +530,25 @@ void TypeConverterTest::addCommonSerData()
 										  << static_cast<int>(QMetaType::QLocale)
 										  << QVariant{QLocale{QLocale::German, QLocale::Austria}}
 										  << QJsonValue{QStringLiteral("de-AT")};
+
+	QTest::newRow("regex.simple") << regexConverter
+								  << QVariantHash{}
+								  << TestQ{}
+								  << static_cast<int>(QMetaType::QRegularExpression)
+								  << QVariant{QRegularExpression{QStringLiteral("^\\w*m$")}}
+								  << QJsonValue{QJsonObject{
+											{QStringLiteral("pattern"), QStringLiteral("^\\w*m$")},
+											{QStringLiteral("options"), static_cast<int>(QRegularExpression::NoPatternOption)}
+										}};
+	QTest::newRow("regex.opts") << regexConverter
+								<< QVariantHash{}
+								<< TestQ{}
+								<< static_cast<int>(QMetaType::QRegularExpression)
+								<< QVariant{QRegularExpression{QStringLiteral("^\\w*m$"), QRegularExpression::OptimizeOnFirstUsageOption | QRegularExpression::CaseInsensitiveOption}}
+								<< QJsonValue{QJsonObject{
+										  {QStringLiteral("pattern"), QStringLiteral("^\\w*m$")},
+										  {QStringLiteral("options"), static_cast<int>(QRegularExpression::OptimizeOnFirstUsageOption | QRegularExpression::CaseInsensitiveOption)}
+									  }};
 }
 
 QTEST_MAIN(TypeConverterTest)
