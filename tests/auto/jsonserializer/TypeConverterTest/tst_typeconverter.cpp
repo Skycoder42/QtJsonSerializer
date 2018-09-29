@@ -14,6 +14,7 @@
 
 // container converters
 #include <QtJsonSerializer/private/qjsonlistconverter_p.h>
+#include <QtJsonSerializer/private/qjsonmapconverter_p.h>
 
 Q_DECLARE_METATYPE(QSharedPointer<QJsonTypeConverter>)
 Q_DECLARE_METATYPE(QJsonValue::Type)
@@ -52,7 +53,9 @@ private:
 	QSharedPointer<QJsonTypeConverter> localeConverter;
 	QSharedPointer<QJsonTypeConverter> regexConverter;
 	QSharedPointer<QJsonTypeConverter> versionConverter;
+
 	QSharedPointer<QJsonTypeConverter> listConverter;
+	QSharedPointer<QJsonTypeConverter> mapConverter;
 
 	void addCommonSerData();
 };
@@ -72,7 +75,9 @@ void TypeConverterTest::initTestCase()
 	localeConverter.reset(new QJsonLocaleConverter{});
 	regexConverter.reset(new QJsonRegularExpressionConverter{});
 	versionConverter.reset(new QJsonVersionNumberConverter{});
+
 	listConverter.reset(new QJsonListConverter{});
+	mapConverter.reset(new QJsonMapConverter{});
 }
 
 void TypeConverterTest::cleanupTestCase()
@@ -133,6 +138,10 @@ void TypeConverterTest::testConverterMeta_data()
 	QTest::newRow("list") << listConverter
 						  << static_cast<int>(QJsonTypeConverter::Standard)
 						  << QList<QJsonValue::Type>{QJsonValue::Array};
+
+	QTest::newRow("map") << mapConverter
+						 << static_cast<int>(QJsonTypeConverter::Standard)
+						 << QList<QJsonValue::Type>{QJsonValue::Object};
 }
 
 void TypeConverterTest::testConverterMeta()
@@ -267,6 +276,31 @@ void TypeConverterTest::testMetaTypeDetection_data()
 	QTest::newRow("list.invalid") << listConverter
 								  << qMetaTypeId<QVector<int>>()
 								  << false;
+
+	QTest::newRow("map.int") << mapConverter
+							 << qMetaTypeId<QMap<QString, int>>()
+							 << true;
+	QTest::newRow("map.string") << mapConverter
+								<< qMetaTypeId<QMap<QString, QString>>()
+								<< true;
+	QTest::newRow("map.variant") << mapConverter
+								 << static_cast<int>(QMetaType::QVariantMap)
+								 << true;
+	QTest::newRow("map.object") << mapConverter
+								<< qMetaTypeId<QMap<QString, QObject*>>()
+								<< true;
+	QTest::newRow("map.list") << mapConverter
+							  << qMetaTypeId<QMap<QString, QMap<QString, bool>>>()
+							  << true;
+	QTest::newRow("map.pair") << mapConverter
+							  << qMetaTypeId<QMap<QString, QPair<int, bool>>>()
+							  << true;
+	QTest::newRow("map.invalid.hash") << mapConverter
+									  << qMetaTypeId<QHash<QString, int>>()
+									  << false;
+	QTest::newRow("map.invalid.key") << mapConverter
+									 << qMetaTypeId<QMap<int, int>>()
+									 << false;
 }
 
 void TypeConverterTest::testMetaTypeDetection()
@@ -293,8 +327,15 @@ void TypeConverterTest::testSerialization_data()
 										<< QVariantHash{}
 										<< TestQ{}
 										<< qMetaTypeId<QList<OpaqueDummy>>()
-										<< QVariant::fromValue(OpaqueDummy{})
+										<< QVariant::fromValue(QList<OpaqueDummy>{{}, {}, {}})
 										<< QJsonValue{QJsonValue::Undefined};
+
+	QTest::newRow("map.unconvertible") << mapConverter
+									   << QVariantHash{}
+									   << TestQ{}
+									   << qMetaTypeId<QMap<QString, OpaqueDummy>>()
+									   << QVariant::fromValue(QMap<QString, OpaqueDummy>{{QStringLiteral("d"), {}}})
+									   << QJsonValue{QJsonValue::Undefined};
 }
 
 void TypeConverterTest::testSerialization()
@@ -654,6 +695,33 @@ void TypeConverterTest::addCommonSerData()
 								  << static_cast<int>(QMetaType::QVariantList)
 								  << QVariant{QVariantList{true}}
 								  << QJsonValue{QJsonArray{false}};
+
+	QTest::newRow("map.empty") << mapConverter
+							   << QVariantHash{}
+							   << TestQ{}
+							   << qMetaTypeId<QMap<QString, int>>()
+							   << QVariant::fromValue(QMap<QString, int>{})
+							   << QJsonValue{QJsonObject{}};
+	QTest::newRow("map.filled") << mapConverter
+								<< QVariantHash{}
+								<< TestQ{{QMetaType::Int, 1, 2}, {QMetaType::Int, 3, 4}, {QMetaType::Int, 5, 6}}
+								<< qMetaTypeId<QMap<QString, int>>()
+								<< QVariant::fromValue(QMap<QString, int>{
+														   {QStringLiteral("a"), 1},
+														   {QStringLiteral("b"), 3},
+														   {QStringLiteral("c"), 5}
+													   })
+								<< QJsonValue{QJsonObject{
+										{QStringLiteral("a"), 2},
+										{QStringLiteral("b"), 4},
+										{QStringLiteral("c"), 6}
+									}};
+	QTest::newRow("map.variant") << mapConverter
+								 << QVariantHash{}
+								 << TestQ{{QMetaType::UnknownType, true, false}}
+								 << static_cast<int>(QMetaType::QVariantList)
+								 << QVariant{QVariantMap{{QStringLiteral("tree"), true}}}
+								 << QJsonValue{QJsonObject{{QStringLiteral("tree"), false}}};
 }
 
 QTEST_MAIN(TypeConverterTest)
