@@ -2,13 +2,18 @@
 #include <QtJsonSerializer>
 
 #include "dummyserializationhelper.h"
+#include "opaquedummy.h"
 
+// basic converters
 #include <QtJsonSerializer/private/qjsonbytearrayconverter_p.h>
 #include <QtJsonSerializer/private/qjsongeomconverter_p.h>
 #include <QtJsonSerializer/private/qjsonjsonconverter_p.h>
 #include <QtJsonSerializer/private/qjsonlocaleconverter_p.h>
 #include <QtJsonSerializer/private/qjsonregularexpressionconverter_p.h>
 #include <QtJsonSerializer/private/qjsonversionnumberconverter_p.h>
+
+// container converters
+#include <QtJsonSerializer/private/qjsonlistconverter_p.h>
 
 Q_DECLARE_METATYPE(QSharedPointer<QJsonTypeConverter>)
 Q_DECLARE_METATYPE(QJsonValue::Type)
@@ -47,6 +52,7 @@ private:
 	QSharedPointer<QJsonTypeConverter> localeConverter;
 	QSharedPointer<QJsonTypeConverter> regexConverter;
 	QSharedPointer<QJsonTypeConverter> versionConverter;
+	QSharedPointer<QJsonTypeConverter> listConverter;
 
 	void addCommonSerData();
 };
@@ -66,6 +72,7 @@ void TypeConverterTest::initTestCase()
 	localeConverter.reset(new QJsonLocaleConverter{});
 	regexConverter.reset(new QJsonRegularExpressionConverter{});
 	versionConverter.reset(new QJsonVersionNumberConverter{});
+	listConverter.reset(new QJsonListConverter{});
 }
 
 void TypeConverterTest::cleanupTestCase()
@@ -122,6 +129,10 @@ void TypeConverterTest::testConverterMeta_data()
 	QTest::newRow("version") << versionConverter
 							 << static_cast<int>(QJsonTypeConverter::Standard)
 							 << QList<QJsonValue::Type>{QJsonValue::String};
+
+	QTest::newRow("list") << listConverter
+						  << static_cast<int>(QJsonTypeConverter::Standard)
+						  << QList<QJsonValue::Type>{QJsonValue::Array};
 }
 
 void TypeConverterTest::testConverterMeta()
@@ -234,6 +245,28 @@ void TypeConverterTest::testMetaTypeDetection_data()
 	QTest::newRow("version.invalid") << versionConverter
 									 << static_cast<int>(QMetaType::QString)
 									 << false;
+
+	QTest::newRow("list.int") << listConverter
+							  << qMetaTypeId<QList<int>>()
+							  << true;
+	QTest::newRow("list.string") << listConverter
+								 << static_cast<int>(QMetaType::QStringList)
+								 << true;
+	QTest::newRow("list.variant") << listConverter
+								  << static_cast<int>(QMetaType::QVariantList)
+								  << true;
+	QTest::newRow("list.object") << listConverter
+								 << qMetaTypeId<QList<QObject*>>()
+								 << true;
+	QTest::newRow("list.list") << listConverter
+							   << qMetaTypeId<QList<QList<bool>>>()
+							   << true;
+	QTest::newRow("list.pair") << listConverter
+							   << qMetaTypeId<QList<QPair<int, bool>>>()
+							   << true;
+	QTest::newRow("list.invalid") << listConverter
+								  << qMetaTypeId<QVector<int>>()
+								  << false;
 }
 
 void TypeConverterTest::testMetaTypeDetection()
@@ -255,6 +288,13 @@ void TypeConverterTest::testSerialization_data()
 	QTest::addColumn<QJsonValue>("result");
 
 	addCommonSerData();
+
+	QTest::newRow("list.unconvertible") << listConverter
+										<< QVariantHash{}
+										<< TestQ{}
+										<< qMetaTypeId<QList<OpaqueDummy>>()
+										<< QVariant::fromValue(OpaqueDummy{})
+										<< QJsonValue{QJsonValue::Undefined};
 }
 
 void TypeConverterTest::testSerialization()
@@ -589,6 +629,31 @@ void TypeConverterTest::addCommonSerData()
 								  << qMetaTypeId<QVersionNumber>()
 								  << QVariant::fromValue(QVersionNumber{1, 2, 3, 4, 5})
 								  << QJsonValue{QStringLiteral("1.2.3.4.5")};
+
+	QTest::newRow("list.empty") << listConverter
+								<< QVariantHash{}
+								<< TestQ{}
+								<< qMetaTypeId<QList<int>>()
+								<< QVariant::fromValue(QList<int>{})
+								<< QJsonValue{QJsonArray{}};
+	QTest::newRow("list.filled") << listConverter
+								 << QVariantHash{}
+								 << TestQ{{QMetaType::Int, 1, 2}, {QMetaType::Int, 3, 4}, {QMetaType::Int, 5, 6}}
+								 << qMetaTypeId<QList<int>>()
+								 << QVariant::fromValue(QList<int>{1, 3, 5})
+								 << QJsonValue{QJsonArray{2, 4, 6}};
+	QTest::newRow("list.string") << listConverter
+								 << QVariantHash{}
+								 << TestQ{{QMetaType::QString, QStringLiteral("test"), QStringLiteral("tree")}}
+								 << static_cast<int>(QMetaType::QStringList)
+								 << QVariant{QStringList{QStringLiteral("test")}}
+								 << QJsonValue{QJsonArray{QStringLiteral("tree")}};
+	QTest::newRow("list.variant") << listConverter
+								  << QVariantHash{}
+								  << TestQ{{QMetaType::UnknownType, true, false}}
+								  << static_cast<int>(QMetaType::QVariantList)
+								  << QVariant{QVariantList{true}}
+								  << QJsonValue{QJsonArray{false}};
 }
 
 QTEST_MAIN(TypeConverterTest)

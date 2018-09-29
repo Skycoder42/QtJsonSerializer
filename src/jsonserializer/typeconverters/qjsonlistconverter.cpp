@@ -52,7 +52,7 @@ int QJsonListConverter::getSubtype(int listType) const
 	int metaType = QMetaType::UnknownType;
 	if(listType == QMetaType::QStringList)
 		metaType = QMetaType::QString;
-	else {
+	else if(listType != QMetaType::QVariantList) {
 		auto match = listTypeRegex.match(QString::fromUtf8(getCanonicalTypeName(listType)));
 		if(match.hasMatch())
 			metaType = QMetaType::type(match.captured(1).toUtf8().trimmed());
