@@ -456,9 +456,6 @@ QByteArray QJsonSerializerPrivate::getTypeName(int propertyType)
 
 QJsonSerializerPrivate::QJsonSerializerPrivate() :
 	typeConverters{
-		//prio 1
-		QSharedPointer<QJsonLocaleConverter>::create(),
-		//prio 0
 		QSharedPointer<QJsonObjectConverter>::create(),
 		QSharedPointer<QJsonGadgetConverter>::create(),
 		QSharedPointer<QJsonMapConverter>::create(),
@@ -473,6 +470,7 @@ QJsonSerializerPrivate::QJsonSerializerPrivate() :
 		QSharedPointer<QJsonPointConverter>::create(),
 		QSharedPointer<QJsonLineConverter>::create(),
 		QSharedPointer<QJsonRectConverter>::create(),
+		QSharedPointer<QJsonLocaleConverter>::create(),
 		QSharedPointer<QJsonRegularExpressionConverter>::create(),
 		QSharedPointer<QJsonStdTupleConverter>::create()
 	}

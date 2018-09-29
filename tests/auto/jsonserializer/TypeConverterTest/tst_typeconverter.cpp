@@ -6,6 +6,7 @@
 #include <QtJsonSerializer/private/qjsonbytearrayconverter_p.h>
 #include <QtJsonSerializer/private/qjsongeomconverter_p.h>
 #include <QtJsonSerializer/private/qjsonjsonconverter_p.h>
+#include <QtJsonSerializer/private/qjsonlocaleconverter_p.h>
 
 Q_DECLARE_METATYPE(QSharedPointer<QJsonTypeConverter>)
 Q_DECLARE_METATYPE(QJsonValue::Type)
@@ -41,6 +42,7 @@ private:
 	QSharedPointer<QJsonTypeConverter> jValConverter;
 	QSharedPointer<QJsonTypeConverter> jObjConverter;
 	QSharedPointer<QJsonTypeConverter> jArrConverter;
+	QSharedPointer<QJsonTypeConverter> localeConverter;
 
 	void addCommonSerData();
 };
@@ -57,6 +59,7 @@ void TypeConverterTest::initTestCase()
 	jValConverter.reset(new QJsonJsonValueConverter{});
 	jObjConverter.reset(new QJsonJsonObjectConverter{});
 	jArrConverter.reset(new QJsonJsonArrayConverter{});
+	localeConverter.reset(new QJsonLocaleConverter{});
 }
 
 void TypeConverterTest::cleanupTestCase()
@@ -101,6 +104,10 @@ void TypeConverterTest::testConverterMeta_data()
 	QTest::newRow("json.array") << jArrConverter
 								<< static_cast<int>(QJsonTypeConverter::Standard)
 								<< QList<QJsonValue::Type>{QJsonValue::Array};
+
+	QTest::newRow("locale") << localeConverter
+							<< static_cast<int>(QJsonTypeConverter::Standard)
+							<< QList<QJsonValue::Type>{QJsonValue::String};
 }
 
 void TypeConverterTest::testConverterMeta()
@@ -122,15 +129,15 @@ void TypeConverterTest::testMetaTypeDetection_data()
 	QTest::newRow("bytearray.bytearray") << byteConverter
 										 << static_cast<int>(QMetaType::QByteArray)
 										 << true;
-	QTest::newRow("bytearray.string") << byteConverter
-									  << static_cast<int>(QMetaType::QString)
-									  << false;
-	QTest::newRow("bytearray.char") << byteConverter
-									<< static_cast<int>(QMetaType::Char)
-									<< false;
-	QTest::newRow("bytearray.string") << byteConverter
-									  << static_cast<int>(QMetaType::Int)
-									  << false;
+	QTest::newRow("bytearray.invalid.string") << byteConverter
+											  << static_cast<int>(QMetaType::QString)
+											  << false;
+	QTest::newRow("bytearray.invalid.char") << byteConverter
+											<< static_cast<int>(QMetaType::Char)
+											<< false;
+	QTest::newRow("bytearray.invalid.string") << byteConverter
+											  << static_cast<int>(QMetaType::Int)
+											  << false;
 
 	QTest::newRow("size.size") << sizeConverter
 							   << static_cast<int>(QMetaType::QSize)
@@ -138,9 +145,9 @@ void TypeConverterTest::testMetaTypeDetection_data()
 	QTest::newRow("size.sizef") << sizeConverter
 								<< static_cast<int>(QMetaType::QSizeF)
 								<< true;
-	QTest::newRow("size.point") << sizeConverter
-								<< static_cast<int>(QMetaType::QPoint)
-								<< false;
+	QTest::newRow("size.invalid") << sizeConverter
+								  << static_cast<int>(QMetaType::QPoint)
+								  << false;
 
 	QTest::newRow("point.point") << pointConverter
 								 << static_cast<int>(QMetaType::QPoint)
@@ -148,9 +155,9 @@ void TypeConverterTest::testMetaTypeDetection_data()
 	QTest::newRow("point.pointf") << pointConverter
 								  << static_cast<int>(QMetaType::QPointF)
 								  << true;
-	QTest::newRow("point.size") << pointConverter
-								<< static_cast<int>(QMetaType::QSize)
-								<< false;
+	QTest::newRow("point.invalid") << pointConverter
+								   << static_cast<int>(QMetaType::QSize)
+								   << false;
 
 	QTest::newRow("line.line") << lineConverter
 							   << static_cast<int>(QMetaType::QLine)
@@ -158,9 +165,9 @@ void TypeConverterTest::testMetaTypeDetection_data()
 	QTest::newRow("line.linef") << lineConverter
 								<< static_cast<int>(QMetaType::QLineF)
 								<< true;
-	QTest::newRow("line.point") << lineConverter
-								<< static_cast<int>(QMetaType::QPoint)
-								<< false;
+	QTest::newRow("line.invalid") << lineConverter
+								  << static_cast<int>(QMetaType::QPoint)
+								  << false;
 
 	QTest::newRow("rect.rect") << rectConverter
 							   << static_cast<int>(QMetaType::QRect)
@@ -168,30 +175,37 @@ void TypeConverterTest::testMetaTypeDetection_data()
 	QTest::newRow("rect.rectf") << rectConverter
 								<< static_cast<int>(QMetaType::QRectF)
 								<< true;
-	QTest::newRow("rect.line") << rectConverter
-							   << static_cast<int>(QMetaType::QLine)
-							   << false;
+	QTest::newRow("rect.invalid") << rectConverter
+								  << static_cast<int>(QMetaType::QLine)
+								  << false;
 
 	QTest::newRow("json.value.value") << jValConverter
 									  << static_cast<int>(QMetaType::QJsonValue)
 									  << true;
-	QTest::newRow("json.value.object") << jValConverter
-									   << static_cast<int>(QMetaType::QJsonObject)
-									   << false;
+	QTest::newRow("json.value.invalid") << jValConverter
+										<< static_cast<int>(QMetaType::QJsonObject)
+										<< false;
 
 	QTest::newRow("json.object.object") << jObjConverter
 										<< static_cast<int>(QMetaType::QJsonObject)
 										<< true;
-	QTest::newRow("json.object.array") << jObjConverter
-									   << static_cast<int>(QMetaType::QJsonArray)
-									   << false;
+	QTest::newRow("json.object.invalid") << jObjConverter
+										 << static_cast<int>(QMetaType::QJsonArray)
+										 << false;
 
 	QTest::newRow("json.array.array") << jArrConverter
 									  << static_cast<int>(QMetaType::QJsonArray)
 									  << true;
-	QTest::newRow("json.array.object") << jArrConverter
-									   << static_cast<int>(QMetaType::QJsonObject)
-									   << false;
+	QTest::newRow("json.array.invalid") << jArrConverter
+										<< static_cast<int>(QMetaType::QJsonObject)
+										<< false;
+
+	QTest::newRow("locale.locale") << localeConverter
+								   << static_cast<int>(QMetaType::QLocale)
+								   << true;
+	QTest::newRow("locale.invalid") << localeConverter
+									<< static_cast<int>(QMetaType::QString)
+									<< false;
 }
 
 void TypeConverterTest::testMetaTypeDetection()
@@ -274,6 +288,59 @@ void TypeConverterTest::testDeserialization_data()
 										  << static_cast<int>(QMetaType::QByteArray)
 										  << QVariant{}
 										  << QJsonValue{QStringLiteral("SGVsbG%gV29ybGQ=")};
+
+	QTest::newRow("size.invalid") << sizeConverter
+								  << QVariantHash{}
+								  << TestQ{}
+								  << static_cast<int>(QMetaType::QSize)
+								  << QVariant{}
+								  << QJsonValue{QJsonObject{
+											{QStringLiteral("width"), 42},
+											{QStringLiteral("haight"), 42}
+										}};
+
+	QTest::newRow("point.invalid") << pointConverter
+								   << QVariantHash{}
+								   << TestQ{}
+								   << static_cast<int>(QMetaType::QPoint)
+								   << QVariant{}
+								   << QJsonValue{QJsonObject{
+											{QStringLiteral("x"), 42},
+											{QStringLiteral("z"), 42}
+										}};
+
+	QTest::newRow("line.invalid") << lineConverter
+								  << QVariantHash{}
+								  << TestQ{}
+								  << static_cast<int>(QMetaType::QLine)
+								  << QVariant{}
+								  << QJsonValue{QJsonObject{
+											{QStringLiteral("p1"), 42},
+											{QStringLiteral("p3"), 42}
+										}};
+
+	QTest::newRow("rect.invalid") << rectConverter
+								  << QVariantHash{}
+								  << TestQ{}
+								  << static_cast<int>(QMetaType::QRect)
+								  << QVariant{}
+								  << QJsonValue{QJsonObject{
+											{QStringLiteral("left"), 42},
+											{QStringLiteral("right"), 42}
+										}};
+
+	QTest::newRow("locale.empty") << localeConverter
+								  << QVariantHash{}
+								  << TestQ{}
+								  << static_cast<int>(QMetaType::QLocale)
+								  << QVariant{QLocale::c()}
+								  << QJsonValue{QString{}};
+	QTest::newRow("locale.invalid") << localeConverter
+									<< QVariantHash{}
+									<< TestQ{}
+									<< static_cast<int>(QMetaType::QLocale)
+									<< QVariant{}
+									<< QJsonValue{QStringLiteral("some random text")};
 }
 
 void TypeConverterTest::testDeserialization()
@@ -417,6 +484,31 @@ void TypeConverterTest::addCommonSerData()
 								<< static_cast<int>(QMetaType::QJsonArray)
 								<< QVariant{QJsonArray{10, 20, true, 4.2}}
 								<< QJsonValue{QJsonArray{10, 20, true, 4.2}};
+
+	QTest::newRow("locale.normal") << localeConverter
+								   << QVariantHash{}
+								   << TestQ{}
+								   << static_cast<int>(QMetaType::QLocale)
+								   << QVariant{QLocale{QLocale::German, QLocale::Germany}}
+								   << QJsonValue{QStringLiteral("de_DE")};
+	QTest::newRow("locale.c") << localeConverter
+							  << QVariantHash{}
+							  << TestQ{}
+							  << static_cast<int>(QMetaType::QLocale)
+							  << QVariant{QLocale::c()}
+							  << QJsonValue{QStringLiteral("C")};
+	QTest::newRow("locale.bcp47.default") << localeConverter
+										  << QVariantHash{{QStringLiteral("useBcp47Locale"), true}}
+										  << TestQ{}
+										  << static_cast<int>(QMetaType::QLocale)
+										  << QVariant{QLocale{QLocale::German, QLocale::Germany}}
+										  << QJsonValue{QStringLiteral("de")};
+	QTest::newRow("locale.bcp47.special") << localeConverter
+										  << QVariantHash{{QStringLiteral("useBcp47Locale"), true}}
+										  << TestQ{}
+										  << static_cast<int>(QMetaType::QLocale)
+										  << QVariant{QLocale{QLocale::German, QLocale::Austria}}
+										  << QJsonValue{QStringLiteral("de-AT")};
 }
 
 QTEST_MAIN(TypeConverterTest)

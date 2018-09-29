@@ -7,10 +7,11 @@
 
 bool QJsonGadgetConverter::canConvert(int metaTypeId) const
 {
-	// exclude a few Qt gadgets that have no properties and thus need to be handelt as normal strings
+	// exclude a few Qt gadgets that have no properties and thus need to be handled otherwise
 	static const QSet<int> gadgetExceptions {
 		QMetaType::QKeySequence,
-		QMetaType::QFont
+		QMetaType::QFont,
+		QMetaType::QLocale,
 	};
 	if(gadgetExceptions.contains(metaTypeId))
 		return false;

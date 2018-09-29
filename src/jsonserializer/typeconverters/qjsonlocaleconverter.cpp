@@ -3,11 +3,6 @@
 
 #include <QtCore/QLocale>
 
-QJsonLocaleConverter::QJsonLocaleConverter()
-{
-	setPriority((Standard) + 1); //higher prio then gadget, as QLocal is a gadget (without any properties...)
-}
-
 bool QJsonLocaleConverter::canConvert(int metaTypeId) const
 {
 	return metaTypeId == QMetaType::QLocale;

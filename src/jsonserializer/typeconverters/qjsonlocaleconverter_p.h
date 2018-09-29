@@ -7,8 +7,6 @@
 class Q_JSONSERIALIZER_EXPORT QJsonLocaleConverter : public QJsonTypeConverter
 {
 public:
-	QJsonLocaleConverter();
-
 	bool canConvert(int metaTypeId) const override;
 	QList<QJsonValue::Type> jsonTypes() const override;
 	QJsonValue serialize(int propertyType, const QVariant &value, const SerializationHelper *helper) const override;
