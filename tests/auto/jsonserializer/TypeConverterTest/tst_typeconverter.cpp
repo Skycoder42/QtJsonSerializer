@@ -5,6 +5,7 @@
 
 #include <QtJsonSerializer/private/qjsonbytearrayconverter_p.h>
 #include <QtJsonSerializer/private/qjsongeomconverter_p.h>
+#include <QtJsonSerializer/private/qjsonjsonconverter_p.h>
 
 Q_DECLARE_METATYPE(QSharedPointer<QJsonTypeConverter>)
 Q_DECLARE_METATYPE(QJsonValue::Type)
@@ -37,6 +38,9 @@ private:
 	QSharedPointer<QJsonTypeConverter> pointConverter;
 	QSharedPointer<QJsonTypeConverter> lineConverter;
 	QSharedPointer<QJsonTypeConverter> rectConverter;
+	QSharedPointer<QJsonTypeConverter> jValConverter;
+	QSharedPointer<QJsonTypeConverter> jObjConverter;
+	QSharedPointer<QJsonTypeConverter> jArrConverter;
 
 	void addCommonSerData();
 };
@@ -50,6 +54,9 @@ void TypeConverterTest::initTestCase()
 	pointConverter.reset(new QJsonPointConverter{});
 	lineConverter.reset(new QJsonLineConverter{});
 	rectConverter.reset(new QJsonRectConverter{});
+	jValConverter.reset(new QJsonJsonValueConverter{});
+	jObjConverter.reset(new QJsonJsonObjectConverter{});
+	jArrConverter.reset(new QJsonJsonArrayConverter{});
 }
 
 void TypeConverterTest::cleanupTestCase()
@@ -82,6 +89,18 @@ void TypeConverterTest::testConverterMeta_data()
 	QTest::newRow("rect") << rectConverter
 						  << static_cast<int>(QJsonTypeConverter::Standard)
 						  << QList<QJsonValue::Type>{QJsonValue::Object};
+
+	QTest::newRow("json.value") << jValConverter
+								<< static_cast<int>(QJsonTypeConverter::Standard)
+								<< QList<QJsonValue::Type>{QJsonValue::Null, QJsonValue::Bool, QJsonValue::Double, QJsonValue::String, QJsonValue::Array, QJsonValue::Object};
+
+	QTest::newRow("json.object") << jObjConverter
+								 << static_cast<int>(QJsonTypeConverter::Standard)
+								 << QList<QJsonValue::Type>{QJsonValue::Object};
+
+	QTest::newRow("json.array") << jArrConverter
+								<< static_cast<int>(QJsonTypeConverter::Standard)
+								<< QList<QJsonValue::Type>{QJsonValue::Array};
 }
 
 void TypeConverterTest::testConverterMeta()
@@ -152,6 +171,27 @@ void TypeConverterTest::testMetaTypeDetection_data()
 	QTest::newRow("rect.line") << rectConverter
 							   << static_cast<int>(QMetaType::QLine)
 							   << false;
+
+	QTest::newRow("json.value.value") << jValConverter
+									  << static_cast<int>(QMetaType::QJsonValue)
+									  << true;
+	QTest::newRow("json.value.object") << jValConverter
+									   << static_cast<int>(QMetaType::QJsonObject)
+									   << false;
+
+	QTest::newRow("json.object.object") << jObjConverter
+										<< static_cast<int>(QMetaType::QJsonObject)
+										<< true;
+	QTest::newRow("json.object.array") << jObjConverter
+									   << static_cast<int>(QMetaType::QJsonArray)
+									   << false;
+
+	QTest::newRow("json.array.array") << jArrConverter
+									  << static_cast<int>(QMetaType::QJsonArray)
+									  << true;
+	QTest::newRow("json.array.object") << jArrConverter
+									   << static_cast<int>(QMetaType::QJsonObject)
+									   << false;
 }
 
 void TypeConverterTest::testMetaTypeDetection()
@@ -262,7 +302,6 @@ void TypeConverterTest::testDeserialization()
 
 void TypeConverterTest::addCommonSerData()
 {
-
 	QTest::newRow("bytearray.basic") << byteConverter
 									 << QVariantHash{}
 									 << TestQ{}
@@ -357,6 +396,27 @@ void TypeConverterTest::addCommonSerData()
 										{QStringLiteral("topLeft"), 42},
 										{QStringLiteral("bottomRight"), 42}
 									}};
+
+	QTest::newRow("json.value") << jValConverter
+								<< QVariantHash{}
+								<< TestQ{}
+								<< static_cast<int>(QMetaType::QJsonValue)
+								<< QVariant{QJsonValue{42}}
+								<< QJsonValue{42};
+
+	QTest::newRow("json.object") << jObjConverter
+								 << QVariantHash{}
+								 << TestQ{}
+								 << static_cast<int>(QMetaType::QJsonObject)
+								 << QVariant{QJsonObject{{QStringLiteral("baum"), 42}}}
+								 << QJsonValue{QJsonObject{{QStringLiteral("baum"), 42}}};
+
+	QTest::newRow("json.array") << jArrConverter
+								<< QVariantHash{}
+								<< TestQ{}
+								<< static_cast<int>(QMetaType::QJsonArray)
+								<< QVariant{QJsonArray{10, 20, true, 4.2}}
+								<< QJsonValue{QJsonArray{10, 20, true, 4.2}};
 }
 
 QTEST_MAIN(TypeConverterTest)
