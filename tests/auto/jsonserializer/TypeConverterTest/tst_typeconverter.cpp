@@ -15,9 +15,17 @@
 // container converters
 #include <QtJsonSerializer/private/qjsonlistconverter_p.h>
 #include <QtJsonSerializer/private/qjsonmapconverter_p.h>
+#include <QtJsonSerializer/private/qjsonpairconverter_p.h>
 
 Q_DECLARE_METATYPE(QSharedPointer<QJsonTypeConverter>)
 Q_DECLARE_METATYPE(QJsonValue::Type)
+
+template <typename T>
+bool operator <(const QMap<QString, T> &m1, const QMap<QString, T> &m2)
+{
+	return m1.keys() < m2.keys() &&
+			m1.values() < m2.values();
+}
 
 class TypeConverterTest : public QObject
 {
@@ -56,12 +64,26 @@ private:
 
 	QSharedPointer<QJsonTypeConverter> listConverter;
 	QSharedPointer<QJsonTypeConverter> mapConverter;
+	QSharedPointer<QJsonTypeConverter> pairConverter;
 
 	void addCommonSerData();
 };
 
 void TypeConverterTest::initTestCase()
 {
+	//converters
+	QJsonSerializer::registerPairConverters<bool, int>();
+	QJsonSerializer::registerPairConverters<int, QList<int>>();
+
+	//comparators
+	QMetaType::registerComparators<QVersionNumber>();
+	QMetaType::registerComparators<QList<int>>();
+	QMetaType::registerComparators<QMap<QString, int>>();
+	QMetaType::registerComparators<QPair<bool, int>>();
+	QMetaType::registerComparators<std::pair<bool, int>>();
+	QMetaType::registerComparators<QPair<int, QList<int>>>();
+
+	// helper classes
 	helper = new DummySerializationHelper{this};
 
 	byteConverter.reset(new QJsonBytearrayConverter{});
@@ -78,6 +100,7 @@ void TypeConverterTest::initTestCase()
 
 	listConverter.reset(new QJsonListConverter{});
 	mapConverter.reset(new QJsonMapConverter{});
+	pairConverter.reset(new QJsonPairConverter{});
 }
 
 void TypeConverterTest::cleanupTestCase()
@@ -142,6 +165,10 @@ void TypeConverterTest::testConverterMeta_data()
 	QTest::newRow("map") << mapConverter
 						 << static_cast<int>(QJsonTypeConverter::Standard)
 						 << QList<QJsonValue::Type>{QJsonValue::Object};
+
+	QTest::newRow("pair") << pairConverter
+						  << static_cast<int>(QJsonTypeConverter::Standard)
+						  << QList<QJsonValue::Type>{QJsonValue::Array};
 }
 
 void TypeConverterTest::testConverterMeta()
@@ -301,6 +328,40 @@ void TypeConverterTest::testMetaTypeDetection_data()
 	QTest::newRow("map.invalid.key") << mapConverter
 									 << qMetaTypeId<QMap<int, int>>()
 									 << false;
+
+	QTest::newRow("pair.qt.basic") << pairConverter
+								   << qMetaTypeId<QPair<QString, int>>()
+								   << true;
+	QTest::newRow("pair.qt.double") << pairConverter
+									<< qMetaTypeId<QPair<int, int>>()
+									<< true;
+	QTest::newRow("pair.qt.list") << pairConverter
+								  << qMetaTypeId<QPair<QList<int>, QList<int>>>()
+								  << true;
+	QTest::newRow("pair.qt.pair") << pairConverter
+								  << qMetaTypeId<QPair<QPair<int, int>, QPair<bool, bool>>>()
+								  << true;
+	QTest::newRow("pair.qt.map") << pairConverter
+								 << qMetaTypeId<QPair<QMap<QString, int>, QList<int>>>()
+								 << true;
+	QTest::newRow("pair.std.basic") << pairConverter
+									<< qMetaTypeId<std::pair<QString, int>>()
+									<< true;
+	QTest::newRow("pair.std.double") << pairConverter
+									 << qMetaTypeId<std::pair<int, int>>()
+									 << true;
+	QTest::newRow("pair.std.list") << pairConverter
+								   << qMetaTypeId<std::pair<QList<int>, QList<int>>>()
+								   << true;
+	QTest::newRow("pair.std.pair") << pairConverter
+								   << qMetaTypeId<std::pair<std::pair<int, int>, std::pair<bool, bool>>>()
+								   << true;
+	QTest::newRow("pair.std.map") << pairConverter
+								  << qMetaTypeId<std::pair<QMap<QString, int>, QList<int>>>()
+								  << true;
+	QTest::newRow("pair.invalid") << versionConverter
+								  << static_cast<int>(QMetaType::QVariantList)
+								  << false;
 }
 
 void TypeConverterTest::testMetaTypeDetection()
@@ -489,7 +550,7 @@ void TypeConverterTest::testDeserialization()
 			QVERIFY_EXCEPTION_THROWN(converter->deserialize(type, data, this, helper), QJsonDeserializationException);
 		else {
 			auto res = converter->deserialize(type, data, this, helper);
-			qDebug() << res.value<QVersionNumber>() << result.value<QVersionNumber>();
+			QVERIFY(res.convert(type));
 			QCOMPARE(res, result);
 		}
 	} catch(std::exception &e) {
@@ -720,9 +781,31 @@ void TypeConverterTest::addCommonSerData()
 	QTest::newRow("map.variant") << mapConverter
 								 << QVariantHash{}
 								 << TestQ{{QMetaType::UnknownType, true, false}}
-								 << static_cast<int>(QMetaType::QVariantList)
+								 << static_cast<int>(QMetaType::QVariantMap)
 								 << QVariant{QVariantMap{{QStringLiteral("tree"), true}}}
 								 << QJsonValue{QJsonObject{{QStringLiteral("tree"), false}}};
+
+	QTest::newRow("pair.qt.basic") << pairConverter
+								   << QVariantHash{}
+								   << TestQ{{QMetaType::Bool, true, 42}, {QMetaType::Int, 42, true}}
+								   << qMetaTypeId<QPair<bool, int>>()
+								   << QVariant::fromValue(QPair<bool, int>{true, 42})
+								   << QJsonValue{QJsonArray{42, true}};
+	QTest::newRow("pair.qt.advanced") << pairConverter
+									  << QVariantHash{}
+									  << TestQ{
+												{QMetaType::Int, 3, 1},
+												{qMetaTypeId<QList<int>>(), QVariant::fromValue(QList<int>{}), 2}
+											}
+									  << qMetaTypeId<QPair<int, QList<int>>>()
+									  << QVariant::fromValue(QPair<int, QList<int>>{3, {}})
+									  << QJsonValue{QJsonArray{1, 2}};
+	QTest::newRow("pair.std") << pairConverter
+							  << QVariantHash{}
+							  << TestQ{{QMetaType::Bool, true, 42}, {QMetaType::Int, 42, true}}
+							  << qMetaTypeId<std::pair<bool, int>>()
+							  << QVariant::fromValue(std::pair<bool, int>{true, 42})
+							  << QJsonValue{QJsonArray{42, true}};
 }
 
 QTEST_MAIN(TypeConverterTest)
