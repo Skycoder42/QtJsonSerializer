@@ -4,6 +4,7 @@
 #include "dummyserializationhelper.h"
 #include "opaquedummy.h"
 #include "testgadget.h"
+#include "testobject.h"
 
 // basic converters
 #include <QtJsonSerializer/private/qjsonbytearrayconverter_p.h>
@@ -21,6 +22,7 @@
 
 // "Object" converter
 #include <QtJsonSerializer/private/qjsongadgetconverter_p.h>
+#include <QtJsonSerializer/private/qjsonobjectconverter_p.h>
 
 Q_DECLARE_METATYPE(QSharedPointer<QJsonTypeConverter>)
 Q_DECLARE_METATYPE(QJsonValue::Type)
@@ -81,17 +83,22 @@ private:
 	QSharedPointer<QJsonTypeConverter> tupleConverter;
 
 	QSharedPointer<QJsonTypeConverter> gadgetConverter;
+	QSharedPointer<QJsonTypeConverter> objectConverter;
 
 	void addCommonSerData();
 };
 
 void TypeConverterTest::initTestCase()
 {
+	// meta types
+	qRegisterMetaType<StaticPolyObject*>();
+
 	//converters
 	QJsonSerializer::registerPairConverters<bool, int>();
 	QJsonSerializer::registerPairConverters<int, QList<int>>();
 	QJsonSerializer::registerTupleConverters<int, bool, double>("std::tuple<int, bool, double>");
 	QJsonSerializer::registerTupleConverters<QList<int>, QPair<bool, bool>, QMap<QString, double>>("std::tuple<QList<int>, QPair<bool, bool>, QMap<QString, double>>");
+	QJsonSerializer::registerPointerConverters<TestObject>();
 
 	//comparators
 	QMetaType::registerEqualsComparator<QVersionNumber>();
@@ -122,7 +129,9 @@ void TypeConverterTest::initTestCase()
 	mapConverter.reset(new QJsonMapConverter{});
 	pairConverter.reset(new QJsonPairConverter{});
 	tupleConverter.reset(new QJsonStdTupleConverter{});
+
 	gadgetConverter.reset(new QJsonGadgetConverter{});
+	objectConverter.reset(new QJsonObjectConverter{});
 }
 
 void TypeConverterTest::cleanupTestCase()
@@ -197,6 +206,10 @@ void TypeConverterTest::testConverterMeta_data()
 						   << QList<QJsonValue::Type>{QJsonValue::Array};
 
 	QTest::newRow("gadget") << gadgetConverter
+							<< static_cast<int>(QJsonTypeConverter::Standard)
+							<< QList<QJsonValue::Type>{QJsonValue::Object, QJsonValue::Null};
+
+	QTest::newRow("object") << objectConverter
 							<< static_cast<int>(QJsonTypeConverter::Standard)
 							<< QList<QJsonValue::Type>{QJsonValue::Object, QJsonValue::Null};
 }
@@ -424,6 +437,25 @@ void TypeConverterTest::testMetaTypeDetection_data()
 	QTest::newRow("gadget.invalid.object") << gadgetConverter
 										   << static_cast<int>(QMetaType::QObjectStar)
 										   << false;
+
+	QTest::newRow("object.basic") << objectConverter
+								  << qMetaTypeId<TestObject*>()
+								  << true;
+	QTest::newRow("object.base") << objectConverter
+								 << static_cast<int>(QMetaType::QObjectStar)
+								 << true;
+	QTest::newRow("object.tracking") << objectConverter
+									 << qMetaTypeId<QPointer<TestObject>>()
+									 << true;
+	QTest::newRow("object.shared") << objectConverter
+								   << qMetaTypeId<QSharedPointer<TestObject>>()
+								   << true;
+	QTest::newRow("object.invalid1") << objectConverter
+									 << qMetaTypeId<TestGadget*>()
+									 << false;
+	QTest::newRow("object.invalid2") << objectConverter
+									 << qMetaTypeId<TestGadget>()
+									 << false;
 }
 
 void TypeConverterTest::testMetaTypeDetection()
@@ -745,13 +777,15 @@ void TypeConverterTest::testDeserialization()
 			QVERIFY(res.convert(type));
 
 			const auto flags = QMetaType::typeFlags(type);
-			if(flags.testFlag(QMetaType::PointerToQObject)) {
-				const auto obj1 = res.value<QObject*>();
-				const auto obj2 = result.value<QObject*>();
+			if(flags.testFlag(QMetaType::PointerToQObject) ||
+			   flags.testFlag(QMetaType::TrackingPointerToQObject) ||
+			   flags.testFlag(QMetaType::SharedPointerToQObject)) {
+				const auto obj1 = res.value<TestObject*>();
+				const auto obj2 = result.value<TestObject*>();
 				if(obj1 != obj2) { //same object is automatically equal
 					QVERIFY(obj1);
 					QVERIFY(obj2);
-					//TODO compare them
+					QVERIFY(obj1->compare(obj2));
 				}
 			} else if(flags.testFlag(QMetaType::PointerToGadget)) {
 				const auto ptr1 = reinterpret_cast<const TestGadget* const *>(res.constData());
@@ -1091,6 +1125,81 @@ void TypeConverterTest::addCommonSerData()
 									 << qMetaTypeId<TestGadget*>()
 									 << QVariant::fromValue<TestGadget*>(nullptr)
 									 << QJsonValue{QJsonValue::Null};
+
+	QTest::newRow("object.basic") << objectConverter
+								  << QVariantHash{}
+								  << TestQ{{QMetaType::Int, 10, 1}, {QMetaType::Double, 0.1, 2}}
+								  << static_cast<QObject*>(nullptr)
+								  << qMetaTypeId<TestObject*>()
+								  << QVariant::fromValue(new TestObject{10, 0.1, 11, this})
+								  << QJsonValue{QJsonObject{
+											{QStringLiteral("key"), 1},
+											{QStringLiteral("value"), 2}
+										}};
+	QTest::newRow("object.tracking") << objectConverter
+									 << QVariantHash{}
+									 << TestQ{{QMetaType::Int, 10, 1}, {QMetaType::Double, 0.1, 2}}
+									 << static_cast<QObject*>(nullptr)
+									 << qMetaTypeId<QPointer<TestObject>>()
+									 << QVariant::fromValue<QPointer<TestObject>>(new TestObject{10, 0.1, 11, this})
+									 << QJsonValue{QJsonObject{
+											   {QStringLiteral("key"), 1},
+											   {QStringLiteral("value"), 2}
+										   }};
+	QTest::newRow("object.shared") << objectConverter
+								   << QVariantHash{}
+								   << TestQ{{QMetaType::Int, 10, 1}, {QMetaType::Double, 0.1, 2}}
+								   << static_cast<QObject*>(nullptr)
+								   << qMetaTypeId<QSharedPointer<TestObject>>()
+								   << QVariant::fromValue(QSharedPointer<TestObject>::create(10, 0.1, 11))
+								   << QJsonValue{QJsonObject{
+											 {QStringLiteral("key"), 1},
+											 {QStringLiteral("value"), 2}
+										 }};
+	QTest::newRow("object.null.basic") << objectConverter
+									   << QVariantHash{}
+									   << TestQ{}
+									   << static_cast<QObject*>(nullptr)
+									   << qMetaTypeId<TestObject*>()
+									   << QVariant::fromValue<TestObject*>(nullptr)
+									   << QJsonValue{QJsonValue::Null};
+	QTest::newRow("object.null.tracking") << objectConverter
+										  << QVariantHash{}
+										  << TestQ{}
+										  << static_cast<QObject*>(nullptr)
+										  << qMetaTypeId<QPointer<TestObject>>()
+										  << QVariant::fromValue<QPointer<TestObject>>(nullptr)
+										  << QJsonValue{QJsonValue::Null};
+	QTest::newRow("object.null.shared") << objectConverter
+										<< QVariantHash{}
+										<< TestQ{}
+										<< static_cast<QObject*>(nullptr)
+										<< qMetaTypeId<QSharedPointer<TestObject>>()
+										<< QVariant::fromValue<QSharedPointer<TestObject>>(nullptr)
+										<< QJsonValue{QJsonValue::Null};
+
+//	QTest::newRow("object.poly.disabled") << objectConverter
+//										  << QVariantHash{{QStringLiteral("polymorphing"), QVariant::fromValue<QJsonSerializer::Polymorphing>(QJsonSerializer::Disabled)}}
+//										  << TestQ{{QMetaType::Int, 10, 1}, {QMetaType::Double, 0.1, 2}}
+//										  << static_cast<QObject*>(nullptr)
+//										  << qMetaTypeId<TestObject*>()
+//										  << QVariant::fromValue(new TestObject{10, 0.1, 11, this})
+//										  << QJsonValue{QJsonObject{
+//													{QStringLiteral("key"), 1},
+//													{QStringLiteral("value"), 2}
+//												}};
+	QTest::newRow("object.poly.enabled.static") << objectConverter
+												<< QVariantHash{{QStringLiteral("polymorphing"), QVariant::fromValue<QJsonSerializer::Polymorphing>(QJsonSerializer::Enabled)}}
+												<< TestQ{{QMetaType::Int, 10, 1}, {QMetaType::Double, 0.1, 2}, {QMetaType::Bool, true, 3}}
+												<< static_cast<QObject*>(nullptr)
+												<< qMetaTypeId<TestObject*>()
+												<< QVariant::fromValue<TestObject*>(new StaticPolyObject{10, 0.1, 11, true, this})
+												<< QJsonValue{QJsonObject{
+														  {QStringLiteral("@class"), QStringLiteral("StaticPolyObject")},
+														  {QStringLiteral("key"), 1},
+														  {QStringLiteral("value"), 2},
+														  {QStringLiteral("extra"), 3}
+													  }};
 }
 
 QTEST_MAIN(TypeConverterTest)

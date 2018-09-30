@@ -1,6 +1,8 @@
 #ifndef QJSONSERIALIZER_H
 #define QJSONSERIALIZER_H
 
+#include <type_traits>
+
 #include "QtJsonSerializer/qtjsonserializer_global.h"
 #include "QtJsonSerializer/qjsonserializerexception.h"
 #include "QtJsonSerializer/qjsonserializer_helpertypes.h"
@@ -195,6 +197,11 @@ private:
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QJsonSerializer::ValidationFlags)
+
+//TODO document
+#define Q_JSON_POLYMORPHIC(x) \
+	static_assert(std::is_same<decltype(x), bool>::value, "x must be bool"); \
+	Q_CLASSINFO("polymorphic", #x)
 
 // ------------- Generic Implementation -------------
 

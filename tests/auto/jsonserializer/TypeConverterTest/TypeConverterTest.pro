@@ -10,11 +10,13 @@ SOURCES += \
 	tst_typeconverter.cpp \
     dummyserializationhelper.cpp \
     opaquedummy.cpp \
-    testgadget.cpp
+    testgadget.cpp \
+    testobject.cpp
 
 include(../../testrun.pri)
 
 HEADERS += \
     dummyserializationhelper.h \
     opaquedummy.h \
-    testgadget.h
+    testgadget.h \
+    testobject.h

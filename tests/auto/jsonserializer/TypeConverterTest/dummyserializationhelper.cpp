@@ -52,7 +52,8 @@ QVariant DummySerializationHelper::deserializeSubtype(int propertyType, const QJ
 	[&](){
 		QCOMPARE(propertyType, data.typeId);
 		QCOMPARE(value, data.json);
-		QCOMPARE(parent, expectedParent);
+		if(expectedParent)
+			QCOMPARE(parent, expectedParent);
 		ok = true;
 	}();
 	if(ok)
