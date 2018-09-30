@@ -489,7 +489,7 @@ void TypeConverterTest::testDeserialization()
 			QVERIFY_EXCEPTION_THROWN(converter->deserialize(type, data, this, helper), QJsonDeserializationException);
 		else {
 			auto res = converter->deserialize(type, data, this, helper);
-			qDebug() << res << result;
+			qDebug() << res.value<QVersionNumber>() << result.value<QVersionNumber>();
 			QCOMPARE(res, result);
 		}
 	} catch(std::exception &e) {
