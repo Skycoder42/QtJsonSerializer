@@ -145,18 +145,6 @@ void TypeConverterTest::testConverterMeta_data()
 	QTest::addColumn<int>("priority");
 	QTest::addColumn<QList<QJsonValue::Type>>("jsonTypes");
 
-	QTest::newRow("json.value") << jValConverter
-								<< static_cast<int>(QJsonTypeConverter::Standard)
-								<< QList<QJsonValue::Type>{QJsonValue::Null, QJsonValue::Bool, QJsonValue::Double, QJsonValue::String, QJsonValue::Array, QJsonValue::Object};
-
-	QTest::newRow("json.object") << jObjConverter
-								 << static_cast<int>(QJsonTypeConverter::Standard)
-								 << QList<QJsonValue::Type>{QJsonValue::Object};
-
-	QTest::newRow("json.array") << jArrConverter
-								<< static_cast<int>(QJsonTypeConverter::Standard)
-								<< QList<QJsonValue::Type>{QJsonValue::Array};
-
 	QTest::newRow("locale") << localeConverter
 							<< static_cast<int>(QJsonTypeConverter::Standard)
 							<< QList<QJsonValue::Type>{QJsonValue::String};
@@ -205,27 +193,6 @@ void TypeConverterTest::testMetaTypeDetection_data()
 	QTest::addColumn<QSharedPointer<QJsonTypeConverter>>("converter");
 	QTest::addColumn<int>("metatype");
 	QTest::addColumn<bool>("matches");
-
-	QTest::newRow("json.value.value") << jValConverter
-									  << static_cast<int>(QMetaType::QJsonValue)
-									  << true;
-	QTest::newRow("json.value.invalid") << jValConverter
-										<< static_cast<int>(QMetaType::QJsonObject)
-										<< false;
-
-	QTest::newRow("json.object.object") << jObjConverter
-										<< static_cast<int>(QMetaType::QJsonObject)
-										<< true;
-	QTest::newRow("json.object.invalid") << jObjConverter
-										 << static_cast<int>(QMetaType::QJsonArray)
-										 << false;
-
-	QTest::newRow("json.array.array") << jArrConverter
-									  << static_cast<int>(QMetaType::QJsonArray)
-									  << true;
-	QTest::newRow("json.array.invalid") << jArrConverter
-										<< static_cast<int>(QMetaType::QJsonObject)
-										<< false;
 
 	QTest::newRow("locale.locale") << localeConverter
 								   << static_cast<int>(QMetaType::QLocale)
@@ -570,30 +537,6 @@ void TypeConverterTest::testDeserialization()
 
 void TypeConverterTest::addCommonSerData()
 {
-
-	QTest::newRow("json.value") << jValConverter
-								<< QVariantHash{}
-								<< TestQ{}
-								<< static_cast<QObject*>(nullptr)
-								<< static_cast<int>(QMetaType::QJsonValue)
-								<< QVariant{QJsonValue{42}}
-								<< QJsonValue{42};
-
-	QTest::newRow("json.object") << jObjConverter
-								 << QVariantHash{}
-								 << TestQ{}
-								 << static_cast<QObject*>(nullptr)
-								 << static_cast<int>(QMetaType::QJsonObject)
-								 << QVariant{QJsonObject{{QStringLiteral("baum"), 42}}}
-								 << QJsonValue{QJsonObject{{QStringLiteral("baum"), 42}}};
-
-	QTest::newRow("json.array") << jArrConverter
-								<< QVariantHash{}
-								<< TestQ{}
-								<< static_cast<QObject*>(nullptr)
-								<< static_cast<int>(QMetaType::QJsonArray)
-								<< QVariant{QJsonArray{10, 20, true, 4.2}}
-								<< QJsonValue{QJsonArray{10, 20, true, 4.2}};
 
 	QTest::newRow("locale.normal") << localeConverter
 								   << QVariantHash{}
