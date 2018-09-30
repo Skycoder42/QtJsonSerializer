@@ -9,10 +9,12 @@ TARGET = tst_typeconverter
 SOURCES += \
 	tst_typeconverter.cpp \
     dummyserializationhelper.cpp \
-    opaquedummy.cpp
+    opaquedummy.cpp \
+    testgadget.cpp
 
 include(../../testrun.pri)
 
 HEADERS += \
     dummyserializationhelper.h \
-    opaquedummy.h
+    opaquedummy.h \
+    testgadget.h

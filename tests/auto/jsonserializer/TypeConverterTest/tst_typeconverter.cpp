@@ -3,6 +3,7 @@
 
 #include "dummyserializationhelper.h"
 #include "opaquedummy.h"
+#include "testgadget.h"
 
 // basic converters
 #include <QtJsonSerializer/private/qjsonbytearrayconverter_p.h>
@@ -17,6 +18,9 @@
 #include <QtJsonSerializer/private/qjsonmapconverter_p.h>
 #include <QtJsonSerializer/private/qjsonpairconverter_p.h>
 #include <QtJsonSerializer/private/qjsonstdtupleconverter_p.h>
+
+// "Object" converter
+#include <QtJsonSerializer/private/qjsongadgetconverter_p.h>
 
 Q_DECLARE_METATYPE(QSharedPointer<QJsonTypeConverter>)
 Q_DECLARE_METATYPE(QJsonValue::Type)
@@ -76,6 +80,8 @@ private:
 	QSharedPointer<QJsonTypeConverter> pairConverter;
 	QSharedPointer<QJsonTypeConverter> tupleConverter;
 
+	QSharedPointer<QJsonTypeConverter> gadgetConverter;
+
 	void addCommonSerData();
 };
 
@@ -88,13 +94,14 @@ void TypeConverterTest::initTestCase()
 	QJsonSerializer::registerTupleConverters<QList<int>, QPair<bool, bool>, QMap<QString, double>>("std::tuple<QList<int>, QPair<bool, bool>, QMap<QString, double>>");
 
 	//comparators
-	QMetaType::registerComparators<QVersionNumber>();
-	QMetaType::registerComparators<QList<int>>();
-	QMetaType::registerComparators<QMap<QString, int>>();
-	QMetaType::registerComparators<QPair<bool, int>>();
-	QMetaType::registerComparators<std::pair<bool, int>>();
-	QMetaType::registerComparators<QPair<int, QList<int>>>();
-	QMetaType::registerComparators<TestTpl1>();
+	QMetaType::registerEqualsComparator<QVersionNumber>();
+	QMetaType::registerEqualsComparator<QList<int>>();
+	QMetaType::registerEqualsComparator<QMap<QString, int>>();
+	QMetaType::registerEqualsComparator<QPair<bool, int>>();
+	QMetaType::registerEqualsComparator<std::pair<bool, int>>();
+	QMetaType::registerEqualsComparator<QPair<int, QList<int>>>();
+	QMetaType::registerEqualsComparator<TestTpl1>();
+	QMetaType::registerEqualsComparator<TestGadget>();
 
 	// helper classes
 	helper = new DummySerializationHelper{this};
@@ -115,6 +122,7 @@ void TypeConverterTest::initTestCase()
 	mapConverter.reset(new QJsonMapConverter{});
 	pairConverter.reset(new QJsonPairConverter{});
 	tupleConverter.reset(new QJsonStdTupleConverter{});
+	gadgetConverter.reset(new QJsonGadgetConverter{});
 }
 
 void TypeConverterTest::cleanupTestCase()
@@ -187,6 +195,10 @@ void TypeConverterTest::testConverterMeta_data()
 	QTest::newRow("tuple") << tupleConverter
 						   << static_cast<int>(QJsonTypeConverter::Standard)
 						   << QList<QJsonValue::Type>{QJsonValue::Array};
+
+	QTest::newRow("gadget") << gadgetConverter
+							<< static_cast<int>(QJsonTypeConverter::Standard)
+							<< QList<QJsonValue::Type>{QJsonValue::Object, QJsonValue::Null};
 }
 
 void TypeConverterTest::testConverterMeta()
@@ -390,6 +402,28 @@ void TypeConverterTest::testMetaTypeDetection_data()
 	QTest::newRow("tuple.invalid") << tupleConverter
 								   << static_cast<int>(QMetaType::QVariantList)
 								   << false;
+
+	QTest::newRow("gadget.basic") << gadgetConverter
+								  << qMetaTypeId<TestGadget>()
+								  << true;
+	QTest::newRow("gadget.ptr") << gadgetConverter
+								<< qMetaTypeId<TestGadget*>()
+								<< true;
+	QTest::newRow("gadget.excluded.keysequence") << gadgetConverter
+												 << static_cast<int>(QMetaType::QKeySequence)
+												 << false;
+	QTest::newRow("gadget.excluded.font") << gadgetConverter
+										  << static_cast<int>(QMetaType::QFont)
+										  << false;
+	QTest::newRow("gadget.excluded.locale") << gadgetConverter
+											<< static_cast<int>(QMetaType::QLocale)
+											<< false;
+	QTest::newRow("gadget.invalid.none") << gadgetConverter
+										 << qMetaTypeId<OpaqueDummy>()
+										 << false;
+	QTest::newRow("gadget.invalid.object") << gadgetConverter
+										   << static_cast<int>(QMetaType::QObjectStar)
+										   << false;
 }
 
 void TypeConverterTest::testMetaTypeDetection()
@@ -406,6 +440,7 @@ void TypeConverterTest::testSerialization_data()
 	QTest::addColumn<QSharedPointer<QJsonTypeConverter>>("converter");
 	QTest::addColumn<QVariantHash>("properties");
 	QTest::addColumn<QList<DummySerializationHelper::SerInfo>>("serData");
+	QTest::addColumn<QObject*>("parent");
 	QTest::addColumn<int>("type");
 	QTest::addColumn<QVariant>("data");
 	QTest::addColumn<QJsonValue>("result");
@@ -415,6 +450,7 @@ void TypeConverterTest::testSerialization_data()
 	QTest::newRow("list.unconvertible") << listConverter
 										<< QVariantHash{}
 										<< TestQ{}
+										<< static_cast<QObject*>(nullptr)
 										<< qMetaTypeId<QList<OpaqueDummy>>()
 										<< QVariant::fromValue(QList<OpaqueDummy>{{}, {}, {}})
 										<< QJsonValue{QJsonValue::Undefined};
@@ -422,6 +458,7 @@ void TypeConverterTest::testSerialization_data()
 	QTest::newRow("map.unconvertible") << mapConverter
 									   << QVariantHash{}
 									   << TestQ{}
+									   << static_cast<QObject*>(nullptr)
 									   << qMetaTypeId<QMap<QString, OpaqueDummy>>()
 									   << QVariant::fromValue(QMap<QString, OpaqueDummy>{{QStringLiteral("d"), {}}})
 									   << QJsonValue{QJsonValue::Undefined};
@@ -429,6 +466,7 @@ void TypeConverterTest::testSerialization_data()
 	QTest::newRow("pair.qt.unconvertible") << pairConverter
 										   << QVariantHash{}
 										   << TestQ{}
+										   << static_cast<QObject*>(nullptr)
 										   << qMetaTypeId<QPair<int, OpaqueDummy>>()
 										   << QVariant::fromValue(QPair<int, OpaqueDummy>{})
 										   << QJsonValue{QJsonValue::Undefined};
@@ -436,6 +474,7 @@ void TypeConverterTest::testSerialization_data()
 	QTest::newRow("pair.std.unconvertible") << pairConverter
 											<< QVariantHash{}
 											<< TestQ{}
+											<< static_cast<QObject*>(nullptr)
 											<< qMetaTypeId<std::pair<int, OpaqueDummy>>()
 											<< QVariant::fromValue(std::pair<int, OpaqueDummy>{})
 											<< QJsonValue{QJsonValue::Undefined};
@@ -443,6 +482,7 @@ void TypeConverterTest::testSerialization_data()
 	QTest::newRow("tuple.unconvertible") << pairConverter
 										 << QVariantHash{}
 										 << TestQ{}
+										 << static_cast<QObject*>(nullptr)
 										 << qMetaTypeId<std::tuple<OpaqueDummy>>()
 										 << QVariant::fromValue(std::tuple<OpaqueDummy>{})
 										 << QJsonValue{QJsonValue::Undefined};
@@ -477,6 +517,7 @@ void TypeConverterTest::testDeserialization_data()
 	QTest::addColumn<QSharedPointer<QJsonTypeConverter>>("converter");
 	QTest::addColumn<QVariantHash>("properties");
 	QTest::addColumn<QList<DummySerializationHelper::SerInfo>>("deserData");
+	QTest::addColumn<QObject*>("parent");
 	QTest::addColumn<int>("type");
 	QTest::addColumn<QVariant>("result");
 	QTest::addColumn<QJsonValue>("data");
@@ -486,24 +527,28 @@ void TypeConverterTest::testDeserialization_data()
 	QTest::newRow("bytearray.invalid") << byteConverter
 									   << QVariantHash{{QStringLiteral("validateBase64"), false}}
 									   << TestQ{}
+									   << static_cast<QObject*>(nullptr)
 									   << static_cast<int>(QMetaType::QByteArray)
 									   << QVariant{QByteArrayLiteral("Hello World8")}
 									   << QJsonValue{QStringLiteral("SGVsbG8#'gV29ybGQ=42")};
 	QTest::newRow("bytearray.validated1") << byteConverter
 										  << QVariantHash{{QStringLiteral("validateBase64"), true}}
 										  << TestQ{}
+										  << static_cast<QObject*>(nullptr)
 										  << static_cast<int>(QMetaType::QByteArray)
 										  << QVariant{}
 										  << QJsonValue{QStringLiteral("SGVsbG8#'gV29ybGQ=42")};
 	QTest::newRow("bytearray.validated2") << byteConverter
 										  << QVariantHash{{QStringLiteral("validateBase64"), true}}
 										  << TestQ{}
+										  << static_cast<QObject*>(nullptr)
 										  << static_cast<int>(QMetaType::QByteArray)
 										  << QVariant{}
 										  << QJsonValue{QStringLiteral("SGVsbG8gV29ybGQ2=")};
 	QTest::newRow("bytearray.validated3") << byteConverter
 										  << QVariantHash{{QStringLiteral("validateBase64"), true}}
 										  << TestQ{}
+										  << static_cast<QObject*>(nullptr)
 										  << static_cast<int>(QMetaType::QByteArray)
 										  << QVariant{}
 										  << QJsonValue{QStringLiteral("SGVsbG%gV29ybGQ=")};
@@ -511,6 +556,7 @@ void TypeConverterTest::testDeserialization_data()
 	QTest::newRow("size.invalid") << sizeConverter
 								  << QVariantHash{}
 								  << TestQ{}
+								  << static_cast<QObject*>(nullptr)
 								  << static_cast<int>(QMetaType::QSize)
 								  << QVariant{}
 								  << QJsonValue{QJsonObject{
@@ -521,6 +567,7 @@ void TypeConverterTest::testDeserialization_data()
 	QTest::newRow("point.invalid") << pointConverter
 								   << QVariantHash{}
 								   << TestQ{}
+								   << static_cast<QObject*>(nullptr)
 								   << static_cast<int>(QMetaType::QPoint)
 								   << QVariant{}
 								   << QJsonValue{QJsonObject{
@@ -531,6 +578,7 @@ void TypeConverterTest::testDeserialization_data()
 	QTest::newRow("line.invalid") << lineConverter
 								  << QVariantHash{}
 								  << TestQ{}
+								  << static_cast<QObject*>(nullptr)
 								  << static_cast<int>(QMetaType::QLine)
 								  << QVariant{}
 								  << QJsonValue{QJsonObject{
@@ -541,6 +589,7 @@ void TypeConverterTest::testDeserialization_data()
 	QTest::newRow("rect.invalid") << rectConverter
 								  << QVariantHash{}
 								  << TestQ{}
+								  << static_cast<QObject*>(nullptr)
 								  << static_cast<int>(QMetaType::QRect)
 								  << QVariant{}
 								  << QJsonValue{QJsonObject{
@@ -551,12 +600,14 @@ void TypeConverterTest::testDeserialization_data()
 	QTest::newRow("locale.empty") << localeConverter
 								  << QVariantHash{}
 								  << TestQ{}
+								  << static_cast<QObject*>(nullptr)
 								  << static_cast<int>(QMetaType::QLocale)
 								  << QVariant{QLocale::c()}
 								  << QJsonValue{QString{}};
 	QTest::newRow("locale.invalid") << localeConverter
 									<< QVariantHash{}
 									<< TestQ{}
+									<< static_cast<QObject*>(nullptr)
 									<< static_cast<int>(QMetaType::QLocale)
 									<< QVariant{}
 									<< QJsonValue{QStringLiteral("some random text")};
@@ -564,6 +615,7 @@ void TypeConverterTest::testDeserialization_data()
 	QTest::newRow("regex.string") << regexConverter
 								  << QVariantHash{}
 								  << TestQ{}
+								  << static_cast<QObject*>(nullptr)
 								  << static_cast<int>(QMetaType::QRegularExpression)
 								  << QVariant{QRegularExpression{QStringLiteral("just\\sa\\sstring")}}
 								  << QJsonValue{QStringLiteral("just\\sa\\sstring")};
@@ -571,12 +623,14 @@ void TypeConverterTest::testDeserialization_data()
 	QTest::newRow("version.suffixed") << versionConverter
 									  << QVariantHash{}
 									  << TestQ{}
+									  << static_cast<QObject*>(nullptr)
 									  << qMetaTypeId<QVersionNumber>()
 									  << QVariant::fromValue(QVersionNumber{1, 2, 3})
 									  << QJsonValue{QStringLiteral("1.2.3-r1")};
 	QTest::newRow("version.invalid") << versionConverter
 									 << QVariantHash{}
 									 << TestQ{}
+									 << static_cast<QObject*>(nullptr)
 									 << qMetaTypeId<QVersionNumber>()
 									 << QVariant{}
 									 << QJsonValue{QStringLiteral("A1.4.5")};
@@ -584,6 +638,7 @@ void TypeConverterTest::testDeserialization_data()
 	QTest::newRow("pair.invalid") << pairConverter
 								  << QVariantHash{}
 								  << TestQ{}
+								  << static_cast<QObject*>(nullptr)
 								  << qMetaTypeId<QPair<bool, int>>()
 								  << QVariant{}
 								  << QJsonValue{QJsonArray{true, 2, 3}};
@@ -591,9 +646,81 @@ void TypeConverterTest::testDeserialization_data()
 	QTest::newRow("tuple.invalid") << tupleConverter
 								   << QVariantHash{}
 								   << TestQ{}
+								   << static_cast<QObject*>(nullptr)
 								   << qMetaTypeId<TestTpl1>()
 								   << QVariant{}
 								   << QJsonValue{QJsonArray{1, true, 3.4, 4}};
+
+	QTest::newRow("gadget.validate.none") << gadgetConverter
+										  << QVariantHash{{QStringLiteral("validationFlags"), QVariant::fromValue<QJsonSerializer::ValidationFlags>(QJsonSerializer::StandardValidation)}}
+										  << TestQ{{QMetaType::Int, 10, 1}}
+										  << static_cast<QObject*>(nullptr)
+										  << qMetaTypeId<TestGadget>()
+										  << QVariant::fromValue(TestGadget{10, 0, 0})
+										  << QJsonValue{QJsonObject{
+													{QStringLiteral("key"), 1},
+													{QStringLiteral("extra"), 24}
+												}};
+	QTest::newRow("gadget.validate.extra.invalid") << gadgetConverter
+												   << QVariantHash{{QStringLiteral("validationFlags"), QVariant::fromValue<QJsonSerializer::ValidationFlags>(QJsonSerializer::NoExtraProperties)}}
+												   << TestQ{{QMetaType::Int, 10, 1}}
+												   << static_cast<QObject*>(nullptr)
+												   << qMetaTypeId<TestGadget>()
+												   << QVariant{}
+												   << QJsonValue{QJsonObject{
+															 {QStringLiteral("key"), 1},
+															 {QStringLiteral("extra"), 24}
+														 }};
+	QTest::newRow("gadget.validate.extra.valid") << gadgetConverter
+												 << QVariantHash{{QStringLiteral("validationFlags"), QVariant::fromValue<QJsonSerializer::ValidationFlags>(QJsonSerializer::NoExtraProperties)}}
+												 << TestQ{{QMetaType::Int, 10, 1}}
+												 << static_cast<QObject*>(nullptr)
+												 << qMetaTypeId<TestGadget>()
+												 << QVariant::fromValue(TestGadget{10, 0, 0})
+												 << QJsonValue{QJsonObject{
+														   {QStringLiteral("key"), 1}
+													   }};
+	QTest::newRow("gadget.validate.all.invalid") << gadgetConverter
+												 << QVariantHash{{QStringLiteral("validationFlags"), QVariant::fromValue<QJsonSerializer::ValidationFlags>(QJsonSerializer::AllProperties)}}
+												 << TestQ{{QMetaType::Int, 10, 1}}
+												 << static_cast<QObject*>(nullptr)
+												 << qMetaTypeId<TestGadget>()
+												 << QVariant{}
+												 << QJsonValue{QJsonObject{
+														   {QStringLiteral("key"), 1},
+														   {QStringLiteral("extra"), 24}
+													   }};
+	QTest::newRow("gadget.validate.all.valid") << gadgetConverter
+											   << QVariantHash{{QStringLiteral("validationFlags"), QVariant::fromValue<QJsonSerializer::ValidationFlags>(QJsonSerializer::AllProperties)}}
+											   << TestQ{{QMetaType::Int, 10, 1}, {QMetaType::Double, 10.1, 2}}
+											   << static_cast<QObject*>(nullptr)
+											   << qMetaTypeId<TestGadget>()
+											   << QVariant::fromValue(TestGadget{10, 10.1, 0})
+											   << QJsonValue{QJsonObject{
+														 {QStringLiteral("key"), 1},
+														 {QStringLiteral("value"), 2},
+														 {QStringLiteral("extra"), 24}
+													 }};
+	QTest::newRow("gadget.validate.full.invalid") << gadgetConverter
+												  << QVariantHash{{QStringLiteral("validationFlags"), QVariant::fromValue<QJsonSerializer::ValidationFlags>(QJsonSerializer::FullValidation)}}
+												  << TestQ{{QMetaType::Int, 10, 1}}
+												  << static_cast<QObject*>(nullptr)
+												  << qMetaTypeId<TestGadget>()
+												  << QVariant{}
+												  << QJsonValue{QJsonObject{
+															{QStringLiteral("key"), 1},
+															{QStringLiteral("extra"), 24}
+														}};
+	QTest::newRow("gadget.validate.full.valid") << gadgetConverter
+												<< QVariantHash{{QStringLiteral("validationFlags"), QVariant::fromValue<QJsonSerializer::ValidationFlags>(QJsonSerializer::FullValidation)}}
+												<< TestQ{{QMetaType::Int, 10, 1}, {QMetaType::Double, 10.1, 2}}
+												<< static_cast<QObject*>(nullptr)
+												<< qMetaTypeId<TestGadget>()
+												<< QVariant::fromValue(TestGadget{10, 10.1, 0})
+												<< QJsonValue{QJsonObject{
+														  {QStringLiteral("key"), 1},
+														  {QStringLiteral("value"), 2}
+													  }};
 }
 
 void TypeConverterTest::testDeserialization()
@@ -601,12 +728,14 @@ void TypeConverterTest::testDeserialization()
 	QFETCH(QSharedPointer<QJsonTypeConverter>, converter);
 	QFETCH(QVariantHash, properties);
 	QFETCH(QList<DummySerializationHelper::SerInfo>, deserData);
+	QFETCH(QObject*, parent);
 	QFETCH(int, type);
 	QFETCH(QJsonValue, data);
 	QFETCH(QVariant, result);
 
 	helper->properties = properties;
 	helper->deserData = deserData;
+	helper->expectedParent = parent;
 
 	try {
 		if(!result.isValid())
@@ -614,7 +743,34 @@ void TypeConverterTest::testDeserialization()
 		else {
 			auto res = converter->deserialize(type, data, this, helper);
 			QVERIFY(res.convert(type));
-			QCOMPARE(res, result);
+
+			const auto flags = QMetaType::typeFlags(type);
+			if(flags.testFlag(QMetaType::PointerToQObject)) {
+				const auto obj1 = res.value<QObject*>();
+				const auto obj2 = result.value<QObject*>();
+				if(obj1 != obj2) { //same object is automatically equal
+					QVERIFY(obj1);
+					QVERIFY(obj2);
+					//TODO compare them
+				}
+			} else if(flags.testFlag(QMetaType::PointerToGadget)) {
+				const auto ptr1 = reinterpret_cast<const TestGadget* const *>(res.constData());
+				const auto ptr2 = reinterpret_cast<const TestGadget* const *>(result.constData());
+				if(ptr1 != ptr2) { //same object is automatically equal
+					QVERIFY(ptr1);
+					QVERIFY(ptr2);
+					const auto gadPtr1 = *ptr1;
+					const auto gadPtr2 = *ptr2;
+					if(gadPtr1 != gadPtr2) { //same object is automatically equal
+						QVERIFY(gadPtr1);
+						QVERIFY(gadPtr2);
+						const auto &gad1 = *gadPtr1;
+						const auto &gad2 = *gadPtr2;
+						QCOMPARE(gad1, gad2);
+					}
+				}
+			} else
+				QCOMPARE(res, result);
 		}
 	} catch(std::exception &e) {
 		QFAIL(e.what());
@@ -626,6 +782,7 @@ void TypeConverterTest::addCommonSerData()
 	QTest::newRow("bytearray.basic") << byteConverter
 									 << QVariantHash{}
 									 << TestQ{}
+									 << static_cast<QObject*>(nullptr)
 									 << static_cast<int>(QMetaType::QByteArray)
 									 << QVariant{QByteArrayLiteral("Hello World")}
 									 << QJsonValue{QStringLiteral("SGVsbG8gV29ybGQ=")};
@@ -633,6 +790,7 @@ void TypeConverterTest::addCommonSerData()
 	QTest::newRow("size.int") << sizeConverter
 							  << QVariantHash{}
 							  << TestQ{}
+							  << static_cast<QObject*>(nullptr)
 							  << static_cast<int>(QMetaType::QSize)
 							  << QVariant{QSize{10, 20}}
 							  << QJsonValue{QJsonObject{
@@ -642,6 +800,7 @@ void TypeConverterTest::addCommonSerData()
 	QTest::newRow("size.float") << sizeConverter
 								<< QVariantHash{}
 								<< TestQ{}
+								<< static_cast<QObject*>(nullptr)
 								<< static_cast<int>(QMetaType::QSizeF)
 								<< QVariant{QSizeF{10.1, 20.2}}
 								<< QJsonValue{QJsonObject{
@@ -652,6 +811,7 @@ void TypeConverterTest::addCommonSerData()
 	QTest::newRow("point.int") << pointConverter
 							   << QVariantHash{}
 							   << TestQ{}
+							   << static_cast<QObject*>(nullptr)
 							   << static_cast<int>(QMetaType::QPoint)
 							   << QVariant{QPoint{10, 20}}
 							   << QJsonValue{QJsonObject{
@@ -661,6 +821,7 @@ void TypeConverterTest::addCommonSerData()
 	QTest::newRow("point.float") << pointConverter
 								 << QVariantHash{}
 								 << TestQ{}
+								 << static_cast<QObject*>(nullptr)
 								 << static_cast<int>(QMetaType::QPointF)
 								 << QVariant{QPointF{10.1, 20.2}}
 								 << QJsonValue{QJsonObject{
@@ -674,6 +835,7 @@ void TypeConverterTest::addCommonSerData()
 										{QMetaType::QPoint, QVariant{QPoint{10, 10}}, QJsonValue(42)},
 										{QMetaType::QPoint, QVariant{QPoint{20, 20}}, QJsonValue(42)}
 									}
+							  << static_cast<QObject*>(this)
 							  << static_cast<int>(QMetaType::QLine)
 							  << QVariant{QLine{QPoint{10, 10}, QPoint{20, 20}}}
 							  << QJsonValue{QJsonObject{
@@ -686,6 +848,7 @@ void TypeConverterTest::addCommonSerData()
 										{QMetaType::QPointF, QVariant{QPointF{10.1, 10.1}}, QJsonValue(42)},
 										{QMetaType::QPointF, QVariant{QPointF{20.2, 20.2}}, QJsonValue(42)}
 									}
+								 << static_cast<QObject*>(this)
 								 << static_cast<int>(QMetaType::QLineF)
 								 << QVariant{QLineF{QPointF{10.1, 10.1}, QPointF{20.2, 20.2}}}
 								 << QJsonValue{QJsonObject{
@@ -699,6 +862,7 @@ void TypeConverterTest::addCommonSerData()
 										{QMetaType::QPoint, QVariant{QPoint{10, 10}}, QJsonValue(42)},
 										{QMetaType::QPoint, QVariant{QPoint{20, 20}}, QJsonValue(42)}
 									}
+							  << static_cast<QObject*>(this)
 							  << static_cast<int>(QMetaType::QRect)
 							  << QVariant{QRect{QPoint{10, 10}, QPoint{20, 20}}}
 							  << QJsonValue{QJsonObject{
@@ -711,6 +875,7 @@ void TypeConverterTest::addCommonSerData()
 										{QMetaType::QPointF, QVariant{QPointF{10.1, 10.1}}, QJsonValue(42)},
 										{QMetaType::QPointF, QVariant{QPointF{20.2, 20.2}}, QJsonValue(42)}
 									}
+								 << static_cast<QObject*>(this)
 								 << static_cast<int>(QMetaType::QRectF)
 								 << QVariant{QRectF{QPointF{10.1, 10.1}, QPointF{20.2, 20.2}}}
 								 << QJsonValue{QJsonObject{
@@ -721,6 +886,7 @@ void TypeConverterTest::addCommonSerData()
 	QTest::newRow("json.value") << jValConverter
 								<< QVariantHash{}
 								<< TestQ{}
+								<< static_cast<QObject*>(nullptr)
 								<< static_cast<int>(QMetaType::QJsonValue)
 								<< QVariant{QJsonValue{42}}
 								<< QJsonValue{42};
@@ -728,6 +894,7 @@ void TypeConverterTest::addCommonSerData()
 	QTest::newRow("json.object") << jObjConverter
 								 << QVariantHash{}
 								 << TestQ{}
+								 << static_cast<QObject*>(nullptr)
 								 << static_cast<int>(QMetaType::QJsonObject)
 								 << QVariant{QJsonObject{{QStringLiteral("baum"), 42}}}
 								 << QJsonValue{QJsonObject{{QStringLiteral("baum"), 42}}};
@@ -735,6 +902,7 @@ void TypeConverterTest::addCommonSerData()
 	QTest::newRow("json.array") << jArrConverter
 								<< QVariantHash{}
 								<< TestQ{}
+								<< static_cast<QObject*>(nullptr)
 								<< static_cast<int>(QMetaType::QJsonArray)
 								<< QVariant{QJsonArray{10, 20, true, 4.2}}
 								<< QJsonValue{QJsonArray{10, 20, true, 4.2}};
@@ -742,24 +910,28 @@ void TypeConverterTest::addCommonSerData()
 	QTest::newRow("locale.normal") << localeConverter
 								   << QVariantHash{}
 								   << TestQ{}
+								   << static_cast<QObject*>(nullptr)
 								   << static_cast<int>(QMetaType::QLocale)
 								   << QVariant{QLocale{QLocale::German, QLocale::Germany}}
 								   << QJsonValue{QStringLiteral("de_DE")};
 	QTest::newRow("locale.c") << localeConverter
 							  << QVariantHash{}
 							  << TestQ{}
+							  << static_cast<QObject*>(nullptr)
 							  << static_cast<int>(QMetaType::QLocale)
 							  << QVariant{QLocale::c()}
 							  << QJsonValue{QStringLiteral("C")};
 	QTest::newRow("locale.bcp47.default") << localeConverter
 										  << QVariantHash{{QStringLiteral("useBcp47Locale"), true}}
 										  << TestQ{}
+										  << static_cast<QObject*>(nullptr)
 										  << static_cast<int>(QMetaType::QLocale)
 										  << QVariant{QLocale{QLocale::German, QLocale::Germany}}
 										  << QJsonValue{QStringLiteral("de")};
 	QTest::newRow("locale.bcp47.special") << localeConverter
 										  << QVariantHash{{QStringLiteral("useBcp47Locale"), true}}
 										  << TestQ{}
+										  << static_cast<QObject*>(nullptr)
 										  << static_cast<int>(QMetaType::QLocale)
 										  << QVariant{QLocale{QLocale::German, QLocale::Austria}}
 										  << QJsonValue{QStringLiteral("de-AT")};
@@ -767,6 +939,7 @@ void TypeConverterTest::addCommonSerData()
 	QTest::newRow("regex.simple") << regexConverter
 								  << QVariantHash{}
 								  << TestQ{}
+								  << static_cast<QObject*>(nullptr)
 								  << static_cast<int>(QMetaType::QRegularExpression)
 								  << QVariant{QRegularExpression{QStringLiteral("^\\w*m$")}}
 								  << QJsonValue{QJsonObject{
@@ -776,6 +949,7 @@ void TypeConverterTest::addCommonSerData()
 	QTest::newRow("regex.opts") << regexConverter
 								<< QVariantHash{}
 								<< TestQ{}
+								<< static_cast<QObject*>(nullptr)
 								<< static_cast<int>(QMetaType::QRegularExpression)
 								<< QVariant{QRegularExpression{QStringLiteral("^\\w*m$"), QRegularExpression::OptimizeOnFirstUsageOption | QRegularExpression::CaseInsensitiveOption}}
 								<< QJsonValue{QJsonObject{
@@ -786,12 +960,14 @@ void TypeConverterTest::addCommonSerData()
 	QTest::newRow("version.simple") << versionConverter
 									<< QVariantHash{}
 									<< TestQ{}
+									<< static_cast<QObject*>(nullptr)
 									<< qMetaTypeId<QVersionNumber>()
 									<< QVariant::fromValue(QVersionNumber{1, 2, 3})
 									<< QJsonValue{QStringLiteral("1.2.3")};
 	QTest::newRow("version.long") << versionConverter
 								  << QVariantHash{}
 								  << TestQ{}
+								  << static_cast<QObject*>(nullptr)
 								  << qMetaTypeId<QVersionNumber>()
 								  << QVariant::fromValue(QVersionNumber{1, 2, 3, 4, 5})
 								  << QJsonValue{QStringLiteral("1.2.3.4.5")};
@@ -799,24 +975,28 @@ void TypeConverterTest::addCommonSerData()
 	QTest::newRow("list.empty") << listConverter
 								<< QVariantHash{}
 								<< TestQ{}
+								<< static_cast<QObject*>(nullptr)
 								<< qMetaTypeId<QList<int>>()
 								<< QVariant::fromValue(QList<int>{})
 								<< QJsonValue{QJsonArray{}};
 	QTest::newRow("list.filled") << listConverter
 								 << QVariantHash{}
 								 << TestQ{{QMetaType::Int, 1, 2}, {QMetaType::Int, 3, 4}, {QMetaType::Int, 5, 6}}
+								 << static_cast<QObject*>(this)
 								 << qMetaTypeId<QList<int>>()
 								 << QVariant::fromValue(QList<int>{1, 3, 5})
 								 << QJsonValue{QJsonArray{2, 4, 6}};
 	QTest::newRow("list.string") << listConverter
 								 << QVariantHash{}
 								 << TestQ{{QMetaType::QString, QStringLiteral("test"), QStringLiteral("tree")}}
+								 << static_cast<QObject*>(this)
 								 << static_cast<int>(QMetaType::QStringList)
 								 << QVariant{QStringList{QStringLiteral("test")}}
 								 << QJsonValue{QJsonArray{QStringLiteral("tree")}};
 	QTest::newRow("list.variant") << listConverter
 								  << QVariantHash{}
 								  << TestQ{{QMetaType::UnknownType, true, false}}
+								  << static_cast<QObject*>(this)
 								  << static_cast<int>(QMetaType::QVariantList)
 								  << QVariant{QVariantList{true}}
 								  << QJsonValue{QJsonArray{false}};
@@ -824,12 +1004,14 @@ void TypeConverterTest::addCommonSerData()
 	QTest::newRow("map.empty") << mapConverter
 							   << QVariantHash{}
 							   << TestQ{}
+							   << static_cast<QObject*>(nullptr)
 							   << qMetaTypeId<QMap<QString, int>>()
 							   << QVariant::fromValue(QMap<QString, int>{})
 							   << QJsonValue{QJsonObject{}};
 	QTest::newRow("map.filled") << mapConverter
 								<< QVariantHash{}
 								<< TestQ{{QMetaType::Int, 1, 2}, {QMetaType::Int, 3, 4}, {QMetaType::Int, 5, 6}}
+								<< static_cast<QObject*>(this)
 								<< qMetaTypeId<QMap<QString, int>>()
 								<< QVariant::fromValue(QMap<QString, int>{
 														   {QStringLiteral("a"), 1},
@@ -844,6 +1026,7 @@ void TypeConverterTest::addCommonSerData()
 	QTest::newRow("map.variant") << mapConverter
 								 << QVariantHash{}
 								 << TestQ{{QMetaType::UnknownType, true, false}}
+								 << static_cast<QObject*>(this)
 								 << static_cast<int>(QMetaType::QVariantMap)
 								 << QVariant{QVariantMap{{QStringLiteral("tree"), true}}}
 								 << QJsonValue{QJsonObject{{QStringLiteral("tree"), false}}};
@@ -851,6 +1034,7 @@ void TypeConverterTest::addCommonSerData()
 	QTest::newRow("pair.qt.basic") << pairConverter
 								   << QVariantHash{}
 								   << TestQ{{QMetaType::Bool, true, 42}, {QMetaType::Int, 42, true}}
+								   << static_cast<QObject*>(this)
 								   << qMetaTypeId<QPair<bool, int>>()
 								   << QVariant::fromValue(QPair<bool, int>{true, 42})
 								   << QJsonValue{QJsonArray{42, true}};
@@ -860,12 +1044,14 @@ void TypeConverterTest::addCommonSerData()
 												{QMetaType::Int, 3, 1},
 												{qMetaTypeId<QList<int>>(), QVariant::fromValue(QList<int>{}), 2}
 											}
+									  << static_cast<QObject*>(this)
 									  << qMetaTypeId<QPair<int, QList<int>>>()
 									  << QVariant::fromValue(QPair<int, QList<int>>{3, {}})
 									  << QJsonValue{QJsonArray{1, 2}};
 	QTest::newRow("pair.std") << pairConverter
 							  << QVariantHash{}
 							  << TestQ{{QMetaType::Bool, true, 42}, {QMetaType::Int, 42, true}}
+							  << static_cast<QObject*>(this)
 							  << qMetaTypeId<std::pair<bool, int>>()
 							  << QVariant::fromValue(std::pair<bool, int>{true, 42})
 							  << QJsonValue{QJsonArray{42, true}};
@@ -873,9 +1059,38 @@ void TypeConverterTest::addCommonSerData()
 	QTest::newRow("tuple.basic") << tupleConverter
 								 << QVariantHash{}
 								 << TestQ{{QMetaType::Int, 5, 1}, {QMetaType::Bool, true, 2}, {QMetaType::Double, 5.5, 3}}
+								 << static_cast<QObject*>(this)
 								 << qMetaTypeId<std::tuple<int, bool, double>>()
 								 << QVariant::fromValue(std::make_tuple(5, true, 5.5))
 								 << QJsonValue{QJsonArray{1, 2, 3}};
+
+	QTest::newRow("gadget.basic") << gadgetConverter
+								  << QVariantHash{}
+								  << TestQ{{QMetaType::Int, 10, 1}, {QMetaType::Double, 0.1, 2}}
+								  << static_cast<QObject*>(nullptr)
+								  << qMetaTypeId<TestGadget>()
+								  << QVariant::fromValue(TestGadget{10, 0.1, 11})
+								  << QJsonValue{QJsonObject{
+											{QStringLiteral("key"), 1},
+											{QStringLiteral("value"), 2}
+										}};
+	QTest::newRow("gadget.ptr.value") << gadgetConverter
+									  << QVariantHash{}
+									  << TestQ{{QMetaType::Int, 5, 11}, {QMetaType::Double, 0.5, 22}}
+									  << static_cast<QObject*>(nullptr)
+									  << qMetaTypeId<TestGadget*>()
+									  << QVariant::fromValue(new TestGadget{5, 0.5, 5})
+									  << QJsonValue{QJsonObject{
+												{QStringLiteral("key"), 11},
+												{QStringLiteral("value"), 22}
+											}};
+	QTest::newRow("gadget.ptr.null") << gadgetConverter
+									 << QVariantHash{}
+									 << TestQ{}
+									 << static_cast<QObject*>(nullptr)
+									 << qMetaTypeId<TestGadget*>()
+									 << QVariant::fromValue<TestGadget*>(nullptr)
+									 << QJsonValue{QJsonValue::Null};
 }
 
 QTEST_MAIN(TypeConverterTest)

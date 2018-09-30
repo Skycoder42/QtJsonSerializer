@@ -25,6 +25,7 @@ public:
 	};
 	mutable QList<SerInfo> serData;
 	mutable QList<SerInfo> deserData;
+	QObject *expectedParent = nullptr;
 };
 
 Q_DECLARE_METATYPE(QList<DummySerializationHelper::SerInfo>)
