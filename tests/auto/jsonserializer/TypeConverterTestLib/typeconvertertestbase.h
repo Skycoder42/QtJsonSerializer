@@ -6,6 +6,7 @@
 #include <QtJsonSerializer/QJsonTypeConverter>
 
 #include "dummyserializationhelper.h"
+#include "opaquedummy.h"
 
 class TypeConverterTestBase : public QObject
 {
@@ -30,7 +31,8 @@ protected:
 	virtual void addSerData();
 	virtual void addDeserData();
 
-	virtual bool compare(QVariant &actual,
+	virtual bool compare(int type,
+						 QVariant &actual,
 						 QVariant &expected,
 						 const char *aName,
 						 const char *eName,

@@ -2,9 +2,9 @@
 #include <QtJsonSerializer>
 #include <QtTest>
 
-#define SELF_COMPARE(actual, expected) \
+#define SELF_COMPARE(type, actual, expected) \
 do {\
-	if (!compare(actual, expected, #actual, #expected, __FILE__, __LINE__))\
+	if (!compare(type, actual, expected, #actual, #expected, __FILE__, __LINE__))\
 		return;\
 } while (false)
 
@@ -21,8 +21,9 @@ void TypeConverterTestBase::addSerData() {}
 
 void TypeConverterTestBase::addDeserData() {}
 
-bool TypeConverterTestBase::compare(QVariant &actual, QVariant &expected, const char *aName, const char *eName, const char *file, int line)
+bool TypeConverterTestBase::compare(int type, QVariant &actual, QVariant &expected, const char *aName, const char *eName, const char *file, int line)
 {
+	Q_UNUSED(type)
 	return QTest::qCompare(actual, expected, aName, eName, file, line);
 }
 
@@ -137,7 +138,7 @@ void TypeConverterTestBase::testDeserialization()
 		else {
 			auto res = converter()->deserialize(type, data, this, helper);
 			QVERIFY(res.convert(type));
-			SELF_COMPARE(res, result);
+			SELF_COMPARE(type, res, result);
 		}
 	} catch(std::exception &e) {
 		QFAIL(e.what());

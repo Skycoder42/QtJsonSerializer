@@ -201,10 +201,6 @@ void TypeConverterTest::testConverterMeta_data()
 						   << static_cast<int>(QJsonTypeConverter::Standard)
 						   << QList<QJsonValue::Type>{QJsonValue::Array};
 
-	QTest::newRow("gadget") << gadgetConverter
-							<< static_cast<int>(QJsonTypeConverter::Standard)
-							<< QList<QJsonValue::Type>{QJsonValue::Object, QJsonValue::Null};
-
 	QTest::newRow("object") << objectConverter
 							<< static_cast<int>(QJsonTypeConverter::Standard)
 							<< QList<QJsonValue::Type>{QJsonValue::Object, QJsonValue::Null};
@@ -398,28 +394,6 @@ void TypeConverterTest::testMetaTypeDetection_data()
 	QTest::newRow("tuple.invalid") << tupleConverter
 								   << static_cast<int>(QMetaType::QVariantList)
 								   << false;
-
-	QTest::newRow("gadget.basic") << gadgetConverter
-								  << qMetaTypeId<TestGadget>()
-								  << true;
-	QTest::newRow("gadget.ptr") << gadgetConverter
-								<< qMetaTypeId<TestGadget*>()
-								<< true;
-	QTest::newRow("gadget.excluded.keysequence") << gadgetConverter
-												 << static_cast<int>(QMetaType::QKeySequence)
-												 << false;
-	QTest::newRow("gadget.excluded.font") << gadgetConverter
-										  << static_cast<int>(QMetaType::QFont)
-										  << false;
-	QTest::newRow("gadget.excluded.locale") << gadgetConverter
-											<< static_cast<int>(QMetaType::QLocale)
-											<< false;
-	QTest::newRow("gadget.invalid.none") << gadgetConverter
-										 << qMetaTypeId<OpaqueDummy>()
-										 << false;
-	QTest::newRow("gadget.invalid.object") << gadgetConverter
-										   << static_cast<int>(QMetaType::QObjectStar)
-										   << false;
 
 	QTest::newRow("object.basic") << objectConverter
 								  << qMetaTypeId<TestObject*>()
@@ -636,77 +610,6 @@ void TypeConverterTest::testDeserialization_data()
 								   << qMetaTypeId<TestTpl1>()
 								   << QVariant{}
 								   << QJsonValue{QJsonArray{1, true, 3.4, 4}};
-
-	QTest::newRow("gadget.validate.none") << gadgetConverter
-										  << QVariantHash{{QStringLiteral("validationFlags"), QVariant::fromValue<QJsonSerializer::ValidationFlags>(QJsonSerializer::StandardValidation)}}
-										  << TestQ{{QMetaType::Int, 10, 1}}
-										  << static_cast<QObject*>(nullptr)
-										  << qMetaTypeId<TestGadget>()
-										  << QVariant::fromValue(TestGadget{10, 0, 0})
-										  << QJsonValue{QJsonObject{
-													{QStringLiteral("key"), 1},
-													{QStringLiteral("extra"), 24}
-												}};
-	QTest::newRow("gadget.validate.extra.invalid") << gadgetConverter
-												   << QVariantHash{{QStringLiteral("validationFlags"), QVariant::fromValue<QJsonSerializer::ValidationFlags>(QJsonSerializer::NoExtraProperties)}}
-												   << TestQ{{QMetaType::Int, 10, 1}}
-												   << static_cast<QObject*>(nullptr)
-												   << qMetaTypeId<TestGadget>()
-												   << QVariant{}
-												   << QJsonValue{QJsonObject{
-															 {QStringLiteral("key"), 1},
-															 {QStringLiteral("extra"), 24}
-														 }};
-	QTest::newRow("gadget.validate.extra.valid") << gadgetConverter
-												 << QVariantHash{{QStringLiteral("validationFlags"), QVariant::fromValue<QJsonSerializer::ValidationFlags>(QJsonSerializer::NoExtraProperties)}}
-												 << TestQ{{QMetaType::Int, 10, 1}}
-												 << static_cast<QObject*>(nullptr)
-												 << qMetaTypeId<TestGadget>()
-												 << QVariant::fromValue(TestGadget{10, 0, 0})
-												 << QJsonValue{QJsonObject{
-														   {QStringLiteral("key"), 1}
-													   }};
-	QTest::newRow("gadget.validate.all.invalid") << gadgetConverter
-												 << QVariantHash{{QStringLiteral("validationFlags"), QVariant::fromValue<QJsonSerializer::ValidationFlags>(QJsonSerializer::AllProperties)}}
-												 << TestQ{{QMetaType::Int, 10, 1}}
-												 << static_cast<QObject*>(nullptr)
-												 << qMetaTypeId<TestGadget>()
-												 << QVariant{}
-												 << QJsonValue{QJsonObject{
-														   {QStringLiteral("key"), 1},
-														   {QStringLiteral("extra"), 24}
-													   }};
-	QTest::newRow("gadget.validate.all.valid") << gadgetConverter
-											   << QVariantHash{{QStringLiteral("validationFlags"), QVariant::fromValue<QJsonSerializer::ValidationFlags>(QJsonSerializer::AllProperties)}}
-											   << TestQ{{QMetaType::Int, 10, 1}, {QMetaType::Double, 10.1, 2}}
-											   << static_cast<QObject*>(nullptr)
-											   << qMetaTypeId<TestGadget>()
-											   << QVariant::fromValue(TestGadget{10, 10.1, 0})
-											   << QJsonValue{QJsonObject{
-														 {QStringLiteral("key"), 1},
-														 {QStringLiteral("value"), 2},
-														 {QStringLiteral("extra"), 24}
-													 }};
-	QTest::newRow("gadget.validate.full.invalid") << gadgetConverter
-												  << QVariantHash{{QStringLiteral("validationFlags"), QVariant::fromValue<QJsonSerializer::ValidationFlags>(QJsonSerializer::FullValidation)}}
-												  << TestQ{{QMetaType::Int, 10, 1}}
-												  << static_cast<QObject*>(nullptr)
-												  << qMetaTypeId<TestGadget>()
-												  << QVariant{}
-												  << QJsonValue{QJsonObject{
-															{QStringLiteral("key"), 1},
-															{QStringLiteral("extra"), 24}
-														}};
-	QTest::newRow("gadget.validate.full.valid") << gadgetConverter
-												<< QVariantHash{{QStringLiteral("validationFlags"), QVariant::fromValue<QJsonSerializer::ValidationFlags>(QJsonSerializer::FullValidation)}}
-												<< TestQ{{QMetaType::Int, 10, 1}, {QMetaType::Double, 10.1, 2}}
-												<< static_cast<QObject*>(nullptr)
-												<< qMetaTypeId<TestGadget>()
-												<< QVariant::fromValue(TestGadget{10, 10.1, 0})
-												<< QJsonValue{QJsonObject{
-														  {QStringLiteral("key"), 1},
-														  {QStringLiteral("value"), 2}
-													  }};
 }
 
 void TypeConverterTest::testDeserialization()
@@ -1043,34 +946,6 @@ void TypeConverterTest::addCommonSerData()
 								 << qMetaTypeId<std::tuple<int, bool, double>>()
 								 << QVariant::fromValue(std::make_tuple(5, true, 5.5))
 								 << QJsonValue{QJsonArray{1, 2, 3}};
-
-	QTest::newRow("gadget.basic") << gadgetConverter
-								  << QVariantHash{}
-								  << TestQ{{QMetaType::Int, 10, 1}, {QMetaType::Double, 0.1, 2}}
-								  << static_cast<QObject*>(nullptr)
-								  << qMetaTypeId<TestGadget>()
-								  << QVariant::fromValue(TestGadget{10, 0.1, 11})
-								  << QJsonValue{QJsonObject{
-											{QStringLiteral("key"), 1},
-											{QStringLiteral("value"), 2}
-										}};
-	QTest::newRow("gadget.ptr.value") << gadgetConverter
-									  << QVariantHash{}
-									  << TestQ{{QMetaType::Int, 5, 11}, {QMetaType::Double, 0.5, 22}}
-									  << static_cast<QObject*>(nullptr)
-									  << qMetaTypeId<TestGadget*>()
-									  << QVariant::fromValue(new TestGadget{5, 0.5, 5})
-									  << QJsonValue{QJsonObject{
-												{QStringLiteral("key"), 11},
-												{QStringLiteral("value"), 22}
-											}};
-	QTest::newRow("gadget.ptr.null") << gadgetConverter
-									 << QVariantHash{}
-									 << TestQ{}
-									 << static_cast<QObject*>(nullptr)
-									 << qMetaTypeId<TestGadget*>()
-									 << QVariant::fromValue<TestGadget*>(nullptr)
-									 << QJsonValue{QJsonValue::Null};
 
 	QTest::newRow("object.basic") << objectConverter
 								  << QVariantHash{}
