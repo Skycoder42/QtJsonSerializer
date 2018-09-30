@@ -11,6 +11,7 @@
 class TypeConverterTestBase : public QObject
 {
 	Q_OBJECT
+	friend class MultiTypeConverterTestBase;
 
 public:
 	using TestQ = QList<DummySerializationHelper::SerInfo>;
@@ -43,16 +44,16 @@ private Q_SLOTS:
 	void initTestCase();
 	void cleanupTestCase();
 
-	void testConverterMeta_data();
+	virtual void testConverterMeta_data();
 	void testConverterMeta();
 
-	void testMetaTypeDetection_data();
+	virtual void testMetaTypeDetection_data();
 	void testMetaTypeDetection();
 
-	void testSerialization_data();
+	virtual void testSerialization_data();
 	void testSerialization();
 
-	void testDeserialization_data();
+	virtual void testDeserialization_data();
 	void testDeserialization();
 };
 
