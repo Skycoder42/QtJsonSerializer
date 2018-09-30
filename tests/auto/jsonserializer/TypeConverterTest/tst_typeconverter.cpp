@@ -145,10 +145,6 @@ void TypeConverterTest::testConverterMeta_data()
 	QTest::addColumn<int>("priority");
 	QTest::addColumn<QList<QJsonValue::Type>>("jsonTypes");
 
-	QTest::newRow("bytearray") << byteConverter
-							   << static_cast<int>(QJsonTypeConverter::Standard)
-							   << QList<QJsonValue::Type>{QJsonValue::String};
-
 	QTest::newRow("size") << sizeConverter
 						  << static_cast<int>(QJsonTypeConverter::Standard)
 						  << QList<QJsonValue::Type>{QJsonValue::Object};
@@ -229,19 +225,6 @@ void TypeConverterTest::testMetaTypeDetection_data()
 	QTest::addColumn<QSharedPointer<QJsonTypeConverter>>("converter");
 	QTest::addColumn<int>("metatype");
 	QTest::addColumn<bool>("matches");
-
-	QTest::newRow("bytearray.bytearray") << byteConverter
-										 << static_cast<int>(QMetaType::QByteArray)
-										 << true;
-	QTest::newRow("bytearray.invalid.string") << byteConverter
-											  << static_cast<int>(QMetaType::QString)
-											  << false;
-	QTest::newRow("bytearray.invalid.char") << byteConverter
-											<< static_cast<int>(QMetaType::Char)
-											<< false;
-	QTest::newRow("bytearray.invalid.string") << byteConverter
-											  << static_cast<int>(QMetaType::Int)
-											  << false;
 
 	QTest::newRow("size.size") << sizeConverter
 							   << static_cast<int>(QMetaType::QSize)
@@ -556,35 +539,6 @@ void TypeConverterTest::testDeserialization_data()
 
 	addCommonSerData();
 
-	QTest::newRow("bytearray.invalid") << byteConverter
-									   << QVariantHash{{QStringLiteral("validateBase64"), false}}
-									   << TestQ{}
-									   << static_cast<QObject*>(nullptr)
-									   << static_cast<int>(QMetaType::QByteArray)
-									   << QVariant{QByteArrayLiteral("Hello World8")}
-									   << QJsonValue{QStringLiteral("SGVsbG8#'gV29ybGQ=42")};
-	QTest::newRow("bytearray.validated1") << byteConverter
-										  << QVariantHash{{QStringLiteral("validateBase64"), true}}
-										  << TestQ{}
-										  << static_cast<QObject*>(nullptr)
-										  << static_cast<int>(QMetaType::QByteArray)
-										  << QVariant{}
-										  << QJsonValue{QStringLiteral("SGVsbG8#'gV29ybGQ=42")};
-	QTest::newRow("bytearray.validated2") << byteConverter
-										  << QVariantHash{{QStringLiteral("validateBase64"), true}}
-										  << TestQ{}
-										  << static_cast<QObject*>(nullptr)
-										  << static_cast<int>(QMetaType::QByteArray)
-										  << QVariant{}
-										  << QJsonValue{QStringLiteral("SGVsbG8gV29ybGQ2=")};
-	QTest::newRow("bytearray.validated3") << byteConverter
-										  << QVariantHash{{QStringLiteral("validateBase64"), true}}
-										  << TestQ{}
-										  << static_cast<QObject*>(nullptr)
-										  << static_cast<int>(QMetaType::QByteArray)
-										  << QVariant{}
-										  << QJsonValue{QStringLiteral("SGVsbG%gV29ybGQ=")};
-
 	QTest::newRow("size.invalid") << sizeConverter
 								  << QVariantHash{}
 								  << TestQ{}
@@ -813,14 +767,6 @@ void TypeConverterTest::testDeserialization()
 
 void TypeConverterTest::addCommonSerData()
 {
-	QTest::newRow("bytearray.basic") << byteConverter
-									 << QVariantHash{}
-									 << TestQ{}
-									 << static_cast<QObject*>(nullptr)
-									 << static_cast<int>(QMetaType::QByteArray)
-									 << QVariant{QByteArrayLiteral("Hello World")}
-									 << QJsonValue{QStringLiteral("SGVsbG8gV29ybGQ=")};
-
 	QTest::newRow("size.int") << sizeConverter
 							  << QVariantHash{}
 							  << TestQ{}

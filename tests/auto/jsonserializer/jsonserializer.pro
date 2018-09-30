@@ -2,7 +2,12 @@ TEMPLATE = subdirs
 
 SUBDIRS += ObjectSerializerTest \
 	GadgetSerializerTest \
-    TypeConverterTest
+	TypeConverterTestLib \
+	BytearrayConverterTest
+
+never: SUBDIRS += TypeConverterTest
+
+BytearrayConverterTest.depends += TypeConverterTestLib
 
 prepareRecursiveTarget(run-tests)
 QMAKE_EXTRA_TARGETS += run-tests
