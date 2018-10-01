@@ -2,7 +2,11 @@ TEMPLATE = subdirs
 
 SUBDIRS += ObjectSerializerTest \
 	GadgetSerializerTest \
-	TypeConverterTestLib \
+	TypeConverterTestLib
+
+never: SUBDIRS += TypeConverterTest
+
+CONVERTER_TESTS = \
 	BytearrayConverterTest \
 	GadgetConverterTest \
 	GeomConverterTest \
@@ -11,19 +15,13 @@ SUBDIRS += ObjectSerializerTest \
 	LocaleConverterTest \
 	MapConverterTest \
 	PairConverterTest \
-	RegexConverterTest
+	RegexConverterTest \
+	TupleConverterTest
 
-never: SUBDIRS += TypeConverterTest
-
-BytearrayConverterTest.depends += TypeConverterTestLib
-GadgetConverterTest.depends += TypeConverterTestLib
-GeomConverterTest.depends += TypeConverterTestLib
-JsonConverterTest.depends += TypeConverterTestLib
-ListConverterTest.depends += TypeConverterTestLib
-LocaleConverterTest.depends += TypeConverterTestLib
-MapConverterTest.depends += TypeConverterTestLib
-PairConverterTest.depends += TypeConverterTestLib
-RegexConverterTest.depends += TypeConverterTestLib
+for(test, CONVERTER_TESTS) {
+	SUBDIRS += $$test
+	$${test}.depends += TypeConverterTestLib
+}
 
 prepareRecursiveTarget(run-tests)
 QMAKE_EXTRA_TARGETS += run-tests

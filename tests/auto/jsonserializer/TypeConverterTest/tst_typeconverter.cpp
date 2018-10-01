@@ -149,10 +149,6 @@ void TypeConverterTest::testConverterMeta_data()
 							 << static_cast<int>(QJsonTypeConverter::Standard)
 							 << QList<QJsonValue::Type>{QJsonValue::String};
 
-	QTest::newRow("tuple") << tupleConverter
-						   << static_cast<int>(QJsonTypeConverter::Standard)
-						   << QList<QJsonValue::Type>{QJsonValue::Array};
-
 	QTest::newRow("object") << objectConverter
 							<< static_cast<int>(QJsonTypeConverter::Standard)
 							<< QList<QJsonValue::Type>{QJsonValue::Object, QJsonValue::Null};
@@ -180,16 +176,6 @@ void TypeConverterTest::testMetaTypeDetection_data()
 	QTest::newRow("version.invalid") << versionConverter
 									 << static_cast<int>(QMetaType::QString)
 									 << false;
-
-	QTest::newRow("tuple.basic") << tupleConverter
-								 << qMetaTypeId<std::tuple<int, bool, double>>()
-								 << true;
-	QTest::newRow("tuple.extended") << tupleConverter
-									<< qMetaTypeId<std::tuple<QList<int>, QPair<bool, bool>, QMap<QString, double>>>()
-									<< true;
-	QTest::newRow("tuple.invalid") << tupleConverter
-								   << static_cast<int>(QMetaType::QVariantList)
-								   << false;
 
 	QTest::newRow("object.basic") << objectConverter
 								  << qMetaTypeId<TestObject*>()
@@ -231,14 +217,6 @@ void TypeConverterTest::testSerialization_data()
 	QTest::addColumn<QJsonValue>("result");
 
 	addCommonSerData();
-
-	QTest::newRow("tuple.unconvertible") << pairConverter
-										 << QVariantHash{}
-										 << TestQ{}
-										 << static_cast<QObject*>(nullptr)
-										 << qMetaTypeId<std::tuple<OpaqueDummy>>()
-										 << QVariant::fromValue(std::tuple<OpaqueDummy>{})
-										 << QJsonValue{QJsonValue::Undefined};
 }
 
 void TypeConverterTest::testSerialization()
@@ -291,14 +269,6 @@ void TypeConverterTest::testDeserialization_data()
 									 << qMetaTypeId<QVersionNumber>()
 									 << QVariant{}
 									 << QJsonValue{QStringLiteral("A1.4.5")};
-
-	QTest::newRow("tuple.invalid") << tupleConverter
-								   << QVariantHash{}
-								   << TestQ{}
-								   << static_cast<QObject*>(nullptr)
-								   << qMetaTypeId<TestTpl1>()
-								   << QVariant{}
-								   << QJsonValue{QJsonArray{1, true, 3.4, 4}};
 }
 
 void TypeConverterTest::testDeserialization()
@@ -373,14 +343,6 @@ void TypeConverterTest::addCommonSerData()
 								  << qMetaTypeId<QVersionNumber>()
 								  << QVariant::fromValue(QVersionNumber{1, 2, 3, 4, 5})
 								  << QJsonValue{QStringLiteral("1.2.3.4.5")};
-
-	QTest::newRow("tuple.basic") << tupleConverter
-								 << QVariantHash{}
-								 << TestQ{{QMetaType::Int, 5, 1}, {QMetaType::Bool, true, 2}, {QMetaType::Double, 5.5, 3}}
-								 << static_cast<QObject*>(this)
-								 << qMetaTypeId<std::tuple<int, bool, double>>()
-								 << QVariant::fromValue(std::make_tuple(5, true, 5.5))
-								 << QJsonValue{QJsonArray{1, 2, 3}};
 
 	QTest::newRow("object.basic") << objectConverter
 								  << QVariantHash{}
