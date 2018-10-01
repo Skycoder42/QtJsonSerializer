@@ -99,8 +99,10 @@ QVariant QJsonObjectConverter::deserialize(int propertyType, const QJsonValue &v
 
 	//try to get the polymorphic metatype (if allowed)
 	auto jsonObject = value.toObject();
+	auto isPoly = false;
 	if(poly != QJsonSerializer::Disabled) {
 		if(jsonObject.contains(QStringLiteral("@class"))) {
+			isPoly = true;
 			QByteArray classField = jsonObject[QStringLiteral("@class")].toString().toUtf8() + "*";//add the star
 			auto typeId = QMetaType::type(classField.constData());
 			auto nMeta = QMetaType::metaObjectForType(typeId);
@@ -140,6 +142,9 @@ QVariant QJsonObjectConverter::deserialize(int propertyType, const QJsonValue &v
 
 	//now deserialize all json properties
 	for(auto it = jsonObject.constBegin(); it != jsonObject.constEnd(); it++) {
+		if(isPoly && it.key() == QStringLiteral("@class"))
+			continue;
+
 		auto propIndex = metaObject->indexOfProperty(qUtf8Printable(it.key()));
 		QVariant subValue;
 		if(propIndex != -1) {
