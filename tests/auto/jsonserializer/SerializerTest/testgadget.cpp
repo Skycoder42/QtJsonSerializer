@@ -9,18 +9,32 @@ bool TestGadget::operator==(TestGadget other) const
 	return data == other.data;
 }
 
+EnumGadget::EnumGadget() = default;
+
+EnumGadget::EnumGadget(EnumGadget::NormalEnum enumProp) :
+	enumProp{enumProp}
+{}
+
+EnumGadget::EnumGadget(EnumFlag flagsProp) :
+	flagsProp{flagsProp}
+{}
+
+EnumGadget::EnumGadget(EnumFlags flagsProp) :
+	flagsProp{flagsProp}
+{}
+
 bool EnumGadget::operator==(EnumGadget other) const
 {
-	return normalEnumProperty == other.normalEnumProperty &&
-			enumFlagsProperty == other.enumFlagsProperty;
+	return enumProp == other.enumProp &&
+			flagsProp == other.flagsProp;
 }
 
-EnumGadget::EnumFlags EnumGadget::getEnumFlagsProperty() const
+EnumGadget::EnumFlags EnumGadget::getFlagsProp() const
 {
-	return enumFlagsProperty;
+	return flagsProp;
 }
 
-void EnumGadget::setEnumFlagsProperty(EnumFlags value)
+void EnumGadget::setFlagsProp(EnumFlags value)
 {
-	enumFlagsProperty = value;
+	flagsProp = value;
 }

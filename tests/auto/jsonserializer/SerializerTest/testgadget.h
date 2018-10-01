@@ -21,8 +21,8 @@ struct EnumGadget
 {
 	Q_GADGET
 
-	Q_PROPERTY(NormalEnum normalEnumProperty MEMBER normalEnumProperty)
-	Q_PROPERTY(EnumFlags enumFlagsProperty READ getEnumFlagsProperty WRITE setEnumFlagsProperty)
+	Q_PROPERTY(NormalEnum enumProp MEMBER enumProp)
+	Q_PROPERTY(EnumFlags flagsProp READ getFlagsProp WRITE setFlagsProp)
 
 public:
 	enum NormalEnum {
@@ -41,13 +41,18 @@ public:
 	Q_DECLARE_FLAGS(EnumFlags, EnumFlag)
 	Q_FLAG(EnumFlags)
 
+	EnumGadget();
+	EnumGadget(NormalEnum enumProp);
+	EnumGadget(EnumFlag flagsProp);
+	EnumGadget(EnumFlags flagsProp);
+
 	bool operator==(EnumGadget other) const;
 
-	NormalEnum normalEnumProperty = Normal0;
-	EnumFlags enumFlagsProperty;
+	NormalEnum enumProp = Normal0;
+	EnumFlags flagsProp;
 
-	EnumFlags getEnumFlagsProperty() const;
-	void setEnumFlagsProperty(EnumFlags value);
+	EnumFlags getFlagsProp() const;
+	void setFlagsProp(EnumFlags value);
 };
 
 Q_DECLARE_METATYPE(TestGadget)

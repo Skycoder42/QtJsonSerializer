@@ -290,6 +290,38 @@ void SerializerTest::addCommonData()
 	QTest::newRow("nullptr") << QVariant::fromValue(nullptr)
 							 << QJsonValue{QJsonValue::Null}
 							 << true;
+
+	//advanced types
+	QTest::newRow("date") << QVariant{QDate{2010, 10, 20}}
+						  << QJsonValue{QStringLiteral("2010-10-20")}
+						  << true;
+	QTest::newRow("time") << QVariant{QTime{14, 30, 15, 123}}
+						  << QJsonValue{QStringLiteral("14:30:15.123")}
+						  << true;
+	QTest::newRow("datetime") << QVariant{QDateTime{QDate{2010, 10, 20}, QTime{14, 30}}}
+							  << QJsonValue{QStringLiteral("2010-10-20T14:30:00.000")}
+							  << true;
+	auto id = QUuid::createUuid();
+	QTest::newRow("uuid") << QVariant{id}
+						  << QJsonValue{id.toString(QUuid::WithoutBraces)}
+						  << true;
+	QTest::newRow("url") << QVariant{QUrl{QStringLiteral("https://example.com/test.xml?baum=42#tree")}}
+						 << QJsonValue{QStringLiteral("https://example.com/test.xml?baum=42#tree")}
+						 << true;
+
+	//enums/flags
+	QTest::newRow("enum") << QVariant::fromValue<EnumGadget>(EnumGadget::Normal1)
+						  << QJsonValue{QJsonObject{
+									{QStringLiteral("enumProp"), static_cast<int>(EnumGadget::Normal1)},
+									{QStringLiteral("flagsProp"), 0}
+								}}
+						  << true;
+	QTest::newRow("flags") << QVariant::fromValue<EnumGadget>(EnumGadget::FlagX)
+						   << QJsonValue{QJsonObject{
+									 {QStringLiteral("enumProp"), static_cast<int>(EnumGadget::Normal0)},
+									 {QStringLiteral("flagsProp"), static_cast<int>(EnumGadget::FlagX)}
+								 }}
+						   << true;
 }
 
 QTEST_MAIN(SerializerTest)
