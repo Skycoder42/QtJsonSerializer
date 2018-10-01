@@ -4,8 +4,6 @@ SUBDIRS += ObjectSerializerTest \
 	GadgetSerializerTest \
 	TypeConverterTestLib
 
-never: SUBDIRS += TypeConverterTest
-
 CONVERTER_TESTS = \
 	BytearrayConverterTest \
 	GadgetConverterTest \
@@ -14,6 +12,7 @@ CONVERTER_TESTS = \
 	ListConverterTest \
 	LocaleConverterTest \
 	MapConverterTest \
+	ObjectConverterTest \
 	PairConverterTest \
 	RegexConverterTest \
 	TupleConverterTest \
