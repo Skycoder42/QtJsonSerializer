@@ -6,7 +6,9 @@ SUBDIRS += ObjectSerializerTest \
 	BytearrayConverterTest \
 	GadgetConverterTest \
 	GeomConverterTest \
-	JsonConverterTest
+	JsonConverterTest \
+	ListConverterTest \
+	LocaleConverterTest
 
 never: SUBDIRS += TypeConverterTest
 
@@ -14,6 +16,8 @@ BytearrayConverterTest.depends += TypeConverterTestLib
 GadgetConverterTest.depends += TypeConverterTestLib
 GeomConverterTest.depends += TypeConverterTestLib
 JsonConverterTest.depends += TypeConverterTestLib
+ListConverterTest.depends += TypeConverterTestLib
+LocaleConverterTest.depends += TypeConverterTestLib
 
 prepareRecursiveTarget(run-tests)
 QMAKE_EXTRA_TARGETS += run-tests

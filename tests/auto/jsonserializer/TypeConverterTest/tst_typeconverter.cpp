@@ -145,10 +145,6 @@ void TypeConverterTest::testConverterMeta_data()
 	QTest::addColumn<int>("priority");
 	QTest::addColumn<QList<QJsonValue::Type>>("jsonTypes");
 
-	QTest::newRow("locale") << localeConverter
-							<< static_cast<int>(QJsonTypeConverter::Standard)
-							<< QList<QJsonValue::Type>{QJsonValue::String};
-
 	QTest::newRow("regex") << regexConverter
 						   << static_cast<int>(QJsonTypeConverter::Standard)
 						   << QList<QJsonValue::Type>{QJsonValue::Object, QJsonValue::String};
@@ -156,10 +152,6 @@ void TypeConverterTest::testConverterMeta_data()
 	QTest::newRow("version") << versionConverter
 							 << static_cast<int>(QJsonTypeConverter::Standard)
 							 << QList<QJsonValue::Type>{QJsonValue::String};
-
-	QTest::newRow("list") << listConverter
-						  << static_cast<int>(QJsonTypeConverter::Standard)
-						  << QList<QJsonValue::Type>{QJsonValue::Array};
 
 	QTest::newRow("map") << mapConverter
 						 << static_cast<int>(QJsonTypeConverter::Standard)
@@ -194,13 +186,6 @@ void TypeConverterTest::testMetaTypeDetection_data()
 	QTest::addColumn<int>("metatype");
 	QTest::addColumn<bool>("matches");
 
-	QTest::newRow("locale.locale") << localeConverter
-								   << static_cast<int>(QMetaType::QLocale)
-								   << true;
-	QTest::newRow("locale.invalid") << localeConverter
-									<< static_cast<int>(QMetaType::QString)
-									<< false;
-
 	QTest::newRow("regex.regex") << regexConverter
 								 << static_cast<int>(QMetaType::QRegularExpression)
 								 << true;
@@ -214,28 +199,6 @@ void TypeConverterTest::testMetaTypeDetection_data()
 	QTest::newRow("version.invalid") << versionConverter
 									 << static_cast<int>(QMetaType::QString)
 									 << false;
-
-	QTest::newRow("list.int") << listConverter
-							  << qMetaTypeId<QList<int>>()
-							  << true;
-	QTest::newRow("list.string") << listConverter
-								 << static_cast<int>(QMetaType::QStringList)
-								 << true;
-	QTest::newRow("list.variant") << listConverter
-								  << static_cast<int>(QMetaType::QVariantList)
-								  << true;
-	QTest::newRow("list.object") << listConverter
-								 << qMetaTypeId<QList<QObject*>>()
-								 << true;
-	QTest::newRow("list.list") << listConverter
-							   << qMetaTypeId<QList<QList<bool>>>()
-							   << true;
-	QTest::newRow("list.pair") << listConverter
-							   << qMetaTypeId<QList<QPair<int, bool>>>()
-							   << true;
-	QTest::newRow("list.invalid") << listConverter
-								  << qMetaTypeId<QVector<int>>()
-								  << false;
 
 	QTest::newRow("map.int") << mapConverter
 							 << qMetaTypeId<QMap<QString, int>>()
@@ -347,14 +310,6 @@ void TypeConverterTest::testSerialization_data()
 
 	addCommonSerData();
 
-	QTest::newRow("list.unconvertible") << listConverter
-										<< QVariantHash{}
-										<< TestQ{}
-										<< static_cast<QObject*>(nullptr)
-										<< qMetaTypeId<QList<OpaqueDummy>>()
-										<< QVariant::fromValue(QList<OpaqueDummy>{{}, {}, {}})
-										<< QJsonValue{QJsonValue::Undefined};
-
 	QTest::newRow("map.unconvertible") << mapConverter
 									   << QVariantHash{}
 									   << TestQ{}
@@ -423,21 +378,6 @@ void TypeConverterTest::testDeserialization_data()
 	QTest::addColumn<QJsonValue>("data");
 
 	addCommonSerData();
-
-	QTest::newRow("locale.empty") << localeConverter
-								  << QVariantHash{}
-								  << TestQ{}
-								  << static_cast<QObject*>(nullptr)
-								  << static_cast<int>(QMetaType::QLocale)
-								  << QVariant{QLocale::c()}
-								  << QJsonValue{QString{}};
-	QTest::newRow("locale.invalid") << localeConverter
-									<< QVariantHash{}
-									<< TestQ{}
-									<< static_cast<QObject*>(nullptr)
-									<< static_cast<int>(QMetaType::QLocale)
-									<< QVariant{}
-									<< QJsonValue{QStringLiteral("some random text")};
 
 	QTest::newRow("regex.string") << regexConverter
 								  << QVariantHash{}
@@ -537,36 +477,6 @@ void TypeConverterTest::testDeserialization()
 
 void TypeConverterTest::addCommonSerData()
 {
-
-	QTest::newRow("locale.normal") << localeConverter
-								   << QVariantHash{}
-								   << TestQ{}
-								   << static_cast<QObject*>(nullptr)
-								   << static_cast<int>(QMetaType::QLocale)
-								   << QVariant{QLocale{QLocale::German, QLocale::Germany}}
-								   << QJsonValue{QStringLiteral("de_DE")};
-	QTest::newRow("locale.c") << localeConverter
-							  << QVariantHash{}
-							  << TestQ{}
-							  << static_cast<QObject*>(nullptr)
-							  << static_cast<int>(QMetaType::QLocale)
-							  << QVariant{QLocale::c()}
-							  << QJsonValue{QStringLiteral("C")};
-	QTest::newRow("locale.bcp47.default") << localeConverter
-										  << QVariantHash{{QStringLiteral("useBcp47Locale"), true}}
-										  << TestQ{}
-										  << static_cast<QObject*>(nullptr)
-										  << static_cast<int>(QMetaType::QLocale)
-										  << QVariant{QLocale{QLocale::German, QLocale::Germany}}
-										  << QJsonValue{QStringLiteral("de")};
-	QTest::newRow("locale.bcp47.special") << localeConverter
-										  << QVariantHash{{QStringLiteral("useBcp47Locale"), true}}
-										  << TestQ{}
-										  << static_cast<QObject*>(nullptr)
-										  << static_cast<int>(QMetaType::QLocale)
-										  << QVariant{QLocale{QLocale::German, QLocale::Austria}}
-										  << QJsonValue{QStringLiteral("de-AT")};
-
 	QTest::newRow("regex.simple") << regexConverter
 								  << QVariantHash{}
 								  << TestQ{}
@@ -602,35 +512,6 @@ void TypeConverterTest::addCommonSerData()
 								  << qMetaTypeId<QVersionNumber>()
 								  << QVariant::fromValue(QVersionNumber{1, 2, 3, 4, 5})
 								  << QJsonValue{QStringLiteral("1.2.3.4.5")};
-
-	QTest::newRow("list.empty") << listConverter
-								<< QVariantHash{}
-								<< TestQ{}
-								<< static_cast<QObject*>(nullptr)
-								<< qMetaTypeId<QList<int>>()
-								<< QVariant::fromValue(QList<int>{})
-								<< QJsonValue{QJsonArray{}};
-	QTest::newRow("list.filled") << listConverter
-								 << QVariantHash{}
-								 << TestQ{{QMetaType::Int, 1, 2}, {QMetaType::Int, 3, 4}, {QMetaType::Int, 5, 6}}
-								 << static_cast<QObject*>(this)
-								 << qMetaTypeId<QList<int>>()
-								 << QVariant::fromValue(QList<int>{1, 3, 5})
-								 << QJsonValue{QJsonArray{2, 4, 6}};
-	QTest::newRow("list.string") << listConverter
-								 << QVariantHash{}
-								 << TestQ{{QMetaType::QString, QStringLiteral("test"), QStringLiteral("tree")}}
-								 << static_cast<QObject*>(this)
-								 << static_cast<int>(QMetaType::QStringList)
-								 << QVariant{QStringList{QStringLiteral("test")}}
-								 << QJsonValue{QJsonArray{QStringLiteral("tree")}};
-	QTest::newRow("list.variant") << listConverter
-								  << QVariantHash{}
-								  << TestQ{{QMetaType::UnknownType, true, false}}
-								  << static_cast<QObject*>(this)
-								  << static_cast<int>(QMetaType::QVariantList)
-								  << QVariant{QVariantList{true}}
-								  << QJsonValue{QJsonArray{false}};
 
 	QTest::newRow("map.empty") << mapConverter
 							   << QVariantHash{}
