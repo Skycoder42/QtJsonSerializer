@@ -5,6 +5,13 @@
 
 #include <QtJsonSerializer/private/qjsonmapconverter_p.h>
 
+template <typename T>
+bool operator <(const QMap<QString, T> &m1, const QMap<QString, T> &m2)
+{
+	return m1.keys() < m2.keys() &&
+			m1.values() < m2.values();
+}
+
 class MapConverterTest : public TypeConverterTestBase
 {
 	Q_OBJECT

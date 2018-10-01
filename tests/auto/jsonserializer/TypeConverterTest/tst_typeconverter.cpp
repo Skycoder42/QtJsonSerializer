@@ -153,10 +153,6 @@ void TypeConverterTest::testConverterMeta_data()
 							 << static_cast<int>(QJsonTypeConverter::Standard)
 							 << QList<QJsonValue::Type>{QJsonValue::String};
 
-	QTest::newRow("pair") << pairConverter
-						  << static_cast<int>(QJsonTypeConverter::Standard)
-						  << QList<QJsonValue::Type>{QJsonValue::Array};
-
 	QTest::newRow("tuple") << tupleConverter
 						   << static_cast<int>(QJsonTypeConverter::Standard)
 						   << QList<QJsonValue::Type>{QJsonValue::Array};
@@ -195,38 +191,6 @@ void TypeConverterTest::testMetaTypeDetection_data()
 	QTest::newRow("version.invalid") << versionConverter
 									 << static_cast<int>(QMetaType::QString)
 									 << false;
-
-	QTest::newRow("qt.basic") << qMetaTypeId<QPair<QString, int>>()
-							  << true;
-	QTest::newRow("qt.double") << qMetaTypeId<QPair<int, int>>()
-							   << true;
-	QTest::newRow("pair.qt.list") << pairConverter
-								  << qMetaTypeId<QPair<QList<int>, QList<int>>>()
-								  << true;
-	QTest::newRow("pair.qt.pair") << pairConverter
-								  << qMetaTypeId<QPair<QPair<int, int>, QPair<bool, bool>>>()
-								  << true;
-	QTest::newRow("pair.qt.map") << pairConverter
-								 << qMetaTypeId<QPair<QMap<QString, int>, QList<int>>>()
-								 << true;
-	QTest::newRow("pair.std.basic") << pairConverter
-									<< qMetaTypeId<std::pair<QString, int>>()
-									<< true;
-	QTest::newRow("pair.std.double") << pairConverter
-									 << qMetaTypeId<std::pair<int, int>>()
-									 << true;
-	QTest::newRow("pair.std.list") << pairConverter
-								   << qMetaTypeId<std::pair<QList<int>, QList<int>>>()
-								   << true;
-	QTest::newRow("pair.std.pair") << pairConverter
-								   << qMetaTypeId<std::pair<std::pair<int, int>, std::pair<bool, bool>>>()
-								   << true;
-	QTest::newRow("pair.std.map") << pairConverter
-								  << qMetaTypeId<std::pair<QMap<QString, int>, QList<int>>>()
-								  << true;
-	QTest::newRow("pair.invalid") << pairConverter
-								  << static_cast<int>(QMetaType::QVariantList)
-								  << false;
 
 	QTest::newRow("tuple.basic") << tupleConverter
 								 << qMetaTypeId<std::tuple<int, bool, double>>()
@@ -278,22 +242,6 @@ void TypeConverterTest::testSerialization_data()
 	QTest::addColumn<QJsonValue>("result");
 
 	addCommonSerData();
-
-	QTest::newRow("pair.qt.unconvertible") << pairConverter
-										   << QVariantHash{}
-										   << TestQ{}
-										   << static_cast<QObject*>(nullptr)
-										   << qMetaTypeId<QPair<int, OpaqueDummy>>()
-										   << QVariant::fromValue(QPair<int, OpaqueDummy>{})
-										   << QJsonValue{QJsonValue::Undefined};
-
-	QTest::newRow("pair.std.unconvertible") << pairConverter
-											<< QVariantHash{}
-											<< TestQ{}
-											<< static_cast<QObject*>(nullptr)
-											<< qMetaTypeId<std::pair<int, OpaqueDummy>>()
-											<< QVariant::fromValue(std::pair<int, OpaqueDummy>{})
-											<< QJsonValue{QJsonValue::Undefined};
 
 	QTest::newRow("tuple.unconvertible") << pairConverter
 										 << QVariantHash{}
@@ -362,14 +310,6 @@ void TypeConverterTest::testDeserialization_data()
 									 << qMetaTypeId<QVersionNumber>()
 									 << QVariant{}
 									 << QJsonValue{QStringLiteral("A1.4.5")};
-
-	QTest::newRow("pair.invalid") << pairConverter
-								  << QVariantHash{}
-								  << TestQ{}
-								  << static_cast<QObject*>(nullptr)
-								  << qMetaTypeId<QPair<bool, int>>()
-								  << QVariant{}
-								  << QJsonValue{QJsonArray{true, 2, 3}};
 
 	QTest::newRow("tuple.invalid") << tupleConverter
 								   << QVariantHash{}
@@ -473,31 +413,6 @@ void TypeConverterTest::addCommonSerData()
 								  << qMetaTypeId<QVersionNumber>()
 								  << QVariant::fromValue(QVersionNumber{1, 2, 3, 4, 5})
 								  << QJsonValue{QStringLiteral("1.2.3.4.5")};
-
-	QTest::newRow("pair.qt.basic") << pairConverter
-								   << QVariantHash{}
-								   << TestQ{{QMetaType::Bool, true, 42}, {QMetaType::Int, 42, true}}
-								   << static_cast<QObject*>(this)
-								   << qMetaTypeId<QPair<bool, int>>()
-								   << QVariant::fromValue(QPair<bool, int>{true, 42})
-								   << QJsonValue{QJsonArray{42, true}};
-	QTest::newRow("pair.qt.advanced") << pairConverter
-									  << QVariantHash{}
-									  << TestQ{
-												{QMetaType::Int, 3, 1},
-												{qMetaTypeId<QList<int>>(), QVariant::fromValue(QList<int>{}), 2}
-											}
-									  << static_cast<QObject*>(this)
-									  << qMetaTypeId<QPair<int, QList<int>>>()
-									  << QVariant::fromValue(QPair<int, QList<int>>{3, {}})
-									  << QJsonValue{QJsonArray{1, 2}};
-	QTest::newRow("pair.std") << pairConverter
-							  << QVariantHash{}
-							  << TestQ{{QMetaType::Bool, true, 42}, {QMetaType::Int, 42, true}}
-							  << static_cast<QObject*>(this)
-							  << qMetaTypeId<std::pair<bool, int>>()
-							  << QVariant::fromValue(std::pair<bool, int>{true, 42})
-							  << QJsonValue{QJsonArray{42, true}};
 
 	QTest::newRow("tuple.basic") << tupleConverter
 								 << QVariantHash{}
