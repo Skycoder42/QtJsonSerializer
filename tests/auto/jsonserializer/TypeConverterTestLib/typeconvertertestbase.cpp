@@ -1,6 +1,11 @@
 #include "typeconvertertestbase.h"
 #include <QtJsonSerializer>
 #include <QtTest>
+#include <typeinfo>
+
+#define private public
+#include <QtJsonSerializer/private/qjsonserializer_p.h>
+#undef private
 
 #define SELF_COMPARE(type, actual, expected) \
 do {\
@@ -35,6 +40,20 @@ void TypeConverterTestBase::initTestCase()
 void TypeConverterTestBase::cleanupTestCase()
 {
 	cleanupTest();
+}
+
+void TypeConverterTestBase::testConverterIsRegistered_data() {}
+
+void TypeConverterTestBase::testConverterIsRegistered()
+{
+	const auto cOwn = converter();
+	QJsonSerializerPrivate p;
+	for(const auto &conv : qAsConst(p.typeConverters)) {
+		const auto cReg = conv.data();
+		if(typeid(*cOwn).hash_code() == typeid(*cReg).hash_code())
+			return;
+	}
+	QFAIL(QByteArrayLiteral("TypeConverter \"") + typeid(*cOwn).name() + QByteArrayLiteral("\" is not registerd within QJsonSerializer"));
 }
 
 void TypeConverterTestBase::testConverterMeta_data()

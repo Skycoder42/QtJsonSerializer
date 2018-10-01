@@ -44,15 +44,14 @@ private Q_SLOTS:
 	void initTestCase();
 	void cleanupTestCase();
 
+	virtual void testConverterIsRegistered_data();
+	void testConverterIsRegistered();
 	virtual void testConverterMeta_data();
 	void testConverterMeta();
-
 	virtual void testMetaTypeDetection_data();
 	void testMetaTypeDetection();
-
 	virtual void testSerialization_data();
 	void testSerialization();
-
 	virtual void testDeserialization_data();
 	void testDeserialization();
 };

@@ -11,6 +11,12 @@ QJsonTypeConverter *MultiTypeConverterTestBase::converter()
 	return converter;
 }
 
+void MultiTypeConverterTestBase::testConverterIsRegistered_data()
+{
+	QTest::addColumn<QJsonTypeConverter*>("converter");
+	addConverterInstances();
+}
+
 void MultiTypeConverterTestBase::testConverterMeta_data()
 {
 	QTest::addColumn<QJsonTypeConverter*>("converter");

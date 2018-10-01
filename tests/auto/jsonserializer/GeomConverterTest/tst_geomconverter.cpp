@@ -10,6 +10,7 @@ class GeomConverterTest : public MultiTypeConverterTestBase
 	Q_OBJECT
 
 protected:
+	void addConverterInstances() override;
 	void addConverterData() override;
 	void addMetaData() override;
 	void addCommonSerData() override;
@@ -21,11 +22,19 @@ private:
 	QJsonLineConverter _lineConverter;
 	QJsonRectConverter _rectConverter;
 
-	QJsonTypeConverter * const sizeConverter = &_sizeConverter;
-	QJsonTypeConverter * const pointConverter = &_pointConverter;
-	QJsonTypeConverter * const lineConverter = &_lineConverter;
-	QJsonTypeConverter * const rectConverter = &_rectConverter;
+	QJsonTypeConverter *sizeConverter = &_sizeConverter;
+	QJsonTypeConverter *pointConverter = &_pointConverter;
+	QJsonTypeConverter *lineConverter = &_lineConverter;
+	QJsonTypeConverter *rectConverter = &_rectConverter;
 };
+
+void GeomConverterTest::addConverterInstances()
+{
+	QTest::newRow("size") << sizeConverter;
+	QTest::newRow("point") << pointConverter;
+	QTest::newRow("line") << lineConverter;
+	QTest::newRow("rect") << rectConverter;
+}
 
 void GeomConverterTest::addConverterData()
 {
