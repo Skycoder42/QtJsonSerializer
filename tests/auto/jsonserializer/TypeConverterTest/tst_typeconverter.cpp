@@ -145,10 +145,6 @@ void TypeConverterTest::testConverterMeta_data()
 	QTest::addColumn<int>("priority");
 	QTest::addColumn<QList<QJsonValue::Type>>("jsonTypes");
 
-	QTest::newRow("regex") << regexConverter
-						   << static_cast<int>(QJsonTypeConverter::Standard)
-						   << QList<QJsonValue::Type>{QJsonValue::Object, QJsonValue::String};
-
 	QTest::newRow("version") << versionConverter
 							 << static_cast<int>(QJsonTypeConverter::Standard)
 							 << QList<QJsonValue::Type>{QJsonValue::String};
@@ -177,13 +173,6 @@ void TypeConverterTest::testMetaTypeDetection_data()
 	QTest::addColumn<QSharedPointer<QJsonTypeConverter>>("converter");
 	QTest::addColumn<int>("metatype");
 	QTest::addColumn<bool>("matches");
-
-	QTest::newRow("regex.regex") << regexConverter
-								 << static_cast<int>(QMetaType::QRegularExpression)
-								 << true;
-	QTest::newRow("regex.invalid") << regexConverter
-								   << static_cast<int>(QMetaType::QString)
-								   << false;
 
 	QTest::newRow("version.version") << versionConverter
 									 << qMetaTypeId<QVersionNumber>()
@@ -288,14 +277,6 @@ void TypeConverterTest::testDeserialization_data()
 
 	addCommonSerData();
 
-	QTest::newRow("regex.string") << regexConverter
-								  << QVariantHash{}
-								  << TestQ{}
-								  << static_cast<QObject*>(nullptr)
-								  << static_cast<int>(QMetaType::QRegularExpression)
-								  << QVariant{QRegularExpression{QStringLiteral("just\\sa\\sstring")}}
-								  << QJsonValue{QStringLiteral("just\\sa\\sstring")};
-
 	QTest::newRow("version.suffixed") << versionConverter
 									  << QVariantHash{}
 									  << TestQ{}
@@ -378,27 +359,6 @@ void TypeConverterTest::testDeserialization()
 
 void TypeConverterTest::addCommonSerData()
 {
-	QTest::newRow("regex.simple") << regexConverter
-								  << QVariantHash{}
-								  << TestQ{}
-								  << static_cast<QObject*>(nullptr)
-								  << static_cast<int>(QMetaType::QRegularExpression)
-								  << QVariant{QRegularExpression{QStringLiteral("^\\w*m$")}}
-								  << QJsonValue{QJsonObject{
-											{QStringLiteral("pattern"), QStringLiteral("^\\w*m$")},
-											{QStringLiteral("options"), static_cast<int>(QRegularExpression::NoPatternOption)}
-										}};
-	QTest::newRow("regex.opts") << regexConverter
-								<< QVariantHash{}
-								<< TestQ{}
-								<< static_cast<QObject*>(nullptr)
-								<< static_cast<int>(QMetaType::QRegularExpression)
-								<< QVariant{QRegularExpression{QStringLiteral("^\\w*m$"), QRegularExpression::OptimizeOnFirstUsageOption | QRegularExpression::CaseInsensitiveOption}}
-								<< QJsonValue{QJsonObject{
-										  {QStringLiteral("pattern"), QStringLiteral("^\\w*m$")},
-										  {QStringLiteral("options"), static_cast<int>(QRegularExpression::OptimizeOnFirstUsageOption | QRegularExpression::CaseInsensitiveOption)}
-									  }};
-
 	QTest::newRow("version.simple") << versionConverter
 									<< QVariantHash{}
 									<< TestQ{}
