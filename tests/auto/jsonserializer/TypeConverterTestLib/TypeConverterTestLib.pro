@@ -9,12 +9,15 @@ HEADERS += \
 	typeconvertertestbase.h \
 	dummyserializationhelper.h \
 	opaquedummy.h \
-    multitypeconvertertestbase.h
+	multitypeconvertertestbase.h
 
 SOURCES += \
 	typeconvertertestbase.cpp \
 	dummyserializationhelper.cpp \
 	opaquedummy.cpp \
-    multitypeconvertertestbase.cpp
+	multitypeconvertertestbase.cpp
 
-QMAKE_EXTRA_TARGETS += run-tests
+runtarget.target = run-tests
+win32: runtarget.depends += $(DESTDIR_TARGET)
+else: runtarget.depends += $(TARGET)
+QMAKE_EXTRA_TARGETS += runtarget

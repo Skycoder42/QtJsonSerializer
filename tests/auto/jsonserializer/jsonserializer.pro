@@ -2,7 +2,8 @@ TEMPLATE = subdirs
 
 SUBDIRS += ObjectSerializerTest \
 	GadgetSerializerTest \
-	TypeConverterTestLib
+	TypeConverterTestLib \
+	SerializerTest
 
 CONVERTER_TESTS = \
 	BytearrayConverterTest \
@@ -21,6 +22,7 @@ CONVERTER_TESTS = \
 for(test, CONVERTER_TESTS) {
 	SUBDIRS += $$test
 	$${test}.depends += TypeConverterTestLib
+	SerializerTest.depends += $${test}
 }
 
 prepareRecursiveTarget(run-tests)
