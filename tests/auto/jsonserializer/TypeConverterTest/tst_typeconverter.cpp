@@ -145,10 +145,6 @@ void TypeConverterTest::testConverterMeta_data()
 	QTest::addColumn<int>("priority");
 	QTest::addColumn<QList<QJsonValue::Type>>("jsonTypes");
 
-	QTest::newRow("version") << versionConverter
-							 << static_cast<int>(QJsonTypeConverter::Standard)
-							 << QList<QJsonValue::Type>{QJsonValue::String};
-
 	QTest::newRow("object") << objectConverter
 							<< static_cast<int>(QJsonTypeConverter::Standard)
 							<< QList<QJsonValue::Type>{QJsonValue::Object, QJsonValue::Null};
@@ -169,13 +165,6 @@ void TypeConverterTest::testMetaTypeDetection_data()
 	QTest::addColumn<QSharedPointer<QJsonTypeConverter>>("converter");
 	QTest::addColumn<int>("metatype");
 	QTest::addColumn<bool>("matches");
-
-	QTest::newRow("version.version") << versionConverter
-									 << qMetaTypeId<QVersionNumber>()
-									 << true;
-	QTest::newRow("version.invalid") << versionConverter
-									 << static_cast<int>(QMetaType::QString)
-									 << false;
 
 	QTest::newRow("object.basic") << objectConverter
 								  << qMetaTypeId<TestObject*>()
@@ -254,21 +243,6 @@ void TypeConverterTest::testDeserialization_data()
 	QTest::addColumn<QJsonValue>("data");
 
 	addCommonSerData();
-
-	QTest::newRow("version.suffixed") << versionConverter
-									  << QVariantHash{}
-									  << TestQ{}
-									  << static_cast<QObject*>(nullptr)
-									  << qMetaTypeId<QVersionNumber>()
-									  << QVariant::fromValue(QVersionNumber{1, 2, 3})
-									  << QJsonValue{QStringLiteral("1.2.3-r1")};
-	QTest::newRow("version.invalid") << versionConverter
-									 << QVariantHash{}
-									 << TestQ{}
-									 << static_cast<QObject*>(nullptr)
-									 << qMetaTypeId<QVersionNumber>()
-									 << QVariant{}
-									 << QJsonValue{QStringLiteral("A1.4.5")};
 }
 
 void TypeConverterTest::testDeserialization()
@@ -329,21 +303,6 @@ void TypeConverterTest::testDeserialization()
 
 void TypeConverterTest::addCommonSerData()
 {
-	QTest::newRow("version.simple") << versionConverter
-									<< QVariantHash{}
-									<< TestQ{}
-									<< static_cast<QObject*>(nullptr)
-									<< qMetaTypeId<QVersionNumber>()
-									<< QVariant::fromValue(QVersionNumber{1, 2, 3})
-									<< QJsonValue{QStringLiteral("1.2.3")};
-	QTest::newRow("version.long") << versionConverter
-								  << QVariantHash{}
-								  << TestQ{}
-								  << static_cast<QObject*>(nullptr)
-								  << qMetaTypeId<QVersionNumber>()
-								  << QVariant::fromValue(QVersionNumber{1, 2, 3, 4, 5})
-								  << QJsonValue{QStringLiteral("1.2.3.4.5")};
-
 	QTest::newRow("object.basic") << objectConverter
 								  << QVariantHash{}
 								  << TestQ{{QMetaType::Int, 10, 1}, {QMetaType::Double, 0.1, 2}}
