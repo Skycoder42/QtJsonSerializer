@@ -82,3 +82,22 @@ bool DynamicPolyObject::compare(const TestObject *other) const
 BrokenObject::BrokenObject(QObject *parent) :
 	TestObject{parent}
 {}
+
+DerivedTestObject::DerivedTestObject(QObject *parent) :
+	TestObject{parent}
+{}
+
+DerivedTestObject::DerivedTestObject(int key, double value, int hidden, bool extra4, QObject *parent) :
+	TestObject{key, value, hidden, parent},
+	extra4{extra4}
+{}
+
+bool DerivedTestObject::compare(const TestObject *other) const
+{
+	auto o = qobject_cast<const DerivedTestObject*>(other);
+	if(o) {
+		return TestObject::compare(o) &&
+				extra4 == o->extra4;
+	} else
+		return false;
+}

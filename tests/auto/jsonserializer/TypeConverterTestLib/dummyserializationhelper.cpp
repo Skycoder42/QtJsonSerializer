@@ -23,17 +23,23 @@ QJsonValue DummySerializationHelper::serializeSubtype(int propertyType, const QV
 	if(serData.isEmpty())
 		throw QJsonSerializationException{"No more data to serialize was expected"};
 
-	auto data = serData.takeFirst();
-	auto ok = false;
-	[&](){
-		QCOMPARE(propertyType, data.typeId);
-		QCOMPARE(value, data.variant);
-		ok = true;
-	}();
-	if(ok)
-		return data.json;
-	else
-		throw QJsonSerializationException{"Data comparison failed"};
+	for(auto i = 0; i < serData.size(); i++) {
+		if(serData[i].typeId != propertyType)
+			continue;
+
+		auto data = serData.takeAt(i);
+		auto ok = false;
+		[&](){
+			QCOMPARE(value, data.variant);
+			ok = true;
+		}();
+		if(ok)
+			return data.json;
+		else
+			throw QJsonSerializationException{"Data comparison failed"};
+	}
+
+	throw QJsonSerializationException{QByteArrayLiteral("Unable to find data of type") + QMetaType::typeName(propertyType) + QByteArrayLiteral("in serData")};
 }
 
 QVariant DummySerializationHelper::deserializeSubtype(QMetaProperty property, const QJsonValue &value, QObject *parent) const
@@ -47,17 +53,23 @@ QVariant DummySerializationHelper::deserializeSubtype(int propertyType, const QJ
 	if(deserData.isEmpty())
 		throw QJsonDeserializationException{"No more data to deserialize was expected"};
 
-	auto data = deserData.takeFirst();
-	auto ok = false;
-	[&](){
-		QCOMPARE(propertyType, data.typeId);
-		QCOMPARE(value, data.json);
-		if(expectedParent)
-			QCOMPARE(parent, expectedParent);
-		ok = true;
-	}();
-	if(ok)
-		return data.variant;
-	else
-		throw QJsonDeserializationException{"Data comparison failed"};
+	for(auto i = 0; i < deserData.size(); i++) {
+		if(deserData[i].typeId != propertyType)
+			continue;
+
+		auto data = deserData.takeAt(i);
+		auto ok = false;
+		[&](){
+			QCOMPARE(value, data.json);
+			if(expectedParent)
+				QCOMPARE(parent, expectedParent);
+			ok = true;
+		}();
+		if(ok)
+			return data.variant;
+		else
+			throw QJsonDeserializationException{"Data comparison failed"};
+	}
+
+	throw QJsonSerializationException{QByteArrayLiteral("Unable to find data of type ") + QMetaType::typeName(propertyType) + QByteArrayLiteral(" in deserData")};
 }

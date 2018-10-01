@@ -70,6 +70,21 @@ public:
 	bool compare(const TestObject *other) const override;
 };
 
+class DerivedTestObject : public TestObject
+{
+	Q_OBJECT
+
+	Q_PROPERTY(bool extra4 MEMBER extra4)
+
+public:
+	Q_INVOKABLE explicit DerivedTestObject(QObject *parent = nullptr);
+	explicit DerivedTestObject(int key, double value, int hidden, bool extra4, QObject *parent = nullptr);
+
+	bool extra4 = false;
+
+	bool compare(const TestObject *other) const override;
+};
+
 class BrokenObject : public TestObject
 {
 	Q_OBJECT
@@ -82,6 +97,7 @@ Q_DECLARE_METATYPE(TestObject*)
 Q_DECLARE_METATYPE(StaticPolyObject*)
 Q_DECLARE_METATYPE(StaticNonPolyObject*)
 Q_DECLARE_METATYPE(DynamicPolyObject*)
+Q_DECLARE_METATYPE(DerivedTestObject*)
 Q_DECLARE_METATYPE(BrokenObject*)
 
 #endif // TESTOBJECT_H
