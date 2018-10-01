@@ -8,7 +8,8 @@ SUBDIRS += ObjectSerializerTest \
 	GeomConverterTest \
 	JsonConverterTest \
 	ListConverterTest \
-	LocaleConverterTest
+	LocaleConverterTest \
+	MapConverterTest
 
 never: SUBDIRS += TypeConverterTest
 
@@ -18,6 +19,7 @@ GeomConverterTest.depends += TypeConverterTestLib
 JsonConverterTest.depends += TypeConverterTestLib
 ListConverterTest.depends += TypeConverterTestLib
 LocaleConverterTest.depends += TypeConverterTestLib
+MapConverterTest.depends += TypeConverterTestLib
 
 prepareRecursiveTarget(run-tests)
 QMAKE_EXTRA_TARGETS += run-tests
