@@ -71,5 +71,5 @@ QVariant DummySerializationHelper::deserializeSubtype(int propertyType, const QJ
 			throw QJsonDeserializationException{"Data comparison failed"};
 	}
 
-	throw QJsonSerializationException{QByteArrayLiteral("Unable to find data of type ") + QMetaType::typeName(propertyType) + QByteArrayLiteral(" in deserData")};
+	throw QJsonDeserializationException{QByteArrayLiteral("Unable to find data of type ") + QMetaType::typeName(propertyType) + QByteArrayLiteral(" in deserData")};
 }

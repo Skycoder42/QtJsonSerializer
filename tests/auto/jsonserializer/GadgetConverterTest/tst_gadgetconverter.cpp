@@ -96,7 +96,6 @@ void GadgetConverterTest::addSerData()
 
 void GadgetConverterTest::addDeserData()
 {
-
 	QTest::newRow("validate.none") << QVariantHash{{QStringLiteral("validationFlags"), QVariant::fromValue<QJsonSerializer::ValidationFlags>(QJsonSerializer::StandardValidation)}}
 								   << TestQ{{QMetaType::Int, 10, 1}}
 								   << static_cast<QObject*>(nullptr)

@@ -9,7 +9,9 @@ TestObject::TestObject(int key, double value, int hidden, QObject *parent) :
 	key{key},
 	value{value},
 	hidden{hidden}
-{}
+{
+	setObjectName(QStringLiteral("TestObject"));
+}
 
 bool TestObject::compare(const TestObject *other) const
 {
