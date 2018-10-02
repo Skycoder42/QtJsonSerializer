@@ -37,10 +37,25 @@ private:
 
 void SerializerTest::initTestCase()
 {
+	//metatypes
+	qRegisterMetaType<TestGadget>();
+	qRegisterMetaType<EnumGadget>();
+	qRegisterMetaType<CustomGadget>();
+	qRegisterMetaType<AliasGadget>();
+	qRegisterMetaType<TestObject*>();
+
+	//aliases
+	qRegisterMetaType<IntAlias>("IntAlias");
+	qRegisterMetaType<ListAlias>();
+	QJsonSerializer::registerInverseTypedef<ListAlias>("QList<CustomGadget>");
+	QCOMPARE(QMetaType::typeName(qMetaTypeId<ListAlias>()), "ListAlias");
+
+	// converters
 	QJsonSerializer::registerListConverters<QList<int>>();
 	QJsonSerializer::registerMapConverters<QMap<QString, int>>();
 
 	QJsonSerializer::registerAllConverters<TestGadget>();
+	QJsonSerializer::registerListConverters<CustomGadget>();
 	QJsonSerializer::registerListConverters<QList<TestGadget>>();
 	QJsonSerializer::registerMapConverters<QMap<QString, TestGadget>>();
 
@@ -65,6 +80,9 @@ void SerializerTest::initTestCase()
 	QMetaType::registerEqualsComparator<QMap<QString, QMap<QString, int>>>();
 
 	QMetaType::registerEqualsComparator<TestGadget>();
+	QMetaType::registerEqualsComparator<EnumGadget>();
+	QMetaType::registerEqualsComparator<CustomGadget>();
+	QMetaType::registerEqualsComparator<AliasGadget>();
 	QMetaType::registerEqualsComparator<QList<TestGadget>>();
 	QMetaType::registerEqualsComparator<QList<QList<TestGadget>>>();
 	QMetaType::registerEqualsComparator<QMap<QString, TestGadget>>();
@@ -514,6 +532,16 @@ void SerializerTest::addCommonData()
 											  }}
 										<< true
 										<< QVariantHash{{QStringLiteral("enumAsString"), true}};
+
+	// aliases
+	QTest::newRow("alias") << QVariant::fromValue<AliasGadget>({10, 20, 30})
+						   << QJsonValue{QJsonObject{
+									{QStringLiteral("intAlias"), 10},
+									{QStringLiteral("listAlias"), QJsonArray{QJsonObject{{QStringLiteral("data"), 20}}}},
+									{QStringLiteral("classList"), QJsonArray{QJsonObject{{QStringLiteral("data"), 30}}}},
+								}}
+						   << true
+						   << QVariantHash{};
 }
 
 void SerializerTest::resetProps()
