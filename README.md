@@ -51,7 +51,7 @@ There are multiple ways to install the Qt module, sorted by preference:
 	- `make install`
 
 ## Usage
-The serializer is provided as a Qt module. Thus, all you have to do is install the module, and then, in your project, add `QT += jsonserializer` to your `.pro` file!
+The serializer is provided as a Qt module. Thus, all you have to do is install the module, and then, in your project, add `QT += jsonserializer` to your `.pro` file! The following chapters show an example and explain a few important details regarding the functionality and limits of the implementation.
 
 ### Example
 Both serialization and desertialization are rather simple. Create an object, and then use the serializer as follows:
@@ -64,7 +64,7 @@ class TestObject : public QObject
 
 	Q_PROPERTY(QString stringProperty MEMBER stringProperty)
 	Q_PROPERTY(QList<int> simpleList MEMBER simpleList)
-	Q_PROPERTY(QMap<QString, double> simpleMap MEMBER simpleMap);  # add the semicolon to surpress most errors of the clang code model
+	Q_PROPERTY(QMap<QString, double> simpleMap MEMBER simpleMap);  # add the semicolon or use a typedef to surpress most errors of the clang code model
 	Q_PROPERTY(TestObject* childObject MEMBER childObject)
 
 public:
@@ -76,6 +76,8 @@ public:
 	TestObject* childObject;
 }
 ```
+
+**Note:** If you want to use a typedef, read the [Support for using and typedef](#support-for-using-and-typedef) section first!
 
 You can serialize (and deserialize) the object with:
 ```cpp
@@ -143,7 +145,7 @@ In order for the serializer to properly work, there are a few things you have to
 	- `std::tuple<TArgs...>`, of any types that are serializable as well
 	- Standard QtCore types (QByteArray, QUrl, QVersionNumber, QUuid, QPoint, QSize, QLine, QRect, QLocale, QRegularExpression)
 		- QByteArray is represented by a base64 encoded string
-	- Any type you add yourself by extending the serializer
+	- Any type you add yourself by extending the serializer (See QJsonTypeConverter documentation)
 4. While simple types (i.e. `QList<int>`) are supported out of the box, for custom types (like `QList<TestObject*>`) you will have to register converters. This goes for
 	- QList and QMap: use `QJsonSerializer::registerAllConverters<T>()`
 	- QList only: use `QJsonSerializer::registerListConverters<T>()`
@@ -158,6 +160,50 @@ In order for the serializer to properly work, there are a few things you have to
 6. By default, the `objectName` property of QObjects is not serialized (See [keepObjectName](src/qjsonserializer.h#L20))
 7. By default, the JSON `null` can only be converted to QObjects. For other types the conversion fails (See [allowDefaultNull](src/qjsonserializer.h#L19))
 
+### Support for using and typedef
+Many converters on the serializer depends on beeing able to get the name of a specific type in order to be able to correctly serialize it. Especially when template types are used, this is required to get the type of the template parameters. This means that some typedefs will not work out of the box, if not correctly registered. This can become rather complicated, because the serializer depends on the somewhat complicated typedef handling of the Qt meta system. There are generally 2 kinds of typedefs described below. 
+
+#### Implicit typedef support
+Implicit typedefs in this context are understood as typedefs that are registered within Qt using `qRegisterMetaType`. The important part here is that the original type name must be declared via `Q_DECLARE_METATYPE` and typedefs are then registered in Qt after that. A basic example would be a typedef for a custom class:
+
+```cpp
+class MyClass {};
+Q_DECLARE_METATYPE(MyClass)
+
+using MyTypedef = MyClass;
+
+qRegisterMetaType<MyClass>();
+qRegisterMetaType<MyClass>("MyTypedef");
+
+qDebug() << QMetaType::typeName(qMetaTypeId<MyTypedef>());
+//will print "MyClass", the original type name
+```
+
+Using such typedefs is completely safe, as Qt will internally resolve the correctly, i.e. declaring a property as `Q_PROPERTY(MyTypedef value ...)` will pass the `MyClass` MetaType to the serializer.
+
+However, this will not work for the case where a typedef is registered as the "original" type name. For these cases, you need the explicit typedefs.
+
+#### Explicit typedef support
+If you for example declare a metatype by a typedef'ed name, this name is considered the "real" name by Qt. The following example shows this for a custom map that is registered as typedef so that it can be used as property on older compilers:
+
+```cpp
+using MyMap = QMap<QString, MyType>;
+Q_DECLARE_METATYPE(MyMap);
+qRegisterMetaType<MyMap>();
+qRegisterMetaType<MyMap>("QMap<QString, MyType>");
+
+qDebug() << QMetaType::typeName(qMetaTypeId<QMap<QString, MyType>>());
+//will print "MyMap", making it impossible to get the value type
+```
+
+To solve this problem, it is possible to explicity register an "inverse typedef" using QJsonTypeConverter::registerInverseTypedef to tell the serializer what the original name of a given type is. This way the converters can get that typename using QJsonTypeConverter::getCanonicalTypeName instead of the registered one:
+
+```cpp
+QJsonTypeConverter::registerInverseTypedef<MyMap>("QMap<QString, MyType>");
+```
+
+The QJsonTypeConverter::getCanonicalTypeName method will now return "QMap<QString, MyType>" if "MyMap" is passed to it, and thus can correctly extract and use "MyType" as value for the serialization.
+
 ### Support for alternative Containers
 Right now, only `QList` and `QMap` ar supported as containers. The reason is, that adding containers requires the registration of converters. Supporting all containers would explode the generated binary, which is why I only support the most common ones.
 
@@ -167,7 +213,7 @@ If you need the other containers, you have 2 options:
 2. Create "converter" properties that are used for serialization only. This is the more simple version, but needs to be done for every occurance of that container, and adds some overhead.
 
 The following example shows how to do that to use `QVector` in code, but serialize as `QList`:
-```
+```cpp
 struct MyGadget {
 	Q_GADGET
 
