@@ -16,11 +16,31 @@
 
 namespace _qjsonserializer_helpertypes {
 
+template <class T, class Enable = void>
+struct gadget_helper
+{
+	static constexpr bool value = false;
+	static inline QJsonValue convert(const QJsonValue &jsonValue) {
+		return jsonValue;
+	}
+};
+
+template <class T>
+struct gadget_helper<T, typename T::QtGadgetHelper>
+{
+	static constexpr bool value = true;
+	static inline QJsonObject convert(const QJsonValue &jsonValue) {
+		return jsonValue.toObject();
+	}
+};
+
+
+
 template <typename T>
 struct is_serializable : public std::integral_constant<bool, !std::is_pointer<T>::value> {}; //C++17 negation
 
 template <typename T>
-struct is_serializable<T*> : public std::is_base_of<QObject, T> {};
+struct is_serializable<T*> : public std::conditional<std::is_base_of<QObject, T>::value || gadget_helper<T>::value, std::true_type, std::false_type>::type {}; //C++17 disjunction
 
 template <typename T>
 struct is_serializable<QSharedPointer<T>> : public std::is_base_of<QObject, T> {};
@@ -48,25 +68,6 @@ struct is_serializable<std::tuple<T1, T2, TArgs...>> : public std::conditional<i
 
 
 
-
-template <class T, class Enable = void>
-struct gadget_helper
-{
-	static constexpr bool value = false;
-	static inline QJsonValue convert(const QJsonValue &jsonValue) {
-		return jsonValue;
-	}
-};
-
-template <class T>
-struct gadget_helper<T, typename T::QtGadgetHelper>
-{
-	static constexpr bool value = true;
-	static inline QJsonObject convert(const QJsonValue &jsonValue) {
-		return jsonValue.toObject();
-	}
-};
-
 template <typename T>
 struct json_type_raw :
 		public std::conditional<gadget_helper<T>::value,
@@ -75,7 +76,7 @@ struct json_type_raw :
 
 template <typename T>
 struct json_type : json_type_raw<T> {
-	static_assert(is_serializable<T>::value, "Only QObject deriving classes can be serialized as pointer");
+	static_assert(is_serializable<T>::value, "Only QObject deriving classes or gadget pointers can be serialized as pointer");
 
 	static inline typename json_type_raw<T>::type convert(const QJsonValue &jsonValue) {
 		return gadget_helper<T>::convert(jsonValue);
@@ -84,7 +85,7 @@ struct json_type : json_type_raw<T> {
 
 template <typename T>
 struct json_type<T*> {
-	static_assert(is_serializable<T*>::value, "Only QObject deriving classes can be serialized as pointer");
+	static_assert(is_serializable<T*>::value, "Only QObject deriving classes or gadget pointers can be serialized as pointer");
 	using type = QJsonObject;
 
 	static inline type convert(const QJsonValue &jsonValue) {
@@ -94,7 +95,7 @@ struct json_type<T*> {
 
 template <typename T>
 struct json_type<QSharedPointer<T>> {
-	static_assert(is_serializable<QSharedPointer<T>>::value, "Only QObject deriving classes can be serialized as pointer");
+	static_assert(is_serializable<QSharedPointer<T>>::value, "Only QObject deriving classes can be serialized as shared pointer");
 	using type = QJsonObject;
 
 	static inline type convert(const QJsonValue &jsonValue) {
@@ -104,7 +105,7 @@ struct json_type<QSharedPointer<T>> {
 
 template <typename T>
 struct json_type<QPointer<T>> {
-	static_assert(is_serializable<QPointer<T>>::value, "Only QObject deriving classes can be serialized as pointer");
+	static_assert(is_serializable<QPointer<T>>::value, "Only QObject deriving classes can be serialized as QPointer");
 	using type = QJsonObject;
 
 	static inline type convert(const QJsonValue &jsonValue) {

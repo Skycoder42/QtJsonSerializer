@@ -354,6 +354,9 @@ void SerializerTest::testDeviceSerialization()
 	gRes = serializer->deserializeFrom<TestGadget>(&buffer);
 	buffer.close();
 	QCOMPARE(gRes, g);
+
+	//invalid
+	QVERIFY_EXCEPTION_THROWN(serializer->serializeTo(42), QJsonSerializationException);
 }
 
 void SerializerTest::addCommonData()
@@ -502,6 +505,57 @@ void SerializerTest::resetProps()
 	serializer->setUseBcp47Locale(true);
 	serializer->setValidationFlags(QJsonSerializer::StandardValidation);
 	serializer->setPolymorphing(QJsonSerializer::Enabled);
+}
+
+namespace  {
+
+template<typename Type, typename Json>
+static void test_type() {
+	QJsonSerializer s;
+	Type v;
+	Json j;
+	static_assert(std::is_same<Json, decltype(s.serialize(v))>::value, "Wrong value returned by expression");
+	s.serializeTo(nullptr, v);
+	s.serializeTo(v);
+	s.deserialize(QJsonValue{}, qMetaTypeId<Type>());
+	s.deserialize(QJsonValue{}, qMetaTypeId<Type>(), nullptr);
+	s.deserialize<Type>(j);
+	s.deserialize<Type>(j, nullptr);
+	s.deserializeFrom(nullptr, qMetaTypeId<Type>());
+	s.deserializeFrom(nullptr, qMetaTypeId<Type>(), nullptr);
+	s.deserializeFrom(QByteArray{}, qMetaTypeId<Type>());
+	s.deserializeFrom(QByteArray{}, qMetaTypeId<Type>(), nullptr);
+	s.deserializeFrom<Type>(nullptr);
+	s.deserializeFrom<Type>(nullptr, nullptr);
+	s.deserializeFrom<Type>(QByteArray{});
+	s.deserializeFrom<Type>(QByteArray{}, nullptr);
+}
+
+Q_DECL_UNUSED void static_compile_test()
+{
+	test_type<QVariant, QJsonValue>();
+	test_type<bool, QJsonValue>();
+	test_type<int, QJsonValue>();
+	test_type<double, QJsonValue>();
+	test_type<QString, QJsonValue>();
+	test_type<TestGadget, QJsonObject>();
+	test_type<TestGadget*, QJsonObject>();
+	test_type<QList<TestGadget>, QJsonArray>();
+	test_type<TestObject*, QJsonObject>();
+	test_type<QPointer<TestObject>, QJsonObject>();
+	test_type<QSharedPointer<TestObject>, QJsonObject>();
+	test_type<QList<TestObject*>, QJsonArray>();
+	test_type<QMap<QString, TestGadget>, QJsonObject>();
+	test_type<QMap<QString, TestObject*>, QJsonObject>();
+	test_type<int, QJsonValue>();
+	test_type<QString, QJsonValue>();
+	test_type<QList<int>, QJsonArray>();
+	test_type<QMap<QString, bool>, QJsonObject>();
+	test_type<QPair<double, bool>, QJsonArray>();
+	test_type<TestTuple, QJsonArray>();
+	test_type<TestPair, QJsonArray>();
+}
+
 }
 
 QTEST_MAIN(SerializerTest)
