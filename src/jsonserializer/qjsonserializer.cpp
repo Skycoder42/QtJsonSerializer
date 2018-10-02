@@ -251,10 +251,16 @@ QVariant QJsonSerializer::deserializeVariant(int propertyType, const QJsonValue 
 
 	if(propertyType != QMetaType::UnknownType) {
 		auto vType = variant.typeName();
-		if(variant.canConvert(propertyType) && variant.convert(propertyType))
+
+		// exclude special values that can convert from null, but should not do so
+		auto allowConvert = true;
+		if(propertyType == QMetaType::QString && value.isNull())
+			allowConvert = false;
+
+		if(allowConvert && variant.canConvert(propertyType) && variant.convert(propertyType))
 			return variant;
 		else if(d->allowNull && value.isNull())
-			return QVariant();
+			return QVariant{propertyType, nullptr};
 		else {
 			throw QJsonDeserializationException(QByteArray("Failed to convert deserialized variant of type ") +
 												(vType ? vType : "<unknown>") +

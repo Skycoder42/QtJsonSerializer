@@ -25,10 +25,13 @@ private Q_SLOTS:
 	void testDeserialization_data();
 	void testDeserialization();
 
+	void testDeviceSerialization();
+
 private:
 	QJsonSerializer *serializer = nullptr;
 
 	void addCommonData();
+	void resetProps();
 };
 
 void SerializerTest::initTestCase()
@@ -225,6 +228,7 @@ void SerializerTest::testSerialization_data()
 	QTest::addColumn<QVariant>("data");
 	QTest::addColumn<QJsonValue>("result");
 	QTest::addColumn<bool>("works");
+	QTest::addColumn<QVariantHash>("extraProps");
 
 	addCommonData();
 }
@@ -234,6 +238,11 @@ void SerializerTest::testSerialization()
 	QFETCH(QVariant, data);
 	QFETCH(QJsonValue, result);
 	QFETCH(bool, works);
+	QFETCH(QVariantHash, extraProps);
+
+	resetProps();
+	for(auto it = extraProps.constBegin(); it != extraProps.constEnd(); it++)
+		serializer->setProperty(qUtf8Printable(it.key()), it.value());
 
 	try {
 		if(works) {
@@ -251,8 +260,51 @@ void SerializerTest::testDeserialization_data()
 	QTest::addColumn<QVariant>("result");
 	QTest::addColumn<QJsonValue>("data");
 	QTest::addColumn<bool>("works");
+	QTest::addColumn<QVariantHash>("extraProps");
 
 	addCommonData();
+
+	QTest::newRow("null.invalid.bool") << QVariant{false}
+									   << QJsonValue{QJsonValue::Null}
+									   << false
+									   << QVariantHash{};
+	QTest::newRow("null.invalid.int") << QVariant{0}
+									  << QJsonValue{QJsonValue::Null}
+									  << false
+									  << QVariantHash{};
+	QTest::newRow("null.invalid.double") << QVariant{0.0}
+										 << QJsonValue{QJsonValue::Null}
+										 << false
+										 << QVariantHash{};
+	QTest::newRow("null.invalid.string") << QVariant{QString()}
+										 << QJsonValue{QJsonValue::Null}
+										 << false
+										 << QVariantHash{};
+	QTest::newRow("null.invalid.gadget") << QVariant::fromValue<TestGadget>({})
+										 << QJsonValue{QJsonValue::Null}
+										 << false
+										 << QVariantHash{};
+
+	QTest::newRow("null.valid.bool") << QVariant{false}
+									 << QJsonValue{QJsonValue::Null}
+									 << true
+									 << QVariantHash{{QStringLiteral("allowDefaultNull"), true}};
+	QTest::newRow("null.valid.int") << QVariant{0}
+									<< QJsonValue{QJsonValue::Null}
+									<< true
+									<< QVariantHash{{QStringLiteral("allowDefaultNull"), true}};
+	QTest::newRow("null.valid.double") << QVariant{0.0}
+									   << QJsonValue{QJsonValue::Null}
+									   << true
+									   << QVariantHash{{QStringLiteral("allowDefaultNull"), true}};
+	QTest::newRow("null.valid.string") << QVariant{QString()}
+									   << QJsonValue{QJsonValue::Null}
+									   << true
+									   << QVariantHash{{QStringLiteral("allowDefaultNull"), true}};
+	QTest::newRow("null.valid.gadget") << QVariant::fromValue<TestGadget>({})
+									   << QJsonValue{QJsonValue::Null}
+									   << true
+									   << QVariantHash{{QStringLiteral("allowDefaultNull"), true}};
 }
 
 void SerializerTest::testDeserialization()
@@ -260,11 +312,19 @@ void SerializerTest::testDeserialization()
 	QFETCH(QJsonValue, data);
 	QFETCH(QVariant, result);
 	QFETCH(bool, works);
+	QFETCH(QVariantHash, extraProps);
+
+	resetProps();
+	for(auto it = extraProps.constBegin(); it != extraProps.constEnd(); it++)
+		serializer->setProperty(qUtf8Printable(it.key()), it.value());
 
 	try {
 		if(works) {
 			auto res = serializer->deserialize(data, result.userType(), this);
-			QCOMPARE(res, result);
+			if(result.userType() == qMetaTypeId<TestObject*>())
+				QVERIFY(TestObject::equals(res.value<TestObject*>(), result.value<TestObject*>()));
+			else
+				QCOMPARE(res, result);
 		} else
 			QVERIFY_EXCEPTION_THROWN(serializer->deserialize(data, result.userType(), this), QJsonDeserializationException);
 	} catch(std::exception &e) {
@@ -272,56 +332,176 @@ void SerializerTest::testDeserialization()
 	}
 }
 
+void SerializerTest::testDeviceSerialization()
+{
+	const TestGadget g{10};
+	const QByteArray bRes{R"__({"data":10})__"};
+
+	// to bytearray
+	auto ba = serializer->serializeTo(g, QJsonDocument::Compact);
+	QCOMPARE(ba, bRes);
+	auto gRes = serializer->deserializeFrom<TestGadget>(ba);
+	QCOMPARE(gRes, g);
+
+	//to device
+	ba.clear();
+	QBuffer buffer{&ba};
+	QVERIFY(buffer.open(QIODevice::WriteOnly | QIODevice::Text));
+	serializer->serializeTo(&buffer, g, QJsonDocument::Compact);
+	buffer.close();
+	QCOMPARE(ba, bRes);
+	QVERIFY(buffer.open(QIODevice::ReadOnly | QIODevice::Text));
+	gRes = serializer->deserializeFrom<TestGadget>(&buffer);
+	buffer.close();
+	QCOMPARE(gRes, g);
+}
+
 void SerializerTest::addCommonData()
 {
 	//basic types without any converter
 	QTest::newRow("bool") << QVariant{true}
 						  << QJsonValue{true}
-						  << true;
+						  << true
+						  << QVariantHash{};
 	QTest::newRow("int") << QVariant{42}
 						 << QJsonValue{42}
-						 << true;
+						 << true
+						 << QVariantHash{};
 	QTest::newRow("double") << QVariant{4.2}
 							<< QJsonValue{4.2}
-							<< true;
-	QTest::newRow("string") << QVariant{QStringLiteral("baum")}
-							<< QJsonValue{QStringLiteral("baum")}
-							<< true;
+							<< true
+							<< QVariantHash{};
+	QTest::newRow("string.normal") << QVariant{QStringLiteral("baum")}
+								   << QJsonValue{QStringLiteral("baum")}
+								   << true
+								   << QVariantHash{};
+	QTest::newRow("string.empty") << QVariant{QString()}
+								  << QJsonValue{QString()}
+								  << true
+								  << QVariantHash{};
 	QTest::newRow("nullptr") << QVariant::fromValue(nullptr)
 							 << QJsonValue{QJsonValue::Null}
-							 << true;
+							 << true
+							 << QVariantHash{};
 
 	//advanced types
-	QTest::newRow("date") << QVariant{QDate{2010, 10, 20}}
-						  << QJsonValue{QStringLiteral("2010-10-20")}
-						  << true;
-	QTest::newRow("time") << QVariant{QTime{14, 30, 15, 123}}
-						  << QJsonValue{QStringLiteral("14:30:15.123")}
-						  << true;
-	QTest::newRow("datetime") << QVariant{QDateTime{QDate{2010, 10, 20}, QTime{14, 30}}}
-							  << QJsonValue{QStringLiteral("2010-10-20T14:30:00.000")}
-							  << true;
+	QTest::newRow("date.valid") << QVariant{QDate{2010, 10, 20}}
+								<< QJsonValue{QStringLiteral("2010-10-20")}
+								<< true
+								<< QVariantHash{};
+	QTest::newRow("date.invalid") << QVariant{QDate{}}
+								  << QJsonValue{QString{}}
+								  << true
+								  << QVariantHash{};
+	QTest::newRow("time.valid") << QVariant{QTime{14, 30, 15, 123}}
+								<< QJsonValue{QStringLiteral("14:30:15.123")}
+								<< true
+								<< QVariantHash{};
+	QTest::newRow("time.invalid") << QVariant{QTime{}}
+								  << QJsonValue{QString{}}
+								  << true
+								  << QVariantHash{};
+	QTest::newRow("datetime.valid") << QVariant{QDateTime{QDate{2010, 10, 20}, QTime{14, 30}}}
+									<< QJsonValue{QStringLiteral("2010-10-20T14:30:00.000")}
+									<< true
+									<< QVariantHash{};
+	QTest::newRow("datetime.invalid") << QVariant{QDateTime{}}
+									  << QJsonValue{QString{}}
+									  << true
+									  << QVariantHash{};
 	auto id = QUuid::createUuid();
 	QTest::newRow("uuid") << QVariant{id}
 						  << QJsonValue{id.toString(QUuid::WithoutBraces)}
-						  << true;
-	QTest::newRow("url") << QVariant{QUrl{QStringLiteral("https://example.com/test.xml?baum=42#tree")}}
-						 << QJsonValue{QStringLiteral("https://example.com/test.xml?baum=42#tree")}
-						 << true;
+						  << true
+						  << QVariantHash{};
+	QTest::newRow("url.valid") << QVariant{QUrl{QStringLiteral("https://example.com/test.xml?baum=42#tree")}}
+							   << QJsonValue{QStringLiteral("https://example.com/test.xml?baum=42#tree")}
+							   << true
+							   << QVariantHash{};
+	QTest::newRow("url.invalid") << QVariant{QUrl{}}
+								 << QJsonValue{QString{}}
+								 << true
+								 << QVariantHash{};
+
+	//objects/gadget -> ser-helper tests
+	QTest::newRow("gadget.normal") << QVariant::fromValue<TestGadget>(42)
+								   << QJsonValue{QJsonObject{{QStringLiteral("data"), 42}}}
+								   << true
+								   << QVariantHash{};
+	QTest::newRow("object.normal") << QVariant::fromValue(new TestObject{24})
+								   << QJsonValue{QJsonObject{{QStringLiteral("data"), 24}}}
+								   << true
+								   << QVariantHash{};
+	QTest::newRow("object.null") << QVariant::fromValue<TestObject*>(nullptr)
+								 << QJsonValue{QJsonValue::Null}
+								 << true
+								 << QVariantHash{};
+	QTest::newRow("object.null") << QVariant::fromValue<TestObject*>(nullptr)
+								 << QJsonValue{QJsonValue::Null}
+								 << true
+								 << QVariantHash{};
+	QTest::newRow("object.name") << QVariant::fromValue(new TestObject{10})
+								 << QJsonValue{QJsonObject{{QStringLiteral("data"), 10}, {QStringLiteral("objectName"), QStringLiteral("testname")}}}
+								 << true
+								 << QVariantHash{{QStringLiteral("keepObjectName"), true}};
+
+	// simple list -> more ser-helper tests
+	QTest::newRow("list.empty") << QVariant::fromValue<QList<int>>({})
+								<< QJsonValue{QJsonArray{}}
+								<< true
+								<< QVariantHash{};
+	QTest::newRow("list.int") << QVariant::fromValue<QList<int>>({1, 2, 3})
+							  << QJsonValue{QJsonArray{1, 2, 3}}
+							  << true
+							  << QVariantHash{};
 
 	//enums/flags
-	QTest::newRow("enum") << QVariant::fromValue<EnumGadget>(EnumGadget::Normal1)
-						  << QJsonValue{QJsonObject{
-									{QStringLiteral("enumProp"), static_cast<int>(EnumGadget::Normal1)},
-									{QStringLiteral("flagsProp"), 0}
-								}}
-						  << true;
-	QTest::newRow("flags") << QVariant::fromValue<EnumGadget>(EnumGadget::FlagX)
-						   << QJsonValue{QJsonObject{
-									 {QStringLiteral("enumProp"), static_cast<int>(EnumGadget::Normal0)},
-									 {QStringLiteral("flagsProp"), static_cast<int>(EnumGadget::FlagX)}
-								 }}
-						   << true;
+	QTest::newRow("enum.int") << QVariant::fromValue<EnumGadget>(EnumGadget::Normal1)
+							  << QJsonValue{QJsonObject{
+										{QStringLiteral("enumProp"), static_cast<int>(EnumGadget::Normal1)},
+										{QStringLiteral("flagsProp"), 0}
+									}}
+							  << true
+							  << QVariantHash{};
+	QTest::newRow("enum.string") << QVariant::fromValue<EnumGadget>(EnumGadget::Normal2)
+								 << QJsonValue{QJsonObject{
+										   {QStringLiteral("enumProp"), QStringLiteral("Normal2")},
+										   {QStringLiteral("flagsProp"), QString()}
+									   }}
+								 << true
+								 << QVariantHash{{QStringLiteral("enumAsString"), true}};
+	QTest::newRow("flags.int") << QVariant::fromValue<EnumGadget>(EnumGadget::FlagX)
+							   << QJsonValue{QJsonObject{
+										 {QStringLiteral("enumProp"), static_cast<int>(EnumGadget::Normal0)},
+										 {QStringLiteral("flagsProp"), static_cast<int>(EnumGadget::FlagX)}
+									 }}
+							   << true
+							   << QVariantHash{};
+	QTest::newRow("flags.string.single") << QVariant::fromValue<EnumGadget>(EnumGadget::Flag1 | EnumGadget::Flag2)
+										 << QJsonValue{QJsonObject{
+													{QStringLiteral("enumProp"), QStringLiteral("Normal0")},
+													{QStringLiteral("flagsProp"), QStringLiteral("FlagX")}
+											   }}
+										 << true
+										 << QVariantHash{{QStringLiteral("enumAsString"), true}};
+	QTest::newRow("flags.string.multi") << QVariant::fromValue<EnumGadget>(EnumGadget::Flag1 | EnumGadget::Flag3)
+										<< QJsonValue{QJsonObject{
+												   {QStringLiteral("enumProp"), QStringLiteral("Normal0")},
+												   {QStringLiteral("flagsProp"), QStringLiteral("Flag1|Flag3")}
+											  }}
+										<< true
+										<< QVariantHash{{QStringLiteral("enumAsString"), true}};
+}
+
+void SerializerTest::resetProps()
+{
+	serializer->setAllowDefaultNull(false);
+	serializer->setKeepObjectName(false);
+	serializer->setEnumAsString(false);
+	serializer->setValidateBase64(true);
+	serializer->setUseBcp47Locale(true);
+	serializer->setValidationFlags(QJsonSerializer::StandardValidation);
+	serializer->setPolymorphing(QJsonSerializer::Enabled);
 }
 
 QTEST_MAIN(SerializerTest)

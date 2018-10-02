@@ -3,7 +3,9 @@
 TestObject::TestObject(int data, QObject *parent) :
 	QObject{parent},
 	data{data}
-{}
+{
+	setObjectName(QStringLiteral("testname"));
+}
 
 TestObject::TestObject(QObject *parent) :
 	QObject{parent}
