@@ -13,6 +13,8 @@ class Q_JSONSERIALIZER_EXPORT QJsonSerializerPrivate
 public:
 	static QByteArray getTypeName(int propertyType);
 
+	QJsonSerializerPrivate();
+
 private:
 	friend class QJsonSerializer;
 
@@ -29,8 +31,6 @@ private:
 
 	QList<QSharedPointer<QJsonTypeConverter>> typeConverters;
 	mutable QHash<int, QSharedPointer<QJsonTypeConverter>> typeConverterTypeCache;
-
-	QJsonSerializerPrivate();
 };
 
 #endif // QJSONSERIALIZER_P_H
