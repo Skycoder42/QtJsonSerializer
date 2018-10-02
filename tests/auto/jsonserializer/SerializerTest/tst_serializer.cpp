@@ -26,6 +26,7 @@ private Q_SLOTS:
 	void testDeserialization();
 
 	void testDeviceSerialization();
+	void testExceptionTrace();
 
 private:
 	QJsonSerializer *serializer = nullptr;
@@ -357,6 +358,25 @@ void SerializerTest::testDeviceSerialization()
 
 	//invalid
 	QVERIFY_EXCEPTION_THROWN(serializer->serializeTo(42), QJsonSerializationException);
+}
+
+void SerializerTest::testExceptionTrace()
+{
+	try {
+		serializer->deserialize<QList<TestGadget>>({
+													   QJsonObject{
+														   {QStringLiteral("data"), QStringLiteral("test")}
+													   }
+												   });
+		QFAIL("No exception thrown");
+	} catch (QJsonSerializerException &e) {
+		auto trace = e.propertyTrace();
+		QCOMPARE(trace.size(), 2);
+		QCOMPARE(trace[0].first, QByteArray{"[0]"});
+		QCOMPARE(trace[0].second, QByteArray{"TestGadget"});
+		QCOMPARE(trace[1].first, QByteArray{"data"});
+		QCOMPARE(trace[1].second, QByteArray{"int"});
+	}
 }
 
 void SerializerTest::addCommonData()

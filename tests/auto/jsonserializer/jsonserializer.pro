@@ -1,7 +1,6 @@
 TEMPLATE = subdirs
 
-SUBDIRS += ObjectSerializerTest \
-	GadgetSerializerTest \
+SUBDIRS += \
 	TypeConverterTestLib
 
 CONVERTER_TESTS = \

@@ -12,7 +12,7 @@ class QJsonSerializationExceptionPrivate;
 class Q_JSONSERIALIZER_EXPORT QJsonSerializerException : public QException
 {
 public:
-	//! The type of a stack of a property trace
+	//! The type of a stack of a property trace (name, type)
 	using PropertyTrace = QStack<QPair<QByteArray, QByteArray>>;
 
 	//! Constructor with error message
