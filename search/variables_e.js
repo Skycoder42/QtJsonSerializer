@@ -13,6 +13,6 @@ var searchData=
   ['openmultipledocuments',['OpenMultipleDocuments',['https://doc.qt.io/qt-5/classde_1_1skycoder42_1_1_qt_mvvm_1_1_quick_1_1_file_chooser.html#afe5e1dd628f5dab82cd11e25ea0922d6a479f95775cc5043249d9bfd43fe16672',0,'de::skycoder42::QtMvvm::Quick::FileChooser']]],
   ['operations',['Operations',['https://doc.qt.io/qt-5/qt3drender-qmemorybarrier.html#Operation-enum',0,'Qt3DRender::QMemoryBarrier']]],
   ['optimizationflags',['OptimizationFlags',['https://doc.qt.io/qt-5/qgraphicsview.html#OptimizationFlag-enum',0,'QGraphicsView']]],
-  ['options',['Options',['https://doc.qt.io/qt-5/qfiledialog.html#Option-enum',0,'QFileDialog::Options()'],['https://doc.qt.io/qt-5/qfileiconprovider.html#Option-enum',0,'QFileIconProvider::Options()']]],
+  ['options',['Options',['https://doc.qt.io/qt-5/qfileiconprovider.html#Option-enum',0,'QFileIconProvider::Options()'],['https://doc.qt.io/qt-5/qfiledialog.html#Option-enum',0,'QFileDialog::Options()']]],
   ['orientations',['Orientations',['https://doc.qt.io/qt-5/qt.html#Orientation-enum',0,'Qt']]]
 ];

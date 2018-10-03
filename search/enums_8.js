@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['validationflag',['ValidationFlag',['../class_q_json_serializer.html#a0fb6dc294c5f0c2279e1e60c8bf19b37',1,'QJsonSerializer']]]
+  ['terminalmode',['TerminalMode',['https://doc.qt.io/qt-5/class_qt_service_1_1_service.html#a4d4e2022cf06e670e6ae4159809c5df2',0,'QtService::Service']]]
 ];

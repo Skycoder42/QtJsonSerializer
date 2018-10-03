@@ -1,5 +1,18 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
 <tagfile>
+  <compound kind="file">
+    <name>qjsonserializer.h</name>
+    <path>/home/sky/Programming/QtLibraries/QtJsonSerializer/src/jsonserializer/</path>
+    <filename>qjsonserializer_8h</filename>
+    <class kind="class">QJsonSerializer</class>
+    <member kind="define">
+      <type>#define</type>
+      <name>Q_JSON_POLYMORPHIC</name>
+      <anchorfile>qjsonserializer_8h.html</anchorfile>
+      <anchor>ae7850cd06e039d9ba8993dd5bfa2f2b3</anchor>
+      <arglist>(x)</arglist>
+    </member>
+  </compound>
   <compound kind="class">
     <name>QJsonDeserializationException</name>
     <filename>class_q_json_deserialization_exception.html</filename>
@@ -373,6 +386,13 @@
       <arglist>(QSharedPointer&lt; QJsonTypeConverter &gt; converter)</arglist>
     </member>
     <member kind="function" static="yes">
+      <type>static void</type>
+      <name>registerInverseTypedef</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>a2929476a559a5d85a29f4033a767f19b</anchor>
+      <arglist>(const char *typeName)</arglist>
+    </member>
+    <member kind="function" static="yes">
       <type>static bool</type>
       <name>registerListConverters</name>
       <anchorfile>class_q_json_serializer.html</anchorfile>
@@ -411,8 +431,15 @@
       <type>static bool</type>
       <name>registerPairConverters</name>
       <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>ab643659186d5972a2bd7fd80bf5072b6</anchor>
-      <arglist>()</arglist>
+      <anchor>a9a388df04a7feabc539aa96c695632c3</anchor>
+      <arglist>(const char *originalTypeName=nullptr)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static bool</type>
+      <name>registerTupleConverters</name>
+      <anchorfile>class_q_json_serializer.html</anchorfile>
+      <anchor>a6a42c90ba8c539310799f5aaf8a367db</anchor>
+      <arglist>(const char *originalTypeName=nullptr)</arglist>
     </member>
     <member kind="function" protection="protected">
       <type>QVariant</type>
@@ -563,7 +590,7 @@
       <type></type>
       <name>Priority</name>
       <anchorfile>class_q_json_type_converter.html</anchorfile>
-      <anchor>a9ac88a7b6e3e954b825afd56d1558b6d</anchor>
+      <anchor>a32bc149f8f339a09e95cf15748cbe2e1</anchor>
       <arglist></arglist>
     </member>
     <member kind="function">
@@ -622,6 +649,13 @@
       <anchor>af162ac051c8a5c9d168a1deecf5e0ae7</anchor>
       <arglist>(int propertyType, const QJsonValue &amp;value, QObject *parent, const SerializationHelper *helper) const =0</arglist>
     </member>
+    <member kind="function" protection="protected">
+      <type>QByteArray</type>
+      <name>getCanonicalTypeName</name>
+      <anchorfile>class_q_json_type_converter.html</anchorfile>
+      <anchor>a4f7a148b1156f59d4be5cc39c32f2738</anchor>
+      <arglist>(int propertyType) const</arglist>
+    </member>
     <docanchor file="class_q_json_type_converter" title="Example">example</docanchor>
     <docanchor file="class_q_json_type_converter" title="Setup">setup</docanchor>
     <docanchor file="class_q_json_type_converter" title="The Converter class">class</docanchor>
@@ -633,13 +667,6 @@
   <compound kind="class">
     <name>QJsonTypeConverter::SerializationHelper</name>
     <filename>class_q_json_type_converter_1_1_serialization_helper.html</filename>
-    <member kind="function" virtualness="virtual">
-      <type>virtual</type>
-      <name>~SerializationHelper</name>
-      <anchorfile>class_q_json_type_converter_1_1_serialization_helper.html</anchorfile>
-      <anchor>aaf892eb7a271d9966eb19c4b5eec1e35</anchor>
-      <arglist>()</arglist>
-    </member>
     <member kind="function" virtualness="pure">
       <type>virtual QVariant</type>
       <name>getProperty</name>
@@ -685,7 +712,10 @@
     <docanchor file="index" title="Usage">qtjsonserializer_readme_label_2</docanchor>
     <docanchor file="index" title="Example">qtjsonserializer_readme_label_3</docanchor>
     <docanchor file="index" title="Important Usage Hints">qtjsonserializer_readme_label_4</docanchor>
-    <docanchor file="index" title="Support for alternative Containers">qtjsonserializer_readme_label_5</docanchor>
-    <docanchor file="index" title="Documentation">qtjsonserializer_readme_label_6</docanchor>
+    <docanchor file="index" title="Support for using and typedef">qtjsonserializer_readme_label_5</docanchor>
+    <docanchor file="index" title="Implicit typedef support">qtjsonserializer_readme_label_6</docanchor>
+    <docanchor file="index" title="Explicit typedef support">qtjsonserializer_readme_label_7</docanchor>
+    <docanchor file="index" title="Support for alternative Containers">qtjsonserializer_readme_label_8</docanchor>
+    <docanchor file="index" title="Documentation">qtjsonserializer_readme_label_9</docanchor>
   </compound>
 </tagfile>
