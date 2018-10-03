@@ -62,6 +62,7 @@ public:
 	explicit QJsonSerializer(QObject *parent = nullptr);
 	~QJsonSerializer() override;
 
+	//! Registers a the original name of a declared typedef
 	template<typename T>
 	static void registerInverseTypedef(const char *typeName);
 
@@ -83,6 +84,7 @@ public:
 	//! Registers two types for pair conversion
 	template<typename T, typename U>
 	static bool registerPairConverters(const char *originalTypeName = nullptr);
+	//! Registers a number of types for tuple conversion
 	template<typename... TArgs>
 	static bool registerTupleConverters(const char *originalTypeName = nullptr);
 
@@ -198,7 +200,7 @@ private:
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QJsonSerializer::ValidationFlags)
 
-//TODO document
+//! A macro the mark a class as polymorphic
 #define Q_JSON_POLYMORPHIC(x) \
 	static_assert(std::is_same<decltype(x), bool>::value, "x must be bool"); \
 	Q_CLASSINFO("polymorphic", #x)
@@ -400,4 +402,5 @@ void QJsonSerializer::addJsonTypeConverter()
 	addJsonTypeConverter(QSharedPointer<T>::create());
 }
 
+//! @file qjsonserializer.h The QJsonSerializer header file
 #endif // QJSONSERIALIZER_H

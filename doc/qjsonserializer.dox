@@ -186,6 +186,27 @@ is present, the data is treated polymorphic.
 */
 
 /*!
+@fn QJsonSerializer::registerInverseTypedef
+
+@tparam T The type to register the original name for
+@param typeName The name to be registered
+
+Use this method in case you are working with a typedef that was registered as the primary
+type it Qt using #Q_DECLARE_METATYPE. This can be neccessary for some container types. Simple example:
+
+@code{.cpp}
+using MyMap = QMap<QString, int>;
+Q_DECLARE_METATYPE(MyMap);
+
+// ...
+
+QJsonSerializer::registerInverseTypedef<MyMap>("QMap<QString, int>");
+@endcode
+
+@sa QJsonTypeConverter::getCanonicalTypeName
+*/
+
+/*!
 @fn QJsonSerializer::registerListConverters
 
 @tparam T The type to register converters for
@@ -255,7 +276,8 @@ A shortcut for all the container registrations QJsonSerializer provides. The met
 - `QJsonSerializer::registerMapConverters<T>()`
 
 @sa QJsonSerializer::registerListConverters, QJsonSerializer::registerMapConverters,
-QJsonSerializer::registerPointerConverters, QJsonSerializer::registerPairConverters
+QJsonSerializer::registerPointerConverters, QJsonSerializer::registerPairConverters,
+QJsonSerializer::registerTupleConverters
 */
 
 /*!
@@ -272,7 +294,8 @@ methods for the given type:
 - `QMetaType::registerConverter<QPointer<QObject>, QPointer<T>>()`
 - `QMetaType::registerConverter<QPointer<T>, QPointer<QObject>>()`
 
-@sa QJsonSerializer::registerAllConverters, QJsonSerializer::registerPairConverters
+@sa QJsonSerializer::registerAllConverters, QJsonSerializer::registerPairConverters,
+QJsonSerializer::registerTupleConverters
 */
 
 /*!
@@ -293,18 +316,47 @@ A shortcut for all the container registrations QJsonSerializer provides. The met
 
 @tparam T1 The first type to register converters for
 @tparam T2 The second type to register converters for
+@param originalTypeName If given, automatically registers an inverse typedef for the given std::pair
 
-Performs the registration of converters for `QPair<T1, T2> <--> QPair<QVariant, QVariant>`.
+Performs the registration of converters for `QPair<T1, T2> <--> QPair<QVariant, QVariant>`
+and `std::pair<T1, T2> <--> QPair<QVariant, QVariant>`.
 This conversion is a requirement for the serializer, if you want to be able to serialize
-QPairs with the given two types. The function calls the following methods for the given type:
+pairs with the given two types. The function calls the following methods for the given type:
 - `QMetaType::registerConverter<QPair<T1, T2>, QPair<QVariant, QVariant>>()`
 - `QMetaType::registerConverter<QPair<QVariant, QVariant>, QPair<T1, T2>>()`
+- `QMetaType::registerConverter<std::pair<T1, T2>, QPair<QVariant, QVariant>>()`
+- `QMetaType::registerConverter<QPair<QVariant, QVariant>, std::pair<T1, T2>>()`
+
+If originalTypeName is set, this method also calls
+`QJsonSerializer::registerInverseTypedef<std::pair<T1, T2>>(originalTypeName);`.
 
 @attention Only this very specific combination in this specific order is registered. If you change
 one type to another, or swap the two types, you need to call this method again with this different pair.
-This includes pairs with T1 == T2.
 
-@sa QJsonSerializer::registerAllConverters, QJsonSerializer::registerPointerConverters
+@sa QJsonSerializer::registerAllConverters, QJsonSerializer::registerPointerConverters,
+QJsonSerializer::registerTupleConverters, QJsonSerializer::registerInverseTypedef
+*/
+
+/*!
+@fn QJsonSerializer::registerTupleConverters
+
+@tparam TArgs The types that make up the tuple to register converters for
+@param originalTypeName If given, automatically registers an inverse typedef for the given std::tuple
+
+Performs the registration of converters for `std::tuple<TArgs...> <--> QVariantList`.
+This conversion is a requirement for the serializer, if you want to be able to serialize
+tuples with the given two types. The function calls the following methods for the given type:
+- `QMetaType::registerConverter<std::tuple<TArgs...>, QVariantList>()`
+- `QMetaType::registerConverter<QVariantList, std::tuple<TArgs...>>()`
+
+If originalTypeName is set, this method also calls
+`QJsonSerializer::registerInverseTypedef<std::tuple<TArgs...>>(originalTypeName);`.
+
+@attention Only this very specific combination in this specific order is registered. If you change
+one type to another, or swap the types, you need to call this method again with this different type set.
+
+@sa QJsonSerializer::registerAllConverters, QJsonSerializer::registerPointerConverters,
+QJsonSerializer::registerPairConverters, QJsonSerializer::registerInverseTypedef
 */
 
 /*!

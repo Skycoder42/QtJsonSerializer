@@ -14,8 +14,8 @@ class Q_JSONSERIALIZER_EXPORT QJsonTypeConverter
 {
 	Q_DISABLE_COPY(QJsonTypeConverter)
 public:
-	//! Sample values for a priority value
-	enum Priority : qint32 {
+	//! Sample values for a priority value (default converters are mostly Standard and are guaranteed to be between Low and High)
+	enum Priority : int {
 		ExtremlyLow = -0x00FFFFFF,
 		VeryLow = -0x0000FFFF,
 		Low = -0x000000FF,
@@ -67,6 +67,7 @@ public:
 	virtual QVariant deserialize(int propertyType, const QJsonValue &value, QObject *parent, const SerializationHelper *helper) const = 0;
 
 protected:
+	//! Returns the actual original typename of the given type
 	QByteArray getCanonicalTypeName(int propertyType) const;
 
 private:

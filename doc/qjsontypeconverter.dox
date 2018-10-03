@@ -212,6 +212,24 @@ multiple converters.
 @sa @ref example Example, QJsonTypeConverter::serialize, SerializationHelper
 */
 
+/*!
+@fn QJsonTypeConverter::getCanonicalTypeName
+
+@param propertyType The metatype id to get the name of
+@returns The name of the type
+
+This method is basically like QMetaType::typeName, but it takes "inverse typedefs" that
+have been registered using QJsonSerializer::registerInverseTypedef and returns the name
+that was registerd with that method for those types instead.
+
+In case you make use of the name of some type in your converter to not just print it in
+a exception, but work with it, like for example to extract the type of a template parameter
+from your type, **always** use this method. If not, anything registered with the previously
+mentioned method will not be taken into account!
+
+@sa QJsonSerializer::registerInverseTypedef
+*/
+
 
 
 /*!

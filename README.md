@@ -153,7 +153,7 @@ In order for the serializer to properly work, there are a few things you have to
 	- QPair and std::pair: use `QJsonSerializer::registerPairConverters<T1, T2>()`
 	- std::tuple: use `QJsonSerializer::registerTupleConverters<TArgs...>()`
 	- QSharedPointer/QPointer: use `QJsonSerializer::registerPointerConverters<T>()`
-5. Polymorphic QObjects are supported. This is done by the serializer via adding a special `@class` json property. To make a class polymorphic you can:
+5. Polymorphic QObjects are supported. This is done by the serializer via adding a special @@class json property. To make a class polymorphic you can:
 	- Add `Q_JSON_POLYMORPHIC(true)` (or `Q_CLASSINFO("polymorphic", "true")`) to its definition
 	- Globally force polyphormism (See QJsonSerializer::polymorphing in the doc)
 	- Set a dynamic property: `setProperty("__qt_json_serializer_polymorphic", true);`
@@ -161,7 +161,7 @@ In order for the serializer to properly work, there are a few things you have to
 7. By default, the JSON `null` can only be converted to QObjects. For other types the conversion fails (See [allowDefaultNull](src/qjsonserializer.h#L19))
 
 ### Support for using and typedef
-Many converters on the serializer depends on beeing able to get the name of a specific type in order to be able to correctly serialize it. Especially when template types are used, this is required to get the type of the template parameters. This means that some typedefs will not work out of the box, if not correctly registered. This can become rather complicated, because the serializer depends on the somewhat complicated typedef handling of the Qt meta system. There are generally 2 kinds of typedefs described below. 
+Many converters on the serializer depends on beeing able to get the name of a specific type in order to be able to correctly serialize it. Especially when template types are used, this is required to get the type of the template parameters. This means that some typedefs will not work out of the box, if not correctly registered. This can become rather complicated, because the serializer depends on the somewhat complicated typedef handling of the Qt meta system. There are generally 2 kinds of typedefs described below.
 
 #### Implicit typedef support
 Implicit typedefs in this context are understood as typedefs that are registered within Qt using `qRegisterMetaType`. The important part here is that the original type name must be declared via `Q_DECLARE_METATYPE` and typedefs are then registered in Qt after that. A basic example would be a typedef for a custom class:

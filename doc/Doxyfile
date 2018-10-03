@@ -927,6 +927,7 @@ EXCLUDE_PATTERNS       = moc_* \
 EXCLUDE_SYMBOLS        = _qjsonserializer_helpertypes \
 						 \
 						 QAbstractAspect \
+						 QAbstractXmlReceiver \
 						 QBasicAtomicInteger \
 						 QBasicAtomicPointer \
 						 QComponent \
