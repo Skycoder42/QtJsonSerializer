@@ -64,7 +64,7 @@ class TestObject : public QObject
 
 	Q_PROPERTY(QString stringProperty MEMBER stringProperty)
 	Q_PROPERTY(QList<int> simpleList MEMBER simpleList)
-	Q_PROPERTY(QMap<QString, double> simpleMap MEMBER simpleMap);  # add the semicolon or use a typedef to surpress most errors of the clang code model
+	Q_PROPERTY(QMap<QString, double> simpleMap MEMBER simpleMap);  // add the semicolon or use a typedef to surpress most errors of the clang code model
 	Q_PROPERTY(TestObject* childObject MEMBER childObject)
 
 public:
