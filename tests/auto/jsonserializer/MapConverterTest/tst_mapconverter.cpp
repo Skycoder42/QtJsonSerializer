@@ -31,6 +31,7 @@ private:
 void MapConverterTest::initTest()
 {
 	QMetaType::registerEqualsComparator<QMap<QString, int>>();
+	QMetaType::registerEqualsComparator<QHash<QString, int>>();
 }
 
 QJsonTypeConverter *MapConverterTest::converter()
@@ -59,7 +60,11 @@ void MapConverterTest::addMetaData()
 						  << true;
 	QTest::newRow("pair") << qMetaTypeId<QMap<QString, QPair<int, bool>>>()
 						  << true;
-	QTest::newRow("invalid.hash") << qMetaTypeId<QHash<QString, int>>()
+
+	QTest::newRow("hash") << qMetaTypeId<QHash<QString, int>>()
+						  << true;
+
+	QTest::newRow("invalid.pair") << qMetaTypeId<QPair<QString, int>>()
 								  << false;
 	QTest::newRow("invalid.key") << qMetaTypeId<QMap<int, int>>()
 								 << false;
@@ -73,26 +78,46 @@ void MapConverterTest::addCommonSerData()
 						   << qMetaTypeId<QMap<QString, int>>()
 						   << QVariant::fromValue(QMap<QString, int>{})
 						   << QJsonValue{QJsonObject{}};
-	QTest::newRow("filled") << QVariantHash{}
-							<< TestQ{{QMetaType::Int, 1, 2}, {QMetaType::Int, 3, 4}, {QMetaType::Int, 5, 6}}
-							<< static_cast<QObject*>(this)
-							<< qMetaTypeId<QMap<QString, int>>()
-							<< QVariant::fromValue(QMap<QString, int>{
-									  {QStringLiteral("a"), 1},
-									  {QStringLiteral("b"), 3},
-									  {QStringLiteral("c"), 5}
-								  })
-							<< QJsonValue{QJsonObject{
-									{QStringLiteral("a"), 2},
-									{QStringLiteral("b"), 4},
-									{QStringLiteral("c"), 6}
-								}};
-	QTest::newRow("variant") << QVariantHash{}
-							 << TestQ{{QMetaType::UnknownType, true, false}}
-							 << static_cast<QObject*>(this)
-							 << static_cast<int>(QMetaType::QVariantMap)
-							 << QVariant{QVariantMap{{QStringLiteral("tree"), true}}}
-							 << QJsonValue{QJsonObject{{QStringLiteral("tree"), false}}};
+	QTest::newRow("filled.map") << QVariantHash{}
+								<< TestQ{{QMetaType::Int, 1, 2}, {QMetaType::Int, 3, 4}, {QMetaType::Int, 5, 6}}
+								<< static_cast<QObject*>(this)
+								<< qMetaTypeId<QMap<QString, int>>()
+								<< QVariant::fromValue(QMap<QString, int>{
+										  {QStringLiteral("a"), 1},
+										  {QStringLiteral("b"), 3},
+										  {QStringLiteral("c"), 5}
+									  })
+								<< QJsonValue{QJsonObject{
+										{QStringLiteral("a"), 2},
+										{QStringLiteral("b"), 4},
+										{QStringLiteral("c"), 6}
+									}};
+	QTest::newRow("filled.hash") << QVariantHash{}
+								 << TestQ{{QMetaType::Int, 1, 2}, {QMetaType::Int, 3, 4}, {QMetaType::Int, 5, 6}}
+								 << static_cast<QObject*>(this)
+								 << qMetaTypeId<QHash<QString, int>>()
+								 << QVariant::fromValue(QHash<QString, int>{
+										   {QStringLiteral("a"), 1},
+										   {QStringLiteral("b"), 3},
+										   {QStringLiteral("c"), 5}
+									   })
+								 << QJsonValue{QJsonObject{
+										 {QStringLiteral("a"), 2},
+										 {QStringLiteral("b"), 4},
+										 {QStringLiteral("c"), 6}
+									 }};
+	QTest::newRow("variant.map") << QVariantHash{}
+								 << TestQ{{QMetaType::UnknownType, true, false}}
+								 << static_cast<QObject*>(this)
+								 << static_cast<int>(QMetaType::QVariantMap)
+								 << QVariant{QVariantMap{{QStringLiteral("tree"), true}}}
+								 << QJsonValue{QJsonObject{{QStringLiteral("tree"), false}}};
+	QTest::newRow("variant.hash") << QVariantHash{}
+								  << TestQ{{QMetaType::UnknownType, true, false}}
+								  << static_cast<QObject*>(this)
+								  << static_cast<int>(QMetaType::QVariantHash)
+								  << QVariant{QVariantHash{{QStringLiteral("tree"), true}}}
+								  << QJsonValue{QJsonObject{{QStringLiteral("tree"), false}}};
 }
 
 void MapConverterTest::addSerData()

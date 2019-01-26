@@ -3,11 +3,12 @@
 
 #include <QtCore/QJsonObject>
 
-const QRegularExpression QJsonMapConverter::mapTypeRegex(QStringLiteral(R"__(^QMap<\s*QString\s*,\s*(.*?)\s*>$)__"));
+const QRegularExpression QJsonMapConverter::mapTypeRegex(QStringLiteral(R"__(^(?:QMap|QHash)<\s*QString\s*,\s*(.*?)\s*>$)__"));
 
 bool QJsonMapConverter::canConvert(int metaTypeId) const
 {
 	return metaTypeId == QMetaType::QVariantMap ||
+			metaTypeId == QMetaType::QVariantHash ||
 			mapTypeRegex.match(QString::fromUtf8(getCanonicalTypeName(metaTypeId))).hasMatch();
 }
 

@@ -21,6 +21,8 @@
 #include <QtCore/qlinkedlist.h>
 #include <QtCore/qvector.h>
 #include <QtCore/qset.h>
+#include <QtCore/qhash.h>
+#include <QtCore/qmap.h>
 
 class QJsonSerializerPrivate;
 //! A class to serializer and deserializer c++ classes to and from JSON
@@ -70,10 +72,11 @@ public:
 	template<typename T>
 	static void registerInverseTypedef(const char *typeName);
 
-	template <template<typename> class TContainer, typename TClass,
-			  typename TAppendArg = const TClass&, typename TAppendRet = void>
-	static bool registerListContainerConverters(TAppendRet (TContainer<TClass>::*appendMethod)(TAppendArg) = &TContainer<TClass>::append,
+	template <template<typename> class TContainer, typename TClass, typename TAppendRet = void>
+	static bool registerListContainerConverters(TAppendRet (TContainer<TClass>::*appendMethod)(const TClass &) = &TContainer<TClass>::append,
 												void (TContainer<TClass>::*reserveMethod)(int) = &TContainer<TClass>::reserve);
+	template <template<typename, typename> class TContainer, typename TClass, typename TInsertRet = typename TContainer<QString, TClass>::iterator>
+	static bool registerMapContainerConverters(TInsertRet (TContainer<QString, TClass>::*insertMethod)(const QString &, const TClass &) = &TContainer<QString, TClass>::insert);
 	//! Registers a custom type for list converisons
 	template<typename T>
 	static inline bool registerListConverters();
@@ -224,8 +227,8 @@ void QJsonSerializer::registerInverseTypedef(const char *typeName)
 	registerInverseTypedefImpl(qMetaTypeId<T>(), QMetaObject::normalizedType(typeName));
 }
 
-template <template<typename> class TContainer, typename TClass, typename TAppendArg, typename TAppendRet>
-bool QJsonSerializer::registerListContainerConverters(TAppendRet (TContainer<TClass>::*appendMethod)(TAppendArg), void (TContainer<TClass>::*reserveMethod)(int))
+template <template<typename> class TContainer, typename TClass, typename TAppendRet>
+bool QJsonSerializer::registerListContainerConverters(TAppendRet (TContainer<TClass>::*appendMethod)(const TClass &), void (TContainer<TClass>::*reserveMethod)(int))
 {
 	return QMetaType::registerConverter<TContainer<TClass>, QVariantList>([](const TContainer<TClass> &list) -> QVariantList {
 		QVariantList l;
@@ -253,6 +256,33 @@ bool QJsonSerializer::registerListContainerConverters(TAppendRet (TContainer<TCl
 	});
 }
 
+template<template <typename, typename> class TContainer, typename TClass, typename TInsertRet>
+bool QJsonSerializer::registerMapContainerConverters(TInsertRet (TContainer<QString, TClass>::*insertMethod)(const QString &, const TClass &))
+{
+	return QMetaType::registerConverter<TContainer<QString, TClass>, QVariantMap>([](const TContainer<QString, TClass> &map) -> QVariantMap {
+		QVariantMap m;
+		for(auto it = map.constBegin(); it != map.constEnd(); ++it)
+			m.insert(it.key(), QVariant::fromValue(it.value()));
+		return m;
+	}) & QMetaType::registerConverter<QVariantMap, TContainer<QString, TClass>>([insertMethod](const QVariantMap &map) -> TContainer<QString, TClass> {
+		TContainer<QString, TClass> m;
+		for(auto it = map.constBegin(); it != map.constEnd(); ++it) {
+			auto v = it.value();
+			const auto vt = v.type();
+			if(v.convert(qMetaTypeId<TClass>()))
+				(m.*insertMethod)(it.key(), v.value<TClass>());
+			else {
+				qWarning() << "Conversion to"
+						   << QMetaType::typeName(qMetaTypeId<TContainer<QString, TClass>>())
+						   << "failed, could not convert element value of type"
+						   << QMetaType::typeName(vt);
+				(m.*insertMethod)(it.key(), TClass());
+			}
+		}
+		return m;
+	});
+}
+
 template<typename T>
 bool QJsonSerializer::registerListConverters()
 {
@@ -272,28 +302,8 @@ bool QJsonSerializer::registerSetConverters()
 template<typename T>
 bool QJsonSerializer::registerMapConverters()
 {
-	return QMetaType::registerConverter<QMap<QString, T>, QVariantMap>([](const QMap<QString, T> &map) -> QVariantMap {
-		QVariantMap m;
-		for(auto it = map.constBegin(); it != map.constEnd(); ++it)
-			m.insert(it.key(), QVariant::fromValue(it.value()));
-		return m;
-	}) & QMetaType::registerConverter<QVariantMap, QMap<QString, T>>([](const QVariantMap &map) -> QMap<QString, T> {
-		QMap<QString, T> m;
-		for(auto it = map.constBegin(); it != map.constEnd(); ++it) {
-			auto v = it.value();
-			auto vt = v.type();
-			if(v.convert(qMetaTypeId<T>()))
-				m.insert(it.key(), v.value<T>());
-			else {
-				qWarning() << "Conversion to"
-						   << QMetaType::typeName(qMetaTypeId<QMap<QString, T>>())
-						   << "failed, could not convert element value of type"
-						   << QMetaType::typeName(vt);
-				m.insert(it.key(), T());
-			}
-		}
-		return m;
-	});
+	return registerMapContainerConverters<QMap, T>() &&
+			registerMapContainerConverters<QHash, T>();
 }
 
 template<typename T>
