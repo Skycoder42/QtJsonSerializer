@@ -6,8 +6,7 @@ SOURCES += \
 	qjsonserializerexception.cpp \
 	qjsonserializer.cpp \
 	qjsontypeconverter.cpp \
-	qjsonexceptioncontext.cpp \
-    qtjsonserializer_global.cpp
+	qjsonexceptioncontext.cpp
 
 HEADERS += \
 	qjsonserializerexception.h \
@@ -20,6 +19,7 @@ HEADERS += \
 	qjsonserializerexception_p.h
 
 include(typeconverters/typeconverters.pri)
+include(typesplit.pri)
 
 load(qt_module)
 
@@ -30,3 +30,6 @@ win32 {
 } else:mac {
 	QMAKE_TARGET_BUNDLE_PREFIX = "de.skycoder42."
 }
+
+DISTFILES += \
+	typesplit.pri
