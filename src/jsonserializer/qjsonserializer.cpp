@@ -6,6 +6,7 @@
 
 #include <QtCore/QDateTime>
 #include <QtCore/QBuffer>
+#include <QtCore/QCoreApplication>
 
 #include "typeconverters/qjsonobjectconverter_p.h"
 #include "typeconverters/qjsongadgetconverter_p.h"
@@ -19,6 +20,8 @@
 #include "typeconverters/qjsonlocaleconverter_p.h"
 #include "typeconverters/qjsonregularexpressionconverter_p.h"
 #include "typeconverters/qjsonstdtupleconverter_p.h"
+
+Q_COREAPP_STARTUP_FUNCTION(qtJsonSerializerRegisterTypes);
 
 QJsonSerializer::QJsonSerializer(QObject *parent) :
 	QObject{parent},

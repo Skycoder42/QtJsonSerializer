@@ -5,7 +5,8 @@
 
 #define QT_JSON_SERIALIZER_NAMED(T) #T
 
-namespace {
+namespace _qjsonserializer_helpertypes {
+namespace converter_hooks {
 
 void register_%{typeindex}_converters() {
 	bool ok = QJsonSerializer::%{convertMethod}<%{type}>();
@@ -13,4 +14,4 @@ void register_%{typeindex}_converters() {
 }
 
 }
-Q_COREAPP_STARTUP_FUNCTION(register_%{typeindex}_converters)
+}

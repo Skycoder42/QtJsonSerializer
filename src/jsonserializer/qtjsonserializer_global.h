@@ -13,4 +13,6 @@
 #  define Q_JSONSERIALIZER_EXPORT
 #endif
 
+Q_JSONSERIALIZER_EXPORT void qtJsonSerializerRegisterTypes();
+
 #endif // QTJSONSERIALIZER_GLOBAL_H

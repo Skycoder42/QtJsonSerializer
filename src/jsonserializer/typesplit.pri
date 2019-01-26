@@ -58,12 +58,28 @@ for(tId, $$list(ALL_TYPES, LIST_TYPES, MAP_TYPES)) {
 
 		out_file = $$QT_JSONSERIALIZER_REGPATH/qjsonconverterreg_$${type_index}.cpp
 		!exists($$out_file):!write_file($$out_file, raw_data):error("Failed to create $$out_file")
-		type_index = $$num_add($$type_index, 1)
-
 		GENERATED_SOURCES += $$out_file
-		export(GENERATED_SOURCES)
+
+		startup_hookfile_declare += "void register_$${type_index}_converters();"
+		startup_hookfile_call += "$$escape_expand(\\t)_qjsonserializer_helpertypes::converter_hooks::register_$${type_index}_converters();"
+
+		type_index = $$num_add($$type_index, 1)
 	}
 }
+
+
+startup_hookfile = "$${LITERAL_HASH}include \"qtjsonserializer_global.h\""
+startup_hookfile += "namespace _qjsonserializer_helpertypes {"
+startup_hookfile += "namespace converter_hooks {"
+startup_hookfile += $$startup_hookfile_declare
+startup_hookfile += "}"
+startup_hookfile += "}"
+startup_hookfile += "void qtJsonSerializerRegisterTypes() {"
+startup_hookfile += $$startup_hookfile_call
+startup_hookfile += "}"
+out_file = $$QT_JSONSERIALIZER_REGPATH/qjsonconverterreg_all.cpp
+!exists($$out_file):!write_file($$out_file, startup_hookfile):error("Failed to create $$out_file")
+GENERATED_SOURCES += $$out_file
 
 DISTFILES += \
 	$$PWD/qjsonconverterreg.cpp.template
