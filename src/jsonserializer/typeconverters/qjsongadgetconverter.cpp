@@ -74,7 +74,7 @@ QVariant QJsonGadgetConverter::deserialize(int propertyType, const QJsonValue &v
 			return QVariant{propertyType, nullptr}; //initialize an empty (nullptr) variant
 		const auto gadgetType = QMetaType::type(metaObject->className());
 		if(gadgetType == QMetaType::UnknownType)
-			throw QJsonDeserializationException(QByteArray("Unable to type of gadget from gadget pointer type") + QMetaType::typeName(propertyType));
+			throw QJsonDeserializationException(QByteArray("Unable to get type of gadget from gadget-pointer type") + QMetaType::typeName(propertyType));
 		gadgetPtr = QMetaType::create(gadgetType);
 		gadget = QVariant{propertyType, &gadgetPtr};
 	} else {
