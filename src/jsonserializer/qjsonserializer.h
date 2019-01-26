@@ -17,6 +17,10 @@
 #include <QtCore/qdebug.h>
 #include <QtCore/qsharedpointer.h>
 #include <QtCore/qpointer.h>
+#include <QtCore/qlist.h>
+#include <QtCore/qlinkedlist.h>
+#include <QtCore/qvector.h>
+#include <QtCore/qset.h>
 
 class QJsonSerializerPrivate;
 //! A class to serializer and deserializer c++ classes to and from JSON
@@ -66,27 +70,31 @@ public:
 	template<typename T>
 	static void registerInverseTypedef(const char *typeName);
 
+	template <template<typename> class TContainer, typename TClass,
+			  typename TAppendArg = const TClass&, typename TAppendRet = void>
+	static bool registerListContainerConverters(TAppendRet (TContainer<TClass>::*appendMethod)(TAppendArg) = &TContainer<TClass>::append,
+												void (TContainer<TClass>::*reserveMethod)(int) = &TContainer<TClass>::reserve);
 	//! Registers a custom type for list converisons
 	template<typename T>
-	static bool registerListConverters();
+	static inline bool registerListConverters();
 	//! Registers a custom type for map converisons
 	template<typename T>
-	static bool registerMapConverters();
+	static inline bool registerMapConverters();
 	//! Registers a custom type for list and map converisons
 	template<typename T>
-	static bool registerAllConverters();
+	static inline bool registerAllConverters();
 	//! Registers a custom type for QSharedPointer and QPointer converisons
 	template<typename T>
-	static bool registerPointerConverters();
+	static inline bool registerPointerConverters();
 	//! Registers a custom type for QSharedPointer and QPointer converisons, including lists of those pointer types
 	template<typename T>
-	static bool registerPointerListConverters();
+	static inline bool registerPointerListConverters();
 	//! Registers two types for pair conversion
 	template<typename T, typename U>
-	static bool registerPairConverters(const char *originalTypeName = nullptr);
+	static inline bool registerPairConverters(const char *originalTypeName = nullptr);
 	//! Registers a number of types for tuple conversion
 	template<typename... TArgs>
-	static bool registerTupleConverters(const char *originalTypeName = nullptr);
+	static inline bool registerTupleConverters(const char *originalTypeName = nullptr);
 
 	//! @readAcFn{QJsonSerializer::allowDefaultNull}
 	bool allowDefaultNull() const;
@@ -214,46 +222,55 @@ void QJsonSerializer::registerInverseTypedef(const char *typeName)
 	registerInverseTypedefImpl(qMetaTypeId<T>(), QMetaObject::normalizedType(typeName));
 }
 
-template<typename T>
-bool QJsonSerializer::registerListConverters() {
-	auto ok1 = QMetaType::registerConverter<QList<T>, QVariantList>([](const QList<T> &list) -> QVariantList {
+template <template<typename> class TContainer, typename TClass, typename TAppendArg, typename TAppendRet>
+bool QJsonSerializer::registerListContainerConverters(TAppendRet (TContainer<TClass>::*appendMethod)(TAppendArg), void (TContainer<TClass>::*reserveMethod)(int))
+{
+	return QMetaType::registerConverter<TContainer<TClass>, QVariantList>([](const TContainer<TClass> &list) -> QVariantList {
 		QVariantList l;
-		for(auto v : list)
+		l.reserve(list.size());
+		for(const auto &v : list)
 			l.append(QVariant::fromValue(v));
 		return l;
-	});
-
-	auto ok2 = QMetaType::registerConverter<QVariantList, QList<T>>([](const QVariantList &list) -> QList<T> {
-		QList<T> l;
-		for(auto v : list) {
-			auto vt = v.type();
-			if(v.convert(qMetaTypeId<T>()))
-				l.append(v.value<T>());
+	}) & QMetaType::registerConverter<QVariantList, TContainer<TClass>>([appendMethod, reserveMethod](const QVariantList &list) -> TContainer<TClass> {
+		TContainer<TClass> l;
+		if(reserveMethod)
+			(l.*reserveMethod)(list.size());
+		for(auto v : list) { // clazy:exclude=range-loop
+			const auto vt = v.type();
+			if(v.convert(qMetaTypeId<TClass>()))
+				(l.*appendMethod)(v.value<TClass>());
 			else {
 				qWarning() << "Conversion to"
-						   << QMetaType::typeName(qMetaTypeId<QList<T>>())
+						   << QMetaType::typeName(qMetaTypeId<TContainer<TClass>>())
 						   << "failed, could not convert element of type"
 						   << QMetaType::typeName(vt);
-				l.append(T());
+				(l.*appendMethod)(TClass());
 			}
 		}
 		return l;
 	});
+}
 
-	return ok1 && ok2;
+template<typename T>
+bool QJsonSerializer::registerListConverters()
+{
+	return registerListContainerConverters<QList, T>() &&
+			registerListContainerConverters<QLinkedList, T>(&QLinkedList<T>::append, nullptr) &&
+			registerListContainerConverters<QVector, T>() &&
+			registerListContainerConverters<QStack, T>() &&
+			registerListContainerConverters<QQueue, T>()/* &&
+			registerListContainerConverters<QSet, T>(&QSet<T>::insert)*/;
 }
 
 template<typename T>
 bool QJsonSerializer::registerMapConverters()
 {
-	auto ok1 = QMetaType::registerConverter<QMap<QString, T>, QVariantMap>([](const QMap<QString, T> &map) -> QVariantMap {
+	return QMetaType::registerConverter<QMap<QString, T>, QVariantMap>([](const QMap<QString, T> &map) -> QVariantMap {
 		QVariantMap m;
 		for(auto it = map.constBegin(); it != map.constEnd(); ++it)
 			m.insert(it.key(), QVariant::fromValue(it.value()));
 		return m;
-	});
-
-	auto ok2 = QMetaType::registerConverter<QVariantMap, QMap<QString, T>>([](const QVariantMap &map) -> QMap<QString, T> {
+	}) & QMetaType::registerConverter<QVariantMap, QMap<QString, T>>([](const QVariantMap &map) -> QMap<QString, T> {
 		QMap<QString, T> m;
 		for(auto it = map.constBegin(); it != map.constEnd(); ++it) {
 			auto v = it.value();
@@ -270,45 +287,36 @@ bool QJsonSerializer::registerMapConverters()
 		}
 		return m;
 	});
-
-	return ok1 && ok2;
 }
 
 template<typename T>
 bool QJsonSerializer::registerAllConverters()
 {
-	auto ok1 = registerListConverters<T>();
-	auto ok2 = registerMapConverters<T>();
-	return ok1 && ok2;
+	return registerListConverters<T>() & registerMapConverters<T>();
 }
 
 template<typename T>
 bool QJsonSerializer::registerPointerConverters()
 {
 	static_assert(std::is_base_of<QObject, T>::value, "T must inherit QObject");
-	auto ok1 = QMetaType::registerConverter<QSharedPointer<QObject>, QSharedPointer<T>>([](const QSharedPointer<QObject> &object) -> QSharedPointer<T> {
+	return QMetaType::registerConverter<QSharedPointer<QObject>, QSharedPointer<T>>([](const QSharedPointer<QObject> &object) -> QSharedPointer<T> {
 		return object.objectCast<T>();
-	});
-	auto ok2 = QMetaType::registerConverter<QSharedPointer<T>, QSharedPointer<QObject>>([](const QSharedPointer<T> &object) -> QSharedPointer<QObject> {
+	}) & QMetaType::registerConverter<QSharedPointer<T>, QSharedPointer<QObject>>([](const QSharedPointer<T> &object) -> QSharedPointer<QObject> {
 		return object.template staticCast<QObject>();//must work, because of static assert
-	});
-	auto ok3 = QMetaType::registerConverter<QPointer<QObject>, QPointer<T>>([](const QPointer<QObject> &object) -> QPointer<T> {
+	}) & QMetaType::registerConverter<QPointer<QObject>, QPointer<T>>([](const QPointer<QObject> &object) -> QPointer<T> {
 		return qobject_cast<T*>(object.data());
-	});
-	auto ok4 = QMetaType::registerConverter<QPointer<T>, QPointer<QObject>>([](const QPointer<T> &object) -> QPointer<QObject> {
+	}) & QMetaType::registerConverter<QPointer<T>, QPointer<QObject>>([](const QPointer<T> &object) -> QPointer<QObject> {
 		return static_cast<QObject*>(object.data());
 	});
-	return ok1 && ok2 && ok3 && ok4;
 }
 
 template<typename T>
 bool QJsonSerializer::registerPointerListConverters()
 {
 	static_assert(std::is_base_of<QObject, T>::value, "T must inherit QObject");
-	auto ok1 = registerPointerConverters<T>();
-	auto ok2 = registerAllConverters<QSharedPointer<T>>();
-	auto ok3 = registerAllConverters<QPointer<T>>();
-	return ok1 && ok2 && ok3;
+	return registerPointerConverters<T>() &
+			registerAllConverters<QSharedPointer<T>>() &
+			registerAllConverters<QPointer<T>>();
 }
 
 template<typename T1, typename T2>
@@ -316,31 +324,27 @@ bool QJsonSerializer::registerPairConverters(const char *originalTypeName)
 {
 	if(originalTypeName)
 		registerInverseTypedef<std::pair<T1, T2>>(originalTypeName);
-	auto ok1 = QMetaType::registerConverter<QPair<T1, T2>, QPair<QVariant, QVariant>>([](const QPair<T1, T2> &pair) -> QPair<QVariant, QVariant> {
+	return QMetaType::registerConverter<QPair<T1, T2>, QPair<QVariant, QVariant>>([](const QPair<T1, T2> &pair) -> QPair<QVariant, QVariant> {
 		return {
 			QVariant::fromValue(pair.first),
 			QVariant::fromValue(pair.second)
 		};
-	});
-	auto ok2 = QMetaType::registerConverter<QPair<QVariant, QVariant>, QPair<T1, T2>>([](const QPair<QVariant, QVariant> &pair) -> QPair<T1, T2> {
+	}) & QMetaType::registerConverter<QPair<QVariant, QVariant>, QPair<T1, T2>>([](const QPair<QVariant, QVariant> &pair) -> QPair<T1, T2> {
+		return {
+			pair.first.value<T1>(),
+			pair.second.value<T2>()
+		};
+	}) & QMetaType::registerConverter<std::pair<T1, T2>, QPair<QVariant, QVariant>>([](const std::pair<T1, T2> &pair) -> QPair<QVariant, QVariant> {
+		return {
+			QVariant::fromValue(pair.first),
+			QVariant::fromValue(pair.second)
+		};
+	}) & QMetaType::registerConverter<QPair<QVariant, QVariant>, std::pair<T1, T2>>([](const QPair<QVariant, QVariant> &pair) -> std::pair<T1, T2> {
 		return {
 			pair.first.value<T1>(),
 			pair.second.value<T2>()
 		};
 	});
-	auto ok3 = QMetaType::registerConverter<std::pair<T1, T2>, QPair<QVariant, QVariant>>([](const std::pair<T1, T2> &pair) -> QPair<QVariant, QVariant> {
-		return {
-			QVariant::fromValue(pair.first),
-			QVariant::fromValue(pair.second)
-		};
-	});
-	auto ok4 = QMetaType::registerConverter<QPair<QVariant, QVariant>, std::pair<T1, T2>>([](const QPair<QVariant, QVariant> &pair) -> std::pair<T1, T2> {
-		return {
-			pair.first.value<T1>(),
-			pair.second.value<T2>()
-		};
-	});
-	return ok1 && ok2 && ok3 && ok4;
 }
 
 template<typename... TArgs>
@@ -348,9 +352,8 @@ bool QJsonSerializer::registerTupleConverters(const char *originalTypeName)
 {
 	if(originalTypeName)
 		registerInverseTypedef<std::tuple<TArgs...>>(originalTypeName);
-	auto ok1 = QMetaType::registerConverter<std::tuple<TArgs...>, QVariantList>(&_qjsonserializer_helpertypes::tplToList<TArgs...>);
-	auto ok2 = QMetaType::registerConverter<QVariantList, std::tuple<TArgs...>>(&_qjsonserializer_helpertypes::listToTpl<TArgs...>);
-	return ok1 && ok2;
+	return QMetaType::registerConverter<std::tuple<TArgs...>, QVariantList>(&_qjsonserializer_helpertypes::tplToList<TArgs...>) &
+			QMetaType::registerConverter<QVariantList, std::tuple<TArgs...>>(&_qjsonserializer_helpertypes::listToTpl<TArgs...>);
 }
 
 template<typename T>

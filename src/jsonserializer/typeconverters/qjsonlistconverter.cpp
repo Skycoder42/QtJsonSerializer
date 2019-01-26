@@ -3,7 +3,7 @@
 
 #include <QtCore/QJsonArray>
 
-const QRegularExpression QJsonListConverter::listTypeRegex(QStringLiteral(R"__(^QList<\s*(.*?)\s*>$)__"));
+const QRegularExpression QJsonListConverter::listTypeRegex(QStringLiteral(R"__(^(?:QList|QLinkedList|QVector|QStack|QQueue)<\s*(.*?)\s*>$)__"));
 
 bool QJsonListConverter::canConvert(int metaTypeId) const
 {
