@@ -9,10 +9,11 @@ osx_image: xcode10.1
 
 env:
   global:
-    - QPMX_CACHE_DIR=$HOME/.qpmx-cache
+    - QDEP_CACHE_DIR=$HOME/.qdep-cache
     - QT_VER=5.12.0
     - DOCKER_IMAGE=base
     - MAKE_RUN_TESTS=true
+    - TARGET_NAME=qtjsonserializer
 
 matrix:
   include:
@@ -52,7 +53,7 @@ deploy:
   api_key:
     secure: BTMUeBjCBfDFo3Pysojz2yMFKnK0Lz3wkS3Pa+IfrztWHkWQWxZWqcvj/jGQiwqcuZhGu604E0T8NlOwUHylXxLL1ZE5+eQFXBc7GEmNOZ9Ql3ay9XiYegqYKN9nO9zgtB6QzJ3G3i4FMyQrfiSUaFTlOsosnQkJZJc0AcvW2kdmoNYpfWBGAK/WcejXTI27BnbxXX7nmf3A+yYLbyreAH2wZRt2NNv691tqC7YFL4p2aHOb51J/higTFalgSaI9ClpcXXuPh0S9GHy1CtDRvAxzzs5g1Fvu6FDMfkC+U2ka8l5mPZ5n9jd74PX0ijdFyLkjqOGUne29GvQIxKQZ0tWNHmkh/hKB5UG4MowBFjaomyuIBcifCtiUjkcuW8zHefPXsOxhBFiQWN1TatBCQocdPVCu/hT1PYuX1MFXEMKSRtfcj+ZNQTmtH3riHObZcZvm1a7xNg5WAdulK8O/shUGstlmug94RhJIwj7HQzZ0ko4WWham4uFl9amN4Uwr3Ik87MJXGXsXHznr3RTRmrUkqQY/rPKVIp4ZgfXIQqKZhBNNhUlORzVh52D6OQJd4/c6vKiA3FbDsykKPywr83Q+oTuV881Xv1GgqF9ZFXoeSMeIeIwAOWRJ7zKmJ9oZcko91NE7A+FmPjtOzHFYxWoCMbJtOYJ6nJ02VGmGjC8=
   file_glob: true
-  file: install/build_*_$QT_VER.tar.xz
+  file: install/${TARGET_NAME}_*_${QT_VER}.tar.xz
   on:
     repo: Skycoder42/QtJsonSerializer
     tags: true
@@ -60,8 +61,6 @@ deploy:
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -rf $HOME/.gradle/caches/*/plugin-resolution/
-  - rm -rf $QPMX_CACHE_DIR/locks
-  - rm -rf $QPMX_CACHE_DIR/tmp
 cache:
   directories:
     - $HOME/.gradle/caches/
