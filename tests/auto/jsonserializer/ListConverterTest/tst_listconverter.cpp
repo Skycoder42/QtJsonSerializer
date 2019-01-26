@@ -28,6 +28,7 @@ void ListConverterTest::initTest()
 	QMetaType::registerEqualsComparator<QVector<int>>();
 	QMetaType::registerEqualsComparator<QStack<int>>();
 	QMetaType::registerEqualsComparator<QQueue<int>>();
+	QMetaType::registerEqualsComparator<QSet<int>>();
 }
 
 QJsonTypeConverter *ListConverterTest::converter()
@@ -55,8 +56,6 @@ void ListConverterTest::addMetaData()
 						  << true;
 	QTest::newRow("pair") << qMetaTypeId<QList<QPair<int, bool>>>()
 						  << true;
-	QTest::newRow("invalid") << qMetaTypeId<QSet<int>>()
-							 << false;
 
 	QTest::newRow("linkedList") << qMetaTypeId<QLinkedList<int>>()
 								<< true;
@@ -66,6 +65,11 @@ void ListConverterTest::addMetaData()
 						   << true;
 	QTest::newRow("queue") << qMetaTypeId<QQueue<int>>()
 						   << true;
+	QTest::newRow("set") << qMetaTypeId<QSet<int>>()
+						 << true;
+
+	QTest::newRow("invalid") << qMetaTypeId<QPair<int, int>>()
+							 << false;
 }
 
 void ListConverterTest::addCommonSerData()
@@ -108,27 +112,45 @@ void ListConverterTest::addCommonSerData()
 							<< QVariant::fromValue(QVector<int>{1, 3, 5})
 							<< QJsonValue{QJsonArray{2, 4, 6}};
 
-	QStack<int> s;
-	s.push(1);
-	s.push(3);
-	s.push(5);
-	QTest::newRow("stack") << QVariantHash{}
-						   << TestQ{{QMetaType::Int, 1, 2}, {QMetaType::Int, 3, 4}, {QMetaType::Int, 5, 6}}
-						   << static_cast<QObject*>(this)
-						   << qMetaTypeId<QStack<int>>()
-						   << QVariant::fromValue(s)
-						   << QJsonValue{QJsonArray{2, 4, 6}};
+	{
+		QStack<int> s;
+		s.push(1);
+		s.push(3);
+		s.push(5);
+		QTest::newRow("stack") << QVariantHash{}
+							   << TestQ{{QMetaType::Int, 1, 2}, {QMetaType::Int, 3, 4}, {QMetaType::Int, 5, 6}}
+							   << static_cast<QObject*>(this)
+							   << qMetaTypeId<QStack<int>>()
+							   << QVariant::fromValue(s)
+							   << QJsonValue{QJsonArray{2, 4, 6}};
+	}
 
-	QQueue<int> q;
-	q.enqueue(1);
-	q.enqueue(3);
-	q.enqueue(5);
-	QTest::newRow("queue") << QVariantHash{}
-						   << TestQ{{QMetaType::Int, 1, 2}, {QMetaType::Int, 3, 4}, {QMetaType::Int, 5, 6}}
-						   << static_cast<QObject*>(this)
-						   << qMetaTypeId<QQueue<int>>()
-						   << QVariant::fromValue(q)
-						   << QJsonValue{QJsonArray{2, 4, 6}};
+	{
+		QQueue<int> q;
+		q.enqueue(1);
+		q.enqueue(3);
+		q.enqueue(5);
+		QTest::newRow("queue") << QVariantHash{}
+							   << TestQ{{QMetaType::Int, 1, 2}, {QMetaType::Int, 3, 4}, {QMetaType::Int, 5, 6}}
+							   << static_cast<QObject*>(this)
+							   << qMetaTypeId<QQueue<int>>()
+							   << QVariant::fromValue(q)
+							   << QJsonValue{QJsonArray{2, 4, 6}};
+	}
+
+	{
+		QSet<int> s{1, 3, 5};
+		TestQ q;
+		auto ctr = 0;
+		for(const auto &v : qAsConst(s))
+			q.append({QMetaType::Int, v, (++ctr)*2});
+		QTest::newRow("set") << QVariantHash{}
+							 << q
+							 << static_cast<QObject*>(this)
+							 << qMetaTypeId<QSet<int>>()
+							 << QVariant::fromValue(s)
+							 << QJsonValue{QJsonArray{2, 4, 6}};
+	}
 }
 
 void ListConverterTest::addSerData()

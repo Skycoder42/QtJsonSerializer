@@ -25,15 +25,19 @@ ALL_TYPES = \
 	QJsonObject \
 	QJsonArray \
 	QVersionNumber \
+	QLocale \
+	QRegularExpression
+LIST_TYPES = \
 	QSize \
 	QPoint \
 	QLine \
-	QRect \
-	QLocale \
-	QRegularExpression
-LIST_TYPES =
+	QRect
 MAP_TYPES = \
-	QByteArray
+	QByteArray\
+	QSize \
+	QPoint \
+	QLine \
+	QRect
 
 isEmpty(QT_JSONSERIALIZER_REGPATH): QT_JSONSERIALIZER_REGPATH = $$OUT_PWD/.reggen
 mkpath($$QT_JSONSERIALIZER_REGPATH)

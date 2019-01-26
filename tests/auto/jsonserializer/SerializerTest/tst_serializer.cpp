@@ -54,7 +54,8 @@ void SerializerTest::initTestCase()
 	QJsonSerializer::registerListConverters<QList<int>>();
 	QJsonSerializer::registerMapConverters<QMap<QString, int>>();
 
-	QJsonSerializer::registerAllConverters<TestGadget>();
+	QJsonSerializer::registerListConverters<TestGadget>();
+	QJsonSerializer::registerMapConverters<TestGadget>();
 	QJsonSerializer::registerListConverters<CustomGadget>();
 	QJsonSerializer::registerListConverters<QList<TestGadget>>();
 	QJsonSerializer::registerMapConverters<QMap<QString, TestGadget>>();

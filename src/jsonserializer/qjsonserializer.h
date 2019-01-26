@@ -77,6 +77,8 @@ public:
 	//! Registers a custom type for list converisons
 	template<typename T>
 	static inline bool registerListConverters();
+	template<typename T>
+	static inline bool registerSetConverters();
 	//! Registers a custom type for map converisons
 	template<typename T>
 	static inline bool registerMapConverters();
@@ -258,8 +260,13 @@ bool QJsonSerializer::registerListConverters()
 			registerListContainerConverters<QLinkedList, T>(&QLinkedList<T>::append, nullptr) &&
 			registerListContainerConverters<QVector, T>() &&
 			registerListContainerConverters<QStack, T>() &&
-			registerListContainerConverters<QQueue, T>()/* &&
-			registerListContainerConverters<QSet, T>(&QSet<T>::insert)*/;
+			registerListContainerConverters<QQueue, T>();
+}
+
+template<typename T>
+bool QJsonSerializer::registerSetConverters()
+{
+	return registerListContainerConverters<QSet, T>(&QSet<T>::insert);
 }
 
 template<typename T>
@@ -292,7 +299,9 @@ bool QJsonSerializer::registerMapConverters()
 template<typename T>
 bool QJsonSerializer::registerAllConverters()
 {
-	return registerListConverters<T>() & registerMapConverters<T>();
+	return registerListConverters<T>() &
+			registerSetConverters<T>() &
+			registerMapConverters<T>();
 }
 
 template<typename T>
