@@ -2,14 +2,23 @@
 #define QJSONSERIALIZEREXCEPTION_H
 
 #include "QtJsonSerializer/qtjsonserializer_global.h"
-#include <QtCore/qexception.h>
 #include <QtCore/qstring.h>
 #include <QtCore/qsharedpointer.h>
 #include <QtCore/qstack.h>
 
+#if !defined(QT_NO_EXCEPTIONS) && QT_CONFIG(future)
+#include <QtCore/qexception.h>
+#define QT_JSONSERIALIZER_EXCEPTION_BASE QException
+#define QT_JSONSERIALIZER_EXCEPTION_OR override
+#else
+#include <exception>
+#define QT_JSONSERIALIZER_EXCEPTION_BASE std::exception
+#define QT_JSONSERIALIZER_EXCEPTION_OR
+#endif
+
 class QJsonSerializationExceptionPrivate;
 //! Exception thrown by QJsonSerializer if something goes wrong
-class Q_JSONSERIALIZER_EXPORT QJsonSerializerException : public QException
+class Q_JSONSERIALIZER_EXPORT QJsonSerializerException : public QT_JSONSERIALIZER_EXCEPTION_BASE
 {
 public:
 	//! The type of a stack of a property trace (name, type)
@@ -27,9 +36,9 @@ public:
 	PropertyTrace propertyTrace() const;
 
 	//! @inherit{QException::raise}
-	void raise() const override;
+	virtual void raise() const QT_JSONSERIALIZER_EXCEPTION_OR;
 	//! @inherit{QException::clone}
-	QException *clone() const override;
+	virtual QT_JSONSERIALIZER_EXCEPTION_BASE *clone() const QT_JSONSERIALIZER_EXCEPTION_OR;
 
 protected:
 	//! @private
@@ -44,7 +53,7 @@ public:
 	QJsonSerializationException(const QByteArray &what);
 
 	void raise() const override;
-	QException *clone() const override;
+	QT_JSONSERIALIZER_EXCEPTION_BASE *clone() const override;
 };
 
 //! Exception thrown by QJsonSerializer if something goes wrong while deserializing
@@ -55,7 +64,7 @@ public:
 	QJsonDeserializationException(const QByteArray &what);
 
 	void raise() const override;
-	QException *clone() const override;
+	QT_JSONSERIALIZER_EXCEPTION_BASE *clone() const override;
 };
 
 #endif // QJSONSERIALIZEREXCEPTION_H

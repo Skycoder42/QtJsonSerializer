@@ -26,7 +26,7 @@ void QJsonSerializerException::raise() const
 	throw *this;
 }
 
-QException *QJsonSerializerException::clone() const
+QT_JSONSERIALIZER_EXCEPTION_BASE *QJsonSerializerException::clone() const
 {
 	auto exc = new QJsonSerializerException(QByteArray());
 	exc->d = d;
@@ -42,7 +42,7 @@ void QJsonSerializationException::raise() const
 	throw *this;
 }
 
-QException *QJsonSerializationException::clone() const
+QT_JSONSERIALIZER_EXCEPTION_BASE *QJsonSerializationException::clone() const
 {
 	auto exc = new QJsonSerializationException(QByteArray());
 	exc->d = d;
@@ -58,7 +58,7 @@ void QJsonDeserializationException::raise() const
 	throw *this;
 }
 
-QException *QJsonDeserializationException::clone() const
+QT_JSONSERIALIZER_EXCEPTION_BASE *QJsonDeserializationException::clone() const
 {
 	auto exc = new QJsonDeserializationException(QByteArray());
 	exc->d = d;
