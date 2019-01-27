@@ -11,6 +11,7 @@
 #include "typeconverters/qjsonobjectconverter_p.h"
 #include "typeconverters/qjsongadgetconverter_p.h"
 #include "typeconverters/qjsonmapconverter_p.h"
+#include "typeconverters/qjsonmultimapconverter_p.h"
 #include "typeconverters/qjsonlistconverter_p.h"
 #include "typeconverters/qjsonjsonconverter_p.h"
 #include "typeconverters/qjsonpairconverter_p.h"
@@ -63,6 +64,11 @@ QJsonSerializer::ValidationFlags QJsonSerializer::validationFlags() const
 QJsonSerializer::Polymorphing QJsonSerializer::polymorphing() const
 {
 	return d->polymorphing;
+}
+
+QJsonSerializer::MultiMapMode QJsonSerializer::multiMapMode() const
+{
+	return d->multiMapMode;
 }
 
 QJsonValue QJsonSerializer::serialize(const QVariant &data) const
@@ -173,6 +179,11 @@ void QJsonSerializer::setValidationFlags(ValidationFlags validationFlags)
 void QJsonSerializer::setPolymorphing(QJsonSerializer::Polymorphing polymorphing)
 {
 	d->polymorphing = polymorphing;
+}
+
+void QJsonSerializer::setMultiMapMode(QJsonSerializer::MultiMapMode multiMapMode)
+{
+	d->multiMapMode = multiMapMode;
 }
 
 QVariant QJsonSerializer::getProperty(const char *name) const
@@ -468,6 +479,7 @@ QJsonSerializerPrivate::QJsonSerializerPrivate() :
 		QSharedPointer<QJsonObjectConverter>::create(),
 		QSharedPointer<QJsonGadgetConverter>::create(),
 		QSharedPointer<QJsonMapConverter>::create(),
+		QSharedPointer<QJsonMultiMapConverter>::create(),
 		QSharedPointer<QJsonListConverter>::create(),
 		QSharedPointer<QJsonJsonValueConverter>::create(),
 		QSharedPointer<QJsonJsonObjectConverter>::create(),

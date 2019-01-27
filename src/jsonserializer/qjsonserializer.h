@@ -44,6 +44,7 @@ class Q_JSONSERIALIZER_EXPORT QJsonSerializer : public QObject, protected QJsonT
 	Q_PROPERTY(ValidationFlags validationFlags READ validationFlags WRITE setValidationFlags)
 	//! Specify how the serializer should treat polymorphism for QObject classes
 	Q_PROPERTY(Polymorphing polymorphing READ polymorphing WRITE setPolymorphing)
+	Q_PROPERTY(MultiMapMode multiMapMode READ multiMapMode WRITE setMultiMapMode)
 
 public:
 	//! Flags to specify how strict the serializer should validate when deserializing
@@ -64,6 +65,12 @@ public:
 	};
 	Q_ENUM(Polymorphing)
 
+	enum class MultiMapMode {
+		Map,
+		List
+	};
+	Q_ENUM(MultiMapMode)
+
 	//! Constructor
 	explicit QJsonSerializer(QObject *parent = nullptr);
 	~QJsonSerializer() override;
@@ -76,7 +83,8 @@ public:
 	static bool registerListContainerConverters(TAppendRet (TContainer<TClass>::*appendMethod)(const TClass &) = &TContainer<TClass>::append,
 												void (TContainer<TClass>::*reserveMethod)(int) = &TContainer<TClass>::reserve);
 	template <template<typename, typename> class TContainer, typename TClass, typename TInsertRet = typename TContainer<QString, TClass>::iterator>
-	static bool registerMapContainerConverters(TInsertRet (TContainer<QString, TClass>::*insertMethod)(const QString &, const TClass &) = &TContainer<QString, TClass>::insert);
+	static bool registerMapContainerConverters(TInsertRet (TContainer<QString, TClass>::*insertMethod)(const QString &, const TClass &) = &TContainer<QString, TClass>::insert,
+											   bool asMultiMap = false);
 	//! Registers a custom type for list converisons
 	template<typename T>
 	static inline bool registerListConverters();
@@ -115,6 +123,7 @@ public:
 	ValidationFlags validationFlags() const;
 	//! @readAcFn{QJsonSerializer::polymorphing}
 	Polymorphing polymorphing() const;
+	MultiMapMode multiMapMode() const;
 
 	//! Serializers a QVariant value to a QJsonValue
 	QJsonValue serialize(const QVariant &data) const;
@@ -177,6 +186,7 @@ public Q_SLOTS:
 	void setValidationFlags(ValidationFlags validationFlags);
 	//! @writeAcFn{QJsonSerializer::polymorphing}
 	void setPolymorphing(Polymorphing polymorphing);
+	void setMultiMapMode(MultiMapMode multiMapMode);
 
 protected:
 	//protected implementation -> internal use for the type converters
@@ -257,12 +267,16 @@ bool QJsonSerializer::registerListContainerConverters(TAppendRet (TContainer<TCl
 }
 
 template<template <typename, typename> class TContainer, typename TClass, typename TInsertRet>
-bool QJsonSerializer::registerMapContainerConverters(TInsertRet (TContainer<QString, TClass>::*insertMethod)(const QString &, const TClass &))
+bool QJsonSerializer::registerMapContainerConverters(TInsertRet (TContainer<QString, TClass>::*insertMethod)(const QString &, const TClass &), bool asMultiMap)
 {
-	return QMetaType::registerConverter<TContainer<QString, TClass>, QVariantMap>([](const TContainer<QString, TClass> &map) -> QVariantMap {
+	return QMetaType::registerConverter<TContainer<QString, TClass>, QVariantMap>([asMultiMap](const TContainer<QString, TClass> &map) -> QVariantMap {
 		QVariantMap m;
-		for(auto it = map.constBegin(); it != map.constEnd(); ++it)
-			m.insert(it.key(), QVariant::fromValue(it.value()));
+		for(auto it = map.constBegin(); it != map.constEnd(); ++it) {
+			if(asMultiMap)
+				m.insertMulti(it.key(), QVariant::fromValue(it.value()));
+			else
+				m.insert(it.key(), QVariant::fromValue(it.value()));
+		}
 		return m;
 	}) & QMetaType::registerConverter<QVariantMap, TContainer<QString, TClass>>([insertMethod](const QVariantMap &map) -> TContainer<QString, TClass> {
 		TContainer<QString, TClass> m;
@@ -286,10 +300,10 @@ bool QJsonSerializer::registerMapContainerConverters(TInsertRet (TContainer<QStr
 template<typename T>
 bool QJsonSerializer::registerListConverters()
 {
-	return registerListContainerConverters<QList, T>() &&
-			registerListContainerConverters<QLinkedList, T>(&QLinkedList<T>::append, nullptr) &&
-			registerListContainerConverters<QVector, T>() &&
-			registerListContainerConverters<QStack, T>() &&
+	return registerListContainerConverters<QList, T>() &
+			registerListContainerConverters<QLinkedList, T>(&QLinkedList<T>::append, nullptr) &
+			registerListContainerConverters<QVector, T>() &
+			registerListContainerConverters<QStack, T>() &
 			registerListContainerConverters<QQueue, T>();
 }
 
@@ -302,8 +316,10 @@ bool QJsonSerializer::registerSetConverters()
 template<typename T>
 bool QJsonSerializer::registerMapConverters()
 {
-	return registerMapContainerConverters<QMap, T>() &&
-			registerMapContainerConverters<QHash, T>();
+	return registerMapContainerConverters<QMap, T>() &
+			registerMapContainerConverters<QHash, T>() &
+			registerMapContainerConverters<QMultiMap, T>(&QMultiMap<QString, T>::insert, true) &
+			registerMapContainerConverters<QMultiHash, T>(&QMultiHash<QString, T>::insert, true);
 }
 
 template<typename T>
@@ -423,6 +439,9 @@ void QJsonSerializer::addJsonTypeConverter()
 	static_assert(std::is_base_of<QJsonTypeConverter, T>::value, "T must implement QJsonTypeConverter");
 	addJsonTypeConverter(QSharedPointer<T>::create());
 }
+
+Q_DECLARE_ASSOCIATIVE_CONTAINER_METATYPE(QMultiMap)
+Q_DECLARE_ASSOCIATIVE_CONTAINER_METATYPE(QMultiHash)
 
 //! @file qjsonserializer.h The QJsonSerializer header file
 #endif // QJSONSERIALIZER_H

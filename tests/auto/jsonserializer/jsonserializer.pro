@@ -15,7 +15,8 @@ CONVERTER_TESTS = \
 	PairConverterTest \
 	RegexConverterTest \
 	TupleConverterTest \
-	VersionConverterTest
+	VersionConverterTest \
+	MultiMapConverterTest
 
 for(test, CONVERTER_TESTS) {
 	SUBDIRS += $$test
