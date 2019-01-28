@@ -163,6 +163,10 @@ public:
 	template <typename T>
 	T deserializeFrom(const QByteArray &data, QObject *parent = nullptr) const;
 
+	template <typename TConverter, int Priority = QJsonTypeConverter::Priority::Standard>
+	static void addJsonTypeConverterFactory();
+	static void addJsonTypeConverterFactory(const QSharedPointer<QJsonTypeConverterFactory> &factory);
+
 	//! Adds a custom type converter to this serializer
 	template <typename T>
 	void addJsonTypeConverter();
@@ -431,6 +435,13 @@ T QJsonSerializer::deserializeFrom(const QByteArray &data, QObject *parent) cons
 {
 	static_assert(_qjsonserializer_helpertypes::is_serializable<T>::value, "T cannot be deserialized");
 	return _qjsonserializer_helpertypes::variant_helper<T>::fromVariant(deserializeFrom(data, qMetaTypeId<T>(), parent));
+}
+
+template<typename TConverter, int Priority>
+void QJsonSerializer::addJsonTypeConverterFactory()
+{
+	static_assert(std::is_base_of<QJsonTypeConverter, TConverter>::value, "T must implement QJsonTypeConverter");
+	addJsonTypeConverterFactory(QSharedPointer<QJsonTypeConverterStandardFactory<TConverter, Priority>>::create());
 }
 
 template<typename T>

@@ -123,9 +123,19 @@ QVariant QJsonSerializer::deserializeFrom(const QByteArray &data, int metaTypeId
 	return res;
 }
 
+void QJsonSerializer::addJsonTypeConverterFactory(const QSharedPointer<QJsonTypeConverterFactory> &factory)
+{
+	// call once to "initialize" the factory
+	Q_UNUSED(factory->priority());
+	// add to global list
+	QWriteLocker fLock{&QJsonSerializerPrivate::factoryLock};
+	QJsonSerializerPrivate::typeConverterFactories.append(factory);
+}
+
 void QJsonSerializer::addJsonTypeConverter(QSharedPointer<QJsonTypeConverter> converter)
 {
 	Q_ASSERT_X(converter, Q_FUNC_INFO, "converter must not be null!");
+	QWriteLocker tLocker{&d->typeConverterLock};
 
 	auto inserted = false;
 	for(auto it = d->typeConverters.begin(); it != d->typeConverters.end(); ++it) {
@@ -138,7 +148,8 @@ void QJsonSerializer::addJsonTypeConverter(QSharedPointer<QJsonTypeConverter> co
 	if(!inserted)
 		d->typeConverters.append(converter);
 
-	d->typeConverterTypeCache.clear();
+	d->typeConverterSerCache.clear();
+	d->typeConverterDeserCache.clear();
 }
 
 void QJsonSerializer::addJsonTypeConverter(QJsonTypeConverter *converter)
@@ -223,17 +234,7 @@ QVariant QJsonSerializer::deserializeSubtype(int propertyType, const QJsonValue 
 
 QJsonValue QJsonSerializer::serializeVariant(int propertyType, const QVariant &value) const
 {
-	auto converter = d->typeConverterTypeCache.value(propertyType, nullptr);
-	if(!converter){
-		for(const auto &c : qAsConst(d->typeConverters)) {
-			if(c && c->canConvert(propertyType)) {
-				converter = c;
-				d->typeConverterTypeCache.insert(propertyType, converter);
-				break;
-			}
-		}
-	}
-
+	auto converter = d->findConverter(propertyType);
 	if(!converter)// use fallback method
 		return serializeValue(propertyType, value);
 	else
@@ -242,21 +243,7 @@ QJsonValue QJsonSerializer::serializeVariant(int propertyType, const QVariant &v
 
 QVariant QJsonSerializer::deserializeVariant(int propertyType, const QJsonValue &value, QObject *parent) const
 {
-	auto converter = d->typeConverterTypeCache.value(propertyType, nullptr);
-	if(!converter || !converter->jsonTypes().contains(value.type())) {
-		converter = nullptr; //in case json type did not match
-		auto valueType = value.type();
-		for(const auto &c : qAsConst(d->typeConverters)) {
-			if(c &&
-			   c->jsonTypes().contains(valueType) &&
-			   c->canConvert(propertyType)) {
-				converter = c;
-				d->typeConverterTypeCache.insert(propertyType, converter);
-				break;
-			}
-		}
-	}
-
+	auto converter = d->findConverter(propertyType, value.type());
 	QVariant variant;
 	if(!converter)// use fallback method
 		variant = deserializeValue(propertyType, value);
@@ -467,6 +454,27 @@ void QJsonSerializer::registerInverseTypedefImpl(int typeId, const char *normali
 
 QReadWriteLock QJsonSerializerPrivate::typedefLock;
 QHash<int, QByteArray> QJsonSerializerPrivate::typedefMapping;
+QReadWriteLock QJsonSerializerPrivate::factoryLock;
+QList<QSharedPointer<QJsonTypeConverterFactory>> QJsonSerializerPrivate::typeConverterFactories {
+	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonObjectConverter>>::create(),
+	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonGadgetConverter>>::create(),
+	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonMapConverter>>::create(),
+	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonMultiMapConverter>>::create(),
+	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonListConverter>>::create(),
+	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonJsonValueConverter>>::create(),
+	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonJsonObjectConverter>>::create(),
+	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonJsonArrayConverter>>::create(),
+	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonPairConverter>>::create(),
+	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonBytearrayConverter>>::create(),
+	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonVersionNumberConverter>>::create(),
+	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonSizeConverter>>::create(),
+	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonPointConverter>>::create(),
+	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonLineConverter>>::create(),
+	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonRectConverter>>::create(),
+	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonLocaleConverter>>::create(),
+	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonRegularExpressionConverter>>::create(),
+	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonStdTupleConverter>>::create()
+};
 
 QByteArray QJsonSerializerPrivate::getTypeName(int propertyType)
 {
@@ -474,25 +482,63 @@ QByteArray QJsonSerializerPrivate::getTypeName(int propertyType)
 	return typedefMapping.value(propertyType, QMetaType::typeName(propertyType));
 }
 
-QJsonSerializerPrivate::QJsonSerializerPrivate() :
-	typeConverters{
-		QSharedPointer<QJsonObjectConverter>::create(),
-		QSharedPointer<QJsonGadgetConverter>::create(),
-		QSharedPointer<QJsonMapConverter>::create(),
-		QSharedPointer<QJsonMultiMapConverter>::create(),
-		QSharedPointer<QJsonListConverter>::create(),
-		QSharedPointer<QJsonJsonValueConverter>::create(),
-		QSharedPointer<QJsonJsonObjectConverter>::create(),
-		QSharedPointer<QJsonJsonArrayConverter>::create(),
-		QSharedPointer<QJsonPairConverter>::create(),
-		QSharedPointer<QJsonBytearrayConverter>::create(),
-		QSharedPointer<QJsonVersionNumberConverter>::create(),
-		QSharedPointer<QJsonSizeConverter>::create(),
-		QSharedPointer<QJsonPointConverter>::create(),
-		QSharedPointer<QJsonLineConverter>::create(),
-		QSharedPointer<QJsonRectConverter>::create(),
-		QSharedPointer<QJsonLocaleConverter>::create(),
-		QSharedPointer<QJsonRegularExpressionConverter>::create(),
-		QSharedPointer<QJsonStdTupleConverter>::create()
+QSharedPointer<QJsonTypeConverter> QJsonSerializerPrivate::findConverter(int propertyType, QJsonValue::Type valueType)
+{
+	const auto isSerialization = valueType == QJsonValue::Undefined;
+	QReadLocker tLocker{&typeConverterLock};
+
+	// first: check if already cached
+	QSharedPointer<QJsonTypeConverter> cachedConverter = nullptr; //in case json type did not match
+	if(isSerialization)
+		cachedConverter = typeConverterSerCache.value(propertyType);
+	else {
+		cachedConverter = typeConverterDeserCache.value(propertyType);
+		if(cachedConverter && !cachedConverter->jsonTypes().contains(valueType))
+			cachedConverter.clear();
 	}
-{}
+	if(cachedConverter)
+		return cachedConverter;
+
+	// second: check if the list of explicit converters has a matching one
+	for(const auto &converter : qAsConst(typeConverters)) {
+		if(converter &&
+		   (isSerialization || converter->jsonTypes().contains(valueType)) &&
+		   converter->canConvert(propertyType)) {
+			// elevate lock
+			tLocker.unlock();
+			QWriteLocker wtLocker{&typeConverterLock};
+			// add converter to cache
+			if(isSerialization)
+				typeConverterSerCache.insert(propertyType, converter);
+			else
+				typeConverterDeserCache.insert(propertyType, converter);
+			return converter;
+		}
+	}
+
+	// third: check in the list of global convert factories
+	QReadLocker fLocker{&factoryLock};
+	for(const auto &factory : qAsConst(typeConverterFactories)) {
+		if(factory &&
+		   (isSerialization || factory->jsonTypes().contains(valueType)) &&
+		   factory->canConvert(propertyType)) {
+			auto converter = factory->createConverter();
+			if(converter) {
+				// elevate lock (keep unlocking order to prevent deadlocks)
+				fLocker.unlock();
+				tLocker.unlock();
+				QWriteLocker wtLocker{&typeConverterLock};
+				// add converter to list and cache
+				typeConverters.append(converter);
+				if(isSerialization)
+					typeConverterSerCache.insert(propertyType, converter);
+				else
+					typeConverterDeserCache.insert(propertyType, converter);
+				return converter;
+			}
+		}
+	}
+
+	// fourth: no converter found: return default converter
+	return nullptr;
+}

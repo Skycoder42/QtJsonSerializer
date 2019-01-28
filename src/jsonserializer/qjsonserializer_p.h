@@ -13,13 +13,16 @@ class Q_JSONSERIALIZER_EXPORT QJsonSerializerPrivate
 public:
 	static QByteArray getTypeName(int propertyType);
 
-	QJsonSerializerPrivate();
+	QJsonSerializerPrivate() = default;
 
 private:
 	friend class QJsonSerializer;
 
 	static QReadWriteLock typedefLock;
 	static QHash<int, QByteArray> typedefMapping;
+
+	static QReadWriteLock factoryLock;
+	static QList<QSharedPointer<QJsonTypeConverterFactory>> typeConverterFactories;
 
 	bool allowNull = false;
 	bool keepObjectName = false;
@@ -30,8 +33,12 @@ private:
 	QJsonSerializer::Polymorphing polymorphing = QJsonSerializer::Enabled;
 	QJsonSerializer::MultiMapMode multiMapMode = QJsonSerializer::MultiMapMode::Map; //TODO which one is the better default?
 
+	QReadWriteLock typeConverterLock;
 	QList<QSharedPointer<QJsonTypeConverter>> typeConverters;
-	mutable QHash<int, QSharedPointer<QJsonTypeConverter>> typeConverterTypeCache;
+	QHash<int, QSharedPointer<QJsonTypeConverter>> typeConverterSerCache;
+	QHash<int, QSharedPointer<QJsonTypeConverter>> typeConverterDeserCache;
+
+	QSharedPointer<QJsonTypeConverter> findConverter(int propertyType, QJsonValue::Type valueType = QJsonValue::Undefined);
 };
 
 #endif // QJSONSERIALIZER_P_H

@@ -33,3 +33,30 @@ QByteArray QJsonTypeConverter::getCanonicalTypeName(int propertyType) const
 QJsonTypeConverter::SerializationHelper::SerializationHelper() = default;
 
 QJsonTypeConverter::SerializationHelper::~SerializationHelper() = default;
+
+
+
+QJsonTypeConverterFactory::QJsonTypeConverterFactory() = default;
+
+QJsonTypeConverterFactory::~QJsonTypeConverterFactory() = default;
+
+int QJsonTypeConverterFactory::priority() const
+{
+	if(!_statusConverter)
+		_statusConverter = createConverter();
+	return _statusConverter->priority();
+}
+
+bool QJsonTypeConverterFactory::canConvert(int metaTypeId) const
+{
+	if(!_statusConverter)
+		_statusConverter = createConverter();
+	return _statusConverter->canConvert(metaTypeId);
+}
+
+QList<QJsonValue::Type> QJsonTypeConverterFactory::jsonTypes() const
+{
+	if(!_statusConverter)
+		_statusConverter = createConverter();
+	return _statusConverter->jsonTypes();
+}
