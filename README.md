@@ -26,7 +26,6 @@ There are multiple ways to install the Qt module, sorted by preference:
 
 1. Package Managers: The library is available via:
 	- **Arch-Linux:** AUR-Repository: [`qt5-jsonserializer`](https://aur.archlinux.org/packages/qt5-jsonserializer/)
-	- **Ubuntu Bionic:** Launchpad-PPA: [ppa:skycoder42/qt-modules](https://launchpad.net/~skycoder42/+archive/ubuntu/qt-modules), package `libqt5jsonserializer[3/-dev]`
 	- **Flatpak Module template:** [Skycoder42/deployment qtjsonserializer.json](https://github.com/Skycoder42/deployment/blob/master/flatpak/modules/qtjsonserializer/qtjsonserializer.json)
 	- **MacOs:**
 		- Tap: [`brew tap Skycoder42/qt-modules`](https://github.com/Skycoder42/homebrew-qt-modules)
@@ -135,8 +134,8 @@ In order for the serializer to properly work, there are a few things you have to
 3. The following types are explicitly supported:
 	- `QObject*` and deriving classes
 	- Classes/structs marked with `Q_GADGET` (as value or plain pointer only!)
-	- `QList<T>`, with T beeing any type that is serializable as well
-	- `QMap<QString, T>`, with T beeing any type that is serializable as well (string as key type is required)
+	- `QList<T>`, `QLinkedList<T>`, `QVector<T>`, `QStack<T>`, `QQueue<T>`, `QSet<T>`, with T beeing any type that is serializable as well
+	- `QMap<QString, T>`, `QHash<QString, T>`, `QMultiMap<QString, T>`, `QMultiHash<QString, T>`, with T beeing any type that is serializable as well (string as key type is required)
 	- Simple types, that are supported by QJsonValue (See [QJsonValue::fromVariant](https://doc.qt.io/qt-5/qjsonvalue.html#fromVariant) and [QJsonValue::toVariant](https://doc.qt.io/qt-5/qjsonvalue.html#toVariant))
 	- `Q_ENUM` and `Q_FLAG` types, as integer or as string
 		- The string de/serialization of Q_ENUM and Q_FLAG types only works if used as a Q_PROPERTY. Integer will always work.
@@ -147,9 +146,10 @@ In order for the serializer to properly work, there are a few things you have to
 		- QByteArray is represented by a base64 encoded string
 	- Any type you add yourself by extending the serializer (See QJsonTypeConverter documentation)
 4. While simple types (i.e. `QList<int>`) are supported out of the box, for custom types (like `QList<TestObject*>`) you will have to register converters. This goes for
-	- QList and QMap: use `QJsonSerializer::registerAllConverters<T>()`
-	- QList only: use `QJsonSerializer::registerListConverters<T>()`
-	- QMap only: use `QJsonSerializer::registerMapConverters<T>()`
+	- List-, Set- and Map-Types: use `QJsonSerializer::registerAllConverters<T>()`
+	- List-Types only: use `QJsonSerializer::registerListConverters<T>()`
+	- Set-Types only: use `QJsonSerializer::registerSetConverters<T>()`
+	- Map-Types only: use `QJsonSerializer::registerMapConverters<T>()`
 	- QPair and std::pair: use `QJsonSerializer::registerPairConverters<T1, T2>()`
 	- std::tuple: use `QJsonSerializer::registerTupleConverters<TArgs...>()`
 	- QSharedPointer/QPointer: use `QJsonSerializer::registerPointerConverters<T>()`
@@ -205,32 +205,32 @@ QJsonTypeConverter::registerInverseTypedef<MyMap>("QMap<QString, MyType>");
 The QJsonTypeConverter::getCanonicalTypeName method will now return "QMap<QString, MyType>" if "MyMap" is passed to it, and thus can correctly extract and use "MyType" as value for the serialization.
 
 ### Support for alternative Containers
-Right now, only `QList` and `QMap` ar supported as containers. The reason is, that adding containers requires the registration of converters. Supporting all containers would explode the generated binary, which is why I only support the most common ones.
+Right now, only official Qt-Containers ar supported as containers. The reason is, that adding containers requires the registration of converters.
 
 If you need the other containers, you have 2 options:
 
 1. Implement a custom `QJsonTypeConverter` (You will still have to register all the converters).
 2. Create "converter" properties that are used for serialization only. This is the more simple version, but needs to be done for every occurance of that container, and adds some overhead.
 
-The following example shows how to do that to use `QVector` in code, but serialize as `QList`:
+The following example shows how to do that to use `std::list` in code, but serialize as `QList`:
 ```cpp
 struct MyGadget {
 	Q_GADGET
 
 	Q_PROPERTY(QList<int> myIntVector READ getMyIntList WRITE setMyIntList) //normal property name, as this one appears in json
 	//Important: Add "STORED false":
-	Q_PROPERTY(QVector<int> myIntVectorInternal READ getMyIntVector WRITE setMyIntVector STORED false) //will not be serialized
+	Q_PROPERTY(std::list<int> myIntStdList READ getMyIntStdList WRITE setMyIntStdList STORED false) //will not be serialized
 
 public:
-	QVector<int> getMyIntVector() const;
-	void setMyIntVector(const QVector<int> &vector) ;
+	std::list<int> getMyIntStdList() const;
+	void setMyIntStdList(const std::list<int> &vector) ;
 
 private:
 	QList<int> getMyIntList() const {
-		return getMyIntVector().toList();
+		return QList::fromStdList(getMyIntStdList());
 	}
 	void setMyIntList(const QList<int> &list) {
-		setMyIntVector(QVector<int>::fromList(list));
+		setMyIntStdList(list.toStdList());
 	}
 };
 ```
