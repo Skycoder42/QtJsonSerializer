@@ -33,18 +33,16 @@ LIST_TYPES = \
 	QLine \
 	QRect
 MAP_TYPES = \
-	QByteArray\
-	QSize \
-	QPoint \
-	QLine \
-	QRect
+	QByteArray
+SET_TYPES = \
+	QByteArray
 
 isEmpty(QT_JSONSERIALIZER_REGPATH): QT_JSONSERIALIZER_REGPATH = $$OUT_PWD/.reggen
 mkpath($$QT_JSONSERIALIZER_REGPATH)
 type_index = 0
 
 ALL_TYPES.method = registerAllConverters
-ALL_TYPES.desc = "list and map"
+ALL_TYPES.desc = "list, map and set"
 
 LIST_TYPES.method = registerListConverters
 LIST_TYPES.desc = "map"
@@ -52,7 +50,10 @@ LIST_TYPES.desc = "map"
 MAP_TYPES.method = registerMapConverters
 MAP_TYPES.desc = "list"
 
-for(tId, $$list(ALL_TYPES, LIST_TYPES, MAP_TYPES)) {
+SET_TYPES.method = registerSetConverters
+SET_TYPES.desc = "set"
+
+for(tId, $$list(ALL_TYPES, LIST_TYPES, MAP_TYPES, SET_TYPES)) {
 	for(type, $$tId) {
 		raw_data = $$cat($$PWD/qjsonconverterreg.cpp.template, blob)
 		raw_data = $$replace(raw_data, $$re_escape("%{typeindex}"), $$type_index)
@@ -79,6 +80,10 @@ startup_hookfile += $$startup_hookfile_declare
 startup_hookfile += "}"
 startup_hookfile += "}"
 startup_hookfile += "void qtJsonSerializerRegisterTypes() {"
+startup_hookfile += "$$escape_expand(\\t)static bool wasCalled = false;"
+startup_hookfile += "$$escape_expand(\\t)if(wasCalled)"
+startup_hookfile += "$$escape_expand(\\t\\t)return;"
+startup_hookfile += "$$escape_expand(\\t)wasCalled = true;"
 startup_hookfile += $$startup_hookfile_call
 startup_hookfile += "}"
 out_file = $$QT_JSONSERIALIZER_REGPATH/qjsonconverterreg_all.cpp

@@ -44,30 +44,32 @@ class Q_JSONSERIALIZER_EXPORT QJsonSerializer : public QObject, protected QJsonT
 	Q_PROPERTY(ValidationFlags validationFlags READ validationFlags WRITE setValidationFlags)
 	//! Specify how the serializer should treat polymorphism for QObject classes
 	Q_PROPERTY(Polymorphing polymorphing READ polymorphing WRITE setPolymorphing)
+	//! Specify how multi maps and sets should be serialized
 	Q_PROPERTY(MultiMapMode multiMapMode READ multiMapMode WRITE setMultiMapMode)
 
 public:
 	//! Flags to specify how strict the serializer should validate when deserializing
 	enum ValidationFlag {
-		StandardValidation = 0x00,//!< Do not perform extra validation, only make sure types are valid and compatible
-		NoExtraProperties = 0x01,//!< Make sure the json does not contain any properties that are not in the type to deserialize it to
-		AllProperties = 0x02,//!< Make sure all properties of the type have a value in the deserialized json data
-		FullValidation = (NoExtraProperties | AllProperties)//!< Validate everything
+		StandardValidation = 0x00, //!< Do not perform extra validation, only make sure types are valid and compatible
+		NoExtraProperties = 0x01, //!< Make sure the json does not contain any properties that are not in the type to deserialize it to
+		AllProperties = 0x02, //!< Make sure all properties of the type have a value in the deserialized json data
+		FullValidation = (NoExtraProperties | AllProperties) //!< Validate everything
 	};
 	Q_DECLARE_FLAGS(ValidationFlags, ValidationFlag)
 	Q_FLAG(ValidationFlags)
 
 	//! Enum to specify the modes of polymorphism
 	enum Polymorphing {
-		Disabled,//!< Do not serialize polymorphic and ignore information about classes in json
-		Enabled,//!< Use polymorphism where declared by the classes/json
-		Forced//!< Treat every object polymorphic, and required the class information to be present in json
+		Disabled, //!< Do not serialize polymorphic and ignore information about classes in json
+		Enabled, //!< Use polymorphism where declared by the classes/json
+		Forced //!< Treat every object polymorphic, and required the class information to be present in json
 	};
 	Q_ENUM(Polymorphing)
 
+	//! Enum to specify how multi maps and sets should be serialized
 	enum class MultiMapMode {
-		Map,
-		List
+		Map, //!< Store them as json object, with each element beeing a json array containing the actual values
+		List  //!< Store a list of pairs, where for each pair the first element is the key and the second the value
 	};
 	Q_ENUM(MultiMapMode)
 
@@ -79,15 +81,18 @@ public:
 	template<typename T>
 	static void registerInverseTypedef(const char *typeName);
 
+	//! Registers list converters for the given container type from and to QVariantList
 	template <template<typename> class TContainer, typename TClass, typename TAppendRet = void>
 	static bool registerListContainerConverters(TAppendRet (TContainer<TClass>::*appendMethod)(const TClass &) = &TContainer<TClass>::append,
 												void (TContainer<TClass>::*reserveMethod)(int) = &TContainer<TClass>::reserve);
+	//! Registers map converters for the given container type from and to QVariantMap
 	template <template<typename, typename> class TContainer, typename TClass, typename TInsertRet = typename TContainer<QString, TClass>::iterator>
 	static bool registerMapContainerConverters(TInsertRet (TContainer<QString, TClass>::*insertMethod)(const QString &, const TClass &) = &TContainer<QString, TClass>::insert,
 											   bool asMultiMap = false);
 	//! Registers a custom type for list converisons
 	template<typename T>
 	static inline bool registerListConverters();
+	//! Registers a custom type for set converisons
 	template<typename T>
 	static inline bool registerSetConverters();
 	//! Registers a custom type for map converisons
@@ -123,6 +128,7 @@ public:
 	ValidationFlags validationFlags() const;
 	//! @readAcFn{QJsonSerializer::polymorphing}
 	Polymorphing polymorphing() const;
+	//! @readAcFn{QJsonSerializer::multiMapMode}
 	MultiMapMode multiMapMode() const;
 
 	//! Serializers a QVariant value to a QJsonValue
@@ -163,8 +169,10 @@ public:
 	template <typename T>
 	T deserializeFrom(const QByteArray &data, QObject *parent = nullptr) const;
 
+	//! Globally registers a converter factory to provide converters for all QJsonSerializer instances
 	template <typename TConverter, int Priority = QJsonTypeConverter::Priority::Standard>
 	static void addJsonTypeConverterFactory();
+	//! @copybrief QJsonSerializer::addJsonTypeConverterFactory()
 	static void addJsonTypeConverterFactory(const QSharedPointer<QJsonTypeConverterFactory> &factory);
 
 	//! Adds a custom type converter to this serializer
@@ -190,6 +198,7 @@ public Q_SLOTS:
 	void setValidationFlags(ValidationFlags validationFlags);
 	//! @writeAcFn{QJsonSerializer::polymorphing}
 	void setPolymorphing(Polymorphing polymorphing);
+	//! @writeAcFn{QJsonSerializer::multiMapMode}
 	void setMultiMapMode(MultiMapMode multiMapMode);
 
 protected:

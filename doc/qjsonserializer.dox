@@ -186,6 +186,49 @@ is present, the data is treated polymorphic.
 */
 
 /*!
+@property QJsonSerializer::multiMapMode
+
+@default{`QJsonSerialzer::MultiMapMode::Map`}
+
+Applies to serialization only.<br/>
+Selects how QMultiMap and QMultiHash are serialized. There are two options. Assuimg you have the
+following multi map:
+
+@code{.cpp}
+QMultiMap<QString, int> map;
+map.insert("a", 1);
+map.insert("a", 2);
+map.insert("b", 3);
+@endcode
+
+When in map mode, the following json is generated:
+@code{.json}
+{
+	"a": [1, 2],
+	"b": [3]
+}
+@endcode
+
+When in list mode, the following is generated instead:
+@code{.json}
+[
+	["a", 1],
+	["a", 2],
+	["b", 3],
+]
+@endcode
+
+For deserialization, both formats are always supported.
+
+@accessors{
+	@readAc{multiMapMode()}
+	@writeAc{setMultiMapMode()}
+}
+
+@sa QJsonSerializer::MultiMapMode
+*/
+
+/*!
 @fn QJsonSerializer::registerInverseTypedef
 
 @tparam T The type to register the original name for
@@ -207,45 +250,94 @@ QJsonSerializer::registerInverseTypedef<MyMap>("QMap<QString, int>");
 */
 
 /*!
+@fn QJsonSerializer::registerListContainerConverters
+
+@tparam TContainer The container type to register the converters for
+@tparam TClass The contained type to register converters for
+@tparam TAppendRet The return type of the append method
+
+@param appendMethod A member method of TContainer to be called to append an element to it
+@param reserveMethod A member method of TContainer to reserve memory for faster appending. Can
+be `nullptr` if the container has no such method.
+
+@note Only use this method if you have a custom container. When working with standard Qt
+containers, use QJsonSerializer::registerListConverters instead!
+
+Performs the registration of converters for `TContainer<T> <--> QVariantList`. This conversion
+is a requirement for the serializer, if you want to be able to serialize lists of a type. The
+function calls the following methods for the given type:
+- `QMetaType::registerConverter<TContainer<T>, QVariantList>()`
+- `QMetaType::registerConverter<QVariantList, TContainer<T>>()`
+
+with a generic conversion using QVariant. By default, methods with the signatures
+`&TContainer<TClass>::append` and `&TContainer<TClass>::reserve` are passed as parameters to this
+method to prepare a list for beeing created and actually append items. You can pass custom
+methods if they are named differently on your TContainer. Also, it is allowed to pass `nullptr`
+as second parameter.
+
+@sa QJsonSerializer::registerListConverters, QJsonSerializer::registerSetConverters
+*/
+
+/*!
+@fn QJsonSerializer::registerMapContainerConverters
+
+@tparam TContainer The container type to register the converters for
+@tparam TClass The contained type to register converters for
+@tparam TInsertRet The return type of the insert method
+
+@param insertMethod A member method of TContainer to be called to insert an element to it
+@param asMultiMap Specify if the given map-container is a multi-map or normal map container.
+
+@note Only use this method if you have a custom container. When working with standard Qt
+containers, use QJsonSerializer::registerMapConverters instead!
+
+Performs the registration of converters for `TContainer<QString, TClass> <--> QVariantMap`. This
+conversion is a requirement for the serializer, if you want to be able to serialize lists of a
+type. The function calls the following methods for the given type:
+- `QMetaType::registerConverter<TContainer<QString, TClass>, QVariantMap>()`
+- `QMetaType::registerConverter<QVariantMap, TContainer<QString, TClass>>()`
+
+with a generic conversion using QVariant. By default, methods with the signatures
+`&TContainer<QString, TClass>::insert` are passed as parameters to this method to prepare a map
+for inserting items. You can pass a custom method if it isnamed differently on your TContainer.
+
+@sa QJsonSerializer::registerMapConverters
+*/
+
+/*!
 @fn QJsonSerializer::registerListConverters
 
 @tparam T The type to register converters for
 
-Performs the registration of converters for `QList<T> <--> QVariantList`. This conversion is a
+Performs the registration of converters for list-like Qt containers. This conversion is a
 requirement for the serializer, if you want to be able to serialize lists of a type. The function
 calls the following methods for the given type:
-- `QMetaType::registerConverter<QList<T>, QVariantList>()`
-- `QMetaType::registerConverter<QVariantList, QList<T>>()`
+- `QJsonSerializer::registerListContainerConverters<QList, T>()`
+- `QJsonSerializer::registerListContainerConverters<QLinkedList, T>()`
+- `QJsonSerializer::registerListContainerConverters<QVector, T>()`
+- `QJsonSerializer::registerListContainerConverters<QStack, T>()`
+- `QJsonSerializer::registerListContainerConverters<QQueue, T>()`
 
 with a generic conversion using QVariant.
 
-The following types are already registered by default:
-<table>
-<tr><th>Default list converters</th></tr>
-<tr><td>bool</td></tr>
-<tr><td>int</td></tr>
-<tr><td>unsigned int</td></tr>
-<tr><td>double</td></tr>
-<tr><td>QChar</td></tr>
-<tr><td>QString</td></tr>
-<tr><td>long long</td></tr>
-<tr><td>short</td></tr>
-<tr><td>char</td></tr>
-<tr><td>unsigned long</td></tr>
-<tr><td>unsigned long long</td></tr>
-<tr><td>unsigned short</td></tr>
-<tr><td>signed char</td></tr>
-<tr><td>unsigned char</td></tr>
-<tr><td>float</td></tr>
-<tr><td>QDate</td></tr>
-<tr><td>QTime</td></tr>
-<tr><td>QUrl</td></tr>
-<tr><td>QDateTime</td></tr>
-<tr><td>QUuid</td></tr>
-<tr><td>QObject *</td></tr>
-</table>
+@sa QJsonSerializer::registerAllConverters, QJsonSerializer::registerSetConverters,
+QJsonSerializer::registerMapConverters, qtJsonSerializerRegisterTypes()
+*/
 
-@sa QJsonSerializer::registerAllConverters, QJsonSerializer::registerMapConverters
+/*!
+@fn QJsonSerializer::registerSetConverters
+
+@tparam T The type to register converters for
+
+Performs the registration of converters for set-like Qt containers. This conversion is a
+requirement for the serializer, if you want to be able to serialize sets of a type. The function
+calls the following methods for the given type:
+- `QJsonSerializer::registerListContainerConverters<QSet, T>()`
+
+with a generic conversion using QVariant.
+
+@sa QJsonSerializer::registerAllConverters, QJsonSerializer::registerListConverters,
+QJsonSerializer::registerMapConverters, qtJsonSerializerRegisterTypes()
 */
 
 /*!
@@ -253,17 +345,18 @@ The following types are already registered by default:
 
 @tparam T The type to register converters for
 
-Performs the registration of converters for `QMap<QString, T> <--> QVariantMap`. This conversion is a
+Performs the registration of converters for map-like Qt containers. This conversion is a
 requirement for the serializer, if you want to be able to serialize maps of a type. The function
 calls the following methods for the given type:
-- `QMetaType::registerConverter<QMap<QString, T>, QVariantMap>()`
-- `QMetaType::registerConverter<QVariantMap, QMap<QString, T>>()`
+- `QJsonSerializer::registerMapContainerConverters<QMap, T>()`
+- `QJsonSerializer::registerMapContainerConverters<QHash, T>()`
+- `QJsonSerializer::registerMapContainerConverters<QMultiMap, T>()`
+- `QJsonSerializer::registerMapContainerConverters<QMultiHash, T>()`
 
 with a generic conversion using QVariant.
 
-The types for which converters are already registered are the same as for QJsonSerializer::registerListConverters
-
-@sa QJsonSerializer::registerAllConverters, QJsonSerializer::registerListConverters
+@sa QJsonSerializer::registerAllConverters, QJsonSerializer::registerListConverters,
+QJsonSerializer::registerSetConverters, qtJsonSerializerRegisterTypes()
 */
 
 /*!
@@ -271,13 +364,16 @@ The types for which converters are already registered are the same as for QJsonS
 
 @tparam T The type to register converters for
 
-A shortcut for all the container registrations QJsonSerializer provides. The method internally calls:
+A shortcut for all the container registrations QJsonSerializer provides. The method internally
+calls:
 - `QJsonSerializer::registerListConverters<T>()`
+- `QJsonSerializer::registerSetConverters<T>()`
 - `QJsonSerializer::registerMapConverters<T>()`
 
-@sa QJsonSerializer::registerListConverters, QJsonSerializer::registerMapConverters,
-QJsonSerializer::registerPointerConverters, QJsonSerializer::registerPairConverters,
-QJsonSerializer::registerTupleConverters
+@sa QJsonSerializer::registerListConverters, QJsonSerializer::registerSetConverters,
+QJsonSerializer::registerMapConverters, QJsonSerializer::registerPointerConverters,
+QJsonSerializer::registerPairConverters, QJsonSerializer::registerTupleConverters,
+qtJsonSerializerRegisterTypes()
 */
 
 /*!
@@ -295,7 +391,8 @@ methods for the given type:
 - `QMetaType::registerConverter<QPointer<T>, QPointer<QObject>>()`
 
 @sa QJsonSerializer::registerAllConverters, QJsonSerializer::registerPairConverters,
-QJsonSerializer::registerTupleConverters
+QJsonSerializer::registerTupleConverters,
+qtJsonSerializerRegisterTypes()
 */
 
 /*!
@@ -308,7 +405,8 @@ A shortcut for all the container registrations QJsonSerializer provides. The met
 - `QJsonSerializer::registerAllConverters<QSharedPointer<T>>()`
 - `QJsonSerializer::registerAllConverters<QPointer<T>>()`
 
-@sa QJsonSerializer::registerAllConverters, QJsonSerializer::registerPointerConverters
+@sa QJsonSerializer::registerAllConverters, QJsonSerializer::registerPointerConverters,
+qtJsonSerializerRegisterTypes()
 */
 
 /*!
@@ -497,6 +595,29 @@ QJsonSerializer::registerPairConverters, QJsonSerializer::registerInverseTypedef
 */
 
 /*!
+@fn QJsonSerializer::addJsonTypeConverterFactory()
+
+@tparam T The converter-class to add
+@tparam Priority The priority all the created converters should have
+
+Creates an instance of a QJsonTypeConverterStandardFactory for the given converter type and
+registeres it.
+
+@sa QJsonTypeConverter, QJsonSerializer::addJsonTypeConverter
+*/
+
+/*!
+@fn QJsonSerializer::addJsonTypeConverterFactory(const QSharedPointer<QJsonTypeConverterFactory> &)
+
+@param factory The factory to add
+
+Adds a custom converter factory class that can provide a certain converter for all serializer
+instances globally.
+
+@sa QJsonTypeConverter, QJsonSerializer::addJsonTypeConverterFactory
+*/
+
+/*!
 @fn QJsonSerializer::addJsonTypeConverter()
 
 @tparam T The converter-class to add
@@ -504,7 +625,7 @@ QJsonSerializer::registerPairConverters, QJsonSerializer::registerInverseTypedef
 Adds a custom converter class to add additional serialization capabilities. Check
 the QJsonTypeConverter documentation for details.
 
-@sa QJsonTypeConverter
+@sa QJsonTypeConverter, QJsonSerializer::addJsonTypeConverterFactory
 */
 
 /*!
@@ -515,8 +636,58 @@ the QJsonTypeConverter documentation for details.
 Adds a custom converter class to add additional serialization capabilities. Check
 the QJsonTypeConverter documentation for details.
 
-@warning The serializer takes ownership of the converter and may delete it any time after
-this methods has been called.
+@sa QJsonTypeConverter, QJsonSerializer::addJsonTypeConverterFactory
+*/
 
-@sa QJsonTypeConverter
+
+
+/*!
+@fn qtJsonSerializerRegisterTypes()
+
+This method is called automatically by the library when loaded, to register converters for all
+types supported by default. When build the library as a static library, you have to call it
+yourself instead.
+
+The types and converters that are registerd with this method are:
+
+The following types are already registered by default:
+
+ Type				| List-Converters	| Map-Converters	| Set-Converters
+--------------------|-------------------|-------------------|----------------
+ bool				| yes				| yes				| yes
+ int				| yes				| yes				| yes
+ unsigned int		| yes				| yes				| yes
+ double				| yes				| yes				| yes
+ QChar				| yes				| yes				| yes
+ QString			| yes				| yes				| yes
+ long long			| yes				| yes				| yes
+ short				| yes				| yes				| yes
+ char				| yes				| yes				| yes
+ unsigned long		| yes				| yes				| yes
+ unsigned long long	| yes				| yes				| yes
+ unsigned short		| yes				| yes				| yes
+ signed char		| yes				| yes				| yes
+ unsigned char		| yes				| yes				| yes
+ float				| yes				| yes				| yes
+ QDate				| yes				| yes				| yes
+ QTime				| yes				| yes				| yes
+ QUrl				| yes				| yes				| yes
+ QDateTime			| yes				| yes				| yes
+ QJsonValue			| yes				| yes				| yes
+ QJsonObject		| yes				| yes				| yes
+ QJsonArray			| yes				| yes				| yes
+ QVersionNumber		| yes				| yes				| yes
+ QLocale			| yes				| yes				| yes
+ QRegularExpression	| yes				| yes				| yes
+ QObject *			| yes				| yes				| yes
+ QSize				| yes				| no				| no
+ QPoint				| yes				| no				| no
+ QLine				| yes				| no				| no
+ QRect				| yes				| no				| no
+ QByteArray			| no				| yes				| yes
+
+@sa QJsonSerializer::registerListConverters, QJsonSerializer::registerSetConverters,
+QJsonSerializer::registerMapConverters, QJsonSerializer::registerAllConverters,
+QJsonSerializer::registerPointerConverters, QJsonSerializer::registerPointerListConverters,
+QJsonSerializer::registerPairConverters, QJsonSerializer::registerTupleConverters
 */
