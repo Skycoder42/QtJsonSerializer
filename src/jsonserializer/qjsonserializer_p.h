@@ -15,7 +15,6 @@ public:
 
 	QJsonSerializerPrivate() = default;
 
-private:
 	friend class QJsonSerializer;
 
 	static QReadWriteLock typedefLock;
