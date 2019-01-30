@@ -31,7 +31,7 @@ public:
 	QJsonSerializer::Polymorphing polymorphing = QJsonSerializer::Enabled;
 	QJsonSerializer::MultiMapMode multiMapMode = QJsonSerializer::MultiMapMode::Map; //TODO which one is the better default?
 
-	QReadWriteLock typeConverterLock = QReadWriteLock{};
+	QReadWriteLock typeConverterLock{};
 	QList<QSharedPointer<QJsonTypeConverter>> typeConverters;
 	QHash<int, QSharedPointer<QJsonTypeConverter>> typeConverterSerCache;
 	QHash<int, QSharedPointer<QJsonTypeConverter>> typeConverterDeserCache;
