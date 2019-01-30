@@ -10,10 +10,9 @@
 class Q_JSONSERIALIZER_EXPORT QJsonSerializerPrivate
 {
 	Q_DISABLE_COPY(QJsonSerializerPrivate)
+
 public:
 	static QByteArray getTypeName(int propertyType);
-
-	QJsonSerializerPrivate() = default;
 
 	friend class QJsonSerializer;
 
@@ -32,7 +31,7 @@ public:
 	QJsonSerializer::Polymorphing polymorphing = QJsonSerializer::Enabled;
 	QJsonSerializer::MultiMapMode multiMapMode = QJsonSerializer::MultiMapMode::Map; //TODO which one is the better default?
 
-	QReadWriteLock typeConverterLock;
+	QReadWriteLock typeConverterLock = QReadWriteLock{};
 	QList<QSharedPointer<QJsonTypeConverter>> typeConverters;
 	QHash<int, QSharedPointer<QJsonTypeConverter>> typeConverterSerCache;
 	QHash<int, QSharedPointer<QJsonTypeConverter>> typeConverterDeserCache;
