@@ -31,21 +31,21 @@ class Q_JSONSERIALIZER_EXPORT QJsonSerializer : public QObject, protected QJsonT
 	Q_OBJECT
 
 	//! Specifies, whether null for value types is allowed or not
-	Q_PROPERTY(bool allowDefaultNull READ allowDefaultNull WRITE setAllowDefaultNull)
+	Q_PROPERTY(bool allowDefaultNull READ allowDefaultNull WRITE setAllowDefaultNull NOTIFY allowDefaultNullChanged)
 	//! Specifies, whether the `objectName` property of QObjects should be serialized
-	Q_PROPERTY(bool keepObjectName READ keepObjectName WRITE setKeepObjectName)
+	Q_PROPERTY(bool keepObjectName READ keepObjectName WRITE setKeepObjectName NOTIFY keepObjectNameChanged)
 	//! Specifies, whether enums should be serialized as integer or as string
-	Q_PROPERTY(bool enumAsString READ enumAsString WRITE setEnumAsString)
+	Q_PROPERTY(bool enumAsString READ enumAsString WRITE setEnumAsString NOTIFY enumAsStringChanged)
 	//! Specify whether deserializing a QByteArray should verify the data as base64 instead of silent discarding
-	Q_PROPERTY(bool validateBase64 READ validateBase64 WRITE setValidateBase64)
+	Q_PROPERTY(bool validateBase64 READ validateBase64 WRITE setValidateBase64 NOTIFY validateBase64Changed)
 	//! Specify whether serializing a QLocale should use the bcp47 format
-	Q_PROPERTY(bool useBcp47Locale READ useBcp47Locale WRITE setUseBcp47Locale)
+	Q_PROPERTY(bool useBcp47Locale READ useBcp47Locale WRITE setUseBcp47Locale NOTIFY useBcp47LocaleChanged)
 	//! Specify how strictly the serializer should verify data when deserializing
-	Q_PROPERTY(ValidationFlags validationFlags READ validationFlags WRITE setValidationFlags)
+	Q_PROPERTY(ValidationFlags validationFlags READ validationFlags WRITE setValidationFlags NOTIFY validationFlagsChanged)
 	//! Specify how the serializer should treat polymorphism for QObject classes
-	Q_PROPERTY(Polymorphing polymorphing READ polymorphing WRITE setPolymorphing)
+	Q_PROPERTY(Polymorphing polymorphing READ polymorphing WRITE setPolymorphing NOTIFY polymorphingChanged)
 	//! Specify how multi maps and sets should be serialized
-	Q_PROPERTY(MultiMapMode multiMapMode READ multiMapMode WRITE setMultiMapMode)
+	Q_PROPERTY(MultiMapMode multiMapMode READ multiMapMode WRITE setMultiMapMode NOTIFY multiMapModeChanged)
 
 public:
 	//! Flags to specify how strict the serializer should validate when deserializing
@@ -200,6 +200,16 @@ public Q_SLOTS:
 	void setPolymorphing(Polymorphing polymorphing);
 	//! @writeAcFn{QJsonSerializer::multiMapMode}
 	void setMultiMapMode(MultiMapMode multiMapMode);
+
+Q_SIGNALS:
+	void allowDefaultNullChanged(bool allowDefaultNull);
+	void keepObjectNameChanged(bool keepObjectName);
+	void enumAsStringChanged(bool enumAsString);
+	void validateBase64Changed(bool validateBase64);
+	void useBcp47LocaleChanged(bool useBcp47Locale);
+	void validationFlagsChanged(ValidationFlags validationFlags);
+	void polymorphingChanged(Polymorphing polymorphing);
+	void multiMapModeChanged(MultiMapMode multiMapMode);
 
 protected:
 	//protected implementation -> internal use for the type converters

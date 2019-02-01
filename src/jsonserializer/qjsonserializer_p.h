@@ -10,11 +10,12 @@
 class Q_JSONSERIALIZER_EXPORT QJsonSerializerPrivate
 {
 	Q_DISABLE_COPY(QJsonSerializerPrivate)
+	friend class QJsonSerializer;
 
 public:
 	static QByteArray getTypeName(int propertyType);
 
-	friend class QJsonSerializer;
+	QJsonSerializerPrivate() = default;
 
 	static QReadWriteLock typedefLock;
 	static QHash<int, QByteArray> typedefMapping;
