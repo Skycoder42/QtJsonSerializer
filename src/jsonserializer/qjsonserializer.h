@@ -202,13 +202,21 @@ public Q_SLOTS:
 	void setMultiMapMode(MultiMapMode multiMapMode);
 
 Q_SIGNALS:
+	//! @notifyAcFn{QJsonSerializer::allowDefaultNull}
 	void allowDefaultNullChanged(bool allowDefaultNull);
+	//! @notifyAcFn{QJsonSerializer::keepObjectName}
 	void keepObjectNameChanged(bool keepObjectName);
+	//! @notifyAcFn{QJsonSerializer::enumAsString}
 	void enumAsStringChanged(bool enumAsString);
+	//! @notifyAcFn{QJsonSerializer::validateBase64}
 	void validateBase64Changed(bool validateBase64);
+	//! @notifyAcFn{QJsonSerializer::useBcp47Locale}
 	void useBcp47LocaleChanged(bool useBcp47Locale);
+	//! @notifyAcFn{QJsonSerializer::validationFlags}
 	void validationFlagsChanged(ValidationFlags validationFlags);
+	//! @notifyAcFn{QJsonSerializer::polymorphing}
 	void polymorphingChanged(Polymorphing polymorphing);
+	//! @notifyAcFn{QJsonSerializer::multiMapMode}
 	void multiMapModeChanged(MultiMapMode multiMapMode);
 
 protected:

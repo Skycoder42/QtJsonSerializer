@@ -34,6 +34,7 @@ approach, and in order to get a working deserialization, you will have to enable
 @accessors{
 	@readAc{allowDefaultNull()}
 	@writeAc{setAllowDefaultNull()}
+	@notifyAc{allowDefaultNullChanged()}
 }
 */
 
@@ -52,6 +53,7 @@ of this property.
 @accessors{
 	@readAc{keepObjectName()}
 	@writeAc{setKeepObjectName()}
+	@notifyAc{keepObjectNameChanged()}
 }
 */
 
@@ -69,6 +71,7 @@ to serialize them as a string, the "name" of each value, enable this propterty.
 @accessors{
 	@readAc{enumAsString()}
 	@writeAc{setEnumAsString()}
+	@notifyAc{enumAsStringChanged()}
 }
 */
 
@@ -84,6 +87,7 @@ an exception will be thrown. When disabled, invalid characters are silently disc
 @accessors{
 	@readAc{validateBase64()}
 	@writeAc{setValidateBase64()}
+	@notifyAc{validateBase64Changed()}
 }
 */
 
@@ -102,6 +106,7 @@ Both formats are accepted for deserialization
 @accessors{
 	@readAc{useBcp47Locale()}
 	@writeAc{setUseBcp47Locale()}
+	@notifyAc{useBcp47LocaleChanged()}
 }
 
 @sa QLocale::bcp47Name, QLocale::name
@@ -120,6 +125,7 @@ using defaults values etc.
 @accessors{
 	@readAc{validationFlags()}
 	@writeAc{setValidationFlags()}
+	@notifyAc{validationFlagsChanged()}
 }
 
 @sa QJsonSerializer::ValidationFlag
@@ -182,6 +188,7 @@ is present, the data is treated polymorphic.
 @accessors{
 	@readAc{polymorphing()}
 	@writeAc{setPolymorphing()}
+	@notifyAc{polymorphingChanged()}
 }
 */
 
@@ -223,6 +230,7 @@ For deserialization, both formats are always supported.
 @accessors{
 	@readAc{multiMapMode()}
 	@writeAc{setMultiMapMode()}
+	@notifyAc{multiMapModeChanged()}
 }
 
 @sa QJsonSerializer::MultiMapMode
