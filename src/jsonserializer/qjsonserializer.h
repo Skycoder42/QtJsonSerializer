@@ -21,6 +21,8 @@
 #include <QtCore/qlinkedlist.h>
 #include <QtCore/qvector.h>
 #include <QtCore/qset.h>
+#include <QtCore/qqueue.h>
+#include <QtCore/qstack.h>
 #include <QtCore/qhash.h>
 #include <QtCore/qmap.h>
 
