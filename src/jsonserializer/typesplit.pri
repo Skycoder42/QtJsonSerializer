@@ -55,7 +55,7 @@ SET_TYPES.desc = "set"
 
 for(tId, $$list(ALL_TYPES, LIST_TYPES, MAP_TYPES, SET_TYPES)) {
 	for(type, $$tId) {
-		raw_data = $$cat($$PWD/qjsonconverterreg.cpp.template, blob)
+		raw_data = $$cat($$PWD/qjsonconverterreg.cpp.template, lines)
 		raw_data = $$replace(raw_data, $$re_escape("%{typeindex}"), $$type_index)
 		raw_data = $$replace(raw_data, $$re_escape("%{convertMethod}"), $$first($${tId}.method))
 		raw_data = $$replace(raw_data, $$re_escape("%{type}"), "$$type")
