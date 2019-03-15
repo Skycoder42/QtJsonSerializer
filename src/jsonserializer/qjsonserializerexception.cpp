@@ -13,7 +13,7 @@ const char *QJsonSerializerException::what() const noexcept
 
 QByteArray QJsonSerializerException::message() const
 {
-	return d->what;
+	return d->message;
 }
 
 QJsonSerializerException::PropertyTrace QJsonSerializerException::propertyTrace() const
