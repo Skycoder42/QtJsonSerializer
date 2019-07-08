@@ -36,8 +36,8 @@ private:
 
 void VariantConverterTest::initTest()
 {
-	QJsonSerializer::registerVariantConverters<int, bool, double>("std::variant<int, bool, double>");
-	QJsonSerializer::registerVariantConverters<QList<int>, QPair<bool, bool>, QMap<QString, double>>("std::variant<QList<int>, QPair<bool, bool>, QMap<QString, double>>");
+	QJsonSerializer_registerVariantConverters_named(int, bool, double);
+	QJsonSerializer_registerVariantConverters_named(QList<int>, QPair<bool, bool>, QMap<QString, double>);
 
 	QMetaType::registerEqualsComparator<TestVar1>();
 }

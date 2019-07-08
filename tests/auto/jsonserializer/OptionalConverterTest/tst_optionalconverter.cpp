@@ -32,7 +32,7 @@ private:
 void OptionalConverterTest::initTest()
 {
 	QJsonSerializer::registerOptionalConverters<int>();
-	QJsonSerializer::registerOptionalConverters<std::pair<int, bool>>("std::optional<std::pair<int, bool>>");
+	QJsonSerializer_registerOptionalConverters_named(std::pair<int, bool>);
 	QJsonSerializer::registerOptionalConverters<OpaqueDummy>();
 
 	QMetaType::registerEqualsComparator<std::optional<int>>();

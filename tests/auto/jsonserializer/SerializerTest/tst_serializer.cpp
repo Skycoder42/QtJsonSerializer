@@ -74,10 +74,10 @@ void SerializerTest::initTestCase()
 	QJsonSerializer::registerPairConverters<TestObject*, QList<int>>();
 	QJsonSerializer::registerListConverters<QPair<bool, bool>>();
 
-	QJsonSerializer::registerTupleConverters<int, QString, QList<int>>("std::tuple<int, QString, QList<int>>");
-	QJsonSerializer::registerPairConverters<bool, int>("std::pair<bool, int>");
+	QJsonSerializer_registerTupleConverters_named(int, QString, QList<int>);
+	QJsonSerializer_registerStdPairConverters_named(bool, int);
 	QJsonSerializer::registerOptionalConverters<int>();
-	QJsonSerializer::registerVariantConverters<bool, int, double>("std::variant<bool, int, double>");
+	QJsonSerializer_registerVariantConverters_named(bool, int, double);
 
 	//register list comparators, needed for test only!
 	QMetaType::registerEqualsComparator<QList<int>>();

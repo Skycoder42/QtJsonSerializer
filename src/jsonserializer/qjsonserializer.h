@@ -270,6 +270,26 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(QJsonSerializer::ValidationFlags)
 	static_assert(std::is_same<decltype(x), bool>::value, "x must be bool"); \
 	Q_CLASSINFO("polymorphic", #x)
 
+//! A macro to register a QPair of types, including the original typenames in case of a typedef
+#define QJsonSerializer_registerQPairConverters_named(...) \
+	QJsonSerializer::registerPairConverters<__VA_ARGS__>("QPair<" #__VA_ARGS__ ">")
+
+//! A macro to register a std::pair of types, including the original typenames in case of a typedef
+#define QJsonSerializer_registerStdPairConverters_named(...) \
+	QJsonSerializer::registerPairConverters<__VA_ARGS__>("std::pair<" #__VA_ARGS__ ">")
+
+//! A macro to register a std::tuple of types, including the original typenames in case of a typedef
+#define QJsonSerializer_registerTupleConverters_named(...) \
+	QJsonSerializer::registerTupleConverters<__VA_ARGS__>("std::tuple<" #__VA_ARGS__ ">")
+
+//! A macro to register a std::optional of a type, including the original typename in case of a typedef
+#define QJsonSerializer_registerOptionalConverters_named(...) \
+	QJsonSerializer::registerOptionalConverters<__VA_ARGS__>("std::optional<" #__VA_ARGS__ ">")
+
+//! A macro to register a std::variant of types, including the original typenames in case of a typedef
+#define QJsonSerializer_registerVariantConverters_named(...) \
+	QJsonSerializer::registerVariantConverters<__VA_ARGS__>("std::variant<" #__VA_ARGS__ ">")
+
 // ------------- Generic Implementation -------------
 
 template<typename T>

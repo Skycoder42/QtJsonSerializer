@@ -32,8 +32,8 @@ private:
 
 void TupleConverterTest::initTest()
 {
-	QJsonSerializer::registerTupleConverters<int, bool, double>("std::tuple<int, bool, double>");
-	QJsonSerializer::registerTupleConverters<QList<int>, QPair<bool, bool>, QMap<QString, double>>("std::tuple<QList<int>, QPair<bool, bool>, QMap<QString, double>>");
+	QJsonSerializer_registerTupleConverters_named(int, bool, double);
+	QJsonSerializer_registerTupleConverters_named(QList<int>, QPair<bool, bool>, QMap<QString, double>);
 
 	QMetaType::registerEqualsComparator<TestTpl1>();
 }
