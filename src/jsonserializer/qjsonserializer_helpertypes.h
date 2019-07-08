@@ -201,14 +201,14 @@ struct gen_seq<0, Is...> : seq<Is...> { };
 
 
 template<typename TTuple, size_t... Is>
-void for_each_to_list(TTuple&& tpl, QVariantList &list, seq<Is...>)
+inline void for_each_to_list(TTuple&& tpl, QVariantList &list, seq<Is...>)
 {
 	auto l = { (list.append(QVariant::fromValue(std::get<Is>(tpl))), 0)... };
 	Q_UNUSED(l);
 }
 
 template<typename TTuple, size_t... Is>
-void for_each_from_list(TTuple&& tpl, const QVariantList &list, seq<Is...>)
+inline void for_each_from_list(TTuple&& tpl, const QVariantList &list, seq<Is...>)
 {
 	auto l = { (std::get<Is>(tpl) = list[Is].value<typename std::tuple_element<Is, typename std::decay<TTuple>::type>::type>(), 0)... };
 	Q_UNUSED(l);
@@ -217,7 +217,7 @@ void for_each_from_list(TTuple&& tpl, const QVariantList &list, seq<Is...>)
 }
 
 template <typename... TArgs>
-QVariantList tplToList(const std::tuple<TArgs...> &tpl) {
+inline QVariantList tplToList(const std::tuple<TArgs...> &tpl) {
 	QVariantList list;
 	list.reserve(sizeof...(TArgs));
 	tuple_helpers::for_each_to_list(tpl, list, tuple_helpers::gen_seq<sizeof...(TArgs)>{});
@@ -225,11 +225,42 @@ QVariantList tplToList(const std::tuple<TArgs...> &tpl) {
 }
 
 template <typename... TArgs>
-std::tuple<TArgs...> listToTpl(const QVariantList &list) {
+inline std::tuple<TArgs...> listToTpl(const QVariantList &list) {
 	std::tuple<TArgs...> tpl;
 	tuple_helpers::for_each_from_list(tpl, list, tuple_helpers::gen_seq<sizeof...(TArgs)>{});
 	return tpl;
 }
+
+
+namespace variant_helpers {
+
+template <typename TVariant>
+inline TVariant constructIfType(const QVariant &) {
+	return TVariant{};
+}
+
+template <typename TVariant, typename TValue, typename... TArgs>
+inline TVariant constructIfType(const QVariant &var) {
+	if (var.userType() == qMetaTypeId<TValue>())
+		return var.template value<TValue>();
+	else
+		return constructIfType<TVariant, TArgs...>(var);
+}
+
+}
+
+template <typename... TArgs>
+inline QVariant varToQVar(const std::variant<TArgs...> &var) {
+	return std::visit([](const auto &value) {
+		return QVariant::fromValue(value);
+	}, var);
+}
+
+template <typename... TArgs>
+inline std::variant<TArgs...> qVarToVar(const QVariant &var) {
+	return variant_helpers::constructIfType<std::variant<TArgs...>, TArgs...>(var);
+}
+
 
 }
 

@@ -6,9 +6,11 @@
 
 using TestTuple = std::tuple<int, QString, QList<int>>;
 using TestPair = std::pair<bool, int>;
+using TestVariant = std::variant<bool, int, double>;
 Q_DECLARE_METATYPE(TestTuple)
 Q_DECLARE_METATYPE(TestPair)
 Q_DECLARE_METATYPE(std::optional<int>)
+Q_DECLARE_METATYPE(TestVariant)
 
 class SerializerTest : public QObject
 {
@@ -74,8 +76,8 @@ void SerializerTest::initTestCase()
 
 	QJsonSerializer::registerTupleConverters<int, QString, QList<int>>("std::tuple<int, QString, QList<int>>");
 	QJsonSerializer::registerPairConverters<bool, int>("std::pair<bool, int>");
-
 	QJsonSerializer::registerOptionalConverters<int>();
+	QJsonSerializer::registerVariantConverters<bool, int, double>("std::variant<bool, int, double>");
 
 	//register list comparators, needed for test only!
 	QMetaType::registerEqualsComparator<QList<int>>();
@@ -106,8 +108,8 @@ void SerializerTest::initTestCase()
 
 	QMetaType::registerEqualsComparator<TestTuple>();
 	QMetaType::registerEqualsComparator<TestPair>();
-
 	QMetaType::registerEqualsComparator<std::optional<int>>();
+	QMetaType::registerEqualsComparator<std::variant<bool, int, double>>();
 
 	serializer = new QJsonSerializer{this};
 }
@@ -125,16 +127,16 @@ void SerializerTest::testVariantConversions_data()
 	QTest::addColumn<QVariant>("variantData");
 
 	QTest::newRow("QList<int>") << QVariant::fromValue<QList<int>>({3, 7, 13})
-								<< static_cast<int>(QVariant::List)
+								<< static_cast<int>(QMetaType::QVariantList)
 								<< QVariant{QVariantList{3, 7, 13}};
 	QList<int> l1 = {0, 1, 2};
 	QList<int> l2 = {3, 4, 5};
 	QList<int> l3 = {6, 7, 8};
 	QTest::newRow("QList<QList<int>>") << QVariant::fromValue<QList<QList<int>>>({l1, l2, l3})
-									   << static_cast<int>(QVariant::List)
+									   << static_cast<int>(QMetaType::QVariantList)
 									   << QVariant{};
 	QTest::newRow("QStringList") << QVariant::fromValue<QStringList>({QStringLiteral("a"), QStringLiteral("b"), QStringLiteral("c")})
-								 << static_cast<int>(QVariant::List)
+								 << static_cast<int>(QMetaType::QVariantList)
 								 << QVariant{QVariantList{QStringLiteral("a"), QStringLiteral("b"), QStringLiteral("c")}};
 
 	QTest::newRow("QMap<QString, int>") << QVariant::fromValue<QMap<QString, int>>({
@@ -142,7 +144,7 @@ void SerializerTest::testVariantConversions_data()
 																					   {QStringLiteral("devil"), 666},
 																					   {QStringLiteral("fun"), 0}
 																				   })
-										<< static_cast<int>(QVariant::Map)
+										<< static_cast<int>(QMetaType::QVariantMap)
 										<< QVariant{QVariantMap {
 												{QStringLiteral("baum"), 42},
 												{QStringLiteral("devil"), 666},
@@ -156,17 +158,17 @@ void SerializerTest::testVariantConversions_data()
 																													 {QStringLiteral("m2"), m2},
 																													 {QStringLiteral("m3"), m3}
 																												 })
-													   << static_cast<int>(QVariant::Map)
+													   << static_cast<int>(QMetaType::QVariantMap)
 													   << QVariant{};
 
 	QTest::newRow("QList<TestGadget>") << QVariant::fromValue<QList<TestGadget>>({{}, {}, {}})
-									   << static_cast<int>(QVariant::List)
+									   << static_cast<int>(QMetaType::QVariantList)
 									   << QVariant{};
 	QList<TestGadget> g1 {{}, {}, {}};
 	QList<TestGadget> g2 {{}, {}, {}};
 	QList<TestGadget> g3 {{}, {}, {}};
 	QTest::newRow("QList<QList<TestGadget>>") << QVariant::fromValue<QList<QList<TestGadget>>>({g1, g2, g3})
-											  << static_cast<int>(QVariant::List)
+											  << static_cast<int>(QMetaType::QVariantList)
 											  << QVariant{};
 
 	QTest::newRow("QMap<QString, TestGadget>") << QVariant::fromValue<QMap<QString, TestGadget>>({
@@ -174,7 +176,7 @@ void SerializerTest::testVariantConversions_data()
 																									 {QStringLiteral("devil"), {}},
 																									 {QStringLiteral("fun"), {}}
 																								  })
-											   << static_cast<int>(QVariant::Map)
+											   << static_cast<int>(QMetaType::QVariantMap)
 											   << QVariant{};
 	QMap<QString, TestGadget> r1 = {
 		{QStringLiteral("v0"), {}},
@@ -193,17 +195,17 @@ void SerializerTest::testVariantConversions_data()
 																																   {QStringLiteral("r2"), r2},
 																																   {QStringLiteral("r3"), r3}
 																															   })
-															  << static_cast<int>(QVariant::Map)
+															  << static_cast<int>(QMetaType::QVariantMap)
 															  << QVariant{};
 
 	QTest::newRow("QList<TestObject*>") << QVariant::fromValue<QList<TestObject*>>({new TestObject{this}, new TestObject{this}, new TestObject{this}})
-										<< static_cast<int>(QVariant::List)
+										<< static_cast<int>(QMetaType::QVariantList)
 										<< QVariant{};
 	QList<TestObject*> o1 {new TestObject{this}, new TestObject{this}, new TestObject{this}};
 	QList<TestObject*> o2 {new TestObject{this}, new TestObject{this}, new TestObject{this}};
 	QList<TestObject*> o3 {new TestObject{this}, new TestObject{this}, new TestObject{this}};
 	QTest::newRow("QList<QList<TestObject*>>") << QVariant::fromValue<QList<QList<TestObject*>>>({o1, o2, o3})
-											   << static_cast<int>(QVariant::List)
+											   << static_cast<int>(QMetaType::QVariantList)
 											   << QVariant{};
 
 	QTest::newRow("QMap<QString, TestObject*>") << QVariant::fromValue<QMap<QString, TestObject*>>({
@@ -211,7 +213,7 @@ void SerializerTest::testVariantConversions_data()
 																									   {QStringLiteral("devil"), new TestObject{this}},
 																									   {QStringLiteral("fun"), new TestObject{this}}
 																								   })
-												<< static_cast<int>(QVariant::Map)
+												<< static_cast<int>(QMetaType::QVariantMap)
 												<< QVariant{};
 	QMap<QString, TestObject*> q1 = {
 		{QStringLiteral("v0"), new TestObject{this}},
@@ -230,7 +232,7 @@ void SerializerTest::testVariantConversions_data()
 																																	 {QStringLiteral("q3"), q2},
 																																	 {QStringLiteral("q3"), q3}
 																																 })
-															   << static_cast<int>(QVariant::Map)
+															   << static_cast<int>(QMetaType::QVariantMap)
 															   << QVariant{};
 
 	QSharedPointer<TestObject> sPtr(new TestObject(nullptr));
@@ -254,24 +256,37 @@ void SerializerTest::testVariantConversions_data()
 													<< QVariant{};
 
 	QTest::newRow("QList<QPair<bool, bool>>") << QVariant::fromValue<QList<QPair<bool, bool>>>({{false, true}, {true, false}})
-											  << static_cast<int>(QVariant::List)
+											  << static_cast<int>(QMetaType::QVariantList)
 											  << QVariant{};
 
 	QTest::newRow("std::tuple<int, QString, QList<int>>") << QVariant::fromValue<TestTuple>(std::make_tuple(42, QStringLiteral("Hello World"), QList<int>{1, 2, 3}))
-														  << static_cast<int>(QVariant::List)
+														  << static_cast<int>(QMetaType::QVariantList)
 														  << QVariant{QVariantList{42, QStringLiteral("Hello World"), QVariant::fromValue(QList<int>{1, 2, 3})}};
-	QTest::newRow("std::pair<bool, int>>") << QVariant::fromValue<TestPair>(std::make_pair(true, 20))
-										   << qMetaTypeId<QPair<QVariant, QVariant>>()
-										   << QVariant::fromValue(QPair<QVariant, QVariant>{true, 20});
+	QTest::newRow("std::pair<bool, int>") << QVariant::fromValue<TestPair>(std::make_pair(true, 20))
+										  << qMetaTypeId<QPair<QVariant, QVariant>>()
+										  << QVariant::fromValue(QPair<QVariant, QVariant>{true, 20});
 
 	QVariant optv{42};
-	QTest::newRow("std::optional<int>>") << QVariant::fromValue<std::optional<int>>(42)
-										 << qMetaTypeId<QVariant>()
-										 << QVariant{QMetaType::QVariant, &optv};
+	QTest::newRow("std::optional<int>") << QVariant::fromValue<std::optional<int>>(42)
+										<< static_cast<int>(QMetaType::QVariant)
+										<< QVariant{QMetaType::QVariant, &optv};
 	optv = QVariant::fromValue(nullptr);
 	QTest::newRow("std::nullopt") << QVariant::fromValue<std::optional<int>>(std::nullopt)
-								  << qMetaTypeId<QVariant>()
+								  << static_cast<int>(QMetaType::QVariant)
 								  << QVariant{QMetaType::QVariant, &optv};
+
+	QVariant varv1{true};
+	QTest::newRow("std::variant<bool>") << QVariant::fromValue<TestVariant>(true)
+										<< static_cast<int>(QMetaType::QVariant)
+										<< QVariant{QMetaType::QVariant, &varv1};
+	QVariant varv2{42};
+	QTest::newRow("std::variant<int>") << QVariant::fromValue<TestVariant>(42)
+									   << static_cast<int>(QMetaType::QVariant)
+									   << QVariant{QMetaType::QVariant, &varv2};
+	QVariant varv3{4.2};
+	QTest::newRow("std::variant<double>") << QVariant::fromValue<TestVariant>(4.2)
+										  << qMetaTypeId<QVariant>()
+										  << QVariant{QMetaType::QVariant, &varv3};
 }
 
 void SerializerTest::testVariantConversions()

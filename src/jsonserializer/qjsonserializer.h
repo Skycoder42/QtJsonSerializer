@@ -2,7 +2,9 @@
 #define QJSONSERIALIZER_H
 
 #include <type_traits>
+#include <tuple>
 #include <optional>
+#include <variant>
 
 #include "QtJsonSerializer/qtjsonserializer_global.h"
 #include "QtJsonSerializer/qjsonserializerexception.h"
@@ -113,12 +115,15 @@ public:
 	//! Registers two types for pair conversion
 	template<typename T, typename U>
 	static inline bool registerPairConverters(const char *originalTypeName = nullptr);
-	//! Registers a number of types for tuple conversion
+	//! Registers a number of types for std::tuple conversion
 	template<typename... TArgs>
 	static inline bool registerTupleConverters(const char *originalTypeName = nullptr);
-	//! Registers a custom type for map converisons
+	//! Registers a custom type for std::optional converisons
 	template<typename T>
 	static inline bool registerOptionalConverters(const char *originalTypeName = nullptr);
+	//! Registers a custom type for std::variant converisons
+	template<typename... TArgs>
+	static inline bool registerVariantConverters(const char *originalTypeName = nullptr);
 
 	//! @readAcFn{QJsonSerializer::allowDefaultNull}
 	bool allowDefaultNull() const;
@@ -438,6 +443,15 @@ bool QJsonSerializer::registerOptionalConverters(const char *originalTypeName)
 	}) & QMetaType::registerConverter<QVariant, std::optional<T>>([](const QVariant &var) -> std::optional<T> {
 		return var.userType() == QMetaType::Nullptr ? std::optional<T>{std::nullopt} : var.value<T>();
 	});
+}
+
+template<typename... TArgs>
+bool QJsonSerializer::registerVariantConverters(const char *originalTypeName)
+{
+	if(originalTypeName)
+		registerInverseTypedef<std::variant<TArgs...>>(originalTypeName);
+	return QMetaType::registerConverter<std::variant<TArgs...>, QVariant>(&_qjsonserializer_helpertypes::varToQVar<TArgs...>) &
+			QMetaType::registerConverter<QVariant, std::variant<TArgs...>>(&_qjsonserializer_helpertypes::qVarToVar<TArgs...>);
 }
 
 template<typename T>
