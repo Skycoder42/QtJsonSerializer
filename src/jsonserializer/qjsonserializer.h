@@ -101,7 +101,7 @@ public:
 	template<typename T>
 	static inline bool registerSetConverters();
 	//! Registers a custom type for map converisons
-	template<typename T>
+	template<typename T, bool mapTypes = true, bool hashTypes = true>
 	static inline bool registerMapConverters();
 	//! Registers a custom type for list, set map and optional converisons
 	template<typename T>
@@ -377,13 +377,15 @@ bool QJsonSerializer::registerSetConverters()
 	return registerListContainerConverters<QSet, T>(&QSet<T>::insert);
 }
 
-template<typename T>
+template<typename T, bool mapTypes, bool hashTypes>
 bool QJsonSerializer::registerMapConverters()
 {
-	return registerMapContainerConverters<QMap, T>() &
-			registerMapContainerConverters<QHash, T>() &
-			registerMapContainerConverters<QMultiMap, T>(&QMultiMap<QString, T>::insert, true) &
-			registerMapContainerConverters<QMultiHash, T>(&QMultiHash<QString, T>::insert, true);
+	auto ok = true;
+	if constexpr (mapTypes)
+		ok &= registerMapContainerConverters<QMap, T>() & registerMapContainerConverters<QMultiMap, T>(&QMultiMap<QString, T>::insert, true);
+	if constexpr (hashTypes)
+		ok &= registerMapContainerConverters<QHash, T>() & registerMapContainerConverters<QMultiHash, T>(&QMultiHash<QString, T>::insert, true);
+	return ok;
 }
 
 template<typename T>
