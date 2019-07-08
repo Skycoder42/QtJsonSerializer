@@ -54,10 +54,10 @@ void RegexConverterTest::addCommonSerData()
 						  << TestQ{}
 						  << static_cast<QObject*>(nullptr)
 						  << static_cast<int>(QMetaType::QRegularExpression)
-						  << QVariant{QRegularExpression{QStringLiteral("^\\w*m$"), QRegularExpression::OptimizeOnFirstUsageOption | QRegularExpression::CaseInsensitiveOption}}
+						  << QVariant{QRegularExpression{QStringLiteral("^\\w*m$"), QRegularExpression::CaseInsensitiveOption}}
 						  << QJsonValue{QJsonObject{
 									{QStringLiteral("pattern"), QStringLiteral("^\\w*m$")},
-									{QStringLiteral("options"), static_cast<int>(QRegularExpression::OptimizeOnFirstUsageOption | QRegularExpression::CaseInsensitiveOption)}
+									{QStringLiteral("options"), static_cast<int>(QRegularExpression::CaseInsensitiveOption)}
 								}};
 }
 
