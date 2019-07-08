@@ -5,6 +5,7 @@ SUBDIRS += \
 
 CONVERTER_TESTS = \
 	BytearrayConverterTest \
+	ChronoDurationConverterTest \
 	GadgetConverterTest \
 	GeomConverterTest \
 	JsonConverterTest \

@@ -21,6 +21,7 @@
 #include "typeconverters/qjsonlocaleconverter_p.h"
 #include "typeconverters/qjsonregularexpressionconverter_p.h"
 #include "typeconverters/qjsonstdtupleconverter_p.h"
+#include "typeconverters/qjsonchronodurationconverter_p.h"
 
 #ifndef NO_REGISTER_JSON_CONVERTERS
 Q_COREAPP_STARTUP_FUNCTION(qtJsonSerializerRegisterTypes);
@@ -509,7 +510,8 @@ QList<QSharedPointer<QJsonTypeConverterFactory>> QJsonSerializerPrivate::typeCon
 	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonRectConverter>>::create(),
 	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonLocaleConverter>>::create(),
 	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonRegularExpressionConverter>>::create(),
-	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonStdTupleConverter>>::create()
+	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonStdTupleConverter>>::create(),
+	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonChronoDurationConverter>>::create()
 };
 
 QByteArray QJsonSerializerPrivate::getTypeName(int propertyType)
