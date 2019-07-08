@@ -5,7 +5,6 @@ SUBDIRS += \
 
 CONVERTER_TESTS = \
 	BytearrayConverterTest \
-	ChronoDurationConverterTest \
 	GadgetConverterTest \
 	GeomConverterTest \
 	JsonConverterTest \
@@ -17,7 +16,9 @@ CONVERTER_TESTS = \
 	RegexConverterTest \
 	TupleConverterTest \
 	VersionConverterTest \
-	MultiMapConverterTest
+	MultiMapConverterTest \
+	ChronoDurationConverterTest \
+	OptionalConverterTest
 
 for(test, CONVERTER_TESTS) {
 	SUBDIRS += $$test

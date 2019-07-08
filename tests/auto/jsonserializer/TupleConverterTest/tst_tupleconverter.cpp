@@ -51,7 +51,6 @@ void TupleConverterTest::addConverterData()
 
 void TupleConverterTest::addMetaData()
 {
-
 	QTest::newRow("basic") << qMetaTypeId<std::tuple<int, bool, double>>()
 						   << true;
 	QTest::newRow("extended") << qMetaTypeId<std::tuple<QList<int>, QPair<bool, bool>, QMap<QString, double>>>()

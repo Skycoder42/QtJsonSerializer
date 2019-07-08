@@ -2,6 +2,7 @@
 #define QJSONSERIALIZER_H
 
 #include <type_traits>
+#include <optional>
 
 #include "QtJsonSerializer/qtjsonserializer_global.h"
 #include "QtJsonSerializer/qjsonserializerexception.h"
@@ -100,7 +101,7 @@ public:
 	//! Registers a custom type for map converisons
 	template<typename T>
 	static inline bool registerMapConverters();
-	//! Registers a custom type for list and map converisons
+	//! Registers a custom type for list, set map and optional converisons
 	template<typename T>
 	static inline bool registerAllConverters();
 	//! Registers a custom type for QSharedPointer and QPointer converisons
@@ -115,6 +116,9 @@ public:
 	//! Registers a number of types for tuple conversion
 	template<typename... TArgs>
 	static inline bool registerTupleConverters(const char *originalTypeName = nullptr);
+	//! Registers a custom type for map converisons
+	template<typename T>
+	static inline bool registerOptionalConverters(const char *originalTypeName = nullptr);
 
 	//! @readAcFn{QJsonSerializer::allowDefaultNull}
 	bool allowDefaultNull() const;
@@ -422,6 +426,18 @@ bool QJsonSerializer::registerTupleConverters(const char *originalTypeName)
 		registerInverseTypedef<std::tuple<TArgs...>>(originalTypeName);
 	return QMetaType::registerConverter<std::tuple<TArgs...>, QVariantList>(&_qjsonserializer_helpertypes::tplToList<TArgs...>) &
 			QMetaType::registerConverter<QVariantList, std::tuple<TArgs...>>(&_qjsonserializer_helpertypes::listToTpl<TArgs...>);
+}
+
+template<typename T>
+bool QJsonSerializer::registerOptionalConverters(const char *originalTypeName)
+{
+	if(originalTypeName)
+		registerInverseTypedef<std::optional<T>>(originalTypeName);
+	return QMetaType::registerConverter<std::optional<T>, QVariant>([](const std::optional<T> &opt) -> QVariant {
+		return opt ? QVariant::fromValue(*opt) : QVariant::fromValue(nullptr);
+	}) & QMetaType::registerConverter<QVariant, std::optional<T>>([](const QVariant &var) -> std::optional<T> {
+		return var.userType() == QMetaType::Nullptr ? std::optional<T>{std::nullopt} : var.value<T>();
+	});
 }
 
 template<typename T>
