@@ -105,7 +105,9 @@ public:
 	static inline bool registerMapConverters();
 	//! Registers a custom type for list, set map and optional converisons
 	template<typename T>
-	static inline bool registerAllConverters();
+	static inline bool registerBasicConverters();
+	template<typename T>
+	Q_DECL_DEPRECATED_X("Use QJsonSerializer::registerBasicConverters instead") static inline bool registerAllConverters();
 	//! Registers a custom type for QSharedPointer and QPointer converisons
 	template<typename T>
 	static inline bool registerPointerConverters();
@@ -385,11 +387,17 @@ bool QJsonSerializer::registerMapConverters()
 }
 
 template<typename T>
-bool QJsonSerializer::registerAllConverters()
+bool QJsonSerializer::registerBasicConverters()
 {
 	return registerListConverters<T>() &
 			registerSetConverters<T>() &
 			registerMapConverters<T>();
+}
+
+template<typename T>
+bool QJsonSerializer::registerAllConverters()
+{
+	return QJsonSerializer::registerBasicConverters<T>();
 }
 
 template<typename T>
@@ -412,8 +420,8 @@ bool QJsonSerializer::registerPointerListConverters()
 {
 	static_assert(std::is_base_of<QObject, T>::value, "T must inherit QObject");
 	return registerPointerConverters<T>() &
-			registerAllConverters<QSharedPointer<T>>() &
-			registerAllConverters<QPointer<T>>();
+			registerBasicConverters<QSharedPointer<T>>() &
+			registerBasicConverters<QPointer<T>>();
 }
 
 template<typename T1, typename T2>

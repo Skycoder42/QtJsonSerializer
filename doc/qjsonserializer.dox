@@ -328,7 +328,7 @@ calls the following methods for the given type:
 
 with a generic conversion using QVariant.
 
-@sa QJsonSerializer::registerAllConverters, QJsonSerializer::registerSetConverters,
+@sa QJsonSerializer::registerBasicConverters, QJsonSerializer::registerSetConverters,
 QJsonSerializer::registerMapConverters, qtJsonSerializerRegisterTypes()
 */
 
@@ -344,7 +344,7 @@ calls the following methods for the given type:
 
 with a generic conversion using QVariant.
 
-@sa QJsonSerializer::registerAllConverters, QJsonSerializer::registerListConverters,
+@sa QJsonSerializer::registerBasicConverters, QJsonSerializer::registerListConverters,
 QJsonSerializer::registerMapConverters, qtJsonSerializerRegisterTypes()
 */
 
@@ -363,12 +363,12 @@ calls the following methods for the given type:
 
 with a generic conversion using QVariant.
 
-@sa QJsonSerializer::registerAllConverters, QJsonSerializer::registerListConverters,
+@sa QJsonSerializer::registerBasicConverters, QJsonSerializer::registerListConverters,
 QJsonSerializer::registerSetConverters, qtJsonSerializerRegisterTypes()
 */
 
 /*!
-@fn QJsonSerializer::registerAllConverters
+@fn QJsonSerializer::registerBasicConverters
 
 @tparam T The type to register converters for
 
@@ -398,7 +398,7 @@ methods for the given type:
 - `QMetaType::registerConverter<QPointer<QObject>, QPointer<T>>()`
 - `QMetaType::registerConverter<QPointer<T>, QPointer<QObject>>()`
 
-@sa QJsonSerializer::registerAllConverters, QJsonSerializer::registerPairConverters,
+@sa QJsonSerializer::registerBasicConverters, QJsonSerializer::registerPairConverters,
 QJsonSerializer::registerTupleConverters,
 qtJsonSerializerRegisterTypes()
 */
@@ -410,10 +410,10 @@ qtJsonSerializerRegisterTypes()
 
 A shortcut for all the container registrations QJsonSerializer provides. The method internally calls:
 - `QJsonSerializer::registerPointerConverters<T>()`
-- `QJsonSerializer::registerAllConverters<QSharedPointer<T>>()`
-- `QJsonSerializer::registerAllConverters<QPointer<T>>()`
+- `QJsonSerializer::registerBasicConverters<QSharedPointer<T>>()`
+- `QJsonSerializer::registerBasicConverters<QPointer<T>>()`
 
-@sa QJsonSerializer::registerAllConverters, QJsonSerializer::registerPointerConverters,
+@sa QJsonSerializer::registerBasicConverters, QJsonSerializer::registerPointerConverters,
 qtJsonSerializerRegisterTypes()
 */
 
@@ -439,7 +439,7 @@ If originalTypeName is set, this method also calls
 @attention Only this very specific combination in this specific order is registered. If you change
 one type to another, or swap the two types, you need to call this method again with this different pair.
 
-@sa QJsonSerializer::registerAllConverters, QJsonSerializer::registerPointerConverters,
+@sa QJsonSerializer::registerBasicConverters, QJsonSerializer::registerPointerConverters,
 QJsonSerializer::registerTupleConverters, QJsonSerializer::registerInverseTypedef
 */
 
@@ -461,7 +461,7 @@ If originalTypeName is set, this method also calls
 @attention Only this very specific combination in this specific order is registered. If you change
 one type to another, or swap the types, you need to call this method again with this different type set.
 
-@sa QJsonSerializer::registerAllConverters, QJsonSerializer::registerPointerConverters,
+@sa QJsonSerializer::registerBasicConverters, QJsonSerializer::registerPointerConverters,
 QJsonSerializer::registerPairConverters, QJsonSerializer::registerInverseTypedef
 */
 
@@ -695,7 +695,8 @@ The following types are already registered by default:
  QByteArray			| no				| yes				| yes
 
 @sa QJsonSerializer::registerListConverters, QJsonSerializer::registerSetConverters,
-QJsonSerializer::registerMapConverters, QJsonSerializer::registerAllConverters,
+QJsonSerializer::registerMapConverters, QJsonSerializer::registerBasicConverters,
 QJsonSerializer::registerPointerConverters, QJsonSerializer::registerPointerListConverters,
-QJsonSerializer::registerPairConverters, QJsonSerializer::registerTupleConverters
+QJsonSerializer::registerPairConverters, QJsonSerializer::registerTupleConverters,
+QJsonSerializer::registerOptionalConverters, QJsonSerializer::registerVariantConverters
 */

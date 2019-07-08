@@ -44,7 +44,7 @@ There are multiple ways to install the Qt module, sorted by preference:
 	- Download the sources. Either use `git clone` or download from the releases. If you choose the second option, you have to manually create a folder named `.git` in the projects root directory, otherwise the build will fail.
 	- `qmake`
 	- `make`  (If you want the tests/examples/etc. run `make all`)
-	- Optional steps: 
+	- Optional steps:
 		- `make doxygen` to generate the documentation
 		- `make -j1 run-tests` to build and run all tests
 	- `make install`
@@ -151,12 +151,14 @@ In order for the serializer to properly work, there are a few things you have to
 		- QByteArray is represented by a base64 encoded string
 	- Any type you add yourself by extending the serializer (See QJsonTypeConverter documentation)
 4. While simple types (i.e. `QList<int>`) are supported out of the box, for custom types (like `QList<TestObject*>`) you will have to register converters. This goes for
-	- List-, Set- and Map-Types: use `QJsonSerializer::registerAllConverters<T>()`
+	- List-, Set- and Map-Types: use `QJsonSerializer::registerBasicConverters<T>()`
 	- List-Types only: use `QJsonSerializer::registerListConverters<T>()`
 	- Set-Types only: use `QJsonSerializer::registerSetConverters<T>()`
 	- Map-Types only: use `QJsonSerializer::registerMapConverters<T>()`
 	- QPair and std::pair: use `QJsonSerializer::registerPairConverters<T1, T2>()`
 	- std::tuple: use `QJsonSerializer::registerTupleConverters<TArgs...>()`
+	- std::optional: use `QJsonSerializer::registerOptionalConverters<T>()`
+	- std::variant: use `QJsonSerializer::registerVariantConverters<TArgs...>()`
 	- QSharedPointer/QPointer: use `QJsonSerializer::registerPointerConverters<T>()`
 5. Polymorphic QObjects are supported. This is done by the serializer via adding a special @@class json property. To make a class polymorphic you can:
 	- Add `Q_JSON_POLYMORPHIC(true)` (or `Q_CLASSINFO("polymorphic", "true")`) to its definition

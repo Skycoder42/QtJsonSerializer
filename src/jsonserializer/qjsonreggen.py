@@ -21,7 +21,7 @@ def escaped(name):
 
 def mode_fn(mode):
 	if mode == Mode.ALL:
-		return "registerAllConverters"
+		return "registerBasicConverters"
 	elif mode == Mode.LIST:
 		return "registerListConverters"
 	elif mode == Mode.MAP:
