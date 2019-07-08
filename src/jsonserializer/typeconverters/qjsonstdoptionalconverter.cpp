@@ -39,7 +39,15 @@ QJsonValue QJsonStdOptionalConverter::serialize(int propertyType, const QVariant
 		return QJsonValue::Null;
 	else {
 		const auto metaType = getSubtype(propertyType);
-		Q_ASSERT_X(cValue.userType() == metaType, Q_FUNC_INFO, "QJsonSerializer::registerOptionalConverters working incorrectly for given type!");
+		if (cValue.userType() != metaType) {
+			throw QJsonSerializationException(QByteArray("Invalid value given for type ") +
+											  QMetaType::typeName(propertyType) +
+											  QByteArray(" - was ") +
+											  value.typeName() +
+											  QByteArray(", which is not the optionals value type (") +
+											  QMetaType::typeName(metaType) +
+											  QByteArray(")"));
+		}
 		return helper->serializeSubtype(metaType, cValue, "value");
 	}
 }

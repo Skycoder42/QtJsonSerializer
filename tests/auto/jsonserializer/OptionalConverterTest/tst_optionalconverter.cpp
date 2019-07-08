@@ -84,11 +84,17 @@ void OptionalConverterTest::addCommonSerData()
 
 void OptionalConverterTest::addSerData()
 {
-	QTest::newRow("unconvertible") << QVariantHash{}
+	QTest::newRow("invalid.unconvertible") << QVariantHash{}
+										   << TestQ{}
+										   << static_cast<QObject*>(nullptr)
+										   << qMetaTypeId<std::optional<OpaqueDummy>>()
+										   << QVariant::fromValue(std::optional<OpaqueDummy>{OpaqueDummy{}})
+										   << QJsonValue{QJsonValue::Undefined};
+	QTest::newRow("invalid.input") << QVariantHash{}
 								   << TestQ{}
 								   << static_cast<QObject*>(nullptr)
-								   << qMetaTypeId<std::optional<OpaqueDummy>>()
-								   << QVariant::fromValue(std::optional<OpaqueDummy>{OpaqueDummy{}})
+								   << qMetaTypeId<std::optional<int>>()
+								   << QVariant::fromValue(QStringLiteral("Hello World"))
 								   << QJsonValue{QJsonValue::Undefined};
 }
 
