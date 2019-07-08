@@ -1,4 +1,4 @@
-ALL_TYPES = \
+JSON_TYPES = \
 	bool \
 	int \
 	uint \
@@ -26,69 +26,47 @@ ALL_TYPES = \
 	QJsonArray \
 	QVersionNumber \
 	QLocale \
-	QRegularExpression
-LIST_TYPES = \
+	QRegularExpression \
 	QSize \
 	QPoint \
 	QLine \
-	QRect
-MAP_TYPES = \
+	QRect \
 	QByteArray
-SET_TYPES = \
-	QByteArray
+
+QSize.modes = list
+QPoint.modes = list
+QLine.modes = list
+QRect.modes = list
+QByteArray.modes = map set
 
 isEmpty(QT_JSONSERIALIZER_REGPATH): QT_JSONSERIALIZER_REGPATH = $$OUT_PWD/.reggen
-mkpath($$QT_JSONSERIALIZER_REGPATH)
-type_index = 0
-
-ALL_TYPES.method = registerAllConverters
-ALL_TYPES.desc = "list, map and set"
-
-LIST_TYPES.method = registerListConverters
-LIST_TYPES.desc = "map"
-
-MAP_TYPES.method = registerMapConverters
-MAP_TYPES.desc = "list"
-
-SET_TYPES.method = registerSetConverters
-SET_TYPES.desc = "set"
-
-for(tId, $$list(ALL_TYPES, LIST_TYPES, MAP_TYPES, SET_TYPES)) {
-	for(type, $$tId) {
-		raw_data = $$cat($$PWD/qjsonconverterreg.cpp.template, lines)
-		raw_data = $$replace(raw_data, $$re_escape("%{typeindex}"), $$type_index)
-		raw_data = $$replace(raw_data, $$re_escape("%{convertMethod}"), $$first($${tId}.method))
-		raw_data = $$replace(raw_data, $$re_escape("%{type}"), "$$type")
-		raw_data = $$replace(raw_data, $$re_escape("%{convertOp}"), $$first($${tId}.desc))
-
-		out_file = $$QT_JSONSERIALIZER_REGPATH/qjsonconverterreg_$${type_index}.cpp
-		!exists($$out_file):!write_file($$out_file, raw_data):error("Failed to create $$out_file")
-		GENERATED_SOURCES += $$out_file
-
-		startup_hookfile_declare += "void register_$${type_index}_converters();"
-		startup_hookfile_call += "$$escape_expand(\\t)_qjsonserializer_helpertypes::converter_hooks::register_$${type_index}_converters();"
-
-		type_index = $$num_add($$type_index, 1)
-	}
+isEmpty(QT_JSONSERIALIZER_TYPESPLIT_PY) {
+	win32: QT_JSONSERIALIZER_TYPESPLIT_PY = python3
+	QT_JSONSERIALIZER_TYPESPLIT_PY += $$shell_path($$PWD/typesplit.py)
 }
 
+for(type, JSON_TYPES) {
+	type_base = $$replace(type, "\\W", "_")
+	target_base = qjsonconverterreg_$${type_base}.cpp
+	target_path = $$absolute_path($$target_base, $$QT_JSONSERIALIZER_REGPATH)
+	$${target_path}.name = $$target_path
+	$${target_path}.depends = $$PWD/typesplit.py $$PWD/typesplit.pri
+	$${target_path}.commands = @$$QMAKE_CHK_DIR_EXISTS $$QT_JSONSERIALIZER_REGPATH || $$QMAKE_MKDIR $$QT_JSONSERIALIZER_REGPATH \
+		$$escape_expand(\n\t)$$QT_JSONSERIALIZER_TYPESPLIT_PY $$shell_quote($$target_path) $$shell_quote($$type) $$eval($${type_base}.modes)
+	QMAKE_EXTRA_TARGETS += $$target_path
+	GENERATED_SOURCES += $$target_path
+}
 
-startup_hookfile = "$${LITERAL_HASH}include \"qtjsonserializer_global.h\""
-startup_hookfile += "namespace _qjsonserializer_helpertypes {"
-startup_hookfile += "namespace converter_hooks {"
-startup_hookfile += $$startup_hookfile_declare
-startup_hookfile += "}"
-startup_hookfile += "}"
-startup_hookfile += "void qtJsonSerializerRegisterTypes() {"
-startup_hookfile += "$$escape_expand(\\t)static bool wasCalled = false;"
-startup_hookfile += "$$escape_expand(\\t)if(wasCalled)"
-startup_hookfile += "$$escape_expand(\\t\\t)return;"
-startup_hookfile += "$$escape_expand(\\t)wasCalled = true;"
-startup_hookfile += $$startup_hookfile_call
-startup_hookfile += "}"
-out_file = $$QT_JSONSERIALIZER_REGPATH/qjsonconverterreg_all.cpp
-!exists($$out_file):!write_file($$out_file, startup_hookfile):error("Failed to create $$out_file")
-GENERATED_SOURCES += $$out_file
+escaped_types =
+for(type, JSON_TYPES): escaped_types += $$shell_quote($$type)
+target_path = $$absolute_path(qjsonconverterreg_hook.cpp, $$QT_JSONSERIALIZER_REGPATH)
+$${target_path}.name = $$target_path
+$${target_path}.depends = $$PWD/typesplit.py $$PWD/typesplit.pri
+$${target_path}.commands = @$$QMAKE_CHK_DIR_EXISTS $$QT_JSONSERIALIZER_REGPATH || $$QMAKE_MKDIR $$QT_JSONSERIALIZER_REGPATH \
+	$$escape_expand(\n\t)$$QT_JSONSERIALIZER_TYPESPLIT_PY super $$shell_quote($$target_path) $$escaped_types
+QMAKE_EXTRA_TARGETS += $$target_path
+GENERATED_SOURCES += $$target_path
 
 DISTFILES += \
-	$$PWD/qjsonconverterreg.cpp.template
+	$$PWD/qjsonconverterreg.cpp.template \
+	$$PWD/typesplit.py
