@@ -51,7 +51,7 @@ mkpath($$QT_JSONSERIALIZER_REGGEN_DIR)
 
 isEmpty(QT_JSONSERIALIZER_TYPESPLIT_PY) {
 	win32: QT_JSONSERIALIZER_TYPESPLIT_PY = python
-	QT_JSONSERIALIZER_TYPESPLIT_PY += $$shell_path($$PWD/qjsonreggen.py)
+	QT_JSONSERIALIZER_TYPESPLIT_PY += $$shell_quote($$PWD/qjsonreggen.py)
 }
 
 for(type, JSON_TYPES) {
