@@ -1,3 +1,6 @@
+DISTFILES += \
+	$$PWD/qjsonreggen.py
+
 JSON_TYPES = \
 	bool \
 	int \
@@ -42,7 +45,7 @@ QByteArray.modes = map set
 isEmpty(QT_JSONSERIALIZER_REGPATH): QT_JSONSERIALIZER_REGPATH = $$OUT_PWD/.reggen
 isEmpty(QT_JSONSERIALIZER_TYPESPLIT_PY) {
 	win32: QT_JSONSERIALIZER_TYPESPLIT_PY = python3
-	QT_JSONSERIALIZER_TYPESPLIT_PY += $$shell_path($$PWD/typesplit.py)
+	QT_JSONSERIALIZER_TYPESPLIT_PY += $$shell_path($$PWD/qjsonreggen.py)
 }
 
 for(type, JSON_TYPES) {
@@ -50,7 +53,7 @@ for(type, JSON_TYPES) {
 	target_base = qjsonconverterreg_$${type_base}.cpp
 	target_path = $$absolute_path($$target_base, $$QT_JSONSERIALIZER_REGPATH)
 	$${target_path}.name = $$target_path
-	$${target_path}.depends = $$PWD/typesplit.py $$PWD/typesplit.pri
+	$${target_path}.depends = $$PWD/qjsonreggen.py $$PWD/qjsonreggen.pri
 	$${target_path}.commands = @$$QMAKE_CHK_DIR_EXISTS $$QT_JSONSERIALIZER_REGPATH || $$QMAKE_MKDIR $$QT_JSONSERIALIZER_REGPATH \
 		$$escape_expand(\n\t)$$QT_JSONSERIALIZER_TYPESPLIT_PY $$shell_quote($$target_path) $$shell_quote($$type) $$eval($${type_base}.modes)
 	QMAKE_EXTRA_TARGETS += $$target_path
@@ -61,12 +64,8 @@ escaped_types =
 for(type, JSON_TYPES): escaped_types += $$shell_quote($$type)
 target_path = $$absolute_path(qjsonconverterreg_hook.cpp, $$QT_JSONSERIALIZER_REGPATH)
 $${target_path}.name = $$target_path
-$${target_path}.depends = $$PWD/typesplit.py $$PWD/typesplit.pri
+$${target_path}.depends = $$PWD/qjsonreggen.py $$PWD/qjsonreggen.pri
 $${target_path}.commands = @$$QMAKE_CHK_DIR_EXISTS $$QT_JSONSERIALIZER_REGPATH || $$QMAKE_MKDIR $$QT_JSONSERIALIZER_REGPATH \
 	$$escape_expand(\n\t)$$QT_JSONSERIALIZER_TYPESPLIT_PY super $$shell_quote($$target_path) $$escaped_types
 QMAKE_EXTRA_TARGETS += $$target_path
 GENERATED_SOURCES += $$target_path
-
-DISTFILES += \
-	$$PWD/qjsonconverterreg.cpp.template \
-	$$PWD/typesplit.py

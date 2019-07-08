@@ -22,7 +22,11 @@
 #include "typeconverters/qjsonregularexpressionconverter_p.h"
 #include "typeconverters/qjsonstdtupleconverter_p.h"
 
+#ifndef NO_REGISTER_JSON_CONVERTERS
 Q_COREAPP_STARTUP_FUNCTION(qtJsonSerializerRegisterTypes);
+#else
+void qtJsonSerializerRegisterTypes();
+#endif
 
 QJsonSerializer::QJsonSerializer(QObject *parent) :
 	QObject{parent},

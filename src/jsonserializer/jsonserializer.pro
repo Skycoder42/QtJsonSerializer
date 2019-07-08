@@ -19,7 +19,9 @@ HEADERS += \
 	qjsonserializerexception_p.h
 
 include(typeconverters/typeconverters.pri)
-include(typesplit.pri)
+
+no_register_json_converters: DEFINES += NO_REGISTER_JSON_CONVERTERS
+else: include(qjsonreggen.pri)
 
 load(qt_module)
 

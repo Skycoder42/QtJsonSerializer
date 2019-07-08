@@ -49,6 +49,11 @@ There are multiple ways to install the Qt module, sorted by preference:
 		- `make -j1 run-tests` to build and run all tests
 	- `make install`
 
+### Building without converter registration
+By default, a bunch of list, map, etc. converters are registered for standard Qt types via the `qtJsonSerializerRegisterTypes` method. This however needs many generated functions and will increase the size of the generated binary drasticly. If you don't need those converters, run `qmake CONFIG+=no_register_json_converters` instead of a parameterless qmake. The mentioned function will then be generated as noop method and no converters are registerd.
+
+Please be aware that in this mode it is not possible to serialize e.g. `QList<int>` unless you manually register the corresponding converters via `QJsonSerializer::registerListConverters<int>();`!
+
 ## Usage
 The serializer is provided as a Qt module. Thus, all you have to do is install the module, and then, in your project, add `QT += jsonserializer` to your `.pro` file! The following chapters show an example and explain a few important details regarding the functionality and limits of the implementation.
 

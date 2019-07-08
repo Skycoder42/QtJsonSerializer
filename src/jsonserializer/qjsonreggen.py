@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-# Syntax: typesplit.py <out_path> <class_name> <modes> ...
-# Syntax: typesplit.py super <out_path> <class_names> ...
+# Syntax: qjsonreggen.py <out_path> <class_name> <modes> ...
+# Syntax: qjsonreggen.py super <out_path> <class_names> ...
 
 import sys
 import re
@@ -11,6 +11,8 @@ class Mode(Enum):
 	LIST = 1
 	MAP = 2
 	SET = 3
+	POINTER = 4
+	POINTER_LIST = 5
 
 
 def escaped(name):
@@ -26,6 +28,10 @@ def mode_fn(mode):
 		return "registerMapConverters"
 	elif mode == Mode.SET:
 		return "registerSetConverters"
+	elif mode == Mode.POINTER:
+		return "registerPointerConverters"
+	elif mode == Mode.POINTER_LIST:
+		return "registerPointerListConverters"
 
 
 def create_hook(file_name, class_name, *modes):

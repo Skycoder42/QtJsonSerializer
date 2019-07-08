@@ -43,6 +43,20 @@ matrix:
     - os: osx
       env:
         - PLATFORM=ios
+    - os: linux
+      env:
+        - PLATFORM=gcc_64
+        - QMAKE_FLAGS="CONFIG+=no_register_json_converters"
+        - NO_TESTS=true
+        - BUILD_EXAMPLES=true
+        - SKIP_UPLOAD=true
+    - os: osx
+      env:
+        - PLATFORM=clang_64
+        - QMAKE_FLAGS="CONFIG+=no_register_json_converters"
+        - NO_TESTS=true
+        - BUILD_EXAMPLES=true
+        - SKIP_UPLOAD=true
 
 before_install:
   - git clone https://github.com/Skycoder42/QtModules.git ./qtmodules-travis
