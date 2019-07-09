@@ -141,7 +141,7 @@ void GadgetConverterTest::addDeserData()
 												{QStringLiteral("value"), 2},
 												{QStringLiteral("extra"), 24}
 											}};
-	QTest::newRow("validate.full.invalid") << QVariantHash{{QStringLiteral("validationFlags"), QVariant::fromValue<QJsonSerializer::ValidationFlags>(QJsonSerializer::FullValidation)}}
+	QTest::newRow("validate.full.invalid") << QVariantHash{{QStringLiteral("validationFlags"), QVariant::fromValue<QJsonSerializer::ValidationFlags>(QJsonSerializer::FullPropertyValidation)}}
 										   << TestQ{{QMetaType::Int, 10, 1}}
 										   << static_cast<QObject*>(nullptr)
 										   << qMetaTypeId<TestGadget>()
@@ -150,7 +150,7 @@ void GadgetConverterTest::addDeserData()
 													{QStringLiteral("key"), 1},
 													{QStringLiteral("extra"), 24}
 												}};
-	QTest::newRow("validate.full.valid") << QVariantHash{{QStringLiteral("validationFlags"), QVariant::fromValue<QJsonSerializer::ValidationFlags>(QJsonSerializer::FullValidation)}}
+	QTest::newRow("validate.full.valid") << QVariantHash{{QStringLiteral("validationFlags"), QVariant::fromValue<QJsonSerializer::ValidationFlags>(QJsonSerializer::FullPropertyValidation)}}
 										 << TestQ{{QMetaType::Int, 10, 1}, {QMetaType::Double, 10.1, 2}}
 										 << static_cast<QObject*>(nullptr)
 										 << qMetaTypeId<TestGadget>()

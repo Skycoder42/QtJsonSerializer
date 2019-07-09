@@ -58,7 +58,12 @@ public:
 		StandardValidation = 0x00, //!< Do not perform extra validation, only make sure types are valid and compatible
 		NoExtraProperties = 0x01, //!< Make sure the json does not contain any properties that are not in the type to deserialize it to
 		AllProperties = 0x02, //!< Make sure all properties of the type have a value in the deserialized json data
-		FullValidation = (NoExtraProperties | AllProperties) //!< Validate everything
+		StrictBasicTypes = 0x04, //!< Make shure basic types (string, int, ...) are actually of those types, instead of accepting all that are convertible
+
+		FullPropertyValidation = (NoExtraProperties | AllProperties), //!< Validate properties are exactly the same as declared
+		FullValidation2 = (FullPropertyValidation | StrictBasicTypes), //!< Validate everything
+
+		FullValidation Q_DECL_ENUMERATOR_DEPRECATED_X("Use QJsonSerializer::FullValidation2 or QJsonSerializer::FullPropertyValidation instead") = (NoExtraProperties | AllProperties)
 	};
 	Q_DECLARE_FLAGS(ValidationFlags, ValidationFlag)
 	Q_FLAG(ValidationFlags)

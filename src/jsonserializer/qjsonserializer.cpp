@@ -360,6 +360,63 @@ QJsonValue QJsonSerializer::serializeValue(int propertyType, const QVariant &val
 
 QVariant QJsonSerializer::deserializeValue(int propertyType, const QJsonValue &value) const
 {
+	// perform strict validations
+	if (d->validationFlags.testFlag(StrictBasicTypes)) {
+		auto doThrow = false;
+		switch (propertyType) {
+		case QMetaType::Bool:
+			if (value.type() != QJsonValue::Bool)
+				doThrow = true;
+			break;
+		case QMetaType::Int:
+		case QMetaType::UInt:
+		case QMetaType::Long:
+		case QMetaType::LongLong:
+		case QMetaType::Short:
+		case QMetaType::ULong:
+		case QMetaType::ULongLong:
+		case QMetaType::UShort:
+		case QMetaType::SChar:
+		case QMetaType::UChar:
+			if (value.type() != QJsonValue::Double)
+				doThrow = true;
+			else if (auto val = value.toDouble(); trunc(val) != val)
+				doThrow = true;
+			break;
+		case QMetaType::QChar:
+		case QMetaType::QString:
+		case QMetaType::QByteArray:
+		case QMetaType::Char:
+		case QMetaType::QDate:
+		case QMetaType::QTime:
+		case QMetaType::QColor:
+		case QMetaType::QUrl:
+		case QMetaType::QDateTime:
+		case QMetaType::QFont:
+		case QMetaType::QUuid:
+			if (value.type() != QJsonValue::String)
+				doThrow = true;
+			break;
+		case QMetaType::Nullptr:
+			if (value.type() != QJsonValue::Null)
+				doThrow = true;
+			break;
+		case QMetaType::Float:
+		case QMetaType::Double:
+			if (value.type() != QJsonValue::Double)
+				doThrow = true;
+			break;
+		default:
+			break;
+		}
+
+		if (doThrow) {
+			throw QJsonDeserializationException(QByteArray("Failed to deserialze JSON-value to type ") +
+												QMetaType::typeName(propertyType) +
+												QByteArray("because the given JSON-value failed strict validation"));
+		}
+	}
+
 	//all json can be converted to qvariant, but not all variant to type conversions do work
 	switch (propertyType) {
 	case QMetaType::QDate: //date, time, datetime -> empty string to d/t/dt fails, but is considered "correct" in this context
