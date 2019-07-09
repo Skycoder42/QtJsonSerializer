@@ -108,17 +108,16 @@ public:
 	//! Registers a custom type for map converisons
 	template<typename T, bool mapTypes = true, bool hashTypes = true>
 	static inline bool registerMapConverters();
-	//! Registers a custom type for list, set map and optional converisons
-	template<typename T>
-	static inline bool registerBasicConverters();
 	template<typename T>
 	Q_DECL_DEPRECATED_X("Use QJsonSerializer::registerBasicConverters instead") static inline bool registerAllConverters();
 	//! Registers a custom type for QSharedPointer and QPointer converisons
 	template<typename T>
 	static inline bool registerPointerConverters();
-	//! Registers a custom type for QSharedPointer and QPointer converisons, including lists of those pointer types
 	template<typename T>
-	static inline bool registerPointerListConverters();
+	Q_DECL_DEPRECATED_X("Use QJsonSerializer::registerBasicConverters instead") static inline bool registerPointerListConverters();
+	//! Registers a custom type for list, set map and optional converisons. Also include pointer converters, if applicable
+	template<typename T>
+	static inline bool registerBasicConverters();
 	//! Registers two types for pair conversion
 	template<typename T, typename U>
 	static inline bool registerPairConverters(const char *originalTypeName = nullptr);
@@ -396,9 +395,16 @@ bool QJsonSerializer::registerMapConverters()
 template<typename T>
 bool QJsonSerializer::registerBasicConverters()
 {
-	return registerListConverters<T>() &
-			registerSetConverters<T>() &
-			registerMapConverters<T>();
+	if constexpr (std::is_base_of_v<QObject, T>) {
+		return registerBasicConverters<T*>() &
+				(registerPointerConverters<T>() &&
+				 (registerBasicConverters<QSharedPointer<T>>() &
+				  registerBasicConverters<QPointer<T>>()));
+	} else {
+		return registerListConverters<T>() &
+				registerSetConverters<T>() &
+				registerMapConverters<T>();
+	}
 }
 
 template<typename T>
@@ -410,7 +416,7 @@ bool QJsonSerializer::registerAllConverters()
 template<typename T>
 bool QJsonSerializer::registerPointerConverters()
 {
-	static_assert(std::is_base_of<QObject, T>::value, "T must inherit QObject");
+	static_assert(std::is_base_of_v<QObject, T>, "T must inherit QObject");
 	return QMetaType::registerConverter<QSharedPointer<QObject>, QSharedPointer<T>>([](const QSharedPointer<QObject> &object) -> QSharedPointer<T> {
 		return object.objectCast<T>();
 	}) & QMetaType::registerConverter<QSharedPointer<T>, QSharedPointer<QObject>>([](const QSharedPointer<T> &object) -> QSharedPointer<QObject> {
@@ -425,10 +431,8 @@ bool QJsonSerializer::registerPointerConverters()
 template<typename T>
 bool QJsonSerializer::registerPointerListConverters()
 {
-	static_assert(std::is_base_of<QObject, T>::value, "T must inherit QObject");
-	return registerPointerConverters<T>() &
-			registerBasicConverters<QSharedPointer<T>>() &
-			registerBasicConverters<QPointer<T>>();
+	static_assert(std::is_base_of_v<QObject, T>, "T must inherit QObject");
+	return registerBasicConverters<T>();
 }
 
 template<typename T1, typename T2>
