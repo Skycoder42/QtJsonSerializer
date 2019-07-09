@@ -274,6 +274,7 @@ containers, use QJsonSerializer::registerListConverters instead!
 Performs the registration of converters for `TContainer<T> <--> QVariantList`. This conversion
 is a requirement for the serializer, if you want to be able to serialize lists of a type. The
 function calls the following methods for the given type:
+
 - `QMetaType::registerConverter<TContainer<T>, QVariantList>()`
 - `QMetaType::registerConverter<QVariantList, TContainer<T>>()`
 
@@ -302,6 +303,7 @@ containers, use QJsonSerializer::registerMapConverters instead!
 Performs the registration of converters for `TContainer<QString, TClass> <--> QVariantMap`. This
 conversion is a requirement for the serializer, if you want to be able to serialize lists of a
 type. The function calls the following methods for the given type:
+
 - `QMetaType::registerConverter<TContainer<QString, TClass>, QVariantMap>()`
 - `QMetaType::registerConverter<QVariantMap, TContainer<QString, TClass>>()`
 
@@ -320,6 +322,7 @@ for inserting items. You can pass a custom method if it isnamed differently on y
 Performs the registration of converters for list-like Qt containers. This conversion is a
 requirement for the serializer, if you want to be able to serialize lists of a type. The function
 calls the following methods for the given type:
+
 - `QJsonSerializer::registerListContainerConverters<QList, T>()`
 - `QJsonSerializer::registerListContainerConverters<QLinkedList, T>()`
 - `QJsonSerializer::registerListContainerConverters<QVector, T>()`
@@ -329,7 +332,10 @@ calls the following methods for the given type:
 with a generic conversion using QVariant.
 
 @sa QJsonSerializer::registerBasicConverters, QJsonSerializer::registerSetConverters,
-QJsonSerializer::registerMapConverters, qtJsonSerializerRegisterTypes()
+QJsonSerializer::registerMapConverters, QJsonSerializer::registerPointerConverters,
+QJsonSerializer::registerPairConverters, QJsonSerializer::registerTupleConverter,
+QJsonSerializer::registerOptionalConverters, QJsonSerializer::registerVariantConverters,
+qtJsonSerializerRegisterTypes()
 */
 
 /*!
@@ -345,42 +351,36 @@ calls the following methods for the given type:
 with a generic conversion using QVariant.
 
 @sa QJsonSerializer::registerBasicConverters, QJsonSerializer::registerListConverters,
-QJsonSerializer::registerMapConverters, qtJsonSerializerRegisterTypes()
+QJsonSerializer::registerMapConverters, QJsonSerializer::registerPointerConverters,
+QJsonSerializer::registerPairConverters, QJsonSerializer::registerTupleConverter,
+QJsonSerializer::registerOptionalConverters, QJsonSerializer::registerVariantConverters,
+qtJsonSerializerRegisterTypes()
 */
 
 /*!
 @fn QJsonSerializer::registerMapConverters
 
 @tparam T The type to register converters for
+@tparam mapTypes Statically enables registration for QMap based containers
+@tparam hashTypes Statically enables registration for QHash based containers
 
 Performs the registration of converters for map-like Qt containers. This conversion is a
 requirement for the serializer, if you want to be able to serialize maps of a type. The function
 calls the following methods for the given type:
-- `QJsonSerializer::registerMapContainerConverters<QMap, T>()`
-- `QJsonSerializer::registerMapContainerConverters<QHash, T>()`
-- `QJsonSerializer::registerMapContainerConverters<QMultiMap, T>()`
-- `QJsonSerializer::registerMapContainerConverters<QMultiHash, T>()`
+
+- If `mapTypes` is true (the default):
+	- `QJsonSerializer::registerMapContainerConverters<QMap, T>()`
+	- `QJsonSerializer::registerMapContainerConverters<QMultiMap, T>()`
+- If `hashTypes` is true (the default):
+	- `QJsonSerializer::registerMapContainerConverters<QHash, T>()`
+	- `QJsonSerializer::registerMapContainerConverters<QMultiHash, T>()`
 
 with a generic conversion using QVariant.
 
 @sa QJsonSerializer::registerBasicConverters, QJsonSerializer::registerListConverters,
-QJsonSerializer::registerSetConverters, qtJsonSerializerRegisterTypes()
-*/
-
-/*!
-@fn QJsonSerializer::registerBasicConverters
-
-@tparam T The type to register converters for
-
-A shortcut for all the container registrations QJsonSerializer provides. The method internally
-calls:
-- `QJsonSerializer::registerListConverters<T>()`
-- `QJsonSerializer::registerSetConverters<T>()`
-- `QJsonSerializer::registerMapConverters<T>()`
-
-@sa QJsonSerializer::registerListConverters, QJsonSerializer::registerSetConverters,
-QJsonSerializer::registerMapConverters, QJsonSerializer::registerPointerConverters,
-QJsonSerializer::registerPairConverters, QJsonSerializer::registerTupleConverters,
+QJsonSerializer::registerSetConverters, QJsonSerializer::registerPointerConverters,
+QJsonSerializer::registerPairConverters, QJsonSerializer::registerTupleConverter,
+QJsonSerializer::registerOptionalConverters, QJsonSerializer::registerVariantConverters,
 qtJsonSerializerRegisterTypes()
 */
 
@@ -393,27 +393,44 @@ Performs the registration of converters for `QSharedPointer<T> <--> QSharedPoint
 `QPointer<T> <--> QPointer<QObject>`. This conversion is a requirement for the serializer, if you
 want to be able to serialize QSharedPointers or QPointers of a type. The function calls the following
 methods for the given type:
+
 - `QMetaType::registerConverter<QSharedPointer<QObject>, QSharedPointer<T>>()`
 - `QMetaType::registerConverter<QSharedPointer<T>, QSharedPointer<QObject>>()`
 - `QMetaType::registerConverter<QPointer<QObject>, QPointer<T>>()`
 - `QMetaType::registerConverter<QPointer<T>, QPointer<QObject>>()`
 
-@sa QJsonSerializer::registerBasicConverters, QJsonSerializer::registerPairConverters,
-QJsonSerializer::registerTupleConverters,
+@sa QJsonSerializer::registerBasicConverters, QJsonSerializer::registerListConverters,
+QJsonSerializer::registerSetConverters, QJsonSerializer::registerMapConverters,
+QJsonSerializer::registerPairConverters, QJsonSerializer::registerTupleConverter,
+QJsonSerializer::registerOptionalConverters, QJsonSerializer::registerVariantConverters,
 qtJsonSerializerRegisterTypes()
 */
 
 /*!
-@fn QJsonSerializer::registerPointerListConverters
+@fn QJsonSerializer::registerBasicConverters
 
 @tparam T The type to register converters for
 
-A shortcut for all the container registrations QJsonSerializer provides. The method internally calls:
+A shortcut for all the container registrations QJsonSerializer provides. For any class that
+does **not** inherit QObject, the method internally calls:
+
+- `QJsonSerializer::registerListConverters<T>()`
+- `QJsonSerializer::registerSetConverters<T>()`
+- `QJsonSerializer::registerMapConverters<T>()`
+
+For a T that extends QObject, it instead calls the following. Please not that you have to
+register such a type *without* the pointer-star, e.g.
+QJsonSerializer::registerBasicConverters<QFile>:
+
 - `QJsonSerializer::registerPointerConverters<T>()`
+- `QJsonSerializer::registerBasicConverters<T*>()`
 - `QJsonSerializer::registerBasicConverters<QSharedPointer<T>>()`
 - `QJsonSerializer::registerBasicConverters<QPointer<T>>()`
 
-@sa QJsonSerializer::registerBasicConverters, QJsonSerializer::registerPointerConverters,
+@sa QJsonSerializer::registerListConverters, QJsonSerializer::registerSetConverters,
+QJsonSerializer::registerMapConverters, QJsonSerializer::registerPointerConverters,
+QJsonSerializer::registerPairConverters, QJsonSerializer::registerTupleConverter,
+QJsonSerializer::registerOptionalConverters, QJsonSerializer::registerVariantConverters,
 qtJsonSerializerRegisterTypes()
 */
 
@@ -428,6 +445,7 @@ Performs the registration of converters for `QPair<T1, T2> <--> QPair<QVariant, 
 and `std::pair<T1, T2> <--> QPair<QVariant, QVariant>`.
 This conversion is a requirement for the serializer, if you want to be able to serialize
 pairs with the given two types. The function calls the following methods for the given type:
+
 - `QMetaType::registerConverter<QPair<T1, T2>, QPair<QVariant, QVariant>>()`
 - `QMetaType::registerConverter<QPair<QVariant, QVariant>, QPair<T1, T2>>()`
 - `QMetaType::registerConverter<std::pair<T1, T2>, QPair<QVariant, QVariant>>()`
@@ -439,8 +457,10 @@ If originalTypeName is set, this method also calls
 @attention Only this very specific combination in this specific order is registered. If you change
 one type to another, or swap the two types, you need to call this method again with this different pair.
 
-@sa QJsonSerializer::registerBasicConverters, QJsonSerializer::registerPointerConverters,
-QJsonSerializer::registerTupleConverters, QJsonSerializer::registerInverseTypedef
+@sa QJsonSerializer::registerBasicConverters, QJsonSerializer::registerListConverters,
+QJsonSerializer::registerSetConverters, QJsonSerializer::registerMapConverters,
+QJsonSerializer::registerPointerConverters, QJsonSerializer::registerTupleConverter,
+QJsonSerializer::registerOptionalConverters, QJsonSerializer::registerVariantConverters
 */
 
 /*!
@@ -451,7 +471,8 @@ QJsonSerializer::registerTupleConverters, QJsonSerializer::registerInverseTypede
 
 Performs the registration of converters for `std::tuple<TArgs...> <--> QVariantList`.
 This conversion is a requirement for the serializer, if you want to be able to serialize
-tuples with the given two types. The function calls the following methods for the given type:
+tuples with the given types. The function calls the following methods for the given type:
+
 - `QMetaType::registerConverter<std::tuple<TArgs...>, QVariantList>()`
 - `QMetaType::registerConverter<QVariantList, std::tuple<TArgs...>>()`
 
@@ -461,8 +482,57 @@ If originalTypeName is set, this method also calls
 @attention Only this very specific combination in this specific order is registered. If you change
 one type to another, or swap the types, you need to call this method again with this different type set.
 
-@sa QJsonSerializer::registerBasicConverters, QJsonSerializer::registerPointerConverters,
-QJsonSerializer::registerPairConverters, QJsonSerializer::registerInverseTypedef
+@sa QJsonSerializer::registerBasicConverters, QJsonSerializer::registerListConverters,
+QJsonSerializer::registerSetConverters, QJsonSerializer::registerMapConverters,
+QJsonSerializer::registerPointerConverters, QJsonSerializer::registerPairConverters,
+QJsonSerializer::registerOptionalConverters, QJsonSerializer::registerVariantConverters
+*/
+
+/*!
+@fn QJsonSerializer::registerOptionalConverters
+
+@tparam T The type that the std::optional wraps
+@param originalTypeName If given, automatically registers an inverse typedef for the given std::optional
+
+Performs the registration of converters for `std::optional<T> <--> QVariant`.
+This conversion is a requirement for the serializer, if you want to be able to serialize
+optionals with the given type. The function calls the following methods for the given type:
+
+- `QMetaType::registerConverter<std::optional<T>, QVariant>()`
+- `QMetaType::registerConverter<QVariant, std::optional<T>>()`
+
+If originalTypeName is set, this method also calls
+`QJsonSerializer::registerInverseTypedef<std::optional<T>>(originalTypeName);`.
+
+@sa QJsonSerializer::registerBasicConverters, QJsonSerializer::registerListConverters,
+QJsonSerializer::registerSetConverters, QJsonSerializer::registerMapConverters,
+QJsonSerializer::registerPointerConverters, QJsonSerializer::registerPairConverters,
+QJsonSerializer::registerTupleConverters, QJsonSerializer::registerVariantConverters
+*/
+
+/*!
+@fn QJsonSerializer::registerVariantConverters
+
+@tparam TArgs The types that make up the variant to register converters for
+@param originalTypeName If given, automatically registers an inverse typedef for the given std::variant
+
+Performs the registration of converters for `std::variant<TArgs...> <--> QVariant`.
+This conversion is a requirement for the serializer, if you want to be able to serialize
+variants with the given types. The function calls the following methods for the given type:
+
+- `QMetaType::registerConverter<std::variant<TArgs...>, QVariant>()`
+- `QMetaType::registerConverter<QVariant, std::variant<TArgs...>>()`
+
+If originalTypeName is set, this method also calls
+`QJsonSerializer::registerInverseTypedef<std::variant<TArgs...>>(originalTypeName);`.
+
+@attention Only this very specific combination in this specific order is registered. If you change
+one type to another, you need to call this method again with this different type set.
+
+@sa QJsonSerializer::registerBasicConverters, QJsonSerializer::registerListConverters,
+QJsonSerializer::registerSetConverters, QJsonSerializer::registerMapConverters,
+QJsonSerializer::registerPointerConverters, QJsonSerializer::registerPairConverters,
+QJsonSerializer::registerTupleConverters, QJsonSerializer::registerOptionalConverters
 */
 
 /*!

@@ -147,7 +147,10 @@ In order for the serializer to properly work, there are a few things you have to
 	- `QJson...` types
 	- `QPair<T1, T2>` and `std::pair<T1, T2>`, of any types that are serializable as well
 	- `std::tuple<TArgs...>`, of any types that are serializable as well
-	- Standard QtCore types (QByteArray, QUrl, QVersionNumber, QUuid, QPoint, QSize, QLine, QRect, QLocale, QRegularExpression)
+	- `std::optional<T>`, of any type that is serializable as well
+	- `std::variant<TArgs...>`, of any types that are serializable as well
+	- `std::chrono::*`, for the basic times (hours, minutes, seconds, milliseconds, microseconds, nanoseconds)
+	- Standard QtCore types (QByteArray, QUrl, QVersionNumber, QUuid, QPoint, QSize, QLine, QRect, QLocale, QRegularExpression, ...)
 		- QByteArray is represented by a base64 encoded string
 	- Any type you add yourself by extending the serializer (See QJsonTypeConverter documentation)
 4. While simple types (i.e. `QList<int>`) are supported out of the box, for custom types (like `QList<TestObject*>`) you will have to register converters. This goes for
@@ -155,6 +158,7 @@ In order for the serializer to properly work, there are a few things you have to
 	- List-Types only: use `QJsonSerializer::registerListConverters<T>()`
 	- Set-Types only: use `QJsonSerializer::registerSetConverters<T>()`
 	- Map-Types only: use `QJsonSerializer::registerMapConverters<T>()`
+		- Maps and hashes can be registered seperately using a template parameter, if you only need one of those
 	- QPair and std::pair: use `QJsonSerializer::registerPairConverters<T1, T2>()`
 	- std::tuple: use `QJsonSerializer::registerTupleConverters<TArgs...>()`
 	- std::optional: use `QJsonSerializer::registerOptionalConverters<T>()`

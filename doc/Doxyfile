@@ -892,7 +892,8 @@ RECURSIVE              = YES
 # Note that relative paths are relative to the directory from which doxygen is
 # run.
 
-EXCLUDE                = ../src/3rdparty
+EXCLUDE                = ../src/3rdparty \
+						 ../src/jsonserializer/qjsonreggen.py
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
 # directories that are symbolic links (a Unix file system feature) are excluded
@@ -927,21 +928,25 @@ EXCLUDE_PATTERNS       = moc_* \
 EXCLUDE_SYMBOLS        = _qjsonserializer_helpertypes \
 						 \
 						 QAbstractAspect \
-						 QAbstractXmlReceiver \
-						 QBasicAtomicInteger \
-						 QBasicAtomicPointer \
 						 QComponent \
 						 QEntity \
-						 QFutureWatcherBase \
 						 QGeometry \
 						 QGeometryRenderer \
 						 QMaterial \
 						 QNode \
 						 QNodeCreatedChangeBase \
 						 QPaintEngineEx \
-						 QQmlExtensionInterface \
+						 QQuickImageProviderWithOptions \
+						 QQuickShaderEffectMesh \
+						 QSGInternalImageNode \
+						 QSGInternalRectangleNode \
+						 QSGLayer \
+						 QSGNodeVisitorEx \
+						 QSGPainterNode \
+						 QSGSpriteNode \
 						 QTechniqueFilter \
-						 QBasicMutex \
+						 QTextToSpeechProcessor \
+						 QT_JSONSERIALIZER_EXCEPTION_BASE \
 						 type
 
 # The EXAMPLE_PATH tag can be used to specify one or more files or directories
