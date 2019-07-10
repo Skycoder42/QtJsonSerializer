@@ -49,9 +49,10 @@ QJsonValue QJsonGadgetConverter::serialize(int propertyType, const QVariant &val
 
 	QJsonObject jsonObject;
 	//go through all properties and try to serialize them
+	const auto ignoreStoredAttribute = helper->getProperty("ignoreStoredAttribute").toBool();
 	for(auto i = 0; i < metaObject->propertyCount(); i++) {
 		auto property = metaObject->property(i);
-		if(property.isStored())
+		if(ignoreStoredAttribute || property.isStored())
 			jsonObject[QString::fromUtf8(property.name())] = helper->serializeSubtype(property, property.readOnGadget(gadget));
 	}
 
@@ -95,10 +96,11 @@ QVariant QJsonGadgetConverter::deserialize(int propertyType, const QJsonValue &v
 
 	//collect required properties, if set
 	QSet<QByteArray> reqProps;
+	const auto ignoreStoredAttribute = helper->getProperty("ignoreStoredAttribute").toBool();
 	if(validationFlags.testFlag(QJsonSerializer::AllProperties)) {
 		for(auto i = 0; i < metaObject->propertyCount(); i++) {
 			auto property = metaObject->property(i);
-			if(property.isStored())
+			if(ignoreStoredAttribute || property.isStored())
 				reqProps.insert(property.name());
 		}
 	}

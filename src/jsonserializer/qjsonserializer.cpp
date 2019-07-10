@@ -78,6 +78,11 @@ QJsonSerializer::MultiMapMode QJsonSerializer::multiMapMode() const
 	return d->multiMapMode;
 }
 
+bool QJsonSerializer::ignoresStoredAttribute() const
+{
+	return d->ignoreStoredAttribute;
+}
+
 QJsonValue QJsonSerializer::serialize(const QVariant &data) const
 {
 	return serializeImpl(data);
@@ -234,6 +239,15 @@ void QJsonSerializer::setMultiMapMode(QJsonSerializer::MultiMapMode multiMapMode
 
 	d->multiMapMode = multiMapMode;
 	emit multiMapModeChanged(d->multiMapMode);
+}
+
+void QJsonSerializer::setIgnoreStoredAttribute(bool ignoreStoredAttribute)
+{
+	if(d->ignoreStoredAttribute == ignoreStoredAttribute)
+		return;
+
+	d->ignoreStoredAttribute = ignoreStoredAttribute;
+	emit ignoreStoredAttributeChanged(d->ignoreStoredAttribute);
 }
 
 QVariant QJsonSerializer::getProperty(const char *name) const

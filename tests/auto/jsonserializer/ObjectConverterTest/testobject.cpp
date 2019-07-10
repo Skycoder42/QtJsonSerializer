@@ -4,11 +4,11 @@ TestObject::TestObject(QObject *parent) :
 	QObject{parent}
 {}
 
-TestObject::TestObject(int key, double value, int hidden, QObject *parent) :
+TestObject::TestObject(int key, double value, int zhidden, QObject *parent) :
 	QObject{parent},
 	key{key},
 	value{value},
-	hidden{hidden}
+	zhidden{zhidden}
 {
 	setObjectName(QStringLiteral("TestObject"));
 }

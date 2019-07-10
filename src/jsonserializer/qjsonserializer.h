@@ -51,6 +51,7 @@ class Q_JSONSERIALIZER_EXPORT QJsonSerializer : public QObject, protected QJsonT
 	Q_PROPERTY(Polymorphing polymorphing READ polymorphing WRITE setPolymorphing NOTIFY polymorphingChanged)
 	//! Specify how multi maps and sets should be serialized
 	Q_PROPERTY(MultiMapMode multiMapMode READ multiMapMode WRITE setMultiMapMode NOTIFY multiMapModeChanged)
+	Q_PROPERTY(bool ignoreStoredAttribute READ ignoresStoredAttribute WRITE setIgnoreStoredAttribute NOTIFY ignoreStoredAttributeChanged)
 
 public:
 	//! Flags to specify how strict the serializer should validate when deserializing
@@ -147,6 +148,8 @@ public:
 	Polymorphing polymorphing() const;
 	//! @readAcFn{QJsonSerializer::multiMapMode}
 	MultiMapMode multiMapMode() const;
+	//! @readAcFn{QJsonSerializer::ignoreStoredAttribute}
+	bool ignoresStoredAttribute() const;
 
 	//! Serializers a QVariant value to a QJsonValue
 	QJsonValue serialize(const QVariant &data) const;
@@ -217,6 +220,8 @@ public Q_SLOTS:
 	void setPolymorphing(Polymorphing polymorphing);
 	//! @writeAcFn{QJsonSerializer::multiMapMode}
 	void setMultiMapMode(MultiMapMode multiMapMode);
+	//! @writeAcFn{QJsonSerializer::ignoreStoredAttribute}
+	void setIgnoreStoredAttribute(bool ignoreStoredAttribute);
 
 Q_SIGNALS:
 	//! @notifyAcFn{QJsonSerializer::allowDefaultNull}
@@ -235,6 +240,8 @@ Q_SIGNALS:
 	void polymorphingChanged(Polymorphing polymorphing);
 	//! @notifyAcFn{QJsonSerializer::multiMapMode}
 	void multiMapModeChanged(MultiMapMode multiMapMode);
+	//! @notifyAcFn{QJsonSerializer::ignoreStoredAttribute}
+	void ignoreStoredAttributeChanged(bool ignoreStoredAttribute);
 
 protected:
 	//protected implementation -> internal use for the type converters

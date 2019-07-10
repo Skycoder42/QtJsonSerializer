@@ -31,6 +31,7 @@ public:
 	QJsonSerializer::ValidationFlags validationFlags = QJsonSerializer::StandardValidation;
 	QJsonSerializer::Polymorphing polymorphing = QJsonSerializer::Enabled;
 	QJsonSerializer::MultiMapMode multiMapMode = QJsonSerializer::MultiMapMode::Map; //TODO which one is the better default?
+	bool ignoreStoredAttribute = false;
 
 	QReadWriteLock typeConverterLock{};
 	QList<QSharedPointer<QJsonTypeConverter>> typeConverters;

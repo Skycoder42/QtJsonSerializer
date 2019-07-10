@@ -272,6 +272,21 @@ void ObjectConverterTest::addSerData()
 													{QStringLiteral("key"), 1},
 													{QStringLiteral("value"), 2}
 												}};
+
+	QTest::newRow("stored.ignore") << QVariantHash{{QStringLiteral("ignoreStoredAttribute"), true}}
+								   << TestQ{
+										{QMetaType::Int, 10, 1},
+										{QMetaType::Double, 0.1, 2},
+										{QMetaType::Int, 11, 3}
+								   }
+								   << static_cast<QObject*>(nullptr)
+								   << qMetaTypeId<TestObject*>()
+								   << QVariant::fromValue(new TestObject{10, 0.1, 11, this})
+								   << QJsonValue{QJsonObject{
+											{QStringLiteral("key"), 1},
+											{QStringLiteral("value"), 2},
+											{QStringLiteral("zhidden"), 3}
+										}};
 }
 
 void ObjectConverterTest::addDeserData()

@@ -10,15 +10,15 @@ class TestObject : public QObject
 
 	Q_PROPERTY(int key MEMBER key)
 	Q_PROPERTY(double value MEMBER value)
-	Q_PROPERTY(int hidden MEMBER hidden STORED false)
+	Q_PROPERTY(int zhidden MEMBER zhidden STORED false)
 
 public:
 	Q_INVOKABLE explicit TestObject(QObject *parent = nullptr);
-	explicit TestObject(int key, double value, int hidden, QObject *parent = nullptr);
+	explicit TestObject(int key, double value, int zhidden, QObject *parent = nullptr);
 
 	int key = 0;
 	double value = 0;
-	int hidden = 0;
+	int zhidden = 0;
 
 	virtual bool compare(const TestObject *other) const;
 };

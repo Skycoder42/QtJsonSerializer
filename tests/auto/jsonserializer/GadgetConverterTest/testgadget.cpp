@@ -1,9 +1,9 @@
 #include "testgadget.h"
 
-TestGadget::TestGadget(int key, double value, int hidden) :
+TestGadget::TestGadget(int key, double value, int zhidden) :
 	key(key),
 	value(value),
-	hidden(hidden)
+	zhidden(zhidden)
 {}
 
 bool TestGadget::operator==(const TestGadget &other) const

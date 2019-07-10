@@ -71,13 +71,14 @@ QJsonValue QJsonObjectConverter::serialize(int propertyType, const QVariant &val
 		meta = getMetaObject(propertyType);
 
 	//go through all properties and try to serialize them
-	auto keepObjectName = helper->getProperty("keepObjectName").toBool();
+	const auto keepObjectName = helper->getProperty("keepObjectName").toBool();
+	const auto ignoreStoredAttribute = helper->getProperty("ignoreStoredAttribute").toBool();
 	auto i = QObject::staticMetaObject.indexOfProperty("objectName");
 	if(!keepObjectName)
 	   i++;
 	for(; i < meta->propertyCount(); i++) {
 		auto property = meta->property(i);
-		if(property.isStored())
+		if(ignoreStoredAttribute || property.isStored())
 			jsonObject[QString::fromUtf8(property.name())] = helper->serializeSubtype(property, property.read(object));
 	}
 
@@ -130,12 +131,13 @@ QVariant QJsonObjectConverter::deserialize(int propertyType, const QJsonValue &v
 	//collect required properties, if set
 	QSet<QByteArray> reqProps;
 	if(validationFlags.testFlag(QJsonSerializer::AllProperties)) {
+		const auto ignoreStoredAttribute = helper->getProperty("ignoreStoredAttribute").toBool();
 		auto i = QObject::staticMetaObject.indexOfProperty("objectName");
 		if(!keepObjectName)
 		   i++;
 		for(; i < metaObject->propertyCount(); i++) {
 			auto property = metaObject->property(i);
-			if(property.isStored())
+			if(ignoreStoredAttribute || property.isStored())
 				reqProps.insert(property.name());
 		}
 	}

@@ -17,7 +17,6 @@ protected:
 	void addConverterData() override;
 	void addMetaData() override;
 	void addCommonSerData() override;
-	void addSerData() override;
 	void addDeserData() override;
 
 	bool compare(int type, QVariant &actual, QVariant &expected, const char *aName, const char *eName, const char *file, int line) override;
@@ -87,11 +86,21 @@ void GadgetConverterTest::addCommonSerData()
 							  << qMetaTypeId<TestGadget*>()
 							  << QVariant::fromValue<TestGadget*>(nullptr)
 							  << QJsonValue{QJsonValue::Null};
-}
 
-void GadgetConverterTest::addSerData()
-{
-
+	QTest::newRow("stored.ignore") << QVariantHash{{QStringLiteral("ignoreStoredAttribute"), true}}
+								   << TestQ{
+										{QMetaType::Int, 10, 1},
+										{QMetaType::Double, 0.1, 2},
+										{QMetaType::Int, 11, 3}
+								   }
+								   << static_cast<QObject*>(nullptr)
+								   << qMetaTypeId<TestGadget>()
+								   << QVariant::fromValue(TestGadget{10, 0.1, 11})
+								   << QJsonValue{QJsonObject{
+											{QStringLiteral("key"), 1},
+											{QStringLiteral("value"), 2},
+											{QStringLiteral("zhidden"), 3}
+										}};
 }
 
 void GadgetConverterTest::addDeserData()
