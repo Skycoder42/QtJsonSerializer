@@ -261,9 +261,6 @@ private:
 	QJsonValue serializeValue(int propertyType, const QVariant &value) const;
 	QVariant deserializeValue(int propertyType, const QJsonValue &value) const;
 
-	QJsonValue serializeEnum(const QMetaEnum &metaEnum, const QVariant &value) const;
-	QVariant deserializeEnum(const QMetaEnum &metaEnum, const QJsonValue &value) const;
-
 	void writeToDevice(const QJsonValue &data, QIODevice *device, QJsonDocument::JsonFormat format) const;
 	QJsonValue readFromDevice(QIODevice *device) const;
 

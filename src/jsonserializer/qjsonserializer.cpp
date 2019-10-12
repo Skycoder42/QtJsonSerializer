@@ -10,6 +10,7 @@
 
 #include "typeconverters/qjsonobjectconverter_p.h"
 #include "typeconverters/qjsongadgetconverter_p.h"
+#include "typeconverters/qjsonenumconverter_p.h"
 #include "typeconverters/qjsonmapconverter_p.h"
 #include "typeconverters/qjsonmultimapconverter_p.h"
 #include "typeconverters/qjsonlistconverter_p.h"
@@ -258,18 +259,20 @@ QVariant QJsonSerializer::getProperty(const char *name) const
 QJsonValue QJsonSerializer::serializeSubtype(QMetaProperty property, const QVariant &value) const
 {
 	QJsonExceptionContext ctx(property);
-	if(property.isEnumType())
-		return serializeEnum(property.enumerator(), value);
-	else
+	if(property.isEnumType()) {
+		const auto metaEnum = property.enumerator();
+		return serializeVariant(QMetaType::type(metaEnum.scope() + QByteArray{"::"} + metaEnum.name()), value);
+	} else
 		return serializeVariant(property.userType(), value);
 }
 
 QVariant QJsonSerializer::deserializeSubtype(QMetaProperty property, const QJsonValue &value, QObject *parent) const
 {
 	QJsonExceptionContext ctx(property);
-	if(property.isEnumType())
-		return deserializeEnum(property.enumerator(), value);
-	else
+	if(property.isEnumType()) {
+		const auto metaEnum = property.enumerator();
+		return deserializeVariant(QMetaType::type(metaEnum.scope() + QByteArray{"::"} + metaEnum.name()), value, parent);
+	} else
 		return deserializeVariant(property.userType(), value, parent);
 }
 
@@ -452,47 +455,6 @@ QVariant QJsonSerializer::deserializeValue(int propertyType, const QJsonValue &v
 	return value.toVariant();
 }
 
-QJsonValue QJsonSerializer::serializeEnum(const QMetaEnum &metaEnum, const QVariant &value) const
-{
-	if(d->enumAsString) {
-		if(metaEnum.isFlag())
-			return QString::fromUtf8(metaEnum.valueToKeys(value.toInt()));
-		else
-			return QString::fromUtf8(metaEnum.valueToKey(value.toInt()));
-	} else
-		return value.toInt();
-}
-
-QVariant QJsonSerializer::deserializeEnum(const QMetaEnum &metaEnum, const QJsonValue &value) const
-{
-	if(value.isString()) {
-		auto result = -1;
-		auto ok = false;
-		if(metaEnum.isFlag())
-			result = metaEnum.keysToValue(qUtf8Printable(value.toString()), &ok);
-		else
-			result = metaEnum.keyToValue(qUtf8Printable(value.toString()), &ok);
-		if(ok)
-			return result;
-		else if(metaEnum.isFlag() && value.toString().isEmpty())
-			return 0x00;
-		else
-			throw QJsonDeserializationException("Invalid value for enum type found: " + value.toString().toUtf8());
-	} else {
-		auto intValue = value.toInt();
-		double intpart;
-		if(std::modf(value.toDouble(), &intpart) != 0.0) {
-			throw QJsonDeserializationException("Invalid value (double) for enum type found: " +
-												QByteArray::number(value.toDouble()));
-		}
-		if(!metaEnum.isFlag() && metaEnum.valueToKey(intValue) == nullptr) {
-			throw QJsonDeserializationException("Invalid integer value. Not a valid enum element: " +
-												QByteArray::number(intValue));
-		}
-		return intValue;
-	}
-}
-
 void QJsonSerializer::writeToDevice(const QJsonValue &data, QIODevice *device, QJsonDocument::JsonFormat format) const
 {
 	QJsonDocument doc;
@@ -568,6 +530,7 @@ QReadWriteLock QJsonSerializerPrivate::factoryLock;
 QList<QSharedPointer<QJsonTypeConverterFactory>> QJsonSerializerPrivate::typeConverterFactories {
 	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonObjectConverter>>::create(),
 	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonGadgetConverter>>::create(),
+	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonEnumConverter>>::create(),
 	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonMapConverter>>::create(),
 	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonMultiMapConverter>>::create(),
 	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonListConverter>>::create(),
