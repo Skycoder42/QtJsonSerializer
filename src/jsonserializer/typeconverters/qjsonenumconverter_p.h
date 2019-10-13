@@ -4,9 +4,14 @@
 #include "qtjsonserializer_global.h"
 #include "qjsontypeconverter.h"
 
+#include <QtCore/QMetaEnum>
+
 class Q_JSONSERIALIZER_EXPORT QJsonEnumConverter : public QJsonTypeConverter
 {
 public:
+	static QJsonValue serializeEnum(const QMetaEnum &metaEnum, const QVariant &value, bool enumAsString);
+	static QVariant deserializeEnum(const QMetaEnum &metaEnum, const QJsonValue &value);
+
 	bool canConvert(int metaTypeId) const override;
 	QList<QJsonValue::Type> jsonTypes() const override;
 	QJsonValue serialize(int propertyType, const QVariant &value, const SerializationHelper *helper) const override;

@@ -3,9 +3,6 @@
 
 #include <cmath>
 
-#include <QtCore/QMetaEnum>
-#include <QDebug>
-
 namespace {
 
 Q_NORETURN inline void throwSer(QByteArray &&what, bool ser)
@@ -18,21 +15,9 @@ Q_NORETURN inline void throwSer(QByteArray &&what, bool ser)
 
 }
 
-bool QJsonEnumConverter::canConvert(int metaTypeId) const
+QJsonValue QJsonEnumConverter::serializeEnum(const QMetaEnum &metaEnum, const QVariant &value, bool enumAsString)
 {
-	return QMetaType::typeFlags(metaTypeId).testFlag(QMetaType::IsEnumeration);
-}
-
-QList<QJsonValue::Type> QJsonEnumConverter::jsonTypes() const
-{
-	return {QJsonValue::String, QJsonValue::Double};
-}
-
-QJsonValue QJsonEnumConverter::serialize(int propertyType, const QVariant &value, const QJsonTypeConverter::SerializationHelper *helper) const
-{
-	qDebug() << helper->getProperty("enumAsString");
-	if (helper->getProperty("enumAsString").toBool()) {
-		const auto metaEnum = getEnum(propertyType, true);
+	if (enumAsString) {
 		if(metaEnum.isFlag())
 			return QString::fromUtf8(metaEnum.valueToKeys(value.toInt()));
 		else
@@ -41,11 +26,8 @@ QJsonValue QJsonEnumConverter::serialize(int propertyType, const QVariant &value
 		return value.toInt();
 }
 
-QVariant QJsonEnumConverter::deserialize(int propertyType, const QJsonValue &value, QObject *parent, const QJsonTypeConverter::SerializationHelper *helper) const
+QVariant QJsonEnumConverter::deserializeEnum(const QMetaEnum &metaEnum, const QJsonValue &value)
 {
-	Q_UNUSED(parent)
-	Q_UNUSED(helper)
-	const auto metaEnum = getEnum(propertyType, true);
 	if(value.isString()) {
 		auto result = -1;
 		auto ok = false;
@@ -76,6 +58,30 @@ QVariant QJsonEnumConverter::deserialize(int propertyType, const QJsonValue &val
 		}
 		return intValue;
 	}
+}
+
+bool QJsonEnumConverter::canConvert(int metaTypeId) const
+{
+	return QMetaType::typeFlags(metaTypeId).testFlag(QMetaType::IsEnumeration);
+}
+
+QList<QJsonValue::Type> QJsonEnumConverter::jsonTypes() const
+{
+	return {QJsonValue::Double, QJsonValue::String};
+}
+
+QJsonValue QJsonEnumConverter::serialize(int propertyType, const QVariant &value, const QJsonTypeConverter::SerializationHelper *helper) const
+{
+	return serializeEnum(getEnum(propertyType, true),
+						 value,
+						 helper->getProperty("enumAsString").toBool());
+}
+
+QVariant QJsonEnumConverter::deserialize(int propertyType, const QJsonValue &value, QObject *parent, const QJsonTypeConverter::SerializationHelper *helper) const
+{
+	Q_UNUSED(parent)
+	Q_UNUSED(helper)
+	return deserializeEnum(getEnum(propertyType, true), value);
 }
 
 QMetaEnum QJsonEnumConverter::getEnum(int metaTypeId, bool ser) const

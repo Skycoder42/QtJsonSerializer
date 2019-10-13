@@ -259,20 +259,18 @@ QVariant QJsonSerializer::getProperty(const char *name) const
 QJsonValue QJsonSerializer::serializeSubtype(QMetaProperty property, const QVariant &value) const
 {
 	QJsonExceptionContext ctx(property);
-	if(property.isEnumType()) {
-		const auto metaEnum = property.enumerator();
-		return serializeVariant(QMetaType::type(metaEnum.scope() + QByteArray{"::"} + metaEnum.name()), value);
-	} else
+	if (property.isEnumType())
+		return QJsonEnumConverter::serializeEnum(property.enumerator(), value, d->enumAsString);
+	else
 		return serializeVariant(property.userType(), value);
 }
 
 QVariant QJsonSerializer::deserializeSubtype(QMetaProperty property, const QJsonValue &value, QObject *parent) const
 {
 	QJsonExceptionContext ctx(property);
-	if(property.isEnumType()) {
-		const auto metaEnum = property.enumerator();
-		return deserializeVariant(QMetaType::type(metaEnum.scope() + QByteArray{"::"} + metaEnum.name()), value, parent);
-	} else
+	if(property.isEnumType())
+		return QJsonEnumConverter::deserializeEnum(property.enumerator(), value);
+	else
 		return deserializeVariant(property.userType(), value, parent);
 }
 
