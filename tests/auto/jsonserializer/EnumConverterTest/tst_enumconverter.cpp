@@ -40,7 +40,7 @@ QJsonTypeConverter *EnumConverterTest::converter()
 
 void EnumConverterTest::addConverterData()
 {
-	QTest::newRow("enum") << static_cast<int>(QJsonTypeConverter::Standard)
+	QTest::newRow("enum") << static_cast<int>(QJsonTypeConverter::Low)
 						  << QList<QJsonValue::Type>{QJsonValue::Double, QJsonValue::String};
 }
 
@@ -49,7 +49,7 @@ void EnumConverterTest::addMetaData()
 	QTest::newRow("enum") << qMetaTypeId<TestClass::TestEnum>()
 						  << true;
 	QTest::newRow("flags") << qMetaTypeId<TestClass::TestFlags>()
-						   << false;
+						   << true;
 	QTest::newRow("invalid") << static_cast<int>(QMetaType::Int)
 							 << false;
 }

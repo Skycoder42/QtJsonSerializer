@@ -60,9 +60,15 @@ QVariant QJsonEnumConverter::deserializeEnum(const QMetaEnum &metaEnum, const QJ
 	}
 }
 
+QJsonEnumConverter::QJsonEnumConverter()
+{
+	setPriority(QJsonTypeConverter::Low);
+}
+
 bool QJsonEnumConverter::canConvert(int metaTypeId) const
 {
-	return QMetaType::typeFlags(metaTypeId).testFlag(QMetaType::IsEnumeration);
+	return QMetaType::typeFlags(metaTypeId).testFlag(QMetaType::IsEnumeration) ||
+			testForEnum(metaTypeId);  // NOTE check once in a while if still needed
 }
 
 QList<QJsonValue::Type> QJsonEnumConverter::jsonTypes() const
@@ -82,6 +88,16 @@ QVariant QJsonEnumConverter::deserialize(int propertyType, const QJsonValue &val
 	Q_UNUSED(parent)
 	Q_UNUSED(helper)
 	return deserializeEnum(getEnum(propertyType, true), value);
+}
+
+bool QJsonEnumConverter::testForEnum(int metaTypeId) const
+{
+	try {
+		getEnum(metaTypeId, true);
+		return true;
+	} catch (QJsonSerializerException &) {
+		return false;
+	}
 }
 
 QMetaEnum QJsonEnumConverter::getEnum(int metaTypeId, bool ser) const

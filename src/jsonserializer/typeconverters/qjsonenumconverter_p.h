@@ -12,12 +12,15 @@ public:
 	static QJsonValue serializeEnum(const QMetaEnum &metaEnum, const QVariant &value, bool enumAsString);
 	static QVariant deserializeEnum(const QMetaEnum &metaEnum, const QJsonValue &value);
 
+	QJsonEnumConverter();
+
 	bool canConvert(int metaTypeId) const override;
 	QList<QJsonValue::Type> jsonTypes() const override;
 	QJsonValue serialize(int propertyType, const QVariant &value, const SerializationHelper *helper) const override;
 	QVariant deserialize(int propertyType, const QJsonValue &value, QObject *parent, const SerializationHelper *helper) const override;
 
 private:
+	bool testForEnum(int metaTypeId) const;
 	QMetaEnum getEnum(int metaTypeId, bool ser) const;
 };
 
