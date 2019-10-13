@@ -3,12 +3,14 @@ TARGET = QtJsonSerializer
 QT = core
 
 SOURCES += \
+	qcbortypeconverter.cpp \
 	qjsonserializerexception.cpp \
 	qjsonserializer.cpp \
 	qjsontypeconverter.cpp \
 	qjsonexceptioncontext.cpp
 
 HEADERS += \
+	qcbortypeconverter.h \
 	qjsonserializerexception.h \
 	qjsonserializer.h \
 	qjsonserializer_p.h \

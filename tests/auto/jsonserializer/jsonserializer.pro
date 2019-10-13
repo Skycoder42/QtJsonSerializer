@@ -1,12 +1,12 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-	EnumConverterTest \
 	TypeConverterTestLib \
 	SerializerTest
 
 CONVERTER_TESTS = \
 	BytearrayConverterTest \
+	EnumConverterTest \
 	GadgetConverterTest \
 	GeomConverterTest \
 	JsonConverterTest \
