@@ -12,14 +12,29 @@
 
 QCborSerializer::QCborSerializer(QObject *parent) :
 	QJsonSerializer{new QCborSerializerPrivate{}, parent}
-{}
+{
+	D->typeTags = {
+		{QMetaType::QColor, static_cast<QCborTag>(QCborSerializer::Color)},
+		{QMetaType::QFont, static_cast<QCborTag>(QCborSerializer::Font)}
+	};
+}
+
+void QCborSerializer::setTypeTag(int metaTypeId, QCborTag tag)
+{
+	QWriteLocker lock{&D->typeTagsLock};
+	if (tag == QCborTypeConverter::NoTag)
+		D->typeTags.remove(metaTypeId);
+	else
+		D->typeTags.insert(metaTypeId, tag);
+}
+
+QCborTag QCborSerializer::typeTag(int metaTypeId) const
+{
+	QReadLocker lock{&D->typeTagsLock};
+	return D->typeTags.value(metaTypeId, QCborTypeConverter::NoTag);
+}
 
 QCborSerializer::~QCborSerializer() = default;
-
-QCborSerializer::ByteArrayTag QCborSerializer::byteArrayTag() const
-{
-	return D->byteArrayTag;
-}
 
 QCborValue QCborSerializer::serialize(const QVariant &data) const
 {
@@ -58,6 +73,11 @@ QVariant QCborSerializer::deserializeFrom(const QByteArray &data, int metaTypeId
 	if (error.error.c != QCborError::NoError)
 		throw QJsonDeserializationException("Failed to read file as CBOR with error: " + error.error.toString().toUtf8());
 	return deserializeVariant(metaTypeId, cbor, parent);
+}
+
+QCborSerializer::ByteArrayTag QCborSerializer::byteArrayTag() const
+{
+	return D->byteArrayTag;
 }
 
 void QCborSerializer::setByteArrayTag(QCborSerializer::ByteArrayTag byteArrayTag)
@@ -144,8 +164,13 @@ QVariant QCborSerializer::deserializeVariant(int propertyType, const QCborValue 
 
 QCborValue QCborSerializer::serializeValue(int propertyType, const QVariant &value) const
 {
-	Q_UNUSED(propertyType)
-	return QCborValue::fromVariant(value);
+	const auto cValue = QCborValue::fromVariant(value);
+	if (!cValue.isTag()) {
+		const auto mTag = typeTag(propertyType == QMetaType::UnknownType ? value.userType() : propertyType);
+		if (mTag != QCborTypeConverter::NoTag)
+			return {mTag, cValue};
+	}
+	return cValue;
 }
 
 QVariant QCborSerializer::deserializeValue(int propertyType, const QCborValue &value) const
@@ -218,6 +243,11 @@ QVariant QCborSerializer::deserializeValue(int propertyType, const QCborValue &v
 		default:
 			break;
 		}
+
+		if (const auto mTag = typeTag(propertyType);
+			mTag != QCborTypeConverter::NoTag &&
+			mTag != value.tag())
+			doThrow = true;
 
 		if (doThrow) {
 			throw QJsonDeserializationException(QByteArray("Failed to deserialze CBOR-value to type ") +

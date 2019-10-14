@@ -15,6 +15,25 @@ class Q_JSONSERIALIZER_EXPORT QCborSerializer : public QJsonSerializer, protecte
 	Q_PROPERTY(ByteArrayTag byteArrayTag READ byteArrayTag WRITE setByteArrayTag NOTIFY byteArrayTagChanged)
 
 public:
+	enum QCborExtendedTags : quint64 {
+		GenericObject = 27,
+		Identifier = 39,
+		Set = 258,
+		ExplicitMap = 259,
+		NetworkAddress = 260,
+		NetworkAddressPrefix = 261,
+		EmbeddedJSON = 262,
+	};
+	Q_ENUM(QCborExtendedTags)
+
+	enum QCborCustomTags : quint64 {
+		Color = 10421,
+		Font = 10421,
+
+		NoTag = static_cast<quint64>(QCborTypeConverter::NoTag)
+	};
+	Q_ENUM(QCborCustomTags)
+
 	enum class ByteArrayTag {
 		None,
 		Base64,
@@ -26,7 +45,12 @@ public:
 	explicit QCborSerializer(QObject *parent = nullptr);
 	~QCborSerializer() override;
 
-	ByteArrayTag byteArrayTag() const;
+	void setTypeTag(int metaTypeId, QCborTag tag = static_cast<QCborTag>(NoTag));
+	template <typename T>
+	void setTypeTag(QCborTag tag = static_cast<QCborTag>(NoTag));
+	QCborTag typeTag(int metaTypeId) const override;
+	template <typename T>
+	QCborTag typeTag() const;
 
 	//! Serializers a QVariant value to a QCborValue
 	QCborValue serialize(const QVariant &data) const;
@@ -62,6 +86,8 @@ public:
 	template <typename T>
 	T deserializeFrom(const QByteArray &data, QObject *parent = nullptr) const;
 
+	ByteArrayTag byteArrayTag() const;
+
 public Q_SLOTS:
 	void setByteArrayTag(ByteArrayTag byteArrayTag);
 
@@ -85,6 +111,18 @@ private:
 };
 
 // ------------- generic implementation -------------
+
+template<typename T>
+void QCborSerializer::setTypeTag(QCborTag tag)
+{
+	setTypeTag(qMetaTypeId<T>(), tag);
+}
+
+template<typename T>
+QCborTag QCborSerializer::typeTag() const
+{
+	return typeTag(qMetaTypeId<T>());
+}
 
 template<typename T>
 typename _qjsonserializer_helpertypes::json_type<T>::cborType QCborSerializer::serialize(const T &data) const

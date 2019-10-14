@@ -4,10 +4,15 @@
 #include "qcborserializer.h"
 #include "qjsonserializer_p.h"
 
+#include <QtCore/QHash>
+
 class QCborSerializerPrivate : public QJsonSerializerPrivate
 {
 public:
 	using ByteArrayTag = QCborSerializer::ByteArrayTag;
+
+	QReadWriteLock typeTagsLock {};
+	QHash<int, QCborTag> typeTags {};
 
 	ByteArrayTag byteArrayTag = ByteArrayTag::None;
 

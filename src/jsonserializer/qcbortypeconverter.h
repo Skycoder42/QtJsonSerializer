@@ -18,6 +18,8 @@ public:
 	public:
 		SerializationHelper();
 
+		virtual QCborTag typeTag(int metaTypeId) const = 0;
+
 		//! Serialize a subvalue, represented by a meta property
 		virtual QCborValue serializeCborSubtype(const QMetaProperty &property, const QVariant &value) const = 0;
 		//! Serialize a subvalue, represented by a type id
