@@ -75,20 +75,6 @@ QVariant QCborSerializer::deserializeFrom(const QByteArray &data, int metaTypeId
 	return deserializeVariant(metaTypeId, cbor, parent);
 }
 
-QCborSerializer::ByteArrayTag QCborSerializer::byteArrayTag() const
-{
-	return D->byteArrayTag;
-}
-
-void QCborSerializer::setByteArrayTag(QCborSerializer::ByteArrayTag byteArrayTag)
-{
-	if (D->byteArrayTag == byteArrayTag)
-		return;
-
-	D->byteArrayTag = byteArrayTag;
-	emit byteArrayTagChanged(D->byteArrayTag, {});
-}
-
 QCborValue QCborSerializer::serializeCborSubtype(const QMetaProperty &property, const QVariant &value) const
 {
 	QJsonExceptionContext ctx{property};
@@ -119,6 +105,31 @@ QVariant QCborSerializer::deserializeCborSubtype(int propertyType, const QCborVa
 	return deserializeVariant(propertyType, value, parent);
 }
 
+QVariant QCborSerializer::getProperty(const char *name) const
+{
+	return QJsonSerializer::getProperty(name);
+}
+
+QJsonValue QCborSerializer::serializeSubtype(QMetaProperty property, const QVariant &value) const
+{
+	return QJsonSerializer::serializeSubtype(property, value);
+}
+
+QJsonValue QCborSerializer::serializeSubtype(int propertyType, const QVariant &value, const QByteArray &traceHint) const
+{
+	return QJsonSerializer::serializeSubtype(propertyType, value, traceHint);
+}
+
+QVariant QCborSerializer::deserializeSubtype(QMetaProperty property, const QJsonValue &value, QObject *parent) const
+{
+	return QJsonSerializer::deserializeSubtype(property, value, parent);
+}
+
+QVariant QCborSerializer::deserializeSubtype(int propertyType, const QJsonValue &value, QObject *parent, const QByteArray &traceHint) const
+{
+	return QJsonSerializer::deserializeSubtype(propertyType, value, parent, traceHint);
+}
+
 QCborValue QCborSerializer::serializeVariant(int propertyType, const QVariant &value) const
 {
 	auto converter = D->findConverter(propertyType);
@@ -144,12 +155,14 @@ QVariant QCborSerializer::deserializeVariant(int propertyType, const QCborValue 
 
 		// exclude special values that can convert from null, but should not do so
 		auto allowConvert = true;
-		if(propertyType == QMetaType::QString && value.isNull())
+		if ((propertyType == QMetaType::QString ||
+			 propertyType == QMetaType::QByteArray)
+			&& value.isNull())
 			allowConvert = false;
 
-		if(allowConvert && variant.canConvert(propertyType) && variant.convert(propertyType))
+		if (allowConvert && variant.canConvert(propertyType) && variant.convert(propertyType))
 			return variant;
-		else if(d->allowNull && value.isNull())
+		else if (d->allowNull && value.isNull())
 			return QVariant{propertyType, nullptr};
 		else {
 			throw QJsonDeserializationException(QByteArray("Failed to convert deserialized variant of type ") +
@@ -164,7 +177,28 @@ QVariant QCborSerializer::deserializeVariant(int propertyType, const QCborValue 
 
 QCborValue QCborSerializer::serializeValue(int propertyType, const QVariant &value) const
 {
-	const auto cValue = QCborValue::fromVariant(value);
+	if (propertyType == QMetaType::UnknownType)
+		propertyType = value.userType();
+
+	// handle special values
+	QCborValue cValue;
+	if (propertyType == QMetaType::QDate) // TODO move to own type converter
+		cValue = QCborValue{QDateTime{value.toDate()}};
+	else if (propertyType == QMetaType::QTime) {
+		if (const auto cTime = value.toTime(); cTime.isValid())
+			cValue = QCborValue{QDateTime{QDate{1970, 1, 1}, value.toTime()}};
+		else
+			cValue = QCborValue{QDateTime{}};
+	} else if (typeTag(propertyType) == QCborKnownTags::UnixTime_t) {
+		QDateTime uDt;
+		if (propertyType == QMetaType::QDate)
+			uDt = QDateTime{value.toDate()};
+		else
+			uDt = value.toDateTime();
+		cValue = QCborValue{QCborKnownTags::UnixTime_t, uDt.toUTC().toSecsSinceEpoch()};
+	} else
+		cValue = QCborValue::fromVariant(value);
+
 	if (!cValue.isTag()) {
 		const auto mTag = typeTag(propertyType == QMetaType::UnknownType ? value.userType() : propertyType);
 		if (mTag != QCborTypeConverter::NoTag)
@@ -180,7 +214,7 @@ QVariant QCborSerializer::deserializeValue(int propertyType, const QCborValue &v
 		auto doThrow = false;
 		switch (propertyType) {
 		case QMetaType::Bool:
-			if (value.isBool())
+			if (!value.isBool())
 				doThrow = true;
 			break;
 		case QMetaType::Int:
@@ -198,23 +232,28 @@ QVariant QCborSerializer::deserializeValue(int propertyType, const QCborValue &v
 			break;
 		case QMetaType::Float:
 		case QMetaType::Double:
-			if (value.isDouble())
+			if (!value.isDouble())
 				doThrow = true;
 			break;
 		case QMetaType::Char:
 		case QMetaType::QChar:
 		case QMetaType::QString:
-		case QMetaType::QColor:  // TODO make tagged
-		case QMetaType::QFont:  // TODO make tagged
-			if (!value.isString())
+		case QMetaType::QColor:
+		case QMetaType::QFont:
+			if (!value.isString() &&
+				!(value.tag() == QCborKnownTags::Base64 && value.taggedValue().isString()) &&
+				!(value.tag() == QCborKnownTags::Base64url && value.taggedValue().isString()))
 				doThrow = true;
 			break;
 		case QMetaType::QByteArray:
-			if (!value.isByteArray())
+			if (!value.isByteArray() &&
+				!(value.tag() == QCborKnownTags::ExpectedBase64 && value.taggedValue().isByteArray()) &&
+				!(value.tag() == QCborKnownTags::ExpectedBase64url && value.taggedValue().isByteArray()) &&
+				!(value.tag() == QCborKnownTags::ExpectedBase16 && value.taggedValue().isByteArray()))
 				doThrow = true;
 			break;
 		case QMetaType::Nullptr:
-			if (value.isNull())
+			if (!value.isNull())
 				doThrow = true;
 			break;
 		case QMetaType::QDate:
@@ -256,7 +295,25 @@ QVariant QCborSerializer::deserializeValue(int propertyType, const QCborValue &v
 		}
 	}
 
-	return value.toVariant();
+	const auto res = value.toVariant();
+	if (propertyType == QMetaType::QDate)
+		return res.toDateTime().date();
+	else if (propertyType == QMetaType::QTime)
+		return res.toDateTime().time(); // WORKAROUND report and remove QTBUG-79196
+	else if (value.tag() == QCborKnownTags::UnixTime_t) {
+		auto dt = QDateTime::fromSecsSinceEpoch(value.taggedValue().toInteger(), Qt::UTC);
+		if (propertyType == QMetaType::QDate)
+			return dt.date();
+		else
+			return dt;
+	} else if (value.tag() == QCborKnownTags::Uuid &&
+			 res.userType() != QMetaType::QUuid)
+		return QUuid::fromRfc4122(res.toByteArray());
+	else if (value.tag() == QCborKnownTags::RegularExpression &&
+			 res.userType() != QMetaType::QRegularExpression)
+		return QRegularExpression{res.toString()};
+	else
+		return res;
 }
 
 // ------------- private implementation -------------

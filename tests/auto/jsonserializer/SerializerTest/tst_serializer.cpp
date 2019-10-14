@@ -592,10 +592,6 @@ void SerializerTest::addCommonData()
 								 << QJsonValue{QJsonValue::Null}
 								 << true
 								 << QVariantHash{};
-	QTest::newRow("object.null") << QVariant::fromValue<TestObject*>(nullptr)
-								 << QJsonValue{QJsonValue::Null}
-								 << true
-								 << QVariantHash{};
 	QTest::newRow("object.name") << QVariant::fromValue(new TestObject{10})
 								 << QJsonValue{QJsonObject{{QStringLiteral("data"), 10}, {QStringLiteral("objectName"), QStringLiteral("testname")}}}
 								 << true

@@ -9,12 +9,8 @@
 class QCborSerializerPrivate : public QJsonSerializerPrivate
 {
 public:
-	using ByteArrayTag = QCborSerializer::ByteArrayTag;
-
 	QReadWriteLock typeTagsLock {};
 	QHash<int, QCborTag> typeTags {};
-
-	ByteArrayTag byteArrayTag = ByteArrayTag::None;
 
 	QSharedPointer<QCborTypeConverter> findConverter(int propertyType,
 													 QCborValue::Type valueType = QCborValue::Undefined,

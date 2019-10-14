@@ -12,8 +12,6 @@ class Q_JSONSERIALIZER_EXPORT QCborSerializer : public QJsonSerializer, protecte
 {
 	Q_OBJECT
 
-	Q_PROPERTY(ByteArrayTag byteArrayTag READ byteArrayTag WRITE setByteArrayTag NOTIFY byteArrayTagChanged)
-
 public:
 	enum QCborExtendedTags : quint64 {
 		GenericObject = 27,
@@ -33,14 +31,6 @@ public:
 		NoTag = static_cast<quint64>(QCborTypeConverter::NoTag)
 	};
 	Q_ENUM(QCborCustomTags)
-
-	enum class ByteArrayTag {
-		None,
-		Base64,
-		Base64url,
-		Base16
-	};
-	Q_ENUM(ByteArrayTag)
 
 	explicit QCborSerializer(QObject *parent = nullptr);
 	~QCborSerializer() override;
@@ -86,19 +76,21 @@ public:
 	template <typename T>
 	T deserializeFrom(const QByteArray &data, QObject *parent = nullptr) const;
 
-	ByteArrayTag byteArrayTag() const;
-
 public Q_SLOTS:
-	void setByteArrayTag(ByteArrayTag byteArrayTag);
 
 Q_SIGNALS:
-	void byteArrayTagChanged(ByteArrayTag byteArrayTag, QPrivateSignal);
 
 protected:
 	QCborValue serializeCborSubtype(const QMetaProperty &property, const QVariant &value) const override;
 	QCborValue serializeCborSubtype(int propertyType, const QVariant &value, const QByteArray &traceHint) const override;
 	QVariant deserializeCborSubtype(const QMetaProperty &property, const QCborValue &value, QObject *parent) const override;
 	QVariant deserializeCborSubtype(int propertyType, const QCborValue &value, QObject *parent, const QByteArray &traceHint) const override;
+
+	QVariant getProperty(const char *name) const override;
+	QJsonValue serializeSubtype(QMetaProperty property, const QVariant &value) const override;
+	QJsonValue serializeSubtype(int propertyType, const QVariant &value, const QByteArray &traceHint) const override;
+	QVariant deserializeSubtype(QMetaProperty property, const QJsonValue &value, QObject *parent) const override;
+	QVariant deserializeSubtype(int propertyType, const QJsonValue &value, QObject *parent, const QByteArray &traceHint) const override;
 
 private:
 	friend class QCborSerializerPrivate;
