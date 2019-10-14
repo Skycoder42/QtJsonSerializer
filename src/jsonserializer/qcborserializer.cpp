@@ -133,10 +133,10 @@ QVariant QCborSerializer::deserializeSubtype(int propertyType, const QJsonValue 
 QCborValue QCborSerializer::serializeVariant(int propertyType, const QVariant &value) const
 {
 	auto converter = D->findConverter(propertyType);
-	if(!converter)// use fallback method
-		return serializeValue(propertyType, value);
-	else
+	if (converter)
 		return converter->serializeCbor(propertyType, value, this);
+	else // use fallback method
+		return serializeValue(propertyType, value);
 }
 
 QVariant QCborSerializer::deserializeVariant(int propertyType, const QCborValue &value, QObject *parent) const
@@ -145,10 +145,10 @@ QVariant QCborSerializer::deserializeVariant(int propertyType, const QCborValue 
 									  value.type(),
 									  value.isTag() ? value.tag() : QCborTypeConverter::NoTag);
 	QVariant variant;
-	if(!converter)// use fallback method
-		variant = deserializeValue(propertyType, value);
-	else
+	if (converter)
 		variant = converter->deserializeCbor(propertyType, value, parent, this);
+	else // use fallback method
+		variant = deserializeValue(propertyType, value);
 
 	if(propertyType != QMetaType::UnknownType) {
 		auto vType = variant.typeName();
@@ -212,9 +212,12 @@ QVariant QCborSerializer::deserializeValue(int propertyType, const QCborValue &v
 	// perform strict validations
 	if (d->validationFlags.testFlag(StrictBasicTypes)) {
 		auto doThrow = false;
+
+		QList<QCborTag> expectedTags;
+		const auto testValue = value.isTag() ? value.taggedValue() : value;
 		switch (propertyType) {
 		case QMetaType::Bool:
-			if (!value.isBool())
+			if (!testValue.isBool())
 				doThrow = true;
 			break;
 		case QMetaType::Int:
@@ -227,57 +230,77 @@ QVariant QCborSerializer::deserializeValue(int propertyType, const QCborValue &v
 		case QMetaType::UShort:
 		case QMetaType::SChar:
 		case QMetaType::UChar:
-			if (!value.isInteger())
+			if (!testValue.isInteger())
 				doThrow = true;
 			break;
 		case QMetaType::Float:
 		case QMetaType::Double:
-			if (!value.isDouble())
+			if (!testValue.isDouble())
 				doThrow = true;
 			break;
 		case QMetaType::Char:
 		case QMetaType::QChar:
 		case QMetaType::QString:
+			expectedTags = {
+				QCborTypeConverter::NoTag,
+				static_cast<QCborTag>(QCborKnownTags::Base64),
+				static_cast<QCborTag>(QCborKnownTags::Base64url)
+			};
+			Q_FALLTHROUGH();
 		case QMetaType::QColor:
 		case QMetaType::QFont:
-			if (!value.isString() &&
-				!(value.tag() == QCborKnownTags::Base64 && value.taggedValue().isString()) &&
-				!(value.tag() == QCborKnownTags::Base64url && value.taggedValue().isString()))
+			if (!testValue.isString())
 				doThrow = true;
 			break;
 		case QMetaType::QByteArray:
-			if (!value.isByteArray() &&
-				!(value.tag() == QCborKnownTags::ExpectedBase64 && value.taggedValue().isByteArray()) &&
-				!(value.tag() == QCborKnownTags::ExpectedBase64url && value.taggedValue().isByteArray()) &&
-				!(value.tag() == QCborKnownTags::ExpectedBase16 && value.taggedValue().isByteArray()))
+			expectedTags = {
+				QCborTypeConverter::NoTag,
+				static_cast<QCborTag>(QCborKnownTags::ExpectedBase64),
+				static_cast<QCborTag>(QCborKnownTags::ExpectedBase64url),
+				static_cast<QCborTag>(QCborKnownTags::ExpectedBase16)
+			};
+			if (!testValue.isByteArray())
 				doThrow = true;
 			break;
 		case QMetaType::Nullptr:
-			if (!value.isNull())
+			if (!testValue.isNull())
 				doThrow = true;
 			break;
 		case QMetaType::QDate:
 		case QMetaType::QTime:
 		case QMetaType::QDateTime:
-			if (!value.isDateTime() &&
-				!(value.tag() == QCborKnownTags::DateTimeString && value.taggedValue().isString()) &&
-				!(value.tag() == QCborKnownTags::UnixTime_t && value.taggedValue().isInteger()))
-				doThrow = true;
+			if (!testValue.isDateTime()) {
+				if (testValue.isString())
+					expectedTags = {static_cast<QCborTag>(QCborKnownTags::DateTimeString)};
+				else if (testValue.isInteger())
+					expectedTags = {static_cast<QCborTag>(QCborKnownTags::UnixTime_t)};
+				else
+					doThrow = true;
+			}
 			break;
 		case QMetaType::QUrl:
-			if (!value.isUrl() &&
-				!(value.tag() == QCborKnownTags::Url && value.taggedValue().isString()))
-				doThrow = true;
+			if (!value.isUrl()) {
+				if (testValue.isString())
+					expectedTags = {static_cast<QCborTag>(QCborKnownTags::Url)};
+				else
+					doThrow = true;
+			}
 			break;
 		case QMetaType::QUuid:
-			if (!value.isUuid() &&
-				!(value.tag() == QCborKnownTags::Uuid && value.taggedValue().isByteArray()))
-				doThrow = true;
+			if (!value.isUuid()) {
+				if (testValue.isByteArray())
+					expectedTags = {static_cast<QCborTag>(QCborKnownTags::Uuid)};
+				else
+					doThrow = true;
+			}
 			break;
 		case QMetaType::QRegularExpression:
-			if (!value.isRegularExpression() &&
-				!(value.tag() == QCborKnownTags::RegularExpression && value.taggedValue().isString()))
-				doThrow = true;
+			if (!value.isRegularExpression()) {
+				if (testValue.isString())
+					expectedTags = {static_cast<QCborTag>(QCborKnownTags::RegularExpression)};
+				else
+					doThrow = true;
+			}
 			break;
 		default:
 			break;
@@ -286,6 +309,9 @@ QVariant QCborSerializer::deserializeValue(int propertyType, const QCborValue &v
 		if (const auto mTag = typeTag(propertyType);
 			mTag != QCborTypeConverter::NoTag &&
 			mTag != value.tag())
+			doThrow = true;
+		else if (!expectedTags.isEmpty() &&
+				 !expectedTags.contains(value.tag()))
 			doThrow = true;
 
 		if (doThrow) {
@@ -329,7 +355,7 @@ QSharedPointer<QCborTypeConverter> QCborSerializerPrivate::findConverter(int pro
 		cachedConverter = typeConverterSerCache.value(propertyType).dynamicCast<QCborTypeConverter>();
 	else {
 		cachedConverter = typeConverterDeserCache.value(propertyType).dynamicCast<QCborTypeConverter>();
-		if(cachedConverter && !cachedConverter->canDeserialize(valueType, tag))
+		if(cachedConverter && !cachedConverter->canDeserialize(tag, propertyType, valueType))
 			cachedConverter.clear();
 	}
 	if (cachedConverter)
@@ -339,8 +365,9 @@ QSharedPointer<QCborTypeConverter> QCborSerializerPrivate::findConverter(int pro
 	for (const auto &jConverter : qAsConst(typeConverters)) {
 		if (const auto converter = jConverter.dynamicCast<QCborTypeConverter>();
 			converter &&
-			converter->canConvert(propertyType) &&
-			(isSerialization || converter->canDeserialize(valueType, tag))) {
+			(isSerialization ?
+				converter->canConvert(propertyType) :
+				converter->canDeserialize(tag, propertyType, valueType))) {
 			// elevate lock
 			tLocker.unlock();
 			QWriteLocker wtLocker{&typeConverterLock};
@@ -358,8 +385,9 @@ QSharedPointer<QCborTypeConverter> QCborSerializerPrivate::findConverter(int pro
 	for (const auto &jFactory : qAsConst(typeConverterFactories)) {
 		if (const auto factory = jFactory.dynamicCast<QCborTypeConverterFactory>();
 			factory &&
-			factory->canConvert(propertyType) &&
-			(isSerialization || factory->canDeserialize(valueType, tag))) {
+			(isSerialization ?
+							 factory->canConvert(propertyType) :
+							 factory->canDeserialize(tag, propertyType, valueType))) {
 			auto converter = factory->createCborConverter();
 			if (converter) {
 				// elevate lock (keep unlocking order to prevent deadlocks)

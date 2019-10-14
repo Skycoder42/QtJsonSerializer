@@ -1,17 +1,17 @@
 #include "qcbortypeconverter.h"
 #include <QtCore/QSet>
 
-QList<QCborTag> QCborTypeConverter::allowedCborTags() const
+QList<QCborTag> QCborTypeConverter::cborTags() const
 {
 	return {};
 }
 
-bool QCborTypeConverter::canDeserialize(QCborValue::Type valueType, QCborTag tag) const
+bool QCborTypeConverter::canDeserialize(QCborTag tag, int metaTypeId, QCborValue::Type valueType) const
 {
-	if (const auto mTags = allowedCborTags(); !mTags.isEmpty())
+	if (const auto mTags = cborTags(); !mTags.isEmpty())
 		return mTags.contains(tag);
 	else
-		return cborTypes().contains(valueType);
+		return canConvert(metaTypeId) && cborTypes().contains(valueType);
 }
 
 QList<QJsonValue::Type> QCborTypeConverter::jsonTypes() const
@@ -78,11 +78,11 @@ QCborTypeConverter::SerializationHelper::SerializationHelper() = default;
 
 QCborTypeConverterFactory::QCborTypeConverterFactory() = default;
 
-bool QCborTypeConverterFactory::canDeserialize(QCborValue::Type valueType, QCborTag tag) const
+bool QCborTypeConverterFactory::canDeserialize(QCborTag tag, int metaTypeId, QCborValue::Type valueType) const
 {
 	if(!_statusConverter)
 		_statusConverter = createConverter();
-	return _statusConverter.staticCast<const QCborTypeConverter>()->canDeserialize(valueType, tag);
+	return _statusConverter.staticCast<const QCborTypeConverter>()->canDeserialize(tag, metaTypeId, valueType);
 }
 
 QSharedPointer<QJsonTypeConverter> QCborTypeConverterFactory::createConverter() const

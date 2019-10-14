@@ -25,8 +25,8 @@ public:
 	Q_ENUM(QCborExtendedTags)
 
 	enum QCborCustomTags : quint64 {
-		Color = 10421,
-		Font = 10421,
+		Color = 10001,
+		Font = 10002,
 
 		NoTag = static_cast<quint64>(QCborTypeConverter::NoTag)
 	};

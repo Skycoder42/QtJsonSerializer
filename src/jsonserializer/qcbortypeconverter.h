@@ -30,9 +30,9 @@ public:
 		virtual QVariant deserializeCborSubtype(int propertyType, const QCborValue &value, QObject *parent, const QByteArray &traceHint = {}) const = 0;
 	};
 
+	virtual QList<QCborTag> cborTags() const;
 	virtual QList<QCborValue::Type> cborTypes() const = 0;
-	virtual QList<QCborTag> allowedCborTags() const;
-	bool canDeserialize(QCborValue::Type valueType, QCborTag tag) const;
+	bool canDeserialize(QCborTag tag, int metaTypeId, QCborValue::Type valueType) const;
 	virtual QCborValue serializeCbor(int propertyType, const QVariant &value, const SerializationHelper *helper) const = 0;
 	virtual QVariant deserializeCbor(int propertyType, const QCborValue &value, QObject *parent, const SerializationHelper *helper) const = 0;
 
@@ -52,7 +52,7 @@ public:
 	QCborTypeConverterFactory();
 
 	//! @copydoc QCborTypeConverter::canDeserialize
-	bool canDeserialize(QCborValue::Type valueType, QCborTag tag) const;
+	bool canDeserialize(QCborTag tag, int metaTypeId, QCborValue::Type valueType) const;
 
 	//! The primary factory method to create converters
 	virtual QSharedPointer<QCborTypeConverter> createCborConverter() const = 0;
