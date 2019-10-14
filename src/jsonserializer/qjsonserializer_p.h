@@ -30,7 +30,7 @@ public:
 	bool useBcp47Locale = true;
 	QJsonSerializer::ValidationFlags validationFlags = QJsonSerializer::StandardValidation;
 	QJsonSerializer::Polymorphing polymorphing = QJsonSerializer::Enabled;
-	QJsonSerializer::MultiMapMode multiMapMode = QJsonSerializer::MultiMapMode::Map; //TODO which one is the better default?
+	QJsonSerializer::MultiMapMode multiMapMode = QJsonSerializer::MultiMapMode::Map;
 	bool ignoreStoredAttribute = false;
 
 	QReadWriteLock typeConverterLock{};

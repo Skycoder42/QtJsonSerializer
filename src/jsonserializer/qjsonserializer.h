@@ -30,6 +30,7 @@
 #include <QtCore/qmap.h>
 
 class QJsonSerializerPrivate;
+class QCborSerializer;
 //! A class to serializer and deserializer c++ classes to and from JSON
 class Q_JSONSERIALIZER_EXPORT QJsonSerializer : public QObject, protected QJsonTypeConverter::SerializationHelper
 {
@@ -244,6 +245,8 @@ Q_SIGNALS:
 	void ignoreStoredAttributeChanged(bool ignoreStoredAttribute);
 
 protected:
+	explicit QJsonSerializer(QJsonSerializerPrivate *dd, QObject *parent);
+
 	//protected implementation -> internal use for the type converters
 	QVariant getProperty(const char *name) const override;
 	QJsonValue serializeSubtype(QMetaProperty property, const QVariant &value) const override;
@@ -251,9 +254,10 @@ protected:
 	QJsonValue serializeSubtype(int propertyType, const QVariant &value, const QByteArray &traceHint) const override;
 	QVariant deserializeSubtype(int propertyType, const QJsonValue &value, QObject *parent, const QByteArray &traceHint) const override;
 
+	QScopedPointer<QJsonSerializerPrivate> d;
 private:
 	friend class QJsonSerializerPrivate;
-	QScopedPointer<QJsonSerializerPrivate> d;
+	friend class QCborSerializer;
 
 	QJsonValue serializeVariant(int propertyType, const QVariant &value) const;
 	QVariant deserializeVariant(int propertyType, const QJsonValue &value, QObject *parent) const;

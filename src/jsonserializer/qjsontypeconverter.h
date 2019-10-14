@@ -75,6 +75,7 @@ private:
 	QScopedPointer<QJsonTypeConverterPrivate> d;
 };
 
+class QCborTypeConverterFactory;
 //! A factory interface to create instances of QJsonTypeConverters
 class Q_JSONSERIALIZER_EXPORT QJsonTypeConverterFactory
 {
@@ -95,6 +96,7 @@ public:
 	virtual QSharedPointer<QJsonTypeConverter> createConverter() const = 0;
 
 private:
+	friend class QCborTypeConverterFactory;
 	mutable QSharedPointer<const QJsonTypeConverter> _statusConverter;
 };
 

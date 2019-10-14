@@ -33,8 +33,12 @@ void qtJsonSerializerRegisterTypes();
 #endif
 
 QJsonSerializer::QJsonSerializer(QObject *parent) :
+	QJsonSerializer{new QJsonSerializerPrivate{}, parent}
+{}
+
+QJsonSerializer::QJsonSerializer(QJsonSerializerPrivate *dd, QObject *parent) :
 	QObject{parent},
-	d{new QJsonSerializerPrivate{}}
+	d{dd}
 {}
 
 QJsonSerializer::~QJsonSerializer() = default;
@@ -563,21 +567,21 @@ QSharedPointer<QJsonTypeConverter> QJsonSerializerPrivate::findConverter(int pro
 
 	// first: check if already cached
 	QSharedPointer<QJsonTypeConverter> cachedConverter = nullptr; //in case json type did not match
-	if(isSerialization)
+	if (isSerialization)
 		cachedConverter = typeConverterSerCache.value(propertyType);
 	else {
 		cachedConverter = typeConverterDeserCache.value(propertyType);
 		if(cachedConverter && !cachedConverter->jsonTypes().contains(valueType))
 			cachedConverter.clear();
 	}
-	if(cachedConverter)
+	if (cachedConverter)
 		return cachedConverter;
 
 	// second: check if the list of explicit converters has a matching one
-	for(const auto &converter : qAsConst(typeConverters)) {
-		if(converter &&
-		   (isSerialization || converter->jsonTypes().contains(valueType)) &&
-		   converter->canConvert(propertyType)) {
+	for (const auto &converter : qAsConst(typeConverters)) {
+		if (converter &&
+			converter->canConvert(propertyType) &&
+			(isSerialization || converter->jsonTypes().contains(valueType))) {
 			// elevate lock
 			tLocker.unlock();
 			QWriteLocker wtLocker{&typeConverterLock};
@@ -592,19 +596,19 @@ QSharedPointer<QJsonTypeConverter> QJsonSerializerPrivate::findConverter(int pro
 
 	// third: check in the list of global convert factories
 	QReadLocker fLocker{&factoryLock};
-	for(const auto &factory : qAsConst(typeConverterFactories)) {
-		if(factory &&
-		   (isSerialization || factory->jsonTypes().contains(valueType)) &&
-		   factory->canConvert(propertyType)) {
+	for (const auto &factory : qAsConst(typeConverterFactories)) {
+		if (factory &&
+			factory->canConvert(propertyType) &&
+			(isSerialization || factory->jsonTypes().contains(valueType))) {
 			auto converter = factory->createConverter();
-			if(converter) {
+			if (converter) {
 				// elevate lock (keep unlocking order to prevent deadlocks)
 				fLocker.unlock();
 				tLocker.unlock();
 				QWriteLocker wtLocker{&typeConverterLock};
 				// add converter to list and cache
 				typeConverters.append(converter);
-				if(isSerialization)
+				if (isSerialization)
 					typeConverterSerCache.insert(propertyType, converter);
 				else
 					typeConverterDeserCache.insert(propertyType, converter);

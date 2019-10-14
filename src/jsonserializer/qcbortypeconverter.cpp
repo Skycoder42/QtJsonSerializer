@@ -6,6 +6,14 @@ QList<QCborTag> QCborTypeConverter::allowedCborTags() const
 	return {};
 }
 
+bool QCborTypeConverter::canDeserialize(QCborValue::Type valueType, QCborTag tag) const
+{
+	if (const auto mTags = allowedCborTags(); !mTags.isEmpty())
+		return mTags.contains(tag);
+	else
+		return cborTypes().contains(valueType);
+}
+
 QList<QJsonValue::Type> QCborTypeConverter::jsonTypes() const
 {
 	QSet<QJsonValue::Type> typeSet;
@@ -20,12 +28,14 @@ QList<QJsonValue::Type> QCborTypeConverter::jsonTypes() const
 
 QJsonValue QCborTypeConverter::serialize(int propertyType, const QVariant &value, const QJsonTypeConverter::SerializationHelper *helper) const
 {
-	return serializeCbor(propertyType, value, helper).toJsonValue();
+	Q_ASSERT(dynamic_cast<const SerializationHelper*>(helper));
+	return serializeCbor(propertyType, value, static_cast<const SerializationHelper*>(helper)).toJsonValue();
 }
 
 QVariant QCborTypeConverter::deserialize(int propertyType, const QJsonValue &value, QObject *parent, const QJsonTypeConverter::SerializationHelper *helper) const
 {
-	return deserializeCbor(propertyType, QCborValue::fromJsonValue(value), parent, helper);
+	Q_ASSERT(dynamic_cast<const SerializationHelper*>(helper));
+	return deserializeCbor(propertyType, QCborValue::fromJsonValue(value), parent, static_cast<const SerializationHelper*>(helper));
 }
 
 QList<QJsonValue::Type> QCborTypeConverter::cborToJsonType(QCborValue::Type type) const
@@ -58,4 +68,24 @@ QList<QJsonValue::Type> QCborTypeConverter::cborToJsonType(QCborValue::Type type
 	case QCborValue::DateTime:
 		return {QJsonValue::String, QJsonValue::Double};
 	}
+}
+
+
+
+QCborTypeConverter::SerializationHelper::SerializationHelper() = default;
+
+
+
+QCborTypeConverterFactory::QCborTypeConverterFactory() = default;
+
+bool QCborTypeConverterFactory::canDeserialize(QCborValue::Type valueType, QCborTag tag) const
+{
+	if(!_statusConverter)
+		_statusConverter = createConverter();
+	return _statusConverter.staticCast<const QCborTypeConverter>()->canDeserialize(valueType, tag);
+}
+
+QSharedPointer<QJsonTypeConverter> QCborTypeConverterFactory::createConverter() const
+{
+	return createCborConverter();
 }
