@@ -25,8 +25,17 @@ public:
 	Q_ENUM(QCborExtendedTags)
 
 	enum QCborCustomTags : quint64 {
-		Color = 10001,
-		Font = 10002,
+		Color = 10000,
+		Font = 10001,
+		Enum = 10002,
+		Flags = 10003,
+
+		ChronoNanoSeconds = 10100,
+		ChronoMicroSeconds = 10101,
+		ChronoMilliSeconds = 10102,
+		ChronoSeconds = 10103,
+		ChronoMinutes = 10104,
+		ChronoHours = 10105,
 
 		NoTag = static_cast<quint64>(QCborTypeConverter::NoTag)
 	};

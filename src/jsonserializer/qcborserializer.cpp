@@ -325,17 +325,17 @@ QVariant QCborSerializer::deserializeValue(int propertyType, const QCborValue &v
 	if (propertyType == QMetaType::QDate)
 		return res.toDateTime().date();
 	else if (propertyType == QMetaType::QTime)
-		return res.toDateTime().time(); // WORKAROUND report and remove QTBUG-79196
+		return res.toDateTime().time();
 	else if (value.tag() == QCborKnownTags::UnixTime_t) {
 		auto dt = QDateTime::fromSecsSinceEpoch(value.taggedValue().toInteger(), Qt::UTC);
 		if (propertyType == QMetaType::QDate)
 			return dt.date();
 		else
 			return dt;
-	} else if (value.tag() == QCborKnownTags::Uuid &&
+	} else if (value.tag() == QCborKnownTags::Uuid && // WORKAROUND report and remove QTBUG-79196
 			 res.userType() != QMetaType::QUuid)
 		return QUuid::fromRfc4122(res.toByteArray());
-	else if (value.tag() == QCborKnownTags::RegularExpression &&
+	else if (value.tag() == QCborKnownTags::RegularExpression && // WORKAROUND report and remove QTBUG-79196
 			 res.userType() != QMetaType::QRegularExpression)
 		return QRegularExpression{res.toString()};
 	else

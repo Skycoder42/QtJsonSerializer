@@ -28,14 +28,14 @@ QList<QJsonValue::Type> QCborTypeConverter::jsonTypes() const
 
 QJsonValue QCborTypeConverter::serialize(int propertyType, const QVariant &value, const QJsonTypeConverter::SerializationHelper *helper) const
 {
-	Q_ASSERT(dynamic_cast<const SerializationHelper*>(helper));
-	return serializeCbor(propertyType, value, static_cast<const SerializationHelper*>(helper)).toJsonValue();
+	Q_UNUSED(helper)
+	return serializeCbor(propertyType, value, nullptr).toJsonValue();
 }
 
 QVariant QCborTypeConverter::deserialize(int propertyType, const QJsonValue &value, QObject *parent, const QJsonTypeConverter::SerializationHelper *helper) const
 {
-	Q_ASSERT(dynamic_cast<const SerializationHelper*>(helper));
-	return deserializeCbor(propertyType, QCborValue::fromJsonValue(value), parent, static_cast<const SerializationHelper*>(helper));
+	Q_UNUSED(helper)
+	return deserializeCbor(propertyType, QCborValue::fromJsonValue(value), parent, nullptr);
 }
 
 QList<QJsonValue::Type> QCborTypeConverter::cborToJsonType(QCborValue::Type type) const
