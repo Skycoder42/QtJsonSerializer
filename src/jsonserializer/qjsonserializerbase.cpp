@@ -23,7 +23,7 @@
 //#include "typeconverters/qjsonlocaleconverter_p.h"
 //#include "typeconverters/qjsonregularexpressionconverter_p.h"
 //#include "typeconverters/qjsonstdtupleconverter_p.h"
-//#include "typeconverters/qjsonchronodurationconverter_p.h"
+#include "typeconverters/qjsonchronodurationconverter_p.h"
 //#include "typeconverters/qjsonstdoptionalconverter_p.h"
 //#include "typeconverters/qjsonstdvariantconverter_p.h"
 
@@ -327,7 +327,7 @@ QList<QSharedPointer<QJsonTypeConverterFactory>> QJsonSerializerBasePrivate::typ
 //	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonLocaleConverter>>::create(),
 //	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonRegularExpressionConverter>>::create(),
 //	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonStdTupleConverter>>::create(),
-//	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonChronoDurationConverter>>::create(),
+	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonChronoDurationConverter>>::create(),
 //	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonStdOptionalConverter>>::create(),
 //	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonStdVariantConverter>>::create()
 };
