@@ -1,6 +1,6 @@
 #include "qjsongadgetconverter_p.h"
 #include "qjsonserializerexception.h"
-#include "qjsonserializer_p.h"
+#include "qjsonserializerbase_p.h"
 
 #include <QtCore/QMetaProperty>
 #include <QtCore/QSet>
@@ -92,12 +92,12 @@ QVariant QJsonGadgetConverter::deserialize(int propertyType, const QJsonValue &v
 	}
 
 	auto jsonObject = value.toObject();
-	auto validationFlags = helper->getProperty("validationFlags").value<QJsonSerializer::ValidationFlags>();
+	auto validationFlags = helper->getProperty("validationFlags").value<QJsonSerializerBase::ValidationFlags>();
 
 	//collect required properties, if set
 	QSet<QByteArray> reqProps;
 	const auto ignoreStoredAttribute = helper->getProperty("ignoreStoredAttribute").toBool();
-	if(validationFlags.testFlag(QJsonSerializer::AllProperties)) {
+	if(validationFlags.testFlag(QJsonSerializerBase::AllProperties)) {
 		for(auto i = 0; i < metaObject->propertyCount(); i++) {
 			auto property = metaObject->property(i);
 			if(ignoreStoredAttribute || property.isStored())
@@ -113,7 +113,7 @@ QVariant QJsonGadgetConverter::deserialize(int propertyType, const QJsonValue &v
 			auto subValue = helper->deserializeSubtype(property, it.value(), nullptr);
 			property.writeOnGadget(gadgetPtr, subValue);
 			reqProps.remove(property.name());
-		} else if(validationFlags.testFlag(QJsonSerializer::NoExtraProperties)) {
+		} else if(validationFlags.testFlag(QJsonSerializerBase::NoExtraProperties)) {
 			throw QJsonDeserializationException("Found extra property " +
 												it.key().toUtf8() +
 												" but extra properties are not allowed");
@@ -121,7 +121,7 @@ QVariant QJsonGadgetConverter::deserialize(int propertyType, const QJsonValue &v
 	}
 
 	//make shure all required properties have been read
-	if(validationFlags.testFlag(QJsonSerializer::AllProperties) && !reqProps.isEmpty()) {
+	if(validationFlags.testFlag(QJsonSerializerBase::AllProperties) && !reqProps.isEmpty()) {
 		throw QJsonDeserializationException(QByteArray("Not all properties for ") +
 											metaObject->className() +
 											QByteArray(" are present in the json object. Missing properties: ") +

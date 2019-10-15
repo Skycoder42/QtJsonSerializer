@@ -1,29 +1,30 @@
 TARGET = QtJsonSerializer
 
-QT = core
+QT = core core-private
 
 SOURCES += \
 	qcborserializer.cpp \
-	qcbortypeconverter.cpp \
-	qjsonserializerexception.cpp \
 	qjsonserializer.cpp \
+	qjsonserializerbase.cpp \
+	qjsonserializerexception.cpp \
 	qjsontypeconverter.cpp \
 	qjsonexceptioncontext.cpp
 
 HEADERS += \
 	qcborserializer.h \
 	qcborserializer_p.h \
-	qcbortypeconverter.h \
-	qjsonserializerexception.h \
 	qjsonserializer.h \
 	qjsonserializer_p.h \
+	qjsonserializerbase.h \
+	qjsonserializerbase_p.h \
+	qjsonserializerexception.h \
 	qtjsonserializer_global.h \
 	qjsonserializer_helpertypes.h \
 	qjsontypeconverter.h \
 	qjsonexceptioncontext_p.h \
 	qjsonserializerexception_p.h
 
-include(typeconverters/typeconverters.pri)
+#include(typeconverters/typeconverters.pri)
 
 no_register_json_converters: DEFINES += NO_REGISTER_JSON_CONVERTERS
 else: include(qjsonreggen.pri)

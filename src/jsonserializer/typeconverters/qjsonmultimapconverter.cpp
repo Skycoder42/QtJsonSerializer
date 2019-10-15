@@ -1,6 +1,6 @@
 #include "qjsonmultimapconverter_p.h"
 #include "qjsonserializerexception.h"
-#include "qjsonserializer.h"
+#include "qjsonserializerbase.h"
 
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
@@ -29,8 +29,8 @@ QJsonValue QJsonMultiMapConverter::serialize(int propertyType, const QVariant &v
 	}
 	const auto map = cValue.toMap();
 
-	switch (helper->getProperty("multiMapMode").value<QJsonSerializer::MultiMapMode>()) {
-	case QJsonSerializer::MultiMapMode::Map: {
+	switch (helper->getProperty("multiMapMode").value<QJsonSerializerBase::MultiMapMode>()) {
+	case QJsonSerializerBase::MultiMapMode::Map: {
 		QJsonObject object;
 		for(auto it = map.constBegin(); it != map.constEnd(); ++it) {
 			auto vArray = object.value(it.key()).toArray();
@@ -39,7 +39,7 @@ QJsonValue QJsonMultiMapConverter::serialize(int propertyType, const QVariant &v
 		}
 		return object;
 	}
-	case QJsonSerializer::MultiMapMode::List: {
+	case QJsonSerializerBase::MultiMapMode::List: {
 		QJsonArray array;
 		for(auto it = map.constBegin(); it != map.constEnd(); ++it)
 			array.append(QJsonArray {it.key(), helper->serializeSubtype(metaType, it.value(), it.key().toUtf8())});

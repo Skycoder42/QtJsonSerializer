@@ -15,8 +15,9 @@ Q_NORETURN inline void throwSer(QByteArray &&what, bool ser)
 
 }
 
-QJsonValue QJsonEnumConverter::serializeEnum(const QMetaEnum &metaEnum, const QVariant &value, bool enumAsString)
+QCborValue QJsonEnumConverter::serializeEnum(const QMetaEnum &metaEnum, const QVariant &value, bool enumAsString)
 {
+	// TODO fix
 	if (enumAsString) {
 		if(metaEnum.isFlag())
 			return QString::fromUtf8(metaEnum.valueToKeys(value.toInt()));
@@ -26,8 +27,9 @@ QJsonValue QJsonEnumConverter::serializeEnum(const QMetaEnum &metaEnum, const QV
 		return value.toInt();
 }
 
-QVariant QJsonEnumConverter::deserializeEnum(const QMetaEnum &metaEnum, const QJsonValue &value)
+QVariant QJsonEnumConverter::deserializeEnum(const QMetaEnum &metaEnum, const QCborValue &value)
 {
+	// TODO fix
 	if(value.isString()) {
 		auto result = -1;
 		auto ok = false;
@@ -46,7 +48,7 @@ QVariant QJsonEnumConverter::deserializeEnum(const QMetaEnum &metaEnum, const QJ
 												value.toString().toUtf8()};
 		}
 	} else {
-		const auto intValue = value.toInt();
+		const auto intValue = value.toInteger();
 		double intpart;
 		if(std::modf(value.toDouble(), &intpart) != 0.0) {
 			throw QJsonDeserializationException{"Invalid value (double) for enum type found: " +

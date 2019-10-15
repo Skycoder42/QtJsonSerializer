@@ -6,6 +6,7 @@
 #include <QtCore/qmetatype.h>
 #include <QtCore/qmetaobject.h>
 #include <QtCore/qjsonvalue.h>
+#include <QtCore/qcborvalue.h>
 #include <QtCore/qvariant.h>
 #include <QtCore/qsharedpointer.h>
 
@@ -15,6 +16,8 @@ class Q_JSONSERIALIZER_EXPORT QJsonTypeConverter
 {
 	Q_DISABLE_COPY(QJsonTypeConverter)
 public:
+	static constexpr QCborTag NoTag = static_cast<QCborTag>(-1);
+
 	//! Sample values for a priority value (default converters are mostly Standard and are guaranteed to be between Low and High)
 	enum Priority : int {
 		ExtremlyLow = -0x00FFFFFF,
@@ -24,6 +27,13 @@ public:
 		High = 0x000000FF,
 		VeryHigh = 0x0000FFFF,
 		ExtremlyHigh = 0x00FFFFFF
+	};
+
+	enum DeserializationCapabilityResult : int {
+		Positive = 1,
+		Guessed = 2,
+		Negative = -1,
+		WrongTag = -2
 	};
 
 	//! Helper class passed to the type converter by the serializer. Do not implement yourself
@@ -38,13 +48,13 @@ public:
 		virtual QVariant getProperty(const char *name) const = 0;
 
 		//! Serialize a subvalue, represented by a meta property
-		virtual QJsonValue serializeSubtype(QMetaProperty property, const QVariant &value) const = 0;
+		virtual QCborValue serializeSubtype(QMetaProperty property, const QVariant &value) const = 0;
 		//! Serialize a subvalue, represented by a type id
-		virtual QJsonValue serializeSubtype(int propertyType, const QVariant &value, const QByteArray &traceHint = {}) const = 0;
+		virtual QCborValue serializeSubtype(int propertyType, const QVariant &value, const QByteArray &traceHint = {}) const = 0;
 		//! Deserialize a subvalue, represented by a meta property
-		virtual QVariant deserializeSubtype(QMetaProperty property, const QJsonValue &value, QObject *parent) const = 0;
+		virtual QVariant deserializeSubtype(QMetaProperty property, const QCborValue &value, QObject *parent) const = 0;
 		//! Deserialize a subvalue, represented by a type id
-		virtual QVariant deserializeSubtype(int propertyType, const QJsonValue &value, QObject *parent, const QByteArray &traceHint = {}) const = 0;
+		virtual QVariant deserializeSubtype(int propertyType, const QCborValue &value, QObject *parent, const QByteArray &traceHint = {}) const = 0;
 	};
 
 	//! Constructor
@@ -59,13 +69,20 @@ public:
 
 	//! Returns true, if this implementation can convert the given type
 	virtual bool canConvert(int metaTypeId) const = 0;
-	//! Returns a list of json types this implementation can deserialize
-	virtual QList<QJsonValue::Type> jsonTypes() const = 0;
+	virtual QList<QCborTag> allowedCborTags(int metaTypeId) const = 0;
+	virtual QList<QCborValue::Type> allowedCborTypes(int metaTypeId, QCborTag tag) const = 0;
+	virtual int guessType(QCborTag tag, QCborValue::Type dataType) const;
+	DeserializationCapabilityResult canDeserialize(int &metaTypeId,
+												   QCborTag tag,
+												   QCborValue::Type dataType,
+												   bool asJson,
+												   bool strict) const;
 
 	//! Called by the serializer to serializer your given type
-	virtual QJsonValue serialize(int propertyType, const QVariant &value, const SerializationHelper *helper) const = 0;
+	virtual QCborValue serialize(int propertyType, const QVariant &value, const SerializationHelper *helper) const = 0;
 	//! Called by the deserializer to serializer your given type
-	virtual QVariant deserialize(int propertyType, const QJsonValue &value, QObject *parent, const SerializationHelper *helper) const = 0;
+	virtual QVariant deserializeCbor(int propertyType, const QCborValue &value, QObject *parent, const SerializationHelper *helper) const = 0;
+	virtual QVariant deserializeJson(int propertyType, const QCborValue &value, QObject *parent, const SerializationHelper *helper) const;
 
 protected:
 	//! Returns the actual original typename of the given type
@@ -73,6 +90,8 @@ protected:
 
 private:
 	QScopedPointer<QJsonTypeConverterPrivate> d;
+
+	void mapTypesToJson(QList<QCborValue::Type> &typeList) const;
 };
 
 class QCborTypeConverterFactory;
@@ -89,8 +108,12 @@ public:
 	int priority() const;
 	//! @copydoc QJsonTypeConverter::canConvert
 	bool canConvert(int metaTypeId) const;
-	//! @copydoc QJsonTypeConverter::jsonTypes
-	QList<QJsonValue::Type> jsonTypes() const;
+	//! @copydoc QJsonTypeConverter::canDeserialize
+	QJsonTypeConverter::DeserializationCapabilityResult canDeserialize(int &metaTypeId,
+																	   QCborTag tag,
+																	   QCborValue::Type dataType,
+																	   bool asJson,
+																	   bool strict) const;
 
 	//! The primary factory method to create converters
 	virtual QSharedPointer<QJsonTypeConverter> createConverter() const = 0;
@@ -101,7 +124,7 @@ private:
 };
 
 //! A template implementation of QJsonTypeConverterFactory to generically create simply converters
-template <typename TConverter, int Priority = QJsonTypeConverter::Priority::Standard>
+template <typename TConverter, int OverwritePriority = QJsonTypeConverter::Priority::Standard>
 class QJsonTypeConverterStandardFactory : public QJsonTypeConverterFactory
 {
 public:
@@ -110,11 +133,12 @@ public:
 
 // ------------- GENERIC IMPLEMENTATION -------------
 
-template<typename TConverter, int Priority>
-QSharedPointer<QJsonTypeConverter> QJsonTypeConverterStandardFactory<TConverter, Priority>::createConverter() const
+template<typename TConverter, int OverwritePriority>
+QSharedPointer<QJsonTypeConverter> QJsonTypeConverterStandardFactory<TConverter, OverwritePriority>::createConverter() const
 {
 	auto converter = QSharedPointer<TConverter>::create();
-	converter->setPriority(Priority);
+	if (OverwritePriority != QJsonTypeConverter::Priority::Standard)
+		converter->setPriority(OverwritePriority);
 	return converter;
 }
 

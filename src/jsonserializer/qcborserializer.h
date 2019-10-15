@@ -2,13 +2,10 @@
 #define QCBORSERIALIZER_H
 
 #include "QtJsonSerializer/qtjsonserializer_global.h"
-#include "QtJsonSerializer/qjsonserializer.h"
-#include "QtJsonSerializer/qcbortypeconverter.h"
-
-#include <QtCore/qcborvalue.h>
+#include "QtJsonSerializer/qjsonserializerbase.h"
 
 class QCborSerializerPrivate;
-class Q_JSONSERIALIZER_EXPORT QCborSerializer : public QJsonSerializer, protected QCborTypeConverter::SerializationHelper
+class Q_JSONSERIALIZER_EXPORT QCborSerializer : public QJsonSerializerBase
 {
 	Q_OBJECT
 
@@ -37,12 +34,11 @@ public:
 		ChronoMinutes = 10104,
 		ChronoHours = 10105,
 
-		NoTag = static_cast<quint64>(QCborTypeConverter::NoTag)
+		NoTag = static_cast<quint64>(QJsonTypeConverter::NoTag)
 	};
 	Q_ENUM(QCborCustomTags)
 
 	explicit QCborSerializer(QObject *parent = nullptr);
-	~QCborSerializer() override;
 
 	void setTypeTag(int metaTypeId, QCborTag tag = static_cast<QCborTag>(NoTag));
 	template <typename T>
@@ -85,30 +81,11 @@ public:
 	template <typename T>
 	T deserializeFrom(const QByteArray &data, QObject *parent = nullptr) const;
 
-public Q_SLOTS:
-
-Q_SIGNALS:
-
 protected:
-	QCborValue serializeCborSubtype(const QMetaProperty &property, const QVariant &value) const override;
-	QCborValue serializeCborSubtype(int propertyType, const QVariant &value, const QByteArray &traceHint) const override;
-	QVariant deserializeCborSubtype(const QMetaProperty &property, const QCborValue &value, QObject *parent) const override;
-	QVariant deserializeCborSubtype(int propertyType, const QCborValue &value, QObject *parent, const QByteArray &traceHint) const override;
-
-	QVariant getProperty(const char *name) const override;
-	QJsonValue serializeSubtype(QMetaProperty property, const QVariant &value) const override;
-	QJsonValue serializeSubtype(int propertyType, const QVariant &value, const QByteArray &traceHint) const override;
-	QVariant deserializeSubtype(QMetaProperty property, const QJsonValue &value, QObject *parent) const override;
-	QVariant deserializeSubtype(int propertyType, const QJsonValue &value, QObject *parent, const QByteArray &traceHint) const override;
+	bool jsonMode() const override;
 
 private:
-	friend class QCborSerializerPrivate;
-
-	QCborValue serializeVariant(int propertyType, const QVariant &value) const;
-	QVariant deserializeVariant(int propertyType, const QCborValue &value, QObject *parent) const;
-
-	QCborValue serializeValue(int propertyType, const QVariant &value) const;
-	QVariant deserializeValue(int propertyType, const QCborValue &value) const;
+	Q_DECLARE_PRIVATE(QCborSerializer)
 };
 
 // ------------- generic implementation -------------

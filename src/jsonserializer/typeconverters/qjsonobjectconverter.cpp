@@ -1,6 +1,6 @@
 #include "qjsonobjectconverter_p.h"
 #include "qjsonserializerexception.h"
-#include "qjsonserializer_p.h"
+#include "qjsonserializerbase_p.h"
 
 #include <QtCore/QPointer>
 #include <QtCore/QSharedPointer>
@@ -44,16 +44,16 @@ QJsonValue QJsonObjectConverter::serialize(int propertyType, const QVariant &val
 
 	//get the metaobject, based on polymorphism
 	const QMetaObject *meta = nullptr;
-	auto poly = static_cast<QJsonSerializer::Polymorphing>(helper->getProperty("polymorphing").toInt());
+	auto poly = static_cast<QJsonSerializerBase::Polymorphing>(helper->getProperty("polymorphing").toInt());
 	auto isPoly = false;
 	switch (poly) {
-	case QJsonSerializer::Disabled:
+	case QJsonSerializerBase::Disabled:
 		isPoly = false;
 		break;
-	case QJsonSerializer::Enabled:
+	case QJsonSerializerBase::Enabled:
 		isPoly = polyMetaObject(object);
 		break;
-	case QJsonSerializer::Forced:
+	case QJsonSerializerBase::Forced:
 		isPoly = true;
 		break;
 	default:
@@ -90,9 +90,9 @@ QVariant QJsonObjectConverter::deserialize(int propertyType, const QJsonValue &v
 	if(value.isNull())
 		return toVariant(nullptr, QMetaType::typeFlags(propertyType));
 
-	auto validationFlags = helper->getProperty("validationFlags").value<QJsonSerializer::ValidationFlags>();
+	auto validationFlags = helper->getProperty("validationFlags").value<QJsonSerializerBase::ValidationFlags>();
 	auto keepObjectName = helper->getProperty("keepObjectName").toBool();
-	auto poly = static_cast<QJsonSerializer::Polymorphing>(helper->getProperty("polymorphing").toInt());
+	auto poly = static_cast<QJsonSerializerBase::Polymorphing>(helper->getProperty("polymorphing").toInt());
 
 	auto metaObject = getMetaObject(propertyType);
 	if(!metaObject)
@@ -101,7 +101,7 @@ QVariant QJsonObjectConverter::deserialize(int propertyType, const QJsonValue &v
 	//try to get the polymorphic metatype (if allowed)
 	auto jsonObject = value.toObject();
 	auto isPoly = false;
-	if(poly != QJsonSerializer::Disabled) {
+	if(poly != QJsonSerializerBase::Disabled) {
 		if(jsonObject.contains(QStringLiteral("@class"))) {
 			isPoly = true;
 			QByteArray classField = jsonObject[QStringLiteral("@class")].toString().toUtf8() + "*";//add the star
@@ -116,7 +116,7 @@ QVariant QJsonObjectConverter::deserialize(int propertyType, const QJsonValue &v
 													QMetaType::typeName(propertyType));
 			}
 			metaObject = nMeta;
-		} else if(poly == QJsonSerializer::Forced)
+		} else if(poly == QJsonSerializerBase::Forced)
 			throw QJsonDeserializationException("Json does not contain the \"@class\" field, but forced polymorphism requires it");
 	}
 
@@ -130,7 +130,7 @@ QVariant QJsonObjectConverter::deserialize(int propertyType, const QJsonValue &v
 
 	//collect required properties, if set
 	QSet<QByteArray> reqProps;
-	if(validationFlags.testFlag(QJsonSerializer::AllProperties)) {
+	if(validationFlags.testFlag(QJsonSerializerBase::AllProperties)) {
 		const auto ignoreStoredAttribute = helper->getProperty("ignoreStoredAttribute").toBool();
 		auto i = QObject::staticMetaObject.indexOfProperty("objectName");
 		if(!keepObjectName)
@@ -153,7 +153,7 @@ QVariant QJsonObjectConverter::deserialize(int propertyType, const QJsonValue &v
 			auto property = metaObject->property(propIndex);
 			subValue = helper->deserializeSubtype(property, it.value(), object);
 			reqProps.remove(property.name());
-		} else if(validationFlags.testFlag(QJsonSerializer::NoExtraProperties)) {
+		} else if(validationFlags.testFlag(QJsonSerializerBase::NoExtraProperties)) {
 			throw QJsonDeserializationException("Found extra property " +
 												it.key().toUtf8() +
 												" but extra properties are not allowed");
@@ -163,7 +163,7 @@ QVariant QJsonObjectConverter::deserialize(int propertyType, const QJsonValue &v
 	}
 
 	//make shure all required properties have been read
-	if(validationFlags.testFlag(QJsonSerializer::AllProperties) && !reqProps.isEmpty()) {
+	if(validationFlags.testFlag(QJsonSerializerBase::AllProperties) && !reqProps.isEmpty()) {
 		throw QJsonDeserializationException(QByteArray("Not all properties for ") +
 											metaObject->className() +
 											QByteArray(" are present in the json object Missing properties: ") +

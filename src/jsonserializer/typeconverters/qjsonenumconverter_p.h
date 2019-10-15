@@ -9,8 +9,8 @@
 class Q_JSONSERIALIZER_EXPORT QJsonEnumConverter : public QJsonTypeConverter
 {
 public:
-	static QJsonValue serializeEnum(const QMetaEnum &metaEnum, const QVariant &value, bool enumAsString);
-	static QVariant deserializeEnum(const QMetaEnum &metaEnum, const QJsonValue &value);
+	static QCborValue serializeEnum(const QMetaEnum &metaEnum, const QVariant &value, bool enumAsString);
+	static QVariant deserializeEnum(const QMetaEnum &metaEnum, const QCborValue &value);
 
 	QJsonEnumConverter();
 

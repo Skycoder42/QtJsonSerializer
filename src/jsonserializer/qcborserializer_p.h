@@ -2,19 +2,17 @@
 #define QCBORSERIALIZER_P_H
 
 #include "qcborserializer.h"
-#include "qjsonserializer_p.h"
+#include "qjsonserializerbase_p.h"
 
 #include <QtCore/QHash>
 
-class QCborSerializerPrivate : public QJsonSerializerPrivate
+class QCborSerializerPrivate : public QJsonSerializerBasePrivate
 {
-public:
-	QReadWriteLock typeTagsLock {};
-	QHash<int, QCborTag> typeTags {};
+	Q_DECLARE_PUBLIC(QCborSerializer)
 
-	QSharedPointer<QCborTypeConverter> findConverter(int propertyType,
-													 QCborValue::Type valueType = QCborValue::Undefined,
-													 QCborTag tag = QCborTypeConverter::NoTag);
+public:
+	mutable QReadWriteLock typeTagsLock {};
+	QHash<int, QCborTag> typeTags {};
 };
 
 #endif // QCBORSERIALIZER_P_H
