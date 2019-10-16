@@ -82,6 +82,7 @@ public:
 	T deserializeFrom(const QByteArray &data, QObject *parent = nullptr) const;
 
 protected:
+	// protected implementation -> internal use for the type converters
 	bool jsonMode() const override;
 
 private:

@@ -238,11 +238,19 @@ QVariant QJsonSerializerBase::deserializeSubtype(int propertyType, const QCborVa
 QCborValue QJsonSerializerBase::serializeVariant(int propertyType, const QVariant &value) const
 {
 	Q_D(const QJsonSerializerBase);
+	// first: find a converter and convert to cbor
 	auto converter = d->findSerConverter(propertyType);
+	QCborValue res;
 	if (converter)
-		return converter->serialize(propertyType, value, this);
+		res = converter->serialize(propertyType, value, this);
 	else
-		return d->serializeValue(propertyType, value);
+		res = d->serializeValue(propertyType, value);
+
+	// second: check if an override tag is given, and if yes, override the normal tag
+	if (const auto mTag = typeTag(propertyType); mTag != QJsonTypeConverter::NoTag)
+		return {mTag, res.isTag() ? res.taggedValue() : res};
+	else
+		return res;
 }
 
 QVariant QJsonSerializerBase::deserializeVariant(int propertyType, const QCborValue &value, QObject *parent) const
@@ -382,13 +390,10 @@ QSharedPointer<QJsonTypeConverter> QJsonSerializerBasePrivate::findDeserConverte
 {
 	Q_Q(const QJsonSerializerBase);
 
-	const auto asJson = q->jsonMode();
-	const auto strict = validationFlags.testFlag(ValidationFlag::StrictBasicTypes);
-
 	// first: check if already cached
 	QReadLocker tLocker{&typeConverterLock};
 	if (auto converter = typeConverterDeserCache.value(propertyType);
-		converter && converter->canDeserialize(propertyType, tag, type, asJson, strict) > 0)
+		converter && converter->canDeserialize(propertyType, tag, type, q) > 0)
 		return converter;
 
 
@@ -400,7 +405,7 @@ QSharedPointer<QJsonTypeConverter> QJsonSerializerBasePrivate::findDeserConverte
 	for (const auto &converter : typeConverters) {
 		if (converter) {
 			auto testType = propertyType;
-			switch (converter->canDeserialize(testType, tag, type, asJson, strict)) {
+			switch (converter->canDeserialize(testType, tag, type, q)) {
 			case QJsonTypeConverter::Negative:
 				continue;
 			case QJsonTypeConverter::WrongTag:
@@ -427,7 +432,7 @@ QSharedPointer<QJsonTypeConverter> QJsonSerializerBasePrivate::findDeserConverte
 	for (const auto &factory : qAsConst(typeConverterFactories)) {
 		if (factory) {
 			auto testType = propertyType;
-			switch (factory->canDeserialize(testType, tag, type, asJson, strict)) {
+			switch (factory->canDeserialize(testType, tag, type, q)) {
 			case QJsonTypeConverter::Negative:
 				continue;
 			case QJsonTypeConverter::WrongTag:
@@ -499,11 +504,6 @@ QCborValue QJsonSerializerBasePrivate::serializeValue(int propertyType, const QV
 		propertyType = value.userType();
 
 	auto cValue = QCborValue::fromVariant(value);
-	if (!cValue.isTag()) {
-		const auto mTag = q->typeTag(propertyType);
-		if (mTag != QJsonTypeConverter::NoTag)
-			return {mTag, cValue};
-	}
 	return cValue;
 }
 

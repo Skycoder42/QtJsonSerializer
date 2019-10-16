@@ -189,10 +189,7 @@ protected:
 	explicit QJsonSerializerBase(QObject *parent = nullptr);
 	explicit QJsonSerializerBase(QJsonSerializerBasePrivate &dd, QObject *parent);
 
-	virtual bool jsonMode() const = 0;
-	virtual QCborTag typeTag(int metaTypeId) const = 0;
-
-	//protected implementation -> internal use for the type converters
+	// protected implementation -> internal use for the type converters
 	QVariant getProperty(const char *name) const override;
 	QCborValue serializeSubtype(QMetaProperty property, const QVariant &value) const override;
 	QCborValue serializeSubtype(int propertyType, const QVariant &value, const QByteArray &traceHint) const override;

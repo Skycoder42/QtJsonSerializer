@@ -24,6 +24,9 @@ private:
 									  std::chrono::minutes,
 									  std::chrono::hours>;
 
+	QCborTag tagForType(int metaTypeId) const;
+	MetaDuration parseValue(int propertyType, const QCborValue &value, const SerializationHelper *helper) const;
+
 	template <typename TDuration>
 	TDuration create(const QCborValue &value) const {
 		return TDuration{static_cast<typename TDuration::rep>((value.isTag() ? value.taggedValue() : value).toInteger())};

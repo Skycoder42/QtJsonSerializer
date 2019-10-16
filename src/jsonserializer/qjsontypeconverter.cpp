@@ -30,8 +30,13 @@ int QJsonTypeConverter::guessType(QCborTag tag, QCborValue::Type dataType) const
 	return QMetaType::UnknownType;
 }
 
-QJsonTypeConverter::DeserializationCapabilityResult QJsonTypeConverter::canDeserialize(int &metaTypeId, QCborTag tag, QCborValue::Type dataType, bool asJson, bool strict) const
+QJsonTypeConverter::DeserializationCapabilityResult QJsonTypeConverter::canDeserialize(int &metaTypeId, QCborTag tag, QCborValue::Type dataType, const SerializationHelper *helper) const
 {
+	const auto asJson = helper->jsonMode();
+	const auto strict = helper->getProperty("validationFlags")
+							.value<QJsonSerializerBase::ValidationFlags>()
+							.testFlag(QJsonSerializerBase::ValidationFlag::StrictBasicTypes);
+
 	// case A: a metaTypeId is present
 	if (metaTypeId != QMetaType::UnknownType) {
 		// first: verify the given metatype is supported
@@ -43,7 +48,11 @@ QJsonTypeConverter::DeserializationCapabilityResult QJsonTypeConverter::canDeser
 			// if either we are in strict mode or a tag is given, the tag is verified
 			if (strict || tag != NoTag) {
 				// If there is a list of allowed tags, the given tag must be in it
-				if (const auto aTags = allowedCborTags(metaTypeId); !aTags.isEmpty()) {
+				auto aTags = allowedCborTags(metaTypeId);
+				// also, add the type specific override tag if set
+				if (const auto xTag = helper->typeTag(metaTypeId); xTag != NoTag)
+					aTags.append(xTag);
+				if (!aTags.isEmpty()) {
 					if (!aTags.contains(tag))
 						return DeserializationCapabilityResult::WrongTag;
 				// otherwise, if in strict mode, an empty allowed tag list means the tag must not be set
@@ -131,9 +140,9 @@ bool QJsonTypeConverterFactory::canConvert(int metaTypeId) const
 	return _statusConverter->canConvert(metaTypeId);
 }
 
-QJsonTypeConverter::DeserializationCapabilityResult QJsonTypeConverterFactory::canDeserialize(int &metaTypeId, QCborTag tag, QCborValue::Type dataType, bool asJson, bool strict) const
+QJsonTypeConverter::DeserializationCapabilityResult QJsonTypeConverterFactory::canDeserialize(int &metaTypeId, QCborTag tag, QCborValue::Type dataType, const QJsonTypeConverter::SerializationHelper *helper) const
 {
 	if(!_statusConverter)
 		_statusConverter = createConverter();
-	return _statusConverter->canDeserialize(metaTypeId, tag, dataType, asJson, strict);
+	return _statusConverter->canDeserialize(metaTypeId, tag, dataType, helper);
 }

@@ -44,8 +44,10 @@ public:
 		SerializationHelper();
 		virtual ~SerializationHelper();
 
+		virtual bool jsonMode() const = 0;
 		//! Returns a property from the serializer
 		virtual QVariant getProperty(const char *name) const = 0;
+		virtual QCborTag typeTag(int metaTypeId) const = 0;
 
 		//! Serialize a subvalue, represented by a meta property
 		virtual QCborValue serializeSubtype(QMetaProperty property, const QVariant &value) const = 0;
@@ -75,8 +77,7 @@ public:
 	DeserializationCapabilityResult canDeserialize(int &metaTypeId,
 												   QCborTag tag,
 												   QCborValue::Type dataType,
-												   bool asJson,
-												   bool strict) const;
+												   const SerializationHelper *helper) const;
 
 	//! Called by the serializer to serializer your given type
 	virtual QCborValue serialize(int propertyType, const QVariant &value, const SerializationHelper *helper) const = 0;
@@ -112,8 +113,7 @@ public:
 	QJsonTypeConverter::DeserializationCapabilityResult canDeserialize(int &metaTypeId,
 																	   QCborTag tag,
 																	   QCborValue::Type dataType,
-																	   bool asJson,
-																	   bool strict) const;
+																	   const QJsonTypeConverter::SerializationHelper *helper) const;
 
 	//! The primary factory method to create converters
 	virtual QSharedPointer<QJsonTypeConverter> createConverter() const = 0;

@@ -66,6 +66,7 @@ Q_SIGNALS:
 	void validateBase64Changed(bool validateBase64, QPrivateSignal);
 
 protected:
+	// protected implementation -> internal use for the type converters
 	bool jsonMode() const override;
 	QCborTag typeTag(int metaTypeId) const override;
 

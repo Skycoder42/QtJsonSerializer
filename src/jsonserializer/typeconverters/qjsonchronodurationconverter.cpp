@@ -2,6 +2,8 @@
 #include "qjsonserializerexception.h"
 #include "qcborserializer.h"
 
+#include <QtCore/QSet>
+
 using namespace std::chrono;
 
 Q_DECLARE_METATYPE(std::chrono::nanoseconds)
@@ -13,17 +15,20 @@ Q_DECLARE_METATYPE(std::chrono::hours)
 
 bool QJsonChronoDurationConverter::canConvert(int metaTypeId) const
 {
-	return metaTypeId == qMetaTypeId<nanoseconds>() ||
-			metaTypeId == qMetaTypeId<microseconds>() ||
-			metaTypeId == qMetaTypeId<milliseconds>() ||
-			metaTypeId == qMetaTypeId<seconds>() ||
-			metaTypeId == qMetaTypeId<minutes>() ||
-			metaTypeId == qMetaTypeId<hours>();
+	static const QSet<int> metaTypeIdList {
+		qMetaTypeId<nanoseconds>(),
+		qMetaTypeId<microseconds>(),
+		qMetaTypeId<milliseconds>(),
+		qMetaTypeId<seconds>(),
+		qMetaTypeId<minutes>(),
+		qMetaTypeId<hours>()
+	};
+	return metaTypeIdList.contains(metaTypeId);
 }
 
 QList<QCborTag> QJsonChronoDurationConverter::allowedCborTags(int metaTypeId) const
 {
-	QList<QCborTag> tags {
+	static const QList<QCborTag> tags {
 		static_cast<QCborTag>(QCborSerializer::ChronoNanoSeconds),
 		static_cast<QCborTag>(QCborSerializer::ChronoMicroSeconds),
 		static_cast<QCborTag>(QCborSerializer::ChronoMilliSeconds),
@@ -81,87 +86,87 @@ int QJsonChronoDurationConverter::guessType(QCborTag tag, QCborValue::Type dataT
 QCborValue QJsonChronoDurationConverter::serialize(int propertyType, const QVariant &value, const QJsonTypeConverter::SerializationHelper *helper) const
 {
 	Q_UNUSED(helper)
-	if (propertyType == qMetaTypeId<nanoseconds>())
-		return {static_cast<QCborTag>(QCborSerializer::ChronoNanoSeconds),
-				static_cast<qint64>(value.value<nanoseconds>().count())};
-	else if (propertyType == qMetaTypeId<microseconds>())
-		return {static_cast<QCborTag>(QCborSerializer::ChronoMicroSeconds),
-				static_cast<qint64>(value.value<microseconds>().count())};
-	else if (propertyType == qMetaTypeId<milliseconds>())
-		return {static_cast<QCborTag>(QCborSerializer::ChronoMilliSeconds),
-				static_cast<qint64>(value.value<milliseconds>().count())};
-	else if (propertyType == qMetaTypeId<seconds>())
-		return {static_cast<QCborTag>(QCborSerializer::ChronoSeconds),
-				static_cast<qint64>(value.value<seconds>().count())};
-	else if (propertyType == qMetaTypeId<minutes>())
-		return {static_cast<QCborTag>(QCborSerializer::ChronoMinutes),
-				static_cast<qint64>(value.value<minutes>().count())};
-	else if (propertyType == qMetaTypeId<hours>())
-		return {static_cast<QCborTag>(QCborSerializer::ChronoHours),
-				static_cast<qint64>(value.value<hours>().count())};
-	else
-		throw QJsonSerializationException{"Invalid type id"};
+	const auto tag = tagForType(propertyType);
+	switch (static_cast<quint64>(tag)) {
+	case QCborSerializer::ChronoNanoSeconds:
+		return {tag, static_cast<qint64>(value.value<nanoseconds>().count())};
+	case QCborSerializer::ChronoMicroSeconds:
+		return {tag, static_cast<qint64>(value.value<microseconds>().count())};
+	case QCborSerializer::ChronoMilliSeconds:
+		return {tag, static_cast<qint64>(value.value<milliseconds>().count())};
+	case QCborSerializer::ChronoSeconds:
+		return {tag, static_cast<qint64>(value.value<seconds>().count())};
+	case QCborSerializer::ChronoMinutes:
+		return {tag, static_cast<qint64>(value.value<minutes>().count())};
+	case QCborSerializer::ChronoHours:
+		return {tag, static_cast<qint64>(value.value<hours>().count())};
+	default:
+		Q_UNREACHABLE();
+	}
 }
 
 QVariant QJsonChronoDurationConverter::deserializeCbor(int propertyType, const QCborValue &value, QObject *parent, const SerializationHelper *helper) const
 {
-	Q_UNUSED(propertyType)
 	Q_UNUSED(parent)
-	Q_UNUSED(helper)
+	const auto metaDuration = parseValue(propertyType, value, helper);
+	if (propertyType == qMetaTypeId<nanoseconds>())
+		return QVariant::fromValue(cast<nanoseconds>(metaDuration));
+	else if (propertyType == qMetaTypeId<microseconds>())
+		return QVariant::fromValue(cast<microseconds>(metaDuration));
+	else if (propertyType == qMetaTypeId<milliseconds>())
+		return QVariant::fromValue(cast<milliseconds>(metaDuration));
+	else if (propertyType == qMetaTypeId<seconds>())
+		return QVariant::fromValue(cast<seconds>(metaDuration));
+	else if (propertyType == qMetaTypeId<minutes>())
+		return QVariant::fromValue(cast<minutes>(metaDuration));
+	else if (propertyType == qMetaTypeId<hours>())
+		return QVariant::fromValue(cast<hours>(metaDuration));
+	else
+		throw QJsonSerializationException{"Invalid type id"};
+}
 
-	std::variant<nanoseconds, microseconds, milliseconds, seconds, minutes, hours> metaDuration;
-	if (value.isTag()) {
-		switch (static_cast<quint64>(value.tag())) {
-		case QCborSerializer::ChronoNanoSeconds:
-			metaDuration = create<nanoseconds>(value);
-			break;
-		case QCborSerializer::ChronoMicroSeconds:
-			metaDuration = create<microseconds>(value);
-			break;
-		case QCborSerializer::ChronoMilliSeconds:
-			metaDuration = create<milliseconds>(value);
-			break;
-		case QCborSerializer::ChronoSeconds:
-			metaDuration = create<seconds>(value);
-			break;
-		case QCborSerializer::ChronoMinutes:
-			metaDuration = create<minutes>(value);
-			break;
-		case QCborSerializer::ChronoHours:
-			metaDuration = create<hours>(value);
-			break;
-		default:
+QCborTag QJsonChronoDurationConverter::tagForType(int metaTypeId) const
+{
+	if (metaTypeId == qMetaTypeId<nanoseconds>())
+		return static_cast<QCborTag>(QCborSerializer::ChronoNanoSeconds);
+	else if (metaTypeId == qMetaTypeId<microseconds>())
+		return static_cast<QCborTag>(QCborSerializer::ChronoMicroSeconds);
+	else if (metaTypeId == qMetaTypeId<milliseconds>())
+		return static_cast<QCborTag>(QCborSerializer::ChronoMilliSeconds);
+	else if (metaTypeId == qMetaTypeId<seconds>())
+		return static_cast<QCborTag>(QCborSerializer::ChronoSeconds);
+	else if (metaTypeId == qMetaTypeId<minutes>())
+		return static_cast<QCborTag>(QCborSerializer::ChronoMinutes);
+	else if (metaTypeId == qMetaTypeId<hours>())
+		return static_cast<QCborTag>(QCborSerializer::ChronoHours);
+	else
+		throw QJsonSerializationException{"Invalid type id"};
+}
+
+QJsonChronoDurationConverter::MetaDuration QJsonChronoDurationConverter::parseValue(int propertyType, const QCborValue &value, const QJsonTypeConverter::SerializationHelper *helper) const
+{
+	const auto rTag = value.isTag() ? value.tag() : NoTag;
+	switch (static_cast<quint64>(rTag)) {
+	case QCborSerializer::ChronoNanoSeconds:
+		return create<nanoseconds>(value);
+	case QCborSerializer::ChronoMicroSeconds:
+		return create<microseconds>(value);
+	case QCborSerializer::ChronoMilliSeconds:
+		return create<milliseconds>(value);
+	case QCborSerializer::ChronoSeconds:
+		return create<seconds>(value);
+	case QCborSerializer::ChronoMinutes:
+		return create<minutes>(value);
+	case QCborSerializer::ChronoHours:
+		return create<hours>(value);
+	default:
+		if (!helper || rTag != helper->typeTag(propertyType))
 			throw QJsonDeserializationException{"Invalid CBOR tag " + QByteArray::number(static_cast<quint64>(value.tag()))};
-		}
-
-		if (propertyType == qMetaTypeId<nanoseconds>())
-			return QVariant::fromValue(cast<nanoseconds>(metaDuration));
-		else if (propertyType == qMetaTypeId<microseconds>())
-			return QVariant::fromValue(cast<microseconds>(metaDuration));
-		else if (propertyType == qMetaTypeId<milliseconds>())
-			return QVariant::fromValue(cast<milliseconds>(metaDuration));
-		else if (propertyType == qMetaTypeId<seconds>())
-			return QVariant::fromValue(cast<seconds>(metaDuration));
-		else if (propertyType == qMetaTypeId<minutes>())
-			return QVariant::fromValue(cast<minutes>(metaDuration));
-		else if (propertyType == qMetaTypeId<hours>())
-			return QVariant::fromValue(cast<hours>(metaDuration));
+		Q_FALLTHROUGH();
+	case static_cast<quint64>(NoTag):
+		if (auto vTag = tagForType(propertyType); vTag != NoTag)
+			return parseValue(QMetaType::UnknownType, {vTag, value.taggedValue()}, nullptr);
 		else
-			throw QJsonSerializationException{"Invalid type id"};
-	} else {
-		if (propertyType == qMetaTypeId<nanoseconds>())
-			return QVariant::fromValue(create<nanoseconds>(value));
-		else if (propertyType == qMetaTypeId<microseconds>())
-			return QVariant::fromValue(create<microseconds>(value));
-		else if (propertyType == qMetaTypeId<milliseconds>())
-			return QVariant::fromValue(create<milliseconds>(value));
-		else if (propertyType == qMetaTypeId<seconds>())
-			return QVariant::fromValue(create<seconds>(value));
-		else if (propertyType == qMetaTypeId<minutes>())
-			return QVariant::fromValue(create<minutes>(value));
-		else if (propertyType == qMetaTypeId<hours>())
-			return QVariant::fromValue(create<hours>(value));
-		else
-			throw QJsonSerializationException{"Invalid type id"};
+			throw QJsonSerializationException{"Invalid state reached - no CBOR tag was given, but the property type is not a chrono type"};
 	}
 }
