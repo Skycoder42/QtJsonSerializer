@@ -69,6 +69,7 @@ protected:
 	// protected implementation -> internal use for the type converters
 	bool jsonMode() const override;
 	QCborTag typeTag(int metaTypeId) const override;
+	QList<int> typesForTag(QCborTag tag) const override;
 
 private:
 	Q_DECLARE_PRIVATE(QJsonSerializer)

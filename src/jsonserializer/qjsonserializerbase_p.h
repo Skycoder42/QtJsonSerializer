@@ -19,13 +19,36 @@ public:
 	using Polymorphing = QJsonSerializerBase::Polymorphing;
 	using MultiMapMode = QJsonSerializerBase::MultiMapMode;
 
+	template <typename TConverter>
+	class ConverterCache {
+	public:
+		QSharedPointer<TConverter> get(int metaTypeId) const;
+		void add(int metaTypeId, const QSharedPointer<TConverter> &converter);
+
+		void clear();
+
+	private:
+		mutable QReadWriteLock lock {};
+		QHash<int, QSharedPointer<TConverter>> cache;
+	};
+
+	template <typename TConverter>
+	struct ConverterStore {
+		mutable QReadWriteLock lock {};
+		QList<QSharedPointer<TConverter>> store;
+
+		ConverterStore() = default;
+		ConverterStore(std::initializer_list<QSharedPointer<TConverter>> initData);
+
+		void insertSorted(const QSharedPointer<TConverter> &converter);
+	};
+
 	static QByteArray getTypeName(int propertyType);
 
 	static QReadWriteLock typedefLock;
 	static QHash<int, QByteArray> typedefMapping;
 
-	static QReadWriteLock factoryLock;
-	static QList<QSharedPointer<QJsonTypeConverterFactory>> typeConverterFactories;
+	static ConverterStore<QJsonTypeConverterFactory> typeConverterFactories;
 
 	bool allowNull = false;
 	bool keepObjectName = false;
@@ -36,10 +59,12 @@ public:
 	MultiMapMode multiMapMode = MultiMapMode::Map;
 	bool ignoreStoredAttribute = false;
 
-	mutable QReadWriteLock typeConverterLock {};
-	mutable QList<QSharedPointer<QJsonTypeConverter>> typeConverters;
-	mutable QHash<int, QSharedPointer<QJsonTypeConverter>> typeConverterSerCache;
-	mutable QHash<int, QSharedPointer<QJsonTypeConverter>> typeConverterDeserCache;
+	mutable ConverterStore<QJsonTypeConverter> typeConverters;
+	mutable ConverterCache<QJsonTypeConverter> serCache;
+	mutable ConverterCache<QJsonTypeConverter> deserCache;
+
+	template <typename TConverter>
+	void insertSorted(const QSharedPointer<TConverter> &converter, QList<QSharedPointer<TConverter>> &list) const;
 
 	QSharedPointer<QJsonTypeConverter> findSerConverter(int propertyType) const;
 	QSharedPointer<QJsonTypeConverter> findDeserConverter(int &propertyType, QCborTag tag, QCborValue::Type type) const;
@@ -48,5 +73,50 @@ public:
 	QVariant deserializeCborValue(int propertyType, const QCborValue &value) const;
 	QVariant deserializeJsonValue(int propertyType, const QCborValue &value) const;
 };
+
+template<typename TConverter>
+QSharedPointer<TConverter> QJsonSerializerBasePrivate::ConverterCache<TConverter>::get(int metaTypeId) const
+{
+	QReadLocker _{&lock};
+	return cache.value(metaTypeId, nullptr);
+}
+
+template<typename TConverter>
+void QJsonSerializerBasePrivate::ConverterCache<TConverter>::add(int metaTypeId, const QSharedPointer<TConverter> &converter)
+{
+	QWriteLocker _{&lock};
+	cache.insert(metaTypeId, converter);
+}
+
+template<typename TConverter>
+void QJsonSerializerBasePrivate::ConverterCache<TConverter>::clear()
+{
+	QWriteLocker _{&lock};
+	cache.clear();
+}
+
+template<typename TConverter>
+QJsonSerializerBasePrivate::ConverterStore<TConverter>::ConverterStore(std::initializer_list<QSharedPointer<TConverter>> initData)
+	: store{std::move(initData)}
+{
+#ifndef QT_NO_DEBUG
+	for (auto i = 1; i < store.size(); ++i)
+		Q_ASSERT(store[i]->priority() <= store[i - 1]->priority());
+#endif
+}
+
+template<typename TConverter>
+void QJsonSerializerBasePrivate::ConverterStore<TConverter>::insertSorted(const QSharedPointer<TConverter> &converter)
+{
+	QWriteLocker _{&lock};
+	for(auto it = store.begin(); it != store.end(); ++it) {
+		if((*it)->priority() <= converter->priority()) {
+			store.insert(it, converter);
+			return;
+		}
+	}
+	// not inserted -> add to end
+	store.append(converter);
+}
 
 #endif // QJSONSERIALIZERBASE_P_H

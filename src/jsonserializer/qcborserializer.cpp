@@ -17,6 +17,7 @@ QCborSerializer::QCborSerializer(QObject *parent) :
 void QCborSerializer::setTypeTag(int metaTypeId, QCborTag tag)
 {
 	Q_D(QCborSerializer);
+	Q_ASSERT_X(metaTypeId != QMetaType::UnknownType, Q_FUNC_INFO, "You cannot assign a tag to QMetaType::UnknownType");
 	QWriteLocker lock{&d->typeTagsLock};
 	if (tag == QJsonTypeConverter::NoTag)
 		d->typeTags.remove(metaTypeId);
@@ -73,4 +74,11 @@ QVariant QCborSerializer::deserializeFrom(const QByteArray &data, int metaTypeId
 bool QCborSerializer::jsonMode() const
 {
 	return false;
+}
+
+QList<int> QCborSerializer::typesForTag(QCborTag tag) const
+{
+	Q_D(const QCborSerializer);
+	QReadLocker lock{&d->typeTagsLock};
+	return d->typeTags.keys(tag);
 }

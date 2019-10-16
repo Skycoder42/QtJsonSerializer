@@ -86,3 +86,9 @@ QCborTag QJsonSerializer::typeTag(int metaTypeId) const
 	Q_UNUSED(metaTypeId)
 	return QJsonTypeConverter::NoTag;
 }
+
+QList<int> QJsonSerializer::typesForTag(QCborTag tag) const
+{
+	Q_UNUSED(tag)
+	return {};
+}

@@ -91,32 +91,16 @@ bool QJsonSerializerBase::ignoresStoredAttribute() const
 
 void QJsonSerializerBase::addJsonTypeConverterFactory(const QSharedPointer<QJsonTypeConverterFactory> &factory)
 {
-	// call once to "initialize" the factory
-	Q_UNUSED(factory->priority())
-	// add to global list
-	QWriteLocker fLock{&QJsonSerializerBasePrivate::factoryLock};
-	QJsonSerializerBasePrivate::typeConverterFactories.append(factory);
+	QJsonSerializerBasePrivate::typeConverterFactories.insertSorted(factory);
 }
 
 void QJsonSerializerBase::addJsonTypeConverter(const QSharedPointer<QJsonTypeConverter> &converter)
 {
 	Q_D(QJsonSerializerBase);
 	Q_ASSERT_X(converter, Q_FUNC_INFO, "converter must not be null!");
-	QWriteLocker tLocker{&d->typeConverterLock};
-
-	auto inserted = false;
-	for(auto it = d->typeConverters.begin(); it != d->typeConverters.end(); ++it) {
-		if((*it)->priority() <= converter->priority()) {
-			d->typeConverters.insert(it, converter);
-			inserted = true;
-			break;
-		}
-	}
-	if(!inserted)
-		d->typeConverters.append(converter);
-
-	d->typeConverterSerCache.clear();
-	d->typeConverterDeserCache.clear();
+	d->typeConverters.insertSorted(converter);
+	d->serCache.clear();
+	d->deserCache.clear();
 }
 
 void QJsonSerializerBase::setAllowDefaultNull(bool allowDefaultNull)
@@ -314,8 +298,7 @@ void QJsonSerializerBase::registerInverseTypedefImpl(int typeId, const char *nor
 
 QReadWriteLock QJsonSerializerBasePrivate::typedefLock;
 QHash<int, QByteArray> QJsonSerializerBasePrivate::typedefMapping;
-QReadWriteLock QJsonSerializerBasePrivate::factoryLock;
-QList<QSharedPointer<QJsonTypeConverterFactory>> QJsonSerializerBasePrivate::typeConverterFactories {
+QJsonSerializerBasePrivate::ConverterStore<QJsonTypeConverterFactory> QJsonSerializerBasePrivate::typeConverterFactories {
 //	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonObjectConverter>>::create(),
 //	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonGadgetConverter>>::create(),
 //	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonEnumConverter>>::create(),
@@ -348,39 +331,35 @@ QByteArray QJsonSerializerBasePrivate::getTypeName(int propertyType)
 
 QSharedPointer<QJsonTypeConverter> QJsonSerializerBasePrivate::findSerConverter(int propertyType) const
 {
-	QReadLocker tLocker{&typeConverterLock};
-
 	// first: check if already cached
-	if (auto converter = typeConverterSerCache.value(propertyType); converter)
+	if (auto converter = serCache.get(propertyType); converter)
 		return converter;
 
 	// second: check if the list of explicit converters has a matching one
-	for (const auto &converter : typeConverters) {
+	QReadLocker cLocker{&typeConverters.lock};
+	for (const auto &converter : qAsConst(typeConverters.store)) {
 		if (converter && converter->canConvert(propertyType)) {
 			// add converter to cache
-			tLocker.unlock();
-			QWriteLocker wtLocker{&typeConverterLock};
-			typeConverterSerCache.insert(propertyType, converter);
+			serCache.add(propertyType, converter);
 			return converter;
 		}
 	}
+	cLocker.unlock();
 
 	// third: check in the list of global convert factories
-	QReadLocker fLocker{&factoryLock};
-	for (const auto &factory : qAsConst(typeConverterFactories)) {
+	QReadLocker fLocker{&typeConverterFactories.lock};
+	for (const auto &factory : qAsConst(typeConverterFactories.store)) {
 		if (factory && factory->canConvert(propertyType)) {
 			auto converter = factory->createConverter();
 			if (converter) {
-				// add converter to list and cache (keep unlocking order to prevent deadlocks)
-				fLocker.unlock();
-				tLocker.unlock();
-				QWriteLocker wtLocker{&typeConverterLock};
-				typeConverters.append(converter);
-				typeConverterSerCache.insert(propertyType, converter);
+				// add converter to list and cache
+				typeConverters.insertSorted(converter);
+				serCache.add(propertyType, converter);
 				return converter;
 			}
 		}
 	}
+	fLocker.unlock();
 
 	// fourth: no converter found: return default converter
 	return nullptr;
@@ -390,19 +369,31 @@ QSharedPointer<QJsonTypeConverter> QJsonSerializerBasePrivate::findDeserConverte
 {
 	Q_Q(const QJsonSerializerBase);
 
+	// zeroth: if no property type is given, try out any types associated with the tag
+	if (propertyType == QMetaType::UnknownType && tag != QJsonTypeConverter::NoTag) {
+		const auto tList = q->typesForTag(tag);
+		for (auto typeId : tList) {
+			// if any of those types has a working converter, just use that one
+			auto res = findDeserConverter(typeId, tag, type);
+			if (res) {
+				propertyType = typeId;
+				return res;
+			}
+		}
+	}
+
 	// first: check if already cached
-	QReadLocker tLocker{&typeConverterLock};
-	if (auto converter = typeConverterDeserCache.value(propertyType);
+	if (auto converter = deserCache.get(propertyType);
 		converter && converter->canDeserialize(propertyType, tag, type, q) > 0)
 		return converter;
 
-
 	// second: check if the list of explicit converters has a matching one
+	QReadLocker cLocker{&typeConverters.lock};
 	auto throwWrongTag = false;
 	std::optional<std::pair<std::variant<QSharedPointer<QJsonTypeConverter>,
 										 QSharedPointer<QJsonTypeConverterFactory>>,
 							int>> guessConverter;
-	for (const auto &converter : typeConverters) {
+	for (const auto &converter : qAsConst(typeConverters.store)) {
 		if (converter) {
 			auto testType = propertyType;
 			switch (converter->canDeserialize(testType, tag, type, q)) {
@@ -419,17 +410,16 @@ QSharedPointer<QJsonTypeConverter> QJsonSerializerBasePrivate::findDeserConverte
 				break;
 			}
 
-			// add converter to cache (only happens for positive cases
-			tLocker.unlock();
-			QWriteLocker wtLocker{&typeConverterLock};
-			typeConverterSerCache.insert(propertyType, converter);
+			// add converter to cache (only happens for positive cases)
+			deserCache.add(propertyType, converter);
 			return converter;
 		}
 	}
+	cLocker.unlock();
 
 	// third: check in the list of global convert factories
-	QReadLocker fLocker{&factoryLock};
-	for (const auto &factory : qAsConst(typeConverterFactories)) {
+	QReadLocker fLocker{&typeConverterFactories.lock};
+	for (const auto &factory : qAsConst(typeConverterFactories.store)) {
 		if (factory) {
 			auto testType = propertyType;
 			switch (factory->canDeserialize(testType, tag, type, q)) {
@@ -449,15 +439,13 @@ QSharedPointer<QJsonTypeConverter> QJsonSerializerBasePrivate::findDeserConverte
 			auto converter = factory->createConverter();
 			if (converter) {
 				// add converter to list and cache (keep unlocking order to prevent deadlocks)
-				fLocker.unlock();
-				tLocker.unlock();
-				QWriteLocker wtLocker{&typeConverterLock};
-				typeConverters.append(converter);
-				typeConverterSerCache.insert(propertyType, converter);
+				typeConverters.insertSorted(converter);
+				deserCache.add(propertyType, converter);
 				return converter;
 			}
 		}
 	}
+	fLocker.unlock();
 
 	// fourth: if a guessed converter is available, use that one
 	if (guessConverter) {
@@ -472,13 +460,10 @@ QSharedPointer<QJsonTypeConverter> QJsonSerializerBasePrivate::findDeserConverte
 
 		// if valid, add to cache, set the type and return
 		if (converter) {
-			// add converter to list and cache (keep unlocking order to prevent deadlocks)
-			fLocker.unlock();
-			tLocker.unlock();
-			QWriteLocker wtLocker{&typeConverterLock};
+			// add converter to list and cache
 			if (isFactory)
-				typeConverters.append(converter);
-			typeConverterSerCache.insert(propertyType, converter);
+				typeConverters.insertSorted(converter);
+			deserCache.add(propertyType, converter);
 			propertyType = newType;
 			return converter;
 		}
@@ -499,12 +484,8 @@ QSharedPointer<QJsonTypeConverter> QJsonSerializerBasePrivate::findDeserConverte
 
 QCborValue QJsonSerializerBasePrivate::serializeValue(int propertyType, const QVariant &value) const
 {
-	Q_Q(const QJsonSerializerBase);
-	if (propertyType == QMetaType::UnknownType)
-		propertyType = value.userType();
-
-	auto cValue = QCborValue::fromVariant(value);
-	return cValue;
+	Q_UNUSED(propertyType)
+	return QCborValue::fromVariant(value);
 }
 
 QVariant QJsonSerializerBasePrivate::deserializeCborValue(int propertyType, const QCborValue &value) const

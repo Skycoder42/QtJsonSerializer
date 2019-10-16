@@ -189,6 +189,8 @@ protected:
 	explicit QJsonSerializerBase(QObject *parent = nullptr);
 	explicit QJsonSerializerBase(QJsonSerializerBasePrivate &dd, QObject *parent);
 
+	virtual QList<int> typesForTag(QCborTag tag) const = 0;
+
 	// protected implementation -> internal use for the type converters
 	QVariant getProperty(const char *name) const override;
 	QCborValue serializeSubtype(QMetaProperty property, const QVariant &value) const override;
