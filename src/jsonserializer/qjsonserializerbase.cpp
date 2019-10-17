@@ -245,12 +245,13 @@ QVariant QJsonSerializerBase::deserializeVariant(int propertyType, const QCborVa
 	auto converter = d->findDeserConverter(propertyType,
 										   value.isTag() ? value.tag() : QJsonTypeConverter::NoTag,
 										   value.isTag() ? value.taggedValue().type() : value.type());
+
 	QVariant variant;
 	if (converter) {
 		if (jsonMode())
-			converter->deserializeJson(propertyType, value, parent, this);
+			variant = converter->deserializeJson(propertyType, value, parent, this);
 		else
-			converter->deserializeCbor(propertyType, value, parent, this);
+			variant = converter->deserializeCbor(propertyType, value, parent, this);
 	} else {
 		if (jsonMode())
 			variant = d->deserializeJsonValue(propertyType, value);
@@ -483,13 +484,12 @@ QSharedPointer<QJsonTypeConverter> QJsonSerializerBasePrivate::findDeserConverte
 	return nullptr;
 }
 
-int QJsonSerializerBasePrivate::getEnumId(const QMetaEnum &metaEnum, bool ser) const
+int QJsonSerializerBasePrivate::getEnumId(QMetaEnum metaEnum, bool ser) const
 {
 	QByteArray eName = metaEnum.name();
 	if (const QByteArray scope = metaEnum.scope(); !scope.isEmpty())
 		eName = scope + "::" + eName;
 	const auto eTypeId = QMetaType::type(eName);
-	// TODO qDebug() << eName << eTypeId;
 	if (eTypeId == QMetaType::UnknownType) {
 		if (ser)
 			throw QJsonSerializationException{"Unable to determine typeid of meta enum " + eName};

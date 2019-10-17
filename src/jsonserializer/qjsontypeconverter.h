@@ -71,7 +71,7 @@ public:
 
 	//! Returns true, if this implementation can convert the given type
 	virtual bool canConvert(int metaTypeId) const = 0;
-	virtual QList<QCborTag> allowedCborTags(int metaTypeId) const = 0;
+	virtual QList<QCborTag> allowedCborTags(int metaTypeId) const;
 	virtual QList<QCborValue::Type> allowedCborTypes(int metaTypeId, QCborTag tag) const = 0;
 	virtual int guessType(QCborTag tag, QCborValue::Type dataType) const;
 	DeserializationCapabilityResult canDeserialize(int &metaTypeId,

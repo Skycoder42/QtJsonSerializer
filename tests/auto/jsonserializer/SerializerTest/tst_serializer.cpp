@@ -3,6 +3,7 @@
 
 #include "testgadget.h"
 #include "testobject.h"
+#include "testconverter.h"
 
 using TestTuple = std::tuple<int, QString, QList<int>>;
 using TestPair = std::pair<bool, int>;
@@ -40,6 +41,11 @@ private:
 
 void SerializerTest::initTestCase()
 {
+	// TODO remove again
+	QMetaType::registerConverter<int, EnumContainer::EnumFlags>([](int v){
+		return static_cast<EnumContainer::EnumFlags>(v);
+	});
+
 	//metatypes
 	qRegisterMetaType<TestGadget>();
 	qRegisterMetaType<EnumGadget>();
@@ -112,6 +118,8 @@ void SerializerTest::initTestCase()
 	QMetaType::registerEqualsComparator<std::variant<bool, int, double>>();
 
 	serializer = new QJsonSerializer{this};
+	serializer->addJsonTypeConverter<TestEnumConverter>();
+	serializer->addJsonTypeConverter<TestWrapperConverter>();
 }
 
 void SerializerTest::cleanupTestCase()
@@ -478,8 +486,9 @@ void SerializerTest::testDeserialization()
 			auto res = serializer->deserialize(data, result.userType(), this);
 			if(result.userType() == qMetaTypeId<TestObject*>())
 				QVERIFY(TestObject::equals(res.value<TestObject*>(), result.value<TestObject*>()));
-			else
+			else {
 				QCOMPARE(res, result);
+			}
 		} else
 			QVERIFY_EXCEPTION_THROWN(serializer->deserialize(data, result.userType(), this), QJsonDeserializationException);
 	} catch(std::exception &e) {
@@ -535,7 +544,7 @@ void SerializerTest::testDeserialization()
 
 void SerializerTest::addCommonData()
 {
-	//basic types without any converter
+	// basic types without any converter
 	QTest::newRow("bool") << QVariant{true}
 						  << QJsonValue{true}
 						  << true
@@ -561,7 +570,7 @@ void SerializerTest::addCommonData()
 							 << true
 							 << QVariantHash{};
 
-	//advanced types
+	// advanced types
 	auto id = QUuid::createUuid();
 	QTest::newRow("uuid") << QVariant{id}
 						  << QJsonValue{id.toString(QUuid::WithoutBraces)}
@@ -576,42 +585,14 @@ void SerializerTest::addCommonData()
 								 << true
 								 << QVariantHash{};
 
-	//enums/flags
-	QTest::newRow("enum.int") << QVariant::fromValue<EnumGadget>(EnumGadget::Normal1)
-							  << QJsonValue{QJsonObject{
-										{QStringLiteral("enumProp"), static_cast<int>(EnumGadget::Normal1)},
-										{QStringLiteral("flagsProp"), 0}
-									}}
-							  << true
-							  << QVariantHash{};
-	QTest::newRow("enum.string") << QVariant::fromValue<EnumGadget>(EnumGadget::Normal2)
-								 << QJsonValue{QJsonObject{
-										   {QStringLiteral("enumProp"), QStringLiteral("Normal2")},
-										   {QStringLiteral("flagsProp"), QString()}
+	// type converters
+	QTest::newRow("converter") << QVariant::fromValue<EnumContainer>({EnumContainer::Normal1, EnumContainer::FlagX})
+							   << QJsonValue{QJsonObject{
+										   {QStringLiteral("0"), QStringLiteral("Normal1")},
+										   {QStringLiteral("1"), QStringLiteral("FlagX")}
 									   }}
 								 << true
-								 << QVariantHash{{QStringLiteral("enumAsString"), true}};
-	QTest::newRow("flags.int") << QVariant::fromValue<EnumGadget>(EnumGadget::FlagX)
-							   << QJsonValue{QJsonObject{
-										 {QStringLiteral("enumProp"), static_cast<int>(EnumGadget::Normal0)},
-										 {QStringLiteral("flagsProp"), static_cast<int>(EnumGadget::FlagX)}
-									 }}
-							   << true
-							   << QVariantHash{};
-	QTest::newRow("flags.string.single") << QVariant::fromValue<EnumGadget>(EnumGadget::Flag1 | EnumGadget::Flag2)
-										 << QJsonValue{QJsonObject{
-													{QStringLiteral("enumProp"), QStringLiteral("Normal0")},
-													{QStringLiteral("flagsProp"), QStringLiteral("FlagX")}
-											   }}
-										 << true
-										 << QVariantHash{{QStringLiteral("enumAsString"), true}};
-	QTest::newRow("flags.string.multi") << QVariant::fromValue<EnumGadget>(EnumGadget::Flag1 | EnumGadget::Flag3)
-										<< QJsonValue{QJsonObject{
-												   {QStringLiteral("enumProp"), QStringLiteral("Normal0")},
-												   {QStringLiteral("flagsProp"), QStringLiteral("Flag1|Flag3")}
-											  }}
-										<< true
-										<< QVariantHash{{QStringLiteral("enumAsString"), true}};
+								 << QVariantHash{};
 
 	// aliases
 	QTest::newRow("alias") << QVariant::fromValue<AliasGadget>({10, 20, 30})

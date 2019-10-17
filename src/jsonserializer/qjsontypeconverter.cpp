@@ -23,6 +23,12 @@ void QJsonTypeConverter::setPriority(int priority)
 	d->priority = priority;
 }
 
+QList<QCborTag> QJsonTypeConverter::allowedCborTags(int metaTypeId) const
+{
+	Q_UNUSED(metaTypeId)
+	return {};
+}
+
 int QJsonTypeConverter::guessType(QCborTag tag, QCborValue::Type dataType) const
 {
 	Q_UNUSED(tag)
