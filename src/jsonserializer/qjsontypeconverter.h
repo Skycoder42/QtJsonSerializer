@@ -50,11 +50,11 @@ public:
 		virtual QCborTag typeTag(int metaTypeId) const = 0;
 
 		//! Serialize a subvalue, represented by a meta property
-		virtual QCborValue serializeSubtype(QMetaProperty property, const QVariant &value) const = 0;
+		virtual QCborValue serializeSubtype(const QMetaProperty &property, const QVariant &value) const = 0;
 		//! Serialize a subvalue, represented by a type id
 		virtual QCborValue serializeSubtype(int propertyType, const QVariant &value, const QByteArray &traceHint = {}) const = 0;
 		//! Deserialize a subvalue, represented by a meta property
-		virtual QVariant deserializeSubtype(QMetaProperty property, const QCborValue &value, QObject *parent) const = 0;
+		virtual QVariant deserializeSubtype(const QMetaProperty &property, const QCborValue &value, QObject *parent) const = 0;
 		//! Deserialize a subvalue, represented by a type id
 		virtual QVariant deserializeSubtype(int propertyType, const QCborValue &value, QObject *parent, const QByteArray &traceHint = {}) const = 0;
 	};

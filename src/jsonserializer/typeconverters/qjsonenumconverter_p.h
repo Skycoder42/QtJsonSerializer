@@ -13,11 +13,11 @@ public:
 	static QVariant deserializeEnum(const QMetaEnum &metaEnum, const QCborValue &value);
 
 	QJsonEnumConverter();
-
 	bool canConvert(int metaTypeId) const override;
-	QList<QJsonValue::Type> jsonTypes() const override;
-	QJsonValue serialize(int propertyType, const QVariant &value, const SerializationHelper *helper) const override;
-	QVariant deserialize(int propertyType, const QJsonValue &value, QObject *parent, const SerializationHelper *helper) const override;
+	QList<QCborTag> allowedCborTags(int metaTypeId) const override;
+	QList<QCborValue::Type> allowedCborTypes(int metaTypeId, QCborTag tag) const override;
+	QCborValue serialize(int propertyType, const QVariant &value, const SerializationHelper *helper) const override;
+	QVariant deserializeCbor(int propertyType, const QCborValue &value, QObject *parent, const SerializationHelper *helper) const override;
 
 private:
 	bool testForEnum(int metaTypeId) const;

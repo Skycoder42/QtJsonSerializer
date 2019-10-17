@@ -1,5 +1,6 @@
 #include "qjsonenumconverter_p.h"
 #include "qjsonserializerexception.h"
+#include "qcborserializer.h"
 
 #include <cmath>
 
@@ -17,14 +18,14 @@ Q_NORETURN inline void throwSer(QByteArray &&what, bool ser)
 
 QCborValue QJsonEnumConverter::serializeEnum(const QMetaEnum &metaEnum, const QVariant &value, bool enumAsString)
 {
-	// TODO fix
+	const auto tag = static_cast<QCborTag>(metaEnum.isFlag() ? QCborSerializer::Flags : QCborSerializer::Enum);
 	if (enumAsString) {
 		if(metaEnum.isFlag())
-			return QString::fromUtf8(metaEnum.valueToKeys(value.toInt()));
+			return {tag, QString::fromUtf8(metaEnum.valueToKeys(value.toInt()))};
 		else
-			return QString::fromUtf8(metaEnum.valueToKey(value.toInt()));
+			return {tag, QString::fromUtf8(metaEnum.valueToKey(value.toInt()))};
 	} else
-		return value.toInt();
+		return {tag, value.toInt()};
 }
 
 QVariant QJsonEnumConverter::deserializeEnum(const QMetaEnum &metaEnum, const QCborValue &value)

@@ -69,6 +69,7 @@ public:
 	QSharedPointer<QJsonTypeConverter> findSerConverter(int propertyType) const;
 	QSharedPointer<QJsonTypeConverter> findDeserConverter(int &propertyType, QCborTag tag, QCborValue::Type type) const;
 
+	int getEnumId(const QMetaEnum &metaEnum, bool ser) const;
 	QCborValue serializeValue(int propertyType, const QVariant &value) const;
 	QVariant deserializeCborValue(int propertyType, const QCborValue &value) const;
 	QVariant deserializeJsonValue(int propertyType, const QCborValue &value) const;

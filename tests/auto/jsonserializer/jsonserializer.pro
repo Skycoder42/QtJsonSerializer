@@ -1,9 +1,9 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-	TypeConverterTestLib \
+#	TypeConverterTestLib \
 	SerializerTest \
-	CborSerializerTest
+#	CborSerializerTest
 
 CONVERTER_TESTS = \
 	BytearrayConverterTest \
@@ -24,10 +24,10 @@ CONVERTER_TESTS = \
 	OptionalConverterTest \
 	VariantConverterTest
 
-for(test, CONVERTER_TESTS) {
-	SUBDIRS += $$test
-	$${test}.depends += TypeConverterTestLib
-}
+#for(test, CONVERTER_TESTS) {
+#	SUBDIRS += $$test
+#	$${test}.depends += TypeConverterTestLib
+#}
 
 prepareRecursiveTarget(run-tests)
 QMAKE_EXTRA_TARGETS += run-tests

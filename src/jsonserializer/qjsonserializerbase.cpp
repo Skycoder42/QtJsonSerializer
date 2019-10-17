@@ -188,13 +188,13 @@ QVariant QJsonSerializerBase::getProperty(const char *name) const
 	return property(name);
 }
 
-QCborValue QJsonSerializerBase::serializeSubtype(QMetaProperty property, const QVariant &value) const
+QCborValue QJsonSerializerBase::serializeSubtype(const QMetaProperty &property, const QVariant &value) const
 {
 	Q_D(const QJsonSerializerBase);
 	QJsonExceptionContext ctx(property);
-//	if (property.isEnumType())
-//		return QJsonEnumConverter::serializeEnum(property.enumerator(), value, d->enumAsString);
-//	else
+	if (property.isEnumType())
+		return serializeVariant(d->getEnumId(property.enumerator(), true), value);
+	else
 		return serializeVariant(property.userType(), value);
 }
 
@@ -204,12 +204,13 @@ QCborValue QJsonSerializerBase::serializeSubtype(int propertyType, const QVarian
 	return serializeVariant(propertyType, value);
 }
 
-QVariant QJsonSerializerBase::deserializeSubtype(QMetaProperty property, const QCborValue &value, QObject *parent) const
+QVariant QJsonSerializerBase::deserializeSubtype(const QMetaProperty &property, const QCborValue &value, QObject *parent) const
 {
+	Q_D(const QJsonSerializerBase);
 	QJsonExceptionContext ctx(property);
-//	if(property.isEnumType())
-//		return QJsonEnumConverter::deserializeEnum(property.enumerator(), value);
-//	else
+	if(property.isEnumType())
+		return deserializeVariant(d->getEnumId(property.enumerator(), false), value, parent);
+	else
 		return deserializeVariant(property.userType(), value, parent);
 }
 
@@ -482,6 +483,22 @@ QSharedPointer<QJsonTypeConverter> QJsonSerializerBasePrivate::findDeserConverte
 	return nullptr;
 }
 
+int QJsonSerializerBasePrivate::getEnumId(const QMetaEnum &metaEnum, bool ser) const
+{
+	QByteArray eName = metaEnum.name();
+	if (const QByteArray scope = metaEnum.scope(); !scope.isEmpty())
+		eName = scope + "::" + eName;
+	const auto eTypeId = QMetaType::type(eName);
+	// TODO qDebug() << eName << eTypeId;
+	if (eTypeId == QMetaType::UnknownType) {
+		if (ser)
+			throw QJsonSerializationException{"Unable to determine typeid of meta enum " + eName};
+		else
+			throw QJsonDeserializationException{"Unable to determine typeid of meta enum " + eName};
+	} else
+		return eTypeId;
+}
+
 QCborValue QJsonSerializerBasePrivate::serializeValue(int propertyType, const QVariant &value) const
 {
 	Q_UNUSED(propertyType)
@@ -631,13 +648,9 @@ QVariant QJsonSerializerBasePrivate::deserializeJsonValue(int propertyType, cons
 			break;
 		case QMetaType::QChar:
 		case QMetaType::QString:
-		case QMetaType::QByteArray:
 		case QMetaType::Char:
-		case QMetaType::QDate:
-		case QMetaType::QTime:
 		case QMetaType::QColor:
 		case QMetaType::QUrl:
-		case QMetaType::QDateTime:
 		case QMetaType::QFont:
 		case QMetaType::QUuid:
 			if (!value.isString())
