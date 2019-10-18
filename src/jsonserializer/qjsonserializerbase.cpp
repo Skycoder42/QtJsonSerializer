@@ -188,6 +188,12 @@ QVariant QJsonSerializerBase::getProperty(const char *name) const
 	return property(name);
 }
 
+QByteArray QJsonSerializerBase::getCanonicalTypeName(int propertyType) const
+{
+	QReadLocker lock{&QJsonSerializerBasePrivate::typedefLock};
+	return QJsonSerializerBasePrivate::typedefMapping.value(propertyType, QMetaType::typeName(propertyType));
+}
+
 QCborValue QJsonSerializerBase::serializeSubtype(const QMetaProperty &property, const QVariant &value) const
 {
 	Q_D(const QJsonSerializerBase);
@@ -209,7 +215,7 @@ QVariant QJsonSerializerBase::deserializeSubtype(const QMetaProperty &property, 
 	Q_D(const QJsonSerializerBase);
 	QJsonExceptionContext ctx(property);
 	if(property.isEnumType())
-		return deserializeVariant(d->getEnumId(property.enumerator(), false), value, parent);
+		return deserializeVariant(d->getEnumId(property.enumerator(), false), value, parent, true);
 	else
 		return deserializeVariant(property.userType(), value, parent);
 }
@@ -238,7 +244,7 @@ QCborValue QJsonSerializerBase::serializeVariant(int propertyType, const QVarian
 		return res;
 }
 
-QVariant QJsonSerializerBase::deserializeVariant(int propertyType, const QCborValue &value, QObject *parent) const
+QVariant QJsonSerializerBase::deserializeVariant(int propertyType, const QCborValue &value, QObject *parent, bool skipConversion) const
 {
 	Q_D(const QJsonSerializerBase);
 	// first: find a converter and convert the data to QVariant
@@ -259,8 +265,8 @@ QVariant QJsonSerializerBase::deserializeVariant(int propertyType, const QCborVa
 			variant = d->deserializeCborValue(propertyType, value);
 	}
 
-	// second: if the type was given, enforce a conversion to that type
-	if(propertyType != QMetaType::UnknownType) {
+	// second: if the type was given, enforce a conversion to that type (expect if skipped)
+	if(!skipConversion && propertyType != QMetaType::UnknownType) {
 		auto vType = variant.typeName();
 
 		// exclude special values that can convert from null, but should not do so
@@ -324,12 +330,6 @@ QJsonSerializerBasePrivate::ConverterStore<QJsonTypeConverterFactory> QJsonSeria
 //	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonStdOptionalConverter>>::create(),
 //	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonStdVariantConverter>>::create()
 };
-
-QByteArray QJsonSerializerBasePrivate::getTypeName(int propertyType)
-{
-	QReadLocker lock{&typedefLock};
-	return typedefMapping.value(propertyType, QMetaType::typeName(propertyType));
-}
 
 QSharedPointer<QJsonTypeConverter> QJsonSerializerBasePrivate::findSerConverter(int propertyType) const
 {

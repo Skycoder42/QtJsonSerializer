@@ -62,6 +62,18 @@ public:
 	QVariant deserializeCbor(int propertyType, const QCborValue &value, QObject *parent, const SerializationHelper *helper) const override;
 };
 
+class TestObject : public QObject
+{
+	Q_OBJECT
+
+public:
+	TestObject(QObject *parent = nullptr);
+};
+
+using IntAlias = int;
+using ListAlias = QList<TestObject*>;
+
 Q_DECLARE_METATYPE(EnumContainer)
+Q_DECLARE_METATYPE(ListAlias)
 
 #endif // TESTCONVERTER_H

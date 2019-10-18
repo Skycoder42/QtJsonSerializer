@@ -94,3 +94,9 @@ QVariant TestWrapperConverter::deserializeCbor(int propertyType, const QCborValu
 		static_cast<EnumContainer::EnumFlags>(helper->deserializeSubtype(mo->property(mo->propertyOffset() + 1), map.value(QStringLiteral("1")), parent).toInt())
 	});
 }
+
+
+
+TestObject::TestObject(QObject *parent)
+	: QObject{parent}
+{}

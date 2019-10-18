@@ -1,8 +1,6 @@
 #include <QtTest>
 #include <QtJsonSerializer>
 
-#include "testgadget.h"
-#include "testobject.h"
 #include "testconverter.h"
 
 using TestTuple = std::tuple<int, QString, QList<int>>;
@@ -13,6 +11,25 @@ Q_DECLARE_METATYPE(TestPair)
 Q_DECLARE_METATYPE(std::optional<int>)
 Q_DECLARE_METATYPE(TestVariant)
 
+class AliasHelper : public QJsonSerializerBase
+{
+public:
+	QByteArray getNameHelper(int propertyType) const {
+		return getCanonicalTypeName(propertyType);
+	}
+
+protected:
+	bool jsonMode() const override {
+		return true;
+	}
+	QCborTag typeTag(int metaTypeId) const override {
+		return static_cast<QCborTag>(-1);
+	}
+	QList<int> typesForTag(QCborTag tag) const override {
+		return {};
+	}
+};
+
 class SerializerTest : public QObject
 {
 	Q_OBJECT
@@ -21,6 +38,7 @@ private Q_SLOTS:
 	void initTestCase();
 	void cleanupTestCase();
 
+	void testAliasName();
 	void testVariantConversions_data();
 	void testVariantConversions();
 
@@ -33,6 +51,7 @@ private Q_SLOTS:
 //	void testExceptionTrace();
 
 private:
+	AliasHelper *helper;
 	QJsonSerializer *serializer = nullptr;
 
 	void addCommonData();
@@ -41,43 +60,20 @@ private:
 
 void SerializerTest::initTestCase()
 {
-	// TODO remove again
-	QMetaType::registerConverter<int, EnumContainer::EnumFlags>([](int v){
-		return static_cast<EnumContainer::EnumFlags>(v);
-	});
-
-	//metatypes
-	qRegisterMetaType<TestGadget>();
-	qRegisterMetaType<EnumGadget>();
-	qRegisterMetaType<CustomGadget>();
-	qRegisterMetaType<AliasGadget>();
-	qRegisterMetaType<TestObject*>();
-
 	//aliases
 	qRegisterMetaType<IntAlias>("IntAlias");
 	qRegisterMetaType<ListAlias>();
-	QJsonSerializer::registerInverseTypedef<ListAlias>("QList<CustomGadget>");
-	QCOMPARE(QMetaType::typeName(qMetaTypeId<ListAlias>()), "ListAlias");
+	QJsonSerializer::registerInverseTypedef<ListAlias>("QList<TestObject*>");
 
 	// converters
-	QJsonSerializer::registerListConverters<QList<int>>();
-	QJsonSerializer::registerMapConverters<QMap<QString, int>>();
-
-	QJsonSerializer::registerListConverters<TestGadget>();
-	QJsonSerializer::registerMapConverters<TestGadget>();
-	QJsonSerializer::registerListConverters<CustomGadget>();
-	QJsonSerializer::registerListConverters<QList<TestGadget>>();
-	QJsonSerializer::registerMapConverters<QMap<QString, TestGadget>>();
-
-	QJsonSerializer::registerBasicConverters<TestObject*>();
-	QJsonSerializer::registerListConverters<QList<TestObject*>>();
-	QJsonSerializer::registerMapConverters<QMap<QString, TestObject*>>();
 	QJsonSerializer::registerPointerConverters<TestObject>();
-
+	QJsonSerializer::registerListConverters<TestObject*>();
+	QJsonSerializer::registerListConverters<QList<int>>();
+	QJsonSerializer::registerMapConverters<TestObject*>();
+	QJsonSerializer::registerMapConverters<QMap<QString, int>>();
 	QJsonSerializer::registerPairConverters<int, QString>();
 	QJsonSerializer::registerPairConverters<bool, bool>();
-	QJsonSerializer::registerPairConverters<TestGadget, QList<int>>();
-	QJsonSerializer::registerPairConverters<TestObject*, QList<int>>();
+	QJsonSerializer::registerPairConverters<QList<bool>, bool>();
 	QJsonSerializer::registerListConverters<QPair<bool, bool>>();
 
 	QJsonSerializer_registerTupleConverters_named(int, QString, QList<int>);
@@ -87,29 +83,14 @@ void SerializerTest::initTestCase()
 
 	//register list comparators, needed for test only!
 	QMetaType::registerEqualsComparator<QList<int>>();
+	QMetaType::registerEqualsComparator<QList<TestObject*>>();
 	QMetaType::registerEqualsComparator<QList<QList<int>>>();
 	QMetaType::registerEqualsComparator<QMap<QString, int>>();
-	QMetaType::registerEqualsComparator<QMap<QString, QMap<QString, int>>>();
-
-	QMetaType::registerEqualsComparator<TestGadget>();
-	QMetaType::registerEqualsComparator<EnumGadget>();
-	QMetaType::registerEqualsComparator<CustomGadget>();
-	QMetaType::registerEqualsComparator<AliasGadget>();
-	QMetaType::registerEqualsComparator<QList<TestGadget>>();
-	QMetaType::registerEqualsComparator<QList<QList<TestGadget>>>();
-	QMetaType::registerEqualsComparator<QMap<QString, TestGadget>>();
-	QMetaType::registerEqualsComparator<QMap<QString, QMap<QString, TestGadget>>>();
-
-	QMetaType::registerEqualsComparator<TestObject*>();
-	QMetaType::registerEqualsComparator<QList<TestObject*>>();
-	QMetaType::registerEqualsComparator<QList<QList<TestObject*>>>();
 	QMetaType::registerEqualsComparator<QMap<QString, TestObject*>>();
-	QMetaType::registerEqualsComparator<QMap<QString, QMap<QString, TestObject*>>>();
-
+	QMetaType::registerEqualsComparator<QMap<QString, QMap<QString, int>>>();
 	QMetaType::registerEqualsComparator<QPair<QVariant, QVariant>>();
 	QMetaType::registerEqualsComparator<QPair<int, QString>>();
-	QMetaType::registerEqualsComparator<QPair<TestGadget, QList<int>>>();
-	QMetaType::registerEqualsComparator<QPair<TestObject*, QList<int>>>();
+	QMetaType::registerEqualsComparator<QPair<QList<bool>, bool>>();
 	QMetaType::registerEqualsComparator<QList<QPair<bool, bool>>>();
 
 	QMetaType::registerEqualsComparator<TestTuple>();
@@ -117,6 +98,7 @@ void SerializerTest::initTestCase()
 	QMetaType::registerEqualsComparator<std::optional<int>>();
 	QMetaType::registerEqualsComparator<std::variant<bool, int, double>>();
 
+	helper = new AliasHelper{};
 	serializer = new QJsonSerializer{this};
 	serializer->addJsonTypeConverter<TestEnumConverter>();
 	serializer->addJsonTypeConverter<TestWrapperConverter>();
@@ -128,6 +110,12 @@ void SerializerTest::cleanupTestCase()
 	serializer = nullptr;
 }
 
+void SerializerTest::testAliasName()
+{
+	QCOMPARE(QMetaType::typeName(qMetaTypeId<ListAlias>()), "ListAlias");
+	QCOMPARE(helper->getNameHelper(qMetaTypeId<ListAlias>()), "QList<TestObject*>");
+}
+
 void SerializerTest::testVariantConversions_data()
 {
 	QTest::addColumn<QVariant>("data");
@@ -137,6 +125,14 @@ void SerializerTest::testVariantConversions_data()
 	QTest::newRow("QList<int>") << QVariant::fromValue<QList<int>>({3, 7, 13})
 								<< static_cast<int>(QMetaType::QVariantList)
 								<< QVariant{QVariantList{3, 7, 13}};
+	auto to = new TestObject{this};
+	QTest::newRow("QList<TestObject*>") << QVariant::fromValue<QList<TestObject*>>({nullptr, to, nullptr})
+										<< static_cast<int>(QMetaType::QVariantList)
+										<< QVariant{QVariantList{
+											   QVariant::fromValue<TestObject*>(nullptr),
+											   QVariant::fromValue(to),
+											   QVariant::fromValue<TestObject*>(nullptr)
+										   }};
 	QList<int> l1 = {0, 1, 2};
 	QList<int> l2 = {3, 4, 5};
 	QList<int> l3 = {6, 7, 8};
@@ -158,6 +154,17 @@ void SerializerTest::testVariantConversions_data()
 												{QStringLiteral("devil"), 666},
 												{QStringLiteral("fun"), 0}
 											}};
+	QTest::newRow("QMap<QString, TestObject*>") << QVariant::fromValue<QMap<QString, TestObject*>>({
+													   {QStringLiteral("baum"), nullptr},
+													   {QStringLiteral("devil"), to},
+													   {QStringLiteral("fun"), nullptr}
+												   })
+												<< static_cast<int>(QMetaType::QVariantMap)
+												<< QVariant{QVariantMap {
+													   {QStringLiteral("baum"), QVariant::fromValue<TestObject*>(nullptr)},
+													   {QStringLiteral("devil"), QVariant::fromValue(to)},
+													   {QStringLiteral("fun"), QVariant::fromValue<TestObject*>(nullptr)}
+												   }};
 	QMap<QString, int> m1 = {{QStringLiteral("v0"), 0}, {QStringLiteral("v1"), 1}, {QStringLiteral("v2"), 2}};
 	QMap<QString, int> m2 = {{QStringLiteral("v3"), 3}, {QStringLiteral("v4"), 4}, {QStringLiteral("v5"), 5}};
 	QMap<QString, int> m3 = {{QStringLiteral("v6"), 6}, {QStringLiteral("v7"), 7}, {QStringLiteral("v8"), 8}};
@@ -169,85 +176,11 @@ void SerializerTest::testVariantConversions_data()
 													   << static_cast<int>(QMetaType::QVariantMap)
 													   << QVariant{};
 
-	QTest::newRow("QList<TestGadget>") << QVariant::fromValue<QList<TestGadget>>({{}, {}, {}})
-									   << static_cast<int>(QMetaType::QVariantList)
-									   << QVariant{};
-	QList<TestGadget> g1 {{}, {}, {}};
-	QList<TestGadget> g2 {{}, {}, {}};
-	QList<TestGadget> g3 {{}, {}, {}};
-	QTest::newRow("QList<QList<TestGadget>>") << QVariant::fromValue<QList<QList<TestGadget>>>({g1, g2, g3})
-											  << static_cast<int>(QMetaType::QVariantList)
-											  << QVariant{};
-
-	QTest::newRow("QMap<QString, TestGadget>") << QVariant::fromValue<QMap<QString, TestGadget>>({
-																									 {QStringLiteral("baum"), {}},
-																									 {QStringLiteral("devil"), {}},
-																									 {QStringLiteral("fun"), {}}
-																								  })
-											   << static_cast<int>(QMetaType::QVariantMap)
-											   << QVariant{};
-	QMap<QString, TestGadget> r1 = {
-		{QStringLiteral("v0"), {}},
-		{QStringLiteral("v1"), {}},
-		{QStringLiteral("v2"), {}}};
-	QMap<QString, TestGadget> r2 = {
-		{QStringLiteral("v3"), {}},
-		{QStringLiteral("v4"), {}},
-		{QStringLiteral("v5"), {}}};
-	QMap<QString, TestGadget> r3 = {
-		{QStringLiteral("v6"), {}},
-		{QStringLiteral("v7"), {}},
-		{QStringLiteral("v8"), {}}};
-	QTest::newRow("QMap<QString, QMap<QString, TestGadget>>") << QVariant::fromValue<QMap<QString, QMap<QString, TestGadget>>>({
-																																   {QStringLiteral("r1"), r1},
-																																   {QStringLiteral("r2"), r2},
-																																   {QStringLiteral("r3"), r3}
-																															   })
-															  << static_cast<int>(QMetaType::QVariantMap)
-															  << QVariant{};
-
-	QTest::newRow("QList<TestObject*>") << QVariant::fromValue<QList<TestObject*>>({new TestObject{this}, new TestObject{this}, new TestObject{this}})
-										<< static_cast<int>(QMetaType::QVariantList)
-										<< QVariant{};
-	QList<TestObject*> o1 {new TestObject{this}, new TestObject{this}, new TestObject{this}};
-	QList<TestObject*> o2 {new TestObject{this}, new TestObject{this}, new TestObject{this}};
-	QList<TestObject*> o3 {new TestObject{this}, new TestObject{this}, new TestObject{this}};
-	QTest::newRow("QList<QList<TestObject*>>") << QVariant::fromValue<QList<QList<TestObject*>>>({o1, o2, o3})
-											   << static_cast<int>(QMetaType::QVariantList)
-											   << QVariant{};
-
-	QTest::newRow("QMap<QString, TestObject*>") << QVariant::fromValue<QMap<QString, TestObject*>>({
-																									   {QStringLiteral("baum"), new TestObject{this}},
-																									   {QStringLiteral("devil"), new TestObject{this}},
-																									   {QStringLiteral("fun"), new TestObject{this}}
-																								   })
-												<< static_cast<int>(QMetaType::QVariantMap)
-												<< QVariant{};
-	QMap<QString, TestObject*> q1 = {
-		{QStringLiteral("v0"), new TestObject{this}},
-		{QStringLiteral("v1"), new TestObject{this}},
-		{QStringLiteral("v2"), new TestObject{this}}};
-	QMap<QString, TestObject*> q2 = {
-		{QStringLiteral("v3"), new TestObject{this}},
-		{QStringLiteral("v4"), new TestObject{this}},
-		{QStringLiteral("v5"), new TestObject{this}}};
-	QMap<QString, TestObject*> q3 = {
-		{QStringLiteral("v6"), new TestObject{this}},
-		{QStringLiteral("v7"), new TestObject{this}},
-		{QStringLiteral("v8"), new TestObject{this}}};
-	QTest::newRow("QMap<QString, QMap<QString, TestObject*>>") << QVariant::fromValue<QMap<QString, QMap<QString, TestObject*>>>({
-																																	 {QStringLiteral("q1"), q1},
-																																	 {QStringLiteral("q3"), q2},
-																																	 {QStringLiteral("q3"), q3}
-																																 })
-															   << static_cast<int>(QMetaType::QVariantMap)
-															   << QVariant{};
-
-	QSharedPointer<TestObject> sPtr(new TestObject(nullptr));
+	QSharedPointer<TestObject> sPtr(new TestObject{});
 	QTest::newRow("QSharedPointer<TestObject>") << QVariant::fromValue(sPtr)
 												<< qMetaTypeId<QSharedPointer<QObject>>()
 												<< QVariant::fromValue(sPtr.staticCast<QObject>());
-	QPointer<TestObject> oPtr(new TestObject(this));
+	QPointer<TestObject> oPtr(new TestObject{this});
 	QTest::newRow("QPointer<TestObject>") << QVariant::fromValue(oPtr)
 										  << qMetaTypeId<QPointer<QObject>>()
 										  << QVariant::fromValue<QPointer<QObject>>(oPtr.data());
@@ -256,12 +189,9 @@ void SerializerTest::testVariantConversions_data()
 										 << qMetaTypeId<QPair<QVariant, QVariant>>()
 										 << QVariant::fromValue(QPair<QVariant, QVariant>{42, QStringLiteral("baum")});
 
-	QTest::newRow("QPair<TestGadget, QList<int>>") << QVariant::fromValue<QPair<TestGadget, QList<int>>>({{}, {1, 2, 3}})
-												   << qMetaTypeId<QPair<QVariant, QVariant>>()
-												   << QVariant{};
-	QTest::newRow("QPair<TestObject*, QList<int>>") << QVariant::fromValue<QPair<TestObject*, QList<int>>>({new TestObject{this}, {1, 2, 3}})
-													<< qMetaTypeId<QPair<QVariant, QVariant>>()
-													<< QVariant{};
+	QTest::newRow("QPair<QList<bool>, bool>") << QVariant::fromValue<QPair<QList<bool>, bool>>({{true, false, true}, false})
+											  << qMetaTypeId<QPair<QVariant, QVariant>>()
+											  << QVariant{};
 
 	QTest::newRow("QList<QPair<bool, bool>>") << QVariant::fromValue<QList<QPair<bool, bool>>>({{false, true}, {true, false}})
 											  << static_cast<int>(QMetaType::QVariantList)
@@ -484,11 +414,7 @@ void SerializerTest::testDeserialization()
 	try {
 		if(works) {
 			auto res = serializer->deserialize(data, result.userType(), this);
-			if(result.userType() == qMetaTypeId<TestObject*>())
-				QVERIFY(TestObject::equals(res.value<TestObject*>(), result.value<TestObject*>()));
-			else {
-				QCOMPARE(res, result);
-			}
+			QCOMPARE(res, result);
 		} else
 			QVERIFY_EXCEPTION_THROWN(serializer->deserialize(data, result.userType(), this), QJsonDeserializationException);
 	} catch(std::exception &e) {
@@ -593,16 +519,6 @@ void SerializerTest::addCommonData()
 									   }}
 								 << true
 								 << QVariantHash{};
-
-	// aliases
-	QTest::newRow("alias") << QVariant::fromValue<AliasGadget>({10, 20, 30})
-						   << QJsonValue{QJsonObject{
-									{QStringLiteral("intAlias"), 10},
-									{QStringLiteral("listAlias"), QJsonArray{QJsonObject{{QStringLiteral("data"), 20}}}},
-									{QStringLiteral("classList"), QJsonArray{QJsonObject{{QStringLiteral("data"), 30}}}},
-								}}
-						   << true
-						   << QVariantHash{};
 }
 
 void SerializerTest::resetProps()
@@ -647,14 +563,10 @@ Q_DECL_UNUSED void static_compile_test()
 	test_type<int, QJsonValue>();
 	test_type<double, QJsonValue>();
 	test_type<QString, QJsonValue>();
-	test_type<TestGadget, QJsonObject>();
-	test_type<TestGadget*, QJsonObject>();
-	test_type<QList<TestGadget>, QJsonArray>();
 	test_type<TestObject*, QJsonObject>();
 	test_type<QPointer<TestObject>, QJsonObject>();
 	test_type<QSharedPointer<TestObject>, QJsonObject>();
 	test_type<QList<TestObject*>, QJsonArray>();
-	test_type<QMap<QString, TestGadget>, QJsonObject>();
 	test_type<QMap<QString, TestObject*>, QJsonObject>();
 	test_type<int, QJsonValue>();
 	test_type<QString, QJsonValue>();

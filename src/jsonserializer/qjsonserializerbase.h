@@ -193,13 +193,14 @@ protected:
 
 	// protected implementation -> internal use for the type converters
 	QVariant getProperty(const char *name) const override;
+	QByteArray getCanonicalTypeName(int propertyType) const override;
 	QCborValue serializeSubtype(const QMetaProperty &property, const QVariant &value) const override;
 	QCborValue serializeSubtype(int propertyType, const QVariant &value, const QByteArray &traceHint) const override;
 	QVariant deserializeSubtype(const QMetaProperty &property, const QCborValue &value, QObject *parent) const override;
 	QVariant deserializeSubtype(int propertyType, const QCborValue &value, QObject *parent, const QByteArray &traceHint) const override;
 
 	QCborValue serializeVariant(int propertyType, const QVariant &value) const;
-	QVariant deserializeVariant(int propertyType, const QCborValue &value, QObject *parent) const;
+	QVariant deserializeVariant(int propertyType, const QCborValue &value, QObject *parent, bool skipConversion = false) const;
 
 private:
 	Q_DECLARE_PRIVATE(QJsonSerializerBase)

@@ -95,11 +95,6 @@ QVariant QJsonTypeConverter::deserializeJson(int propertyType, const QCborValue 
 	return deserializeCbor(propertyType, value, parent, helper);
 }
 
-QByteArray QJsonTypeConverter::getCanonicalTypeName(int propertyType) const
-{
-	return QJsonSerializerBasePrivate::getTypeName(propertyType);
-}
-
 void QJsonTypeConverter::mapTypesToJson(QList<QCborValue::Type> &typeList) const
 {
 	for (auto &type : typeList) {

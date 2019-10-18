@@ -48,6 +48,7 @@ public:
 		//! Returns a property from the serializer
 		virtual QVariant getProperty(const char *name) const = 0;
 		virtual QCborTag typeTag(int metaTypeId) const = 0;
+		virtual QByteArray getCanonicalTypeName(int propertyType) const = 0;
 
 		//! Serialize a subvalue, represented by a meta property
 		virtual QCborValue serializeSubtype(const QMetaProperty &property, const QVariant &value) const = 0;
@@ -84,10 +85,6 @@ public:
 	//! Called by the deserializer to serializer your given type
 	virtual QVariant deserializeCbor(int propertyType, const QCborValue &value, QObject *parent, const SerializationHelper *helper) const = 0;
 	virtual QVariant deserializeJson(int propertyType, const QCborValue &value, QObject *parent, const SerializationHelper *helper) const;
-
-protected:
-	//! Returns the actual original typename of the given type
-	QByteArray getCanonicalTypeName(int propertyType) const;
 
 private:
 	QScopedPointer<QJsonTypeConverterPrivate> d;

@@ -43,8 +43,6 @@ public:
 		void insertSorted(const QSharedPointer<TConverter> &converter);
 	};
 
-	static QByteArray getTypeName(int propertyType);
-
 	static QReadWriteLock typedefLock;
 	static QHash<int, QByteArray> typedefMapping;
 
