@@ -1,6 +1,6 @@
 TEMPLATE = app
 
-QT = core testlib jsonserializer
+QT = core gui testlib jsonserializer
 CONFIG += console
 CONFIG -= app_bundle
 

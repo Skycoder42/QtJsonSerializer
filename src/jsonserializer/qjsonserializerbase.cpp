@@ -41,6 +41,19 @@ QJsonSerializerBase::QJsonSerializerBase(QJsonSerializerBasePrivate &dd, QObject
 	QObject{dd, parent}
 {}
 
+QCborValue QJsonSerializerBase::serializeGeneric(const QVariant &value) const
+{
+	return serializeVariant(value.userType(), value);
+}
+
+QVariant QJsonSerializerBase::deserializeGeneric(const std::variant<QCborValue, QJsonValue> &value, int metaTypeId, QObject *parent) const
+{
+	if (std::holds_alternative<QJsonValue>(value))
+		return deserializeVariant(metaTypeId, QCborValue::fromJsonValue(std::get<QJsonValue>(value)), parent);
+	else
+		return deserializeVariant(metaTypeId, std::get<QCborValue>(value), parent);
+}
+
 bool QJsonSerializerBase::allowDefaultNull() const
 {
 	Q_D(const QJsonSerializerBase);

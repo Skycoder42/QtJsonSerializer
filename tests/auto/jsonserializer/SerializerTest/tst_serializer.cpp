@@ -1,5 +1,7 @@
 #include <QtTest>
 #include <QtJsonSerializer>
+#include <QColor>
+#include <QFont>
 
 #include "testconverter.h"
 
@@ -52,7 +54,8 @@ private Q_SLOTS:
 
 private:
 	AliasHelper *helper;
-	QJsonSerializer *serializer = nullptr;
+	QJsonSerializer *jsonSerializer = nullptr;
+	QCborSerializer *cborSerializer = nullptr;
 
 	void addCommonData();
 	void resetProps();
@@ -99,15 +102,20 @@ void SerializerTest::initTestCase()
 	QMetaType::registerEqualsComparator<std::variant<bool, int, double>>();
 
 	helper = new AliasHelper{};
-	serializer = new QJsonSerializer{this};
-	serializer->addJsonTypeConverter<TestEnumConverter>();
-	serializer->addJsonTypeConverter<TestWrapperConverter>();
+	jsonSerializer = new QJsonSerializer{this};
+	jsonSerializer->addJsonTypeConverter<TestEnumConverter>();
+	jsonSerializer->addJsonTypeConverter<TestWrapperConverter>();
+	cborSerializer = new QCborSerializer{this};
+	cborSerializer->addJsonTypeConverter<TestEnumConverter>();
+	cborSerializer->addJsonTypeConverter<TestWrapperConverter>();
 }
 
 void SerializerTest::cleanupTestCase()
 {
-	delete serializer;
-	serializer = nullptr;
+	delete jsonSerializer;
+	jsonSerializer = nullptr;
+	delete jsonSerializer;
+	jsonSerializer = nullptr;
 }
 
 void SerializerTest::testAliasName()
@@ -245,7 +253,8 @@ void SerializerTest::testVariantConversions()
 void SerializerTest::testSerialization_data()
 {
 	QTest::addColumn<QVariant>("data");
-	QTest::addColumn<QJsonValue>("result");
+	QTest::addColumn<QCborValue>("cResult");
+	QTest::addColumn<QJsonValue>("jResult");
 	QTest::addColumn<bool>("works");
 	QTest::addColumn<QVariantHash>("extraProps");
 
@@ -255,20 +264,32 @@ void SerializerTest::testSerialization_data()
 void SerializerTest::testSerialization()
 {
 	QFETCH(QVariant, data);
-	QFETCH(QJsonValue, result);
+	QFETCH(QCborValue, cResult);
+	QFETCH(QJsonValue, jResult);
 	QFETCH(bool, works);
 	QFETCH(QVariantHash, extraProps);
 
 	resetProps();
-	for(auto it = extraProps.constBegin(); it != extraProps.constEnd(); it++)
-		serializer->setProperty(qUtf8Printable(it.key()), it.value());
+	for(auto it = extraProps.constBegin(); it != extraProps.constEnd(); it++) {
+		cborSerializer->setProperty(qUtf8Printable(it.key()), it.value());
+		jsonSerializer->setProperty(qUtf8Printable(it.key()), it.value());
+	}
 
 	try {
-		if(works) {
-			auto res = serializer->serialize(data);
-			QCOMPARE(res, result);
-		} else
-			QVERIFY_EXCEPTION_THROWN(serializer->serialize(data), QJsonSerializationException);
+		if (!cResult.isUndefined()) {
+			if(works) {
+				auto res = cborSerializer->serialize(data);
+				QCOMPARE(res, cResult);
+			} else
+				QVERIFY_EXCEPTION_THROWN(cborSerializer->serialize(data), QJsonSerializationException);
+		}
+		if (!jResult.isUndefined()) {
+			if(works) {
+				auto res = jsonSerializer->serialize(data);
+				QCOMPARE(res, jResult);
+			} else
+				QVERIFY_EXCEPTION_THROWN(jsonSerializer->serialize(data), QJsonSerializationException);
+		}
 	} catch(std::exception &e) {
 		QFAIL(e.what());
 	}
@@ -277,42 +298,65 @@ void SerializerTest::testSerialization()
 void SerializerTest::testDeserialization_data()
 {
 	QTest::addColumn<QVariant>("result");
-	QTest::addColumn<QJsonValue>("data");
+	QTest::addColumn<QCborValue>("cData");
+	QTest::addColumn<QJsonValue>("jData");
 	QTest::addColumn<bool>("works");
 	QTest::addColumn<QVariantHash>("extraProps");
 
 	addCommonData();
 
 	QTest::newRow("null.invalid.bool") << QVariant{false}
+									   << QCborValue{QCborValue::Null}
 									   << QJsonValue{QJsonValue::Null}
 									   << false
-									   << QVariantHash{};
+									   << QVariantHash {
+											  {QStringLiteral("validationFlags"), QVariant::fromValue<QJsonSerializer::ValidationFlags>(QJsonSerializer::ValidationFlag::StandardValidation)}
+										  };
 	QTest::newRow("null.invalid.int") << QVariant{0}
+									  << QCborValue{QCborValue::Null}
 									  << QJsonValue{QJsonValue::Null}
 									  << false
-									  << QVariantHash{};
+									  << QVariantHash {
+											 {QStringLiteral("validationFlags"), QVariant::fromValue<QJsonSerializer::ValidationFlags>(QJsonSerializer::ValidationFlag::StandardValidation)}
+										 };
 	QTest::newRow("null.invalid.double") << QVariant{0.0}
+										 << QCborValue{QCborValue::Null}
 										 << QJsonValue{QJsonValue::Null}
 										 << false
-										 << QVariantHash{};
+										 << QVariantHash {
+												{QStringLiteral("validationFlags"), QVariant::fromValue<QJsonSerializer::ValidationFlags>(QJsonSerializer::ValidationFlag::StandardValidation)}
+											};
 	QTest::newRow("null.invalid.string") << QVariant{QString()}
+										 << QCborValue{QCborValue::Null}
 										 << QJsonValue{QJsonValue::Null}
 										 << false
-										 << QVariantHash{};
+										 << QVariantHash {
+												{QStringLiteral("validationFlags"), QVariant::fromValue<QJsonSerializer::ValidationFlags>(QJsonSerializer::ValidationFlag::StandardValidation)}
+											};
 	QTest::newRow("null.invalid.uuid") << QVariant{QUuid()}
+									   << QCborValue{QCborValue::Null}
 									   << QJsonValue{QJsonValue::Null}
 									   << false
-									   << QVariantHash{};
+									   << QVariantHash {
+											  {QStringLiteral("validationFlags"), QVariant::fromValue<QJsonSerializer::ValidationFlags>(QJsonSerializer::ValidationFlag::StandardValidation)}
+										  };
 	QTest::newRow("null.invalid.url") << QVariant{QUrl()}
+									  << QCborValue{QCborValue::Null}
 									  << QJsonValue{QJsonValue::Null}
 									  << false
-									  << QVariantHash{};
-	QTest::newRow("null.invalid.regex") << QVariant{QRegularExpression()}
-										<< QJsonValue{QJsonValue::Null}
-										<< false
-										<< QVariantHash{};
+									  << QVariantHash {
+											 {QStringLiteral("validationFlags"), QVariant::fromValue<QJsonSerializer::ValidationFlags>(QJsonSerializer::ValidationFlag::StandardValidation)}
+										 };
+//	QTest::newRow("null.invalid.regex") << QVariant{QRegularExpression()}
+//										<< QCborValue{QCborValue::Null}
+//										<< QJsonValue{QJsonValue::Null}
+//										<< false
+//										<< QVariantHash {
+//											   {QStringLiteral("validationFlags"), QVariant::fromValue<QJsonSerializer::ValidationFlags>(QJsonSerializer::ValidationFlag::StandardValidation)}
+//										   };
 
 	QTest::newRow("null.valid.bool") << QVariant{false}
+									 << QCborValue{QCborValue::Null}
 									 << QJsonValue{QJsonValue::Null}
 									 << true
 									 << QVariantHash {
@@ -320,6 +364,7 @@ void SerializerTest::testDeserialization_data()
 											{QStringLiteral("validationFlags"), QVariant::fromValue<QJsonSerializer::ValidationFlags>(QJsonSerializer::ValidationFlag::StandardValidation)}
 										};
 	QTest::newRow("null.valid.int") << QVariant{0}
+									<< QCborValue{QCborValue::Null}
 									<< QJsonValue{QJsonValue::Null}
 									<< true
 									<< QVariantHash {
@@ -327,6 +372,7 @@ void SerializerTest::testDeserialization_data()
 										   {QStringLiteral("validationFlags"), QVariant::fromValue<QJsonSerializer::ValidationFlags>(QJsonSerializer::ValidationFlag::StandardValidation)}
 									   };
 	QTest::newRow("null.valid.double") << QVariant{0.0}
+									   << QCborValue{QCborValue::Null}
 									   << QJsonValue{QJsonValue::Null}
 									   << true
 									   << QVariantHash {
@@ -334,6 +380,7 @@ void SerializerTest::testDeserialization_data()
 											  {QStringLiteral("validationFlags"), QVariant::fromValue<QJsonSerializer::ValidationFlags>(QJsonSerializer::ValidationFlag::StandardValidation)}
 										  };
 	QTest::newRow("null.valid.string") << QVariant{QString()}
+									   << QCborValue{QCborValue::Null}
 									   << QJsonValue{QJsonValue::Null}
 									   << true
 									   << QVariantHash {
@@ -341,6 +388,7 @@ void SerializerTest::testDeserialization_data()
 											  {QStringLiteral("validationFlags"), QVariant::fromValue<QJsonSerializer::ValidationFlags>(QJsonSerializer::ValidationFlag::StandardValidation)}
 										  };
 	QTest::newRow("null.valid.uuid") << QVariant{QUuid()}
+									 << QCborValue{QCborValue::Null}
 									 << QJsonValue{QJsonValue::Null}
 									 << true
 									 << QVariantHash {
@@ -348,75 +396,98 @@ void SerializerTest::testDeserialization_data()
 											{QStringLiteral("validationFlags"), QVariant::fromValue<QJsonSerializer::ValidationFlags>(QJsonSerializer::ValidationFlag::StandardValidation)}
 										};
 	QTest::newRow("null.valid.url") << QVariant{QUrl()}
+									<< QCborValue{QCborValue::Null}
 									<< QJsonValue{QJsonValue::Null}
 									<< true
 									<< QVariantHash {
 										   {QStringLiteral("allowDefaultNull"), true},
 										   {QStringLiteral("validationFlags"), QVariant::fromValue<QJsonSerializer::ValidationFlags>(QJsonSerializer::ValidationFlag::StandardValidation)}
 									   };
-	QTest::newRow("null.valid.regex") << QVariant{QRegularExpression()}
-									  << QJsonValue{QJsonValue::Null}
-									  << true
-									  << QVariantHash {
-											 {QStringLiteral("allowDefaultNull"), true},
-											 {QStringLiteral("validationFlags"), QVariant::fromValue<QJsonSerializer::ValidationFlags>(QJsonSerializer::ValidationFlag::StandardValidation)}
-										 };
+//	QTest::newRow("null.valid.regex") << QVariant{QRegularExpression()}
+//									  << QCborValue{}
+//									  << QJsonValue{QJsonValue::Null}
+//									  << true
+//									  << QVariantHash {
+//											 {QStringLiteral("allowDefaultNull"), true},
+//											 {QStringLiteral("validationFlags"), QVariant::fromValue<QJsonSerializer::ValidationFlags>(QJsonSerializer::ValidationFlag::StandardValidation)}
+//										 };
 
 	QTest::newRow("strict.bool.invalid") << QVariant{false}
+										 << QCborValue{0}
 										 << QJsonValue{0}
 										 << false
 										 << QVariantHash{};
 	QTest::newRow("strict.int.double") << QVariant{4}
+									   << QCborValue{4.2}
 									   << QJsonValue{4.2}
 									   << false
 									   << QVariantHash{};
 	QTest::newRow("strict.int.type") << QVariant{2}
+									 << QCborValue{QStringLiteral("2")}
 									 << QJsonValue{QStringLiteral("2")}
 									 << false
 									 << QVariantHash{};
 	QTest::newRow("strict.string") << QVariant{QStringLiteral("10")}
+								   << QCborValue{10}
 								   << QJsonValue{10}
 								   << false
 								   << QVariantHash{};
 	QTest::newRow("strict.nullptr") << QVariant::fromValue(nullptr)
+									<< QCborValue{QCborMap{}}
 									<< QJsonValue{QJsonObject{}}
 									<< false
 									<< QVariantHash{};
 	QTest::newRow("strict.double") << QVariant{2.2}
+								   << QCborValue{QStringLiteral("2.2")}
 								   << QJsonValue{QStringLiteral("2.2")}
 								   << false
 								   << QVariantHash{};
 	QTest::newRow("strict.url") << QVariant{QUrl{}}
+								<< QCborValue{5}
 								<< QJsonValue{5}
 								<< false
 								<< QVariantHash{};
 	QTest::newRow("strict.uuid") << QVariant{QUuid{}}
+								 << QCborValue{true}
 								 << QJsonValue{true}
 								 << false
 								 << QVariantHash{};
-	QTest::newRow("strict.regex") << QVariant{QRegularExpression{}}
-								  << QJsonValue{42}
-								  << false
-								  << QVariantHash{};
+//	QTest::newRow("strict.regex") << QVariant{QRegularExpression{}}
+//								  << QCborValue{42}
+//								  << QJsonValue{42}
+//								  << false
+//								  << QVariantHash{};
 }
 
 void SerializerTest::testDeserialization()
 {
-	QFETCH(QJsonValue, data);
+	QFETCH(QCborValue, cData);
+	QFETCH(QJsonValue, jData);
 	QFETCH(QVariant, result);
 	QFETCH(bool, works);
 	QFETCH(QVariantHash, extraProps);
 
 	resetProps();
-	for(auto it = extraProps.constBegin(); it != extraProps.constEnd(); it++)
-		serializer->setProperty(qUtf8Printable(it.key()), it.value());
+	for(auto it = extraProps.constBegin(); it != extraProps.constEnd(); it++) {
+		cborSerializer->setProperty(qUtf8Printable(it.key()), it.value());
+		jsonSerializer->setProperty(qUtf8Printable(it.key()), it.value());
+	}
 
 	try {
-		if(works) {
-			auto res = serializer->deserialize(data, result.userType(), this);
-			QCOMPARE(res, result);
-		} else
-			QVERIFY_EXCEPTION_THROWN(serializer->deserialize(data, result.userType(), this), QJsonDeserializationException);
+		if (!cData.isUndefined()) {
+			if(works) {
+				auto res = cborSerializer->deserialize(cData, result.userType(), this);
+				QCOMPARE(res, result);
+			} else
+				QVERIFY_EXCEPTION_THROWN(cborSerializer->deserialize(cData, result.userType(), this), QJsonDeserializationException);
+		}
+		if (!jData.isUndefined()) {
+			if(works) {
+				auto res = jsonSerializer->deserialize(jData, result.userType(), this);
+				QCOMPARE(res, result);
+			} else
+				QVERIFY_EXCEPTION_THROWN(jsonSerializer->deserialize(jData, result.userType(), this), QJsonDeserializationException);
+		}
 	} catch(std::exception &e) {
 		QFAIL(e.what());
 	}
@@ -472,26 +543,32 @@ void SerializerTest::addCommonData()
 {
 	// basic types without any converter
 	QTest::newRow("bool") << QVariant{true}
+						  << QCborValue{true}
 						  << QJsonValue{true}
 						  << true
 						  << QVariantHash{};
 	QTest::newRow("int") << QVariant{42}
+						 << QCborValue{42}
 						 << QJsonValue{42}
 						 << true
 						 << QVariantHash{};
 	QTest::newRow("double") << QVariant{4.2}
+							<< QCborValue{4.2}
 							<< QJsonValue{4.2}
 							<< true
 							<< QVariantHash{};
 	QTest::newRow("string.normal") << QVariant{QStringLiteral("baum")}
+								   << QCborValue{QStringLiteral("baum")}
 								   << QJsonValue{QStringLiteral("baum")}
 								   << true
 								   << QVariantHash{};
 	QTest::newRow("string.empty") << QVariant{QString()}
+								  << QCborValue{QString()}
 								  << QJsonValue{QString()}
 								  << true
 								  << QVariantHash{};
 	QTest::newRow("nullptr") << QVariant::fromValue(nullptr)
+							 << QCborValue{nullptr}
 							 << QJsonValue{QJsonValue::Null}
 							 << true
 							 << QVariantHash{};
@@ -499,37 +576,78 @@ void SerializerTest::addCommonData()
 	// advanced types
 	auto id = QUuid::createUuid();
 	QTest::newRow("uuid") << QVariant{id}
+						  << QCborValue{id}
 						  << QJsonValue{id.toString(QUuid::WithoutBraces)}
 						  << true
 						  << QVariantHash{};
 	QTest::newRow("url.valid") << QVariant{QUrl{QStringLiteral("https://example.com/test.xml?baum=42#tree")}}
+							   << QCborValue{QUrl{QStringLiteral("https://example.com/test.xml?baum=42#tree")}}
 							   << QJsonValue{QStringLiteral("https://example.com/test.xml?baum=42#tree")}
 							   << true
 							   << QVariantHash{};
 	QTest::newRow("url.invalid") << QVariant{QUrl{}}
+								 << QCborValue{QUrl{}}
 								 << QJsonValue{QString{}}
 								 << true
 								 << QVariantHash{};
+//	QTest::newRow("regex.valid") << QVariant{QRegularExpression{QStringLiteral(R"__(^[Hh]ello\s+world!?$)__")}}
+//								 << QCborValue{QRegularExpression{QStringLiteral(R"__(^[Hh]ello\s+world!?$)__")}}
+//								 << QJsonValue{QStringLiteral(R"__(^[Hh]ello\s+world!?$)__")}
+//								 << true
+//								 << QVariantHash{};
+//	QTest::newRow("regex.invalid") << QVariant{QRegularExpression{}}
+//								   << QCborValue{QRegularExpression{}}
+//								   << QJsonValue{QString{}}
+//								   << true
+//								   << QVariantHash{};
+
+	// gui types
+	QTest::newRow("color.rgb") << QVariant::fromValue(QColor{0xAA, 0xBB, 0xCC})
+							   << QCborValue{static_cast<QCborTag>(QCborSerializer::Color), QStringLiteral("#aabbcc")}
+							   << QJsonValue{QStringLiteral("#aabbcc")}
+							   << true
+							   << QVariantHash{};
+	QTest::newRow("color.argb") << QVariant::fromValue(QColor{0xAA, 0xBB, 0xCC, 0xDD})
+								<< QCborValue{static_cast<QCborTag>(QCborSerializer::Color), QStringLiteral("#ddaabbcc")}
+								<< QJsonValue{QStringLiteral("#ddaabbcc")}
+								<< true
+								<< QVariantHash{};
+	// TODO use converter
+//	QTest::newRow("font") << QVariant::fromValue(QFont{QStringLiteral("Liberation Sans")})
+//						  << QCborValue{static_cast<QCborTag>(QCborSerializer::Font), QStringLiteral("Liberation Sans")}
+//						  << QJsonValue{QStringLiteral("Liberation Sans")}
+//						  << true
+//						  << QVariantHash{};
+
 
 	// type converters
 	QTest::newRow("converter") << QVariant::fromValue<EnumContainer>({EnumContainer::Normal1, EnumContainer::FlagX})
+							   << QCborValue{QCborMap{
+									  {QStringLiteral("0"), QStringLiteral("Normal1")},
+									  {QStringLiteral("1"), QStringLiteral("FlagX")}
+								  }}
 							   << QJsonValue{QJsonObject{
-										   {QStringLiteral("0"), QStringLiteral("Normal1")},
-										   {QStringLiteral("1"), QStringLiteral("FlagX")}
-									   }}
-								 << true
-								 << QVariantHash{};
+									  {QStringLiteral("0"), QStringLiteral("Normal1")},
+									  {QStringLiteral("1"), QStringLiteral("FlagX")}
+								  }}
+							   << true
+							   << QVariantHash{};
 }
 
 void SerializerTest::resetProps()
 {
-	serializer->setAllowDefaultNull(false);
-	serializer->setKeepObjectName(false);
-	serializer->setEnumAsString(false);
-	serializer->setValidateBase64(true);
-	serializer->setUseBcp47Locale(true);
-	serializer->setValidationFlags(QJsonSerializer::ValidationFlag::StrictBasicTypes);
-	serializer->setPolymorphing(QJsonSerializer::Polymorphing::Enabled);
+	for (auto ser : {
+			 static_cast<QJsonSerializerBase*>(jsonSerializer),
+			 static_cast<QJsonSerializerBase*>(cborSerializer)}) {
+		jsonSerializer->setAllowDefaultNull(false);
+		ser->setKeepObjectName(false);
+		ser->setEnumAsString(false);
+		ser->setUseBcp47Locale(true);
+		ser->setValidationFlags(QJsonSerializer::ValidationFlag::StrictBasicTypes);
+		ser->setPolymorphing(QJsonSerializer::Polymorphing::Enabled);
+	}
+
+	jsonSerializer->setValidateBase64(true);
 }
 
 namespace  {

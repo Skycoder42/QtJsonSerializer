@@ -2,8 +2,7 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
 #	TypeConverterTestLib \
-	SerializerTest \
-#	CborSerializerTest
+	SerializerTest
 
 CONVERTER_TESTS = \
 	BytearrayConverterTest \

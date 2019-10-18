@@ -120,6 +120,9 @@ public:
 	template<typename... TArgs>
 	static inline bool registerVariantConverters(const char *originalTypeName = nullptr);
 
+	QCborValue serializeGeneric(const QVariant &value) const;
+	QVariant deserializeGeneric(const std::variant<QCborValue, QJsonValue> &value, int metaTypeId, QObject *parent = nullptr) const;
+
 	//! @readAcFn{QJsonSerializer::allowDefaultNull}
 	bool allowDefaultNull() const;
 	//! @readAcFn{QJsonSerializer::keepObjectName}
