@@ -56,6 +56,8 @@ private Q_SLOTS:
 	void testDeserialization();
 };
 
+Q_DECLARE_METATYPE(QCborValue::Type)
 Q_DECLARE_METATYPE(QJsonValue::Type)
+Q_DECLARE_METATYPE(QJsonTypeConverter::DeserializationCapabilityResult)
 
 #endif // TYPECONVERTERTESTLIB_H
