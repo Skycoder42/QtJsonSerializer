@@ -32,6 +32,9 @@ public:
 	NormalEnum normalEnum;
 	EnumFlags enumFlags;
 
+	bool operator==(EnumContainer other) const;
+	bool operator!=(EnumContainer other) const;
+
 private:
 	EnumFlags getEnumFlags() const;
 	void setEnumFlags(EnumFlags value);
@@ -72,6 +75,8 @@ public:
 
 using IntAlias = int;
 using ListAlias = QList<TestObject*>;
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(EnumContainer::EnumFlags)
 
 Q_DECLARE_METATYPE(EnumContainer)
 Q_DECLARE_METATYPE(ListAlias)

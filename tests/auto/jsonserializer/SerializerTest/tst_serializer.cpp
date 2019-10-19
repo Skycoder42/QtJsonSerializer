@@ -2,6 +2,7 @@
 #include <QtJsonSerializer>
 #include <QColor>
 #include <QFont>
+#include <QJsonDocument>
 
 #include "testconverter.h"
 
@@ -49,8 +50,8 @@ private Q_SLOTS:
 	void testDeserialization_data();
 	void testDeserialization();
 
-//	void testDeviceSerialization();
-//	void testExceptionTrace();
+	void testDeviceSerialization();
+	void testExceptionTrace();
 
 private:
 	AliasHelper *helper;
@@ -493,51 +494,55 @@ void SerializerTest::testDeserialization()
 	}
 }
 
-//void SerializerTest::testDeviceSerialization()
-//{
-//	const TestGadget g{10};
-//	const QByteArray bRes{R"__({"data":10})__"};
+void SerializerTest::testDeviceSerialization()
+{
+	const EnumContainer data{EnumContainer::Normal1, EnumContainer::Flag1 | EnumContainer::Flag3};
+	const QCborMap cMap {
+		{QStringLiteral("0"), QStringLiteral("Normal1")},
+		{QStringLiteral("1"), QStringLiteral("Flag1|Flag3")},
+	};
+	const auto cRes = QCborValue{cMap}.toCbor();
+	const auto jMap = QCborValue{cMap}.toJsonValue().toObject();
+	const auto jRes = QJsonDocument{jMap}.toJson(QJsonDocument::Indented);
 
-//	// to bytearray
-//	auto ba = serializer->serializeTo(g, QJsonDocument::Compact);
-//	QCOMPARE(ba, bRes);
-//	auto gRes = serializer->deserializeFrom<TestGadget>(ba);
-//	QCOMPARE(gRes, g);
+	// to/from bytearray
+	QCOMPARE(cborSerializer->serializeTo(data), cRes);
+	QCOMPARE(cborSerializer->deserializeFrom<EnumContainer>(cRes), data);
 
-//	//to device
-//	ba.clear();
-//	QBuffer buffer{&ba};
-//	QVERIFY(buffer.open(QIODevice::WriteOnly | QIODevice::Text));
-//	serializer->serializeTo(&buffer, g, QJsonDocument::Compact);
-//	buffer.close();
-//	QCOMPARE(ba, bRes);
-//	QVERIFY(buffer.open(QIODevice::ReadOnly | QIODevice::Text));
-//	gRes = serializer->deserializeFrom<TestGadget>(&buffer);
-//	buffer.close();
-//	QCOMPARE(gRes, g);
+	QCOMPARE(jsonSerializer->serializeTo(data), jRes);
+	QCOMPARE(jsonSerializer->deserializeFrom<EnumContainer>(jRes), data);
 
-//	//invalid
-//	QVERIFY_EXCEPTION_THROWN(serializer->serializeTo(42), QJsonSerializationException);
-//}
+	// to device
+	QBuffer buffer;
+	QVERIFY(buffer.open(QIODevice::ReadWrite | QIODevice::Text));
+	cborSerializer->serializeTo(&buffer, data);
+	QCOMPARE(buffer.data(), cRes);
+	QVERIFY(buffer.seek(0));
+	QCOMPARE(cborSerializer->deserializeFrom<EnumContainer>(&buffer), data);
+	buffer.close();
 
-//void SerializerTest::testExceptionTrace()
-//{
-//	try {
-//		serializer->deserialize<QList<TestGadget>>({
-//													   QJsonObject{
-//														   {QStringLiteral("data"), QStringLiteral("test")}
-//													   }
-//												   });
-//		QFAIL("No exception thrown");
-//	} catch (QJsonSerializerException &e) {
-//		auto trace = e.propertyTrace();
-//		QCOMPARE(trace.size(), 2);
-//		QCOMPARE(trace[0].first, QByteArray{"[0]"});
-//		QCOMPARE(trace[0].second, QByteArray{"TestGadget"});
-//		QCOMPARE(trace[1].first, QByteArray{"data"});
-//		QCOMPARE(trace[1].second, QByteArray{"int"});
-//	}
-//}
+	QVERIFY(buffer.open(QIODevice::ReadWrite | QIODevice::Text));
+	jsonSerializer->serializeTo(&buffer, data);
+	QCOMPARE(buffer.data(), jRes);
+	QVERIFY(buffer.seek(0));
+	QCOMPARE(jsonSerializer->deserializeFrom<EnumContainer>(&buffer), data);
+	buffer.close();
+}
+
+void SerializerTest::testExceptionTrace()
+{
+	try {
+		cborSerializer->deserialize<EnumContainer>(QCborMap{
+			{QStringLiteral("error"), QCborValue::Null}
+		});
+		QFAIL("No exception thrown");
+	} catch (QJsonSerializerException &e) {
+		auto trace = e.propertyTrace();
+		QCOMPARE(trace.size(), 1);
+		QCOMPARE(trace[0].second, QByteArray{"EnumContainer"});
+		QCOMPARE(trace[0].first, QByteArray{"test"});
+	}
+}
 
 void SerializerTest::addCommonData()
 {
@@ -621,7 +626,7 @@ void SerializerTest::addCommonData()
 
 
 	// type converters
-	QTest::newRow("converter") << QVariant::fromValue<EnumContainer>({EnumContainer::Normal1, EnumContainer::FlagX})
+	QTest::newRow("converter") << QVariant::fromValue(EnumContainer{EnumContainer::Normal1, EnumContainer::FlagX})
 							   << QCborValue{QCborMap{
 									  {QStringLiteral("0"), QStringLiteral("Normal1")},
 									  {QStringLiteral("1"), QStringLiteral("FlagX")}
@@ -652,47 +657,65 @@ void SerializerTest::resetProps()
 
 namespace  {
 
-template<typename Type, typename Json>
+template<typename Type, typename Cbor, typename Json>
 static void test_type() {
-	QJsonSerializer s;
 	Type v;
+	QIODevice *d = nullptr;
+
+	Cbor c;
+	QCborSerializer cs;
+	static_assert(std::is_same<Cbor, decltype(cs.serialize(v))>::value, "Wrong CBOR value returned by expression");
+	cs.serializeTo(d, v);
+	cs.serializeTo(v);
+	cs.deserialize(QCborValue{}, qMetaTypeId<Type>());
+	cs.deserialize(QCborValue{}, qMetaTypeId<Type>(), nullptr);
+	cs.deserialize<Type>(c);
+	cs.deserialize<Type>(c, nullptr);
+	cs.deserializeFrom(d, qMetaTypeId<Type>());
+	cs.deserializeFrom(d, qMetaTypeId<Type>(), nullptr);
+	cs.deserializeFrom(QByteArray{}, qMetaTypeId<Type>());
+	cs.deserializeFrom(QByteArray{}, qMetaTypeId<Type>(), nullptr);
+	cs.deserializeFrom<Type>(d);
+	cs.deserializeFrom<Type>(d, nullptr);
+	cs.deserializeFrom<Type>(QByteArray{});
+	cs.deserializeFrom<Type>(QByteArray{}, nullptr);
+
 	Json j;
-	static_assert(std::is_same<Json, decltype(s.serialize(v))>::value, "Wrong value returned by expression");
-	s.serializeTo(nullptr, v);
-	s.serializeTo(v);
-	s.deserialize(QJsonValue{}, qMetaTypeId<Type>());
-	s.deserialize(QJsonValue{}, qMetaTypeId<Type>(), nullptr);
-	s.deserialize<Type>(j);
-	s.deserialize<Type>(j, nullptr);
-	s.deserializeFrom(nullptr, qMetaTypeId<Type>());
-	s.deserializeFrom(nullptr, qMetaTypeId<Type>(), nullptr);
-	s.deserializeFrom(QByteArray{}, qMetaTypeId<Type>());
-	s.deserializeFrom(QByteArray{}, qMetaTypeId<Type>(), nullptr);
-	s.deserializeFrom<Type>(nullptr);
-	s.deserializeFrom<Type>(nullptr, nullptr);
-	s.deserializeFrom<Type>(QByteArray{});
-	s.deserializeFrom<Type>(QByteArray{}, nullptr);
+	QJsonSerializer js;
+	static_assert(std::is_same<Json, decltype(js.serialize(v))>::value, "Wrong JSON value returned by expression");
+	js.serializeTo(d, v);
+	js.serializeTo(v);
+	js.deserialize(QJsonValue{}, qMetaTypeId<Type>());
+	js.deserialize(QJsonValue{}, qMetaTypeId<Type>(), nullptr);
+	js.deserialize<Type>(j);
+	js.deserialize<Type>(j, nullptr);
+	js.deserializeFrom(d, qMetaTypeId<Type>());
+	js.deserializeFrom(d, qMetaTypeId<Type>(), nullptr);
+	js.deserializeFrom(QByteArray{}, qMetaTypeId<Type>());
+	js.deserializeFrom(QByteArray{}, qMetaTypeId<Type>(), nullptr);
+	js.deserializeFrom<Type>(d);
+	js.deserializeFrom<Type>(d, nullptr);
+	js.deserializeFrom<Type>(QByteArray{});
+	js.deserializeFrom<Type>(QByteArray{}, nullptr);
 }
 
 Q_DECL_UNUSED void static_compile_test()
 {
-	test_type<QVariant, QJsonValue>();
-	test_type<bool, QJsonValue>();
-	test_type<int, QJsonValue>();
-	test_type<double, QJsonValue>();
-	test_type<QString, QJsonValue>();
-	test_type<TestObject*, QJsonObject>();
-	test_type<QPointer<TestObject>, QJsonObject>();
-	test_type<QSharedPointer<TestObject>, QJsonObject>();
-	test_type<QList<TestObject*>, QJsonArray>();
-	test_type<QMap<QString, TestObject*>, QJsonObject>();
-	test_type<int, QJsonValue>();
-	test_type<QString, QJsonValue>();
-	test_type<QList<int>, QJsonArray>();
-	test_type<QMap<QString, bool>, QJsonObject>();
-	test_type<QPair<double, bool>, QJsonArray>();
-	test_type<TestTuple, QJsonArray>();
-	test_type<TestPair, QJsonArray>();
+	test_type<QVariant, QCborValue, QJsonValue>();
+	test_type<bool, QCborValue, QJsonValue>();
+	test_type<int, QCborValue, QJsonValue>();
+	test_type<double, QCborValue, QJsonValue>();
+	test_type<QString, QCborValue, QJsonValue>();
+	test_type<TestObject*, QCborMap, QJsonObject>();
+	test_type<QPointer<TestObject>, QCborMap, QJsonObject>();
+	test_type<QSharedPointer<TestObject>, QCborMap, QJsonObject>();
+	test_type<QList<TestObject*>, QCborArray, QJsonArray>();
+	test_type<QMap<QString, TestObject*>, QCborMap, QJsonObject>();
+	test_type<QList<int>, QCborArray, QJsonArray>();
+	test_type<QMap<QString, bool>, QCborMap, QJsonObject>();
+	test_type<QPair<double, bool>, QCborArray, QJsonArray>();
+	test_type<TestTuple, QCborArray, QJsonArray>();
+	test_type<TestPair, QCborArray, QJsonArray>();
 }
 
 }

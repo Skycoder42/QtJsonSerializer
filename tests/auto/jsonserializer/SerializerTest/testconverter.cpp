@@ -1,6 +1,18 @@
 #include "testconverter.h"
 #include <QCborMap>
 
+bool EnumContainer::operator==(EnumContainer other) const
+{
+	return normalEnum == other.normalEnum &&
+		   enumFlags == other.enumFlags;
+}
+
+bool EnumContainer::operator!=(EnumContainer other) const
+{
+	return normalEnum != other.normalEnum ||
+		   enumFlags != other.enumFlags;
+}
+
 EnumContainer::EnumFlags EnumContainer::getEnumFlags() const
 {
 	return enumFlags;
@@ -89,6 +101,8 @@ QVariant TestWrapperConverter::deserializeCbor(int propertyType, const QCborValu
 {
 	auto mo = &EnumContainer::staticMetaObject;
 	auto map = value.toMap();
+	if (map.contains(QStringLiteral("error")))
+		helper->deserializeSubtype(propertyType, QCborValue{42}, parent, "test");
 	return QVariant::fromValue(EnumContainer {
 		static_cast<EnumContainer::NormalEnum>(helper->deserializeSubtype(mo->property(mo->propertyOffset()), map.value(QStringLiteral("0")), parent).toInt()),
 		static_cast<EnumContainer::EnumFlags>(helper->deserializeSubtype(mo->property(mo->propertyOffset() + 1), map.value(QStringLiteral("1")), parent).toInt())
