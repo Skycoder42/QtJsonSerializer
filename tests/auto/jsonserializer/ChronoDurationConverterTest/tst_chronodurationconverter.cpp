@@ -26,6 +26,7 @@ protected:
 	void addConverterData() override;
 	void addMetaData() override;
 	void addCommonSerData() override;
+	void addDeserData() override;
 
 private:
 	QJsonChronoDurationConverter _converter;
@@ -309,6 +310,13 @@ void ChronoDurationConverterTest::addCommonSerData()
 								 << QVariant::fromValue(10ns)
 								 << QCborValue{static_cast<QCborTag>(QCborSerializer::ChronoNanoSeconds), 10}
 								 << QJsonValue{10};
+	QTest::newRow("nanoseconds") << QVariantHash{}
+								 << TestQ {}
+								 << static_cast<QObject*>(this)
+								 << qMetaTypeId<nanoseconds>()
+								 << QVariant::fromValue(10ns)
+								 << QCborValue{static_cast<QCborTag>(QCborSerializer::ChronoNanoSeconds), 10}
+								 << QJsonValue{10};
 	QTest::newRow("microseconds") << QVariantHash{}
 								  << TestQ {}
 								  << static_cast<QObject*>(this)
@@ -344,6 +352,267 @@ void ChronoDurationConverterTest::addCommonSerData()
 						   << QVariant::fromValue(60h)
 						   << QCborValue{static_cast<QCborTag>(QCborSerializer::ChronoHours), 60}
 						   << QJsonValue{60};
+}
+
+void ChronoDurationConverterTest::addDeserData()
+{
+	QTest::newRow("nanoseconds.micro") << QVariantHash{}
+									   << TestQ {}
+									   << static_cast<QObject*>(this)
+									   << qMetaTypeId<nanoseconds>()
+									   << QVariant::fromValue(duration_cast<nanoseconds>(20us))
+									   << QCborValue{static_cast<QCborTag>(QCborSerializer::ChronoMicroSeconds), 20}
+									   << QJsonValue{QJsonValue::Undefined};
+	QTest::newRow("nanoseconds.milli") << QVariantHash{}
+									   << TestQ {}
+									   << static_cast<QObject*>(this)
+									   << qMetaTypeId<nanoseconds>()
+									   << QVariant::fromValue(duration_cast<nanoseconds>(20ms))
+									   << QCborValue{static_cast<QCborTag>(QCborSerializer::ChronoMilliSeconds), 20}
+									   << QJsonValue{QJsonValue::Undefined};
+	QTest::newRow("nanoseconds.secs") << QVariantHash{}
+									  << TestQ {}
+									  << static_cast<QObject*>(this)
+									  << qMetaTypeId<nanoseconds>()
+									  << QVariant::fromValue(duration_cast<nanoseconds>(20s))
+									  << QCborValue{static_cast<QCborTag>(QCborSerializer::ChronoSeconds), 20}
+									  << QJsonValue{QJsonValue::Undefined};
+	QTest::newRow("nanoseconds.mins") << QVariantHash{}
+									  << TestQ {}
+									  << static_cast<QObject*>(this)
+									  << qMetaTypeId<nanoseconds>()
+									  << QVariant::fromValue(duration_cast<nanoseconds>(20min))
+									  << QCborValue{static_cast<QCborTag>(QCborSerializer::ChronoMinutes), 20}
+									  << QJsonValue{QJsonValue::Undefined};
+	QTest::newRow("nanoseconds.hours") << QVariantHash{}
+									   << TestQ {}
+									   << static_cast<QObject*>(this)
+									   << qMetaTypeId<nanoseconds>()
+									   << QVariant::fromValue(duration_cast<nanoseconds>(20h))
+									   << QCborValue{static_cast<QCborTag>(QCborSerializer::ChronoHours), 20}
+									   << QJsonValue{QJsonValue::Undefined};
+	QTest::newRow("nanoseconds.invalid") << QVariantHash{}
+										 << TestQ {}
+										 << static_cast<QObject*>(this)
+										 << qMetaTypeId<nanoseconds>()
+										 << QVariant{}
+										 << QCborValue{QCborKnownTags::Signature, 20}
+										 << QJsonValue{QJsonValue::Undefined};
+
+	QTest::newRow("microseconds.nano") << QVariantHash{}
+									   << TestQ {}
+									   << static_cast<QObject*>(this)
+									   << qMetaTypeId<microseconds>()
+									   << QVariant{}
+									   << QCborValue{static_cast<QCborTag>(QCborSerializer::ChronoNanoSeconds), 20}
+									   << QJsonValue{QJsonValue::Undefined};
+	QTest::newRow("microseconds.milli") << QVariantHash{}
+										<< TestQ {}
+										<< static_cast<QObject*>(this)
+										<< qMetaTypeId<microseconds>()
+										<< QVariant::fromValue(duration_cast<microseconds>(20ms))
+										<< QCborValue{static_cast<QCborTag>(QCborSerializer::ChronoMilliSeconds), 20}
+										<< QJsonValue{QJsonValue::Undefined};
+	QTest::newRow("microseconds.secs") << QVariantHash{}
+									   << TestQ {}
+									   << static_cast<QObject*>(this)
+									   << qMetaTypeId<microseconds>()
+									   << QVariant::fromValue(duration_cast<microseconds>(20s))
+									   << QCborValue{static_cast<QCborTag>(QCborSerializer::ChronoSeconds), 20}
+									   << QJsonValue{QJsonValue::Undefined};
+	QTest::newRow("microseconds.mins") << QVariantHash{}
+									   << TestQ {}
+									   << static_cast<QObject*>(this)
+									   << qMetaTypeId<microseconds>()
+									   << QVariant::fromValue(duration_cast<microseconds>(20min))
+									   << QCborValue{static_cast<QCborTag>(QCborSerializer::ChronoMinutes), 20}
+									   << QJsonValue{QJsonValue::Undefined};
+	QTest::newRow("microseconds.hours") << QVariantHash{}
+										<< TestQ {}
+										<< static_cast<QObject*>(this)
+										<< qMetaTypeId<microseconds>()
+										<< QVariant::fromValue(duration_cast<microseconds>(20h))
+										<< QCborValue{static_cast<QCborTag>(QCborSerializer::ChronoHours), 20}
+										<< QJsonValue{QJsonValue::Undefined};
+	QTest::newRow("microseconds.invalid") << QVariantHash{}
+										  << TestQ {}
+										  << static_cast<QObject*>(this)
+										  << qMetaTypeId<microseconds>()
+										  << QVariant{}
+										  << QCborValue{QCborKnownTags::Signature, 20}
+										  << QJsonValue{QJsonValue::Undefined};
+
+	QTest::newRow("milliseconds.nano") << QVariantHash{}
+									   << TestQ {}
+									   << static_cast<QObject*>(this)
+									   << qMetaTypeId<milliseconds>()
+									   << QVariant{}
+									   << QCborValue{static_cast<QCborTag>(QCborSerializer::ChronoNanoSeconds), 20}
+									   << QJsonValue{QJsonValue::Undefined};
+	QTest::newRow("milliseconds.micro") << QVariantHash{}
+										<< TestQ {}
+										<< static_cast<QObject*>(this)
+										<< qMetaTypeId<milliseconds>()
+										<< QVariant{}
+										<< QCborValue{static_cast<QCborTag>(QCborSerializer::ChronoMicroSeconds), 20}
+										<< QJsonValue{QJsonValue::Undefined};
+	QTest::newRow("milliseconds.secs") << QVariantHash{}
+									   << TestQ {}
+									   << static_cast<QObject*>(this)
+									   << qMetaTypeId<milliseconds>()
+									   << QVariant::fromValue(duration_cast<milliseconds>(20s))
+									   << QCborValue{static_cast<QCborTag>(QCborSerializer::ChronoSeconds), 20}
+									   << QJsonValue{QJsonValue::Undefined};
+	QTest::newRow("milliseconds.mins") << QVariantHash{}
+									   << TestQ {}
+									   << static_cast<QObject*>(this)
+									   << qMetaTypeId<milliseconds>()
+									   << QVariant::fromValue(duration_cast<milliseconds>(20min))
+									   << QCborValue{static_cast<QCborTag>(QCborSerializer::ChronoMinutes), 20}
+									   << QJsonValue{QJsonValue::Undefined};
+	QTest::newRow("milliseconds.hours") << QVariantHash{}
+										<< TestQ {}
+										<< static_cast<QObject*>(this)
+										<< qMetaTypeId<milliseconds>()
+										<< QVariant::fromValue(duration_cast<milliseconds>(20h))
+										<< QCborValue{static_cast<QCborTag>(QCborSerializer::ChronoHours), 20}
+										<< QJsonValue{QJsonValue::Undefined};
+	QTest::newRow("milliseconds.invalid") << QVariantHash{}
+										  << TestQ {}
+										  << static_cast<QObject*>(this)
+										  << qMetaTypeId<milliseconds>()
+										  << QVariant{}
+										  << QCborValue{QCborKnownTags::Signature, 20}
+										  << QJsonValue{QJsonValue::Undefined};
+
+	QTest::newRow("seconds.nano") << QVariantHash{}
+								  << TestQ {}
+								  << static_cast<QObject*>(this)
+								  << qMetaTypeId<seconds>()
+								  << QVariant{}
+								  << QCborValue{static_cast<QCborTag>(QCborSerializer::ChronoNanoSeconds), 20}
+								  << QJsonValue{QJsonValue::Undefined};
+	QTest::newRow("seconds.micro") << QVariantHash{}
+								   << TestQ {}
+								   << static_cast<QObject*>(this)
+								   << qMetaTypeId<seconds>()
+								   << QVariant{}
+								   << QCborValue{static_cast<QCborTag>(QCborSerializer::ChronoMicroSeconds), 20}
+								   << QJsonValue{QJsonValue::Undefined};
+	QTest::newRow("seconds.milli") << QVariantHash{}
+								   << TestQ {}
+								   << static_cast<QObject*>(this)
+								   << qMetaTypeId<seconds>()
+								   << QVariant{}
+								   << QCborValue{static_cast<QCborTag>(QCborSerializer::ChronoMilliSeconds), 20}
+								   << QJsonValue{QJsonValue::Undefined};
+	QTest::newRow("seconds.mins") << QVariantHash{}
+								  << TestQ {}
+								  << static_cast<QObject*>(this)
+								  << qMetaTypeId<seconds>()
+								  << QVariant::fromValue(duration_cast<seconds>(20min))
+								  << QCborValue{static_cast<QCborTag>(QCborSerializer::ChronoMinutes), 20}
+								  << QJsonValue{QJsonValue::Undefined};
+	QTest::newRow("seconds.hours") << QVariantHash{}
+								   << TestQ {}
+								   << static_cast<QObject*>(this)
+								   << qMetaTypeId<seconds>()
+								   << QVariant::fromValue(duration_cast<seconds>(20h))
+								   << QCborValue{static_cast<QCborTag>(QCborSerializer::ChronoHours), 20}
+								   << QJsonValue{QJsonValue::Undefined};
+	QTest::newRow("seconds.invalid") << QVariantHash{}
+									 << TestQ {}
+									 << static_cast<QObject*>(this)
+									 << qMetaTypeId<seconds>()
+									 << QVariant{}
+									 << QCborValue{QCborKnownTags::Signature, 20}
+									 << QJsonValue{QJsonValue::Undefined};
+
+	QTest::newRow("minutes.nano") << QVariantHash{}
+								  << TestQ {}
+								  << static_cast<QObject*>(this)
+								  << qMetaTypeId<minutes>()
+								  << QVariant{}
+								  << QCborValue{static_cast<QCborTag>(QCborSerializer::ChronoNanoSeconds), 20}
+								  << QJsonValue{QJsonValue::Undefined};
+	QTest::newRow("minutes.micro") << QVariantHash{}
+								   << TestQ {}
+								   << static_cast<QObject*>(this)
+								   << qMetaTypeId<minutes>()
+								   << QVariant{}
+								   << QCborValue{static_cast<QCborTag>(QCborSerializer::ChronoMicroSeconds), 20}
+								   << QJsonValue{QJsonValue::Undefined};
+	QTest::newRow("minutes.milli") << QVariantHash{}
+								   << TestQ {}
+								   << static_cast<QObject*>(this)
+								   << qMetaTypeId<minutes>()
+								   << QVariant{}
+								   << QCborValue{static_cast<QCborTag>(QCborSerializer::ChronoMilliSeconds), 20}
+								   << QJsonValue{QJsonValue::Undefined};
+	QTest::newRow("minutes.secs") << QVariantHash{}
+								  << TestQ {}
+								  << static_cast<QObject*>(this)
+								  << qMetaTypeId<minutes>()
+								  << QVariant{}
+								  << QCborValue{static_cast<QCborTag>(QCborSerializer::ChronoSeconds), 20}
+								  << QJsonValue{QJsonValue::Undefined};
+	QTest::newRow("minutes.hours") << QVariantHash{}
+								   << TestQ {}
+								   << static_cast<QObject*>(this)
+								   << qMetaTypeId<minutes>()
+								   << QVariant::fromValue(duration_cast<minutes>(20h))
+								   << QCborValue{static_cast<QCborTag>(QCborSerializer::ChronoHours), 20}
+								   << QJsonValue{QJsonValue::Undefined};
+	QTest::newRow("minutes.invalid") << QVariantHash{}
+									 << TestQ {}
+									 << static_cast<QObject*>(this)
+									 << qMetaTypeId<minutes>()
+									 << QVariant{}
+									 << QCborValue{QCborKnownTags::Signature, 20}
+									 << QJsonValue{QJsonValue::Undefined};
+
+	QTest::newRow("hours.nano") << QVariantHash{}
+								<< TestQ {}
+								<< static_cast<QObject*>(this)
+								<< qMetaTypeId<hours>()
+								<< QVariant{}
+								<< QCborValue{static_cast<QCborTag>(QCborSerializer::ChronoNanoSeconds), 20}
+								<< QJsonValue{QJsonValue::Undefined};
+	QTest::newRow("hours.micro") << QVariantHash{}
+								 << TestQ {}
+								 << static_cast<QObject*>(this)
+								 << qMetaTypeId<hours>()
+								 << QVariant{}
+								 << QCborValue{static_cast<QCborTag>(QCborSerializer::ChronoMicroSeconds), 20}
+								 << QJsonValue{QJsonValue::Undefined};
+	QTest::newRow("hours.milli") << QVariantHash{}
+								 << TestQ {}
+								 << static_cast<QObject*>(this)
+								 << qMetaTypeId<hours>()
+								 << QVariant{}
+								 << QCborValue{static_cast<QCborTag>(QCborSerializer::ChronoMilliSeconds), 20}
+								 << QJsonValue{QJsonValue::Undefined};
+	QTest::newRow("hours.secs") << QVariantHash{}
+								<< TestQ {}
+								<< static_cast<QObject*>(this)
+								<< qMetaTypeId<hours>()
+								<< QVariant{}
+								<< QCborValue{static_cast<QCborTag>(QCborSerializer::ChronoSeconds), 20}
+								<< QJsonValue{QJsonValue::Undefined};
+	QTest::newRow("hours.mins") << QVariantHash{}
+								<< TestQ {}
+								<< static_cast<QObject*>(this)
+								<< qMetaTypeId<hours>()
+								<< QVariant{}
+								<< QCborValue{static_cast<QCborTag>(QCborSerializer::ChronoMinutes), 20}
+								<< QJsonValue{QJsonValue::Undefined};
+	QTest::newRow("hours.invalid") << QVariantHash{}
+								   << TestQ {}
+								   << static_cast<QObject*>(this)
+								   << qMetaTypeId<hours>()
+								   << QVariant{}
+								   << QCborValue{QCborKnownTags::Signature, 20}
+								   << QJsonValue{QJsonValue::Undefined};
 }
 
 QTEST_MAIN(ChronoDurationConverterTest)

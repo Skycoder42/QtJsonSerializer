@@ -3,8 +3,11 @@
 
 #include "qtjsonserializer_global.h"
 #include "qjsontypeconverter.h"
+#include "qjsonserializerexception.h"
 
 #include <chrono>
+
+#include <QDebug>
 
 class Q_JSONSERIALIZER_EXPORT QJsonChronoDurationConverter : public QJsonTypeConverter
 {
@@ -35,7 +38,14 @@ private:
 	template <typename TDuration>
 	TDuration cast(const MetaDuration &duration) const {
 		return std::visit([](const auto &dur) {
-			return std::chrono::duration_cast<TDuration>(dur);
+			if (std::is_convertible_v<std::decay_t<decltype(dur)>, TDuration>)
+				return std::chrono::duration_cast<TDuration>(dur);
+			else {
+				throw QJsonDeserializationException{QByteArray{"Unable to upcast from deserialized "} +
+													QMetaType::typeName(qMetaTypeId<std::decay_t<decltype(dur)>>()) +
+													QByteArray{" to the requested "} +
+													QMetaType::typeName(qMetaTypeId<TDuration>())};
+			}
 		}, duration);
 	}
 };

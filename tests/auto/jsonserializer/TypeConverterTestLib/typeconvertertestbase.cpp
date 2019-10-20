@@ -118,15 +118,28 @@ void TypeConverterTestBase::testSerialization()
 	QFETCH(QJsonValue, jResult);
 
 	helper->properties = properties;
-	helper->serData = serData;
 
 	try {
-		if(cResult.isUndefined())
+		if(cResult.isUndefined() && jResult.isUndefined()) {
+			helper->json = false;
+			helper->serData = serData;
 			QVERIFY_EXCEPTION_THROWN(converter()->serialize(type, data, helper), QJsonSerializationException);
-		else {
-			auto res = converter()->serialize(type, data, helper);
-			QCOMPARE(res, cResult);
-			QCOMPARE(res.toJsonValue(), jResult);
+			helper->json = true;
+			helper->serData = serData;
+			QVERIFY_EXCEPTION_THROWN(converter()->serialize(type, data, helper), QJsonSerializationException);
+		} else {
+			if (!cResult.isUndefined()) {
+				helper->json = false;
+				helper->serData = serData;
+				auto res = converter()->serialize(type, data, helper);
+				QCOMPARE(res, cResult);
+			}
+			if (!jResult.isUndefined()) {
+				helper->json = true;
+				helper->serData = serData;
+				auto res = converter()->serialize(type, data, helper).toJsonValue();
+				QCOMPARE(res, jResult);
+			}
 		}
 	} catch(std::exception &e) {
 		QFAIL(e.what());
@@ -162,19 +175,31 @@ void TypeConverterTestBase::testDeserialization()
 
 	try {
 		if(!result.isValid()) {
-			helper->deserData = deserData;
-			QVERIFY_EXCEPTION_THROWN(converter()->deserializeCbor(type, cData, this, helper), QJsonDeserializationException);
-			helper->deserData = deserData;
-			QVERIFY_EXCEPTION_THROWN(converter()->deserializeJson(type, QCborValue::fromJsonValue(jData), this, helper), QJsonDeserializationException);
+			if (!cData.isUndefined()) {
+				helper->json = false;
+				helper->deserData = deserData;
+				QVERIFY_EXCEPTION_THROWN(converter()->deserializeCbor(type, cData, this, helper), QJsonDeserializationException);
+			}
+			if (!jData.isUndefined()) {
+				helper->json = true;
+				helper->deserData = deserData;
+				QVERIFY_EXCEPTION_THROWN(converter()->deserializeJson(type, QCborValue::fromJsonValue(jData), this, helper), QJsonDeserializationException);
+			}
 		} else {
-			helper->deserData = deserData;
-			auto res = converter()->deserializeCbor(type, cData, this, helper);
-			QVERIFY(res.convert(type));
-			SELF_COMPARE(type, res, result);
-			helper->deserData = deserData;
-			res = converter()->deserializeJson(type, QCborValue::fromJsonValue(jData), this, helper);
-			QVERIFY(res.convert(type));
-			SELF_COMPARE(type, res, result);
+			if (!cData.isUndefined()) {
+				helper->json = false;
+				helper->deserData = deserData;
+				auto res = converter()->deserializeCbor(type, cData, this, helper);
+				QVERIFY(res.convert(type));
+				SELF_COMPARE(type, res, result);
+			}
+			if (!jData.isUndefined()) {
+				helper->json = true;
+				helper->deserData = deserData;
+				auto res = converter()->deserializeCbor(type, QCborValue::fromJsonValue(jData), this, helper);
+				QVERIFY(res.convert(type));
+				SELF_COMPARE(type, res, result);
+			}
 		}
 	} catch(std::exception &e) {
 		QFAIL(e.what());

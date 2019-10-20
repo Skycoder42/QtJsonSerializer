@@ -1,5 +1,4 @@
 #include "qjsonchronodurationconverter_p.h"
-#include "qjsonserializerexception.h"
 #include "qcborserializer.h"
 
 #include <QtCore/QSet>
@@ -165,7 +164,7 @@ QJsonChronoDurationConverter::MetaDuration QJsonChronoDurationConverter::parseVa
 		Q_FALLTHROUGH();
 	case static_cast<quint64>(NoTag):
 		if (auto vTag = tagForType(propertyType); vTag != NoTag)
-			return parseValue(QMetaType::UnknownType, {vTag, value.taggedValue()}, nullptr);
+			return parseValue(QMetaType::UnknownType, {vTag, value.isTag() ? value.taggedValue() : value}, nullptr);
 		else
 			throw QJsonSerializationException{"Invalid state reached - no CBOR tag was given, but the property type is not a chrono type"};
 	}
