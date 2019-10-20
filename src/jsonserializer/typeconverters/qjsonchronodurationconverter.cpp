@@ -82,9 +82,8 @@ int QJsonChronoDurationConverter::guessType(QCborTag tag, QCborValue::Type dataT
 	}
 }
 
-QCborValue QJsonChronoDurationConverter::serialize(int propertyType, const QVariant &value, const QJsonTypeConverter::SerializationHelper *helper) const
+QCborValue QJsonChronoDurationConverter::serialize(int propertyType, const QVariant &value) const
 {
-	Q_UNUSED(helper)
 	const auto tag = tagForType(propertyType);
 	switch (static_cast<quint64>(tag)) {
 	case QCborSerializer::ChronoNanoSeconds:
@@ -104,10 +103,10 @@ QCborValue QJsonChronoDurationConverter::serialize(int propertyType, const QVari
 	}
 }
 
-QVariant QJsonChronoDurationConverter::deserializeCbor(int propertyType, const QCborValue &value, QObject *parent, const SerializationHelper *helper) const
+QVariant QJsonChronoDurationConverter::deserializeCbor(int propertyType, const QCborValue &value, QObject *parent) const
 {
 	Q_UNUSED(parent)
-	const auto metaDuration = parseValue(propertyType, value, helper);
+	const auto metaDuration = parseValue(propertyType, value, helper());
 	if (propertyType == qMetaTypeId<nanoseconds>())
 		return QVariant::fromValue(cast<nanoseconds>(metaDuration));
 	else if (propertyType == qMetaTypeId<microseconds>())
@@ -142,7 +141,7 @@ QCborTag QJsonChronoDurationConverter::tagForType(int metaTypeId) const
 		throw QJsonSerializationException{"Invalid type id"};
 }
 
-QJsonChronoDurationConverter::MetaDuration QJsonChronoDurationConverter::parseValue(int propertyType, const QCborValue &value, const QJsonTypeConverter::SerializationHelper *helper) const
+QJsonChronoDurationConverter::MetaDuration QJsonChronoDurationConverter::parseValue(int propertyType, const QCborValue &value, const QJsonTypeConverter::SerializationHelper *localHelper) const
 {
 	const auto rTag = value.isTag() ? value.tag() : NoTag;
 	switch (static_cast<quint64>(rTag)) {
@@ -159,7 +158,7 @@ QJsonChronoDurationConverter::MetaDuration QJsonChronoDurationConverter::parseVa
 	case QCborSerializer::ChronoHours:
 		return create<hours>(value);
 	default:
-		if (!helper || rTag != helper->typeTag(propertyType))
+		if (!localHelper || rTag != localHelper->typeTag(propertyType))
 			throw QJsonDeserializationException{"Invalid CBOR tag " + QByteArray::number(static_cast<quint64>(value.tag()))};
 		Q_FALLTHROUGH();
 	case static_cast<quint64>(NoTag):

@@ -14,7 +14,7 @@
 #include "typeconverters/qjsonenumconverter_p.h"
 //#include "typeconverters/qjsonmapconverter_p.h"
 //#include "typeconverters/qjsonmultimapconverter_p.h"
-//#include "typeconverters/qjsonlistconverter_p.h"
+#include "typeconverters/qjsonlistconverter_p.h"
 //#include "typeconverters/qjsonjsonconverter_p.h"
 //#include "typeconverters/qjsonpairconverter_p.h"
 //#include "typeconverters/qjsonbytearrayconverter_p.h"
@@ -98,6 +98,7 @@ void QJsonSerializerBase::addJsonTypeConverter(const QSharedPointer<QJsonTypeCon
 {
 	Q_D(QJsonSerializerBase);
 	Q_ASSERT_X(converter, Q_FUNC_INFO, "converter must not be null!");
+	converter->setHelper(this);
 	d->typeConverters.insertSorted(converter);
 	d->serCache.clear();
 	d->deserCache.clear();
@@ -233,7 +234,7 @@ QCborValue QJsonSerializerBase::serializeVariant(int propertyType, const QVarian
 	auto converter = d->findSerConverter(propertyType);
 	QCborValue res;
 	if (converter)
-		res = converter->serialize(propertyType, value, this);
+		res = converter->serialize(propertyType, value);
 	else
 		res = d->serializeValue(propertyType, value);
 
@@ -255,9 +256,9 @@ QVariant QJsonSerializerBase::deserializeVariant(int propertyType, const QCborVa
 	QVariant variant;
 	if (converter) {
 		if (jsonMode())
-			variant = converter->deserializeJson(propertyType, value, parent, this);
+			variant = converter->deserializeJson(propertyType, value, parent);
 		else
-			variant = converter->deserializeCbor(propertyType, value, parent, this);
+			variant = converter->deserializeCbor(propertyType, value, parent);
 	} else {
 		if (jsonMode())
 			variant = d->deserializeJsonValue(propertyType, value);
@@ -311,7 +312,7 @@ QJsonSerializerBasePrivate::ConverterStore<QJsonTypeConverterFactory> QJsonSeria
 //	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonGadgetConverter>>::create(),
 //	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonMapConverter>>::create(),
 //	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonMultiMapConverter>>::create(),
-//	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonListConverter>>::create(),
+	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonListConverter>>::create(),
 //	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonJsonValueConverter>>::create(),
 //	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonJsonObjectConverter>>::create(),
 //	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonJsonArrayConverter>>::create(),
@@ -333,6 +334,7 @@ QJsonSerializerBasePrivate::ConverterStore<QJsonTypeConverterFactory> QJsonSeria
 
 QSharedPointer<QJsonTypeConverter> QJsonSerializerBasePrivate::findSerConverter(int propertyType) const
 {
+	Q_Q(const QJsonSerializerBase);
 	// first: check if already cached
 	if (auto converter = serCache.get(propertyType); converter)
 		return converter;
@@ -355,6 +357,7 @@ QSharedPointer<QJsonTypeConverter> QJsonSerializerBasePrivate::findSerConverter(
 			auto converter = factory->createConverter();
 			if (converter) {
 				// add converter to list and cache
+				converter->setHelper(q);
 				typeConverters.insertSorted(converter);
 				serCache.add(propertyType, converter);
 				return converter;
@@ -386,7 +389,7 @@ QSharedPointer<QJsonTypeConverter> QJsonSerializerBasePrivate::findDeserConverte
 
 	// first: check if already cached
 	if (auto converter = deserCache.get(propertyType);
-		converter && converter->canDeserialize(propertyType, tag, type, q) > 0)
+		converter && converter->canDeserialize(propertyType, tag, type) > 0)
 		return converter;
 
 	// second: check if the list of explicit converters has a matching one
@@ -398,7 +401,7 @@ QSharedPointer<QJsonTypeConverter> QJsonSerializerBasePrivate::findDeserConverte
 	for (const auto &converter : qAsConst(typeConverters.store)) {
 		if (converter) {
 			auto testType = propertyType;
-			switch (converter->canDeserialize(testType, tag, type, q)) {
+			switch (converter->canDeserialize(testType, tag, type)) {
 			case QJsonTypeConverter::Negative:
 				continue;
 			case QJsonTypeConverter::WrongTag:
@@ -424,7 +427,7 @@ QSharedPointer<QJsonTypeConverter> QJsonSerializerBasePrivate::findDeserConverte
 	for (const auto &factory : qAsConst(typeConverterFactories.store)) {
 		if (factory) {
 			auto testType = propertyType;
-			switch (factory->canDeserialize(testType, tag, type, q)) {
+			switch (factory->canDeserialize(testType, tag, type)) {
 			case QJsonTypeConverter::Negative:
 				continue;
 			case QJsonTypeConverter::WrongTag:
@@ -441,6 +444,7 @@ QSharedPointer<QJsonTypeConverter> QJsonSerializerBasePrivate::findDeserConverte
 			auto converter = factory->createConverter();
 			if (converter) {
 				// add converter to list and cache (keep unlocking order to prevent deadlocks)
+				converter->setHelper(q);
 				typeConverters.insertSorted(converter);
 				deserCache.add(propertyType, converter);
 				return converter;
@@ -463,8 +467,10 @@ QSharedPointer<QJsonTypeConverter> QJsonSerializerBasePrivate::findDeserConverte
 		// if valid, add to cache, set the type and return
 		if (converter) {
 			// add converter to list and cache
-			if (isFactory)
+			if (isFactory) {
+				converter->setHelper(q);
 				typeConverters.insertSorted(converter);
+			}
 			deserCache.add(propertyType, converter);
 			propertyType = newType;
 			return converter;

@@ -1,7 +1,7 @@
 HEADERS += \
 	$$PWD/qjsonchronodurationconverter_p.h \
 	$$PWD/qjsonenumconverter_p.h \
-#	$$PWD/qjsonlistconverter_p.h \
+	$$PWD/qjsonlistconverter_p.h \
 #	$$PWD/qjsonobjectconverter_p.h \
 #	$$PWD/qjsongadgetconverter_p.h \
 #	$$PWD/qjsonmapconverter_p.h \
@@ -20,7 +20,7 @@ HEADERS += \
 SOURCES += \
 	$$PWD/qjsonchronodurationconverter.cpp \
 	$$PWD/qjsonenumconverter.cpp \
-#	$$PWD/qjsonlistconverter.cpp \
+	$$PWD/qjsonlistconverter.cpp \
 #	$$PWD/qjsonobjectconverter.cpp \
 #	$$PWD/qjsongadgetconverter.cpp \
 #	$$PWD/qjsonmapconverter.cpp \

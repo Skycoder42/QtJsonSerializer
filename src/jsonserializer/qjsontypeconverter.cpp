@@ -5,6 +5,7 @@ class QJsonTypeConverterPrivate
 {
 public:
 	int priority = QJsonTypeConverter::Standard;
+	const QJsonTypeConverter::SerializationHelper *helper = nullptr;
 };
 
 QJsonTypeConverter::QJsonTypeConverter() :
@@ -23,6 +24,16 @@ void QJsonTypeConverter::setPriority(int priority)
 	d->priority = priority;
 }
 
+const QJsonTypeConverter::SerializationHelper *QJsonTypeConverter::helper() const
+{
+	return d->helper;
+}
+
+void QJsonTypeConverter::setHelper(const QJsonTypeConverter::SerializationHelper *helper)
+{
+	d->helper = helper;
+}
+
 QList<QCborTag> QJsonTypeConverter::allowedCborTags(int metaTypeId) const
 {
 	Q_UNUSED(metaTypeId)
@@ -36,10 +47,10 @@ int QJsonTypeConverter::guessType(QCborTag tag, QCborValue::Type dataType) const
 	return QMetaType::UnknownType;
 }
 
-QJsonTypeConverter::DeserializationCapabilityResult QJsonTypeConverter::canDeserialize(int &metaTypeId, QCborTag tag, QCborValue::Type dataType, const SerializationHelper *helper) const
+QJsonTypeConverter::DeserializationCapabilityResult QJsonTypeConverter::canDeserialize(int &metaTypeId, QCborTag tag, QCborValue::Type dataType) const
 {
-	const auto asJson = helper->jsonMode();
-	const auto strict = helper->getProperty("validationFlags")
+	const auto asJson = helper()->jsonMode();
+	const auto strict = helper()->getProperty("validationFlags")
 							.value<QJsonSerializerBase::ValidationFlags>()
 							.testFlag(QJsonSerializerBase::ValidationFlag::StrictBasicTypes);
 
@@ -56,7 +67,7 @@ QJsonTypeConverter::DeserializationCapabilityResult QJsonTypeConverter::canDeser
 				// If there is a list of allowed tags, the given tag must be in it
 				auto aTags = allowedCborTags(metaTypeId);
 				// also, add the type specific override tag if set
-				if (const auto xTag = helper->typeTag(metaTypeId); xTag != NoTag)
+				if (const auto xTag = helper()->typeTag(metaTypeId); xTag != NoTag)
 					aTags.append(xTag);
 				if (!aTags.isEmpty()) {
 					if (!aTags.contains(tag))
@@ -90,9 +101,9 @@ QJsonTypeConverter::DeserializationCapabilityResult QJsonTypeConverter::canDeser
 		return DeserializationCapabilityResult::Negative;
 }
 
-QVariant QJsonTypeConverter::deserializeJson(int propertyType, const QCborValue &value, QObject *parent, const QJsonTypeConverter::SerializationHelper *helper) const
+QVariant QJsonTypeConverter::deserializeJson(int propertyType, const QCborValue &value, QObject *parent) const
 {
-	return deserializeCbor(propertyType, value, parent, helper);
+	return deserializeCbor(propertyType, value, parent);
 }
 
 void QJsonTypeConverter::mapTypesToJson(QList<QCborValue::Type> &typeList) const
@@ -141,9 +152,9 @@ bool QJsonTypeConverterFactory::canConvert(int metaTypeId) const
 	return _statusConverter->canConvert(metaTypeId);
 }
 
-QJsonTypeConverter::DeserializationCapabilityResult QJsonTypeConverterFactory::canDeserialize(int &metaTypeId, QCborTag tag, QCborValue::Type dataType, const QJsonTypeConverter::SerializationHelper *helper) const
+QJsonTypeConverter::DeserializationCapabilityResult QJsonTypeConverterFactory::canDeserialize(int &metaTypeId, QCborTag tag, QCborValue::Type dataType) const
 {
 	if(!_statusConverter)
 		_statusConverter = createConverter();
-	return _statusConverter->canDeserialize(metaTypeId, tag, dataType, helper);
+	return _statusConverter->canDeserialize(metaTypeId, tag, dataType);
 }

@@ -43,11 +43,11 @@ QList<QCborValue::Type> QJsonEnumConverter::allowedCborTypes(int metaTypeId, QCb
 	return {QCborValue::Integer, QCborValue::String};
 }
 
-QCborValue QJsonEnumConverter::serialize(int propertyType, const QVariant &value, const QJsonTypeConverter::SerializationHelper *helper) const
+QCborValue QJsonEnumConverter::serialize(int propertyType, const QVariant &value) const
 {
 	const auto metaEnum = getEnum(propertyType, true);
 	const auto tag = static_cast<QCborTag>(metaEnum.isFlag() ? QCborSerializer::Flags : QCborSerializer::Enum);
-	if (helper->getProperty("enumAsString").toBool()) {
+	if (helper()->getProperty("enumAsString").toBool()) {
 		if (metaEnum.isFlag())
 			return {tag, QString::fromUtf8(metaEnum.valueToKeys(value.toInt()))};
 		else
@@ -56,10 +56,9 @@ QCborValue QJsonEnumConverter::serialize(int propertyType, const QVariant &value
 		return {tag, value.toInt()};
 }
 
-QVariant QJsonEnumConverter::deserializeCbor(int propertyType, const QCborValue &value, QObject *parent, const QJsonTypeConverter::SerializationHelper *helper) const
+QVariant QJsonEnumConverter::deserializeCbor(int propertyType, const QCborValue &value, QObject *parent) const
 {
 	Q_UNUSED(parent)
-	Q_UNUSED(helper)
 	const auto metaEnum = getEnum(propertyType, false);
 	auto cValue = value.isTag() ? value.taggedValue() : value;
 	if (cValue.isString()) {
@@ -89,7 +88,7 @@ QVariant QJsonEnumConverter::deserializeCbor(int propertyType, const QCborValue 
 	}
 }
 
-QVariant QJsonEnumConverter::deserializeJson(int propertyType, const QCborValue &value, QObject *parent, const QJsonTypeConverter::SerializationHelper *helper) const
+QVariant QJsonEnumConverter::deserializeJson(int propertyType, const QCborValue &value, QObject *parent) const
 {
 	if (value.isDouble()) {
 		double intpart;
@@ -98,7 +97,7 @@ QVariant QJsonEnumConverter::deserializeJson(int propertyType, const QCborValue 
 												QByteArray::number(value.toDouble())};
 		}
 	}
-	return deserializeCbor(propertyType, value, parent, helper);
+	return deserializeCbor(propertyType, value, parent);
 }
 
 bool QJsonEnumConverter::testForEnum(int metaTypeId) const

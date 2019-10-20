@@ -90,8 +90,9 @@ void TypeConverterTestBase::testMetaTypeDetection()
 	QFETCH(QJsonTypeConverter::DeserializationCapabilityResult, canDeser);
 
 	helper->json = tag == QJsonTypeConverter::NoTag;
+	converter()->setHelper(helper);
 	QCOMPARE(converter()->canConvert(metatype), canSer);
-	QCOMPARE(converter()->canDeserialize(metatype, tag, type, helper), canDeser);
+	QCOMPARE(converter()->canDeserialize(metatype, tag, type), canDeser);
 }
 
 void TypeConverterTestBase::testSerialization_data()
@@ -118,26 +119,27 @@ void TypeConverterTestBase::testSerialization()
 	QFETCH(QJsonValue, jResult);
 
 	helper->properties = properties;
+	converter()->setHelper(helper);
 
 	try {
 		if(cResult.isUndefined() && jResult.isUndefined()) {
 			helper->json = false;
 			helper->serData = serData;
-			QVERIFY_EXCEPTION_THROWN(converter()->serialize(type, data, helper), QJsonSerializationException);
+			QVERIFY_EXCEPTION_THROWN(converter()->serialize(type, data), QJsonSerializationException);
 			helper->json = true;
 			helper->serData = serData;
-			QVERIFY_EXCEPTION_THROWN(converter()->serialize(type, data, helper), QJsonSerializationException);
+			QVERIFY_EXCEPTION_THROWN(converter()->serialize(type, data), QJsonSerializationException);
 		} else {
 			if (!cResult.isUndefined()) {
 				helper->json = false;
 				helper->serData = serData;
-				auto res = converter()->serialize(type, data, helper);
+				auto res = converter()->serialize(type, data);
 				QCOMPARE(res, cResult);
 			}
 			if (!jResult.isUndefined()) {
 				helper->json = true;
 				helper->serData = serData;
-				auto res = converter()->serialize(type, data, helper).toJsonValue();
+				auto res = converter()->serialize(type, data).toJsonValue();
 				QCOMPARE(res, jResult);
 			}
 		}
@@ -172,31 +174,32 @@ void TypeConverterTestBase::testDeserialization()
 
 	helper->properties = properties;
 	helper->expectedParent = parent;
+	converter()->setHelper(helper);
 
 	try {
 		if(!result.isValid()) {
 			if (!cData.isUndefined()) {
 				helper->json = false;
 				helper->deserData = deserData;
-				QVERIFY_EXCEPTION_THROWN(converter()->deserializeCbor(type, cData, this, helper), QJsonDeserializationException);
+				QVERIFY_EXCEPTION_THROWN(converter()->deserializeCbor(type, cData, this), QJsonDeserializationException);
 			}
 			if (!jData.isUndefined()) {
 				helper->json = true;
 				helper->deserData = deserData;
-				QVERIFY_EXCEPTION_THROWN(converter()->deserializeJson(type, QCborValue::fromJsonValue(jData), this, helper), QJsonDeserializationException);
+				QVERIFY_EXCEPTION_THROWN(converter()->deserializeJson(type, QCborValue::fromJsonValue(jData), this), QJsonDeserializationException);
 			}
 		} else {
 			if (!cData.isUndefined()) {
 				helper->json = false;
 				helper->deserData = deserData;
-				auto res = converter()->deserializeCbor(type, cData, this, helper);
+				auto res = converter()->deserializeCbor(type, cData, this);
 				QVERIFY(res.convert(type));
 				SELF_COMPARE(type, res, result);
 			}
 			if (!jData.isUndefined()) {
 				helper->json = true;
 				helper->deserData = deserData;
-				auto res = converter()->deserializeCbor(type, QCborValue::fromJsonValue(jData), this, helper);
+				auto res = converter()->deserializeCbor(type, QCborValue::fromJsonValue(jData), this);
 				QVERIFY(res.convert(type));
 				SELF_COMPARE(type, res, result);
 			}

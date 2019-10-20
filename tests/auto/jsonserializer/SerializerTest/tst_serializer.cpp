@@ -21,14 +21,22 @@ public:
 		return getCanonicalTypeName(propertyType);
 	}
 
+	std::variant<QCborValue, QJsonValue> serializeGeneric(const QVariant &value) const override {
+		return QCborValue::fromVariant(value);
+	}
+
+	QVariant deserializeGeneric(const std::variant<QCborValue, QJsonValue> &value, int, QObject *) const override {
+		return std::get<QCborValue>(value).toVariant();
+	}
+
 protected:
 	bool jsonMode() const override {
 		return true;
 	}
-	QCborTag typeTag(int metaTypeId) const override {
+	QCborTag typeTag(int) const override {
 		return static_cast<QCborTag>(-1);
 	}
-	QList<int> typesForTag(QCborTag tag) const override {
+	QList<int> typesForTag(QCborTag) const override {
 		return {};
 	}
 };

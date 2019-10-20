@@ -70,6 +70,9 @@ public:
 	//! Sets the priority of this converter
 	void setPriority(int priority);
 
+	const SerializationHelper *helper() const;
+	void setHelper(const SerializationHelper *helper);
+
 	//! Returns true, if this implementation can convert the given type
 	virtual bool canConvert(int metaTypeId) const = 0;
 	virtual QList<QCborTag> allowedCborTags(int metaTypeId) const;
@@ -77,14 +80,13 @@ public:
 	virtual int guessType(QCborTag tag, QCborValue::Type dataType) const;
 	DeserializationCapabilityResult canDeserialize(int &metaTypeId,
 												   QCborTag tag,
-												   QCborValue::Type dataType,
-												   const SerializationHelper *helper) const;
+												   QCborValue::Type dataType) const;
 
 	//! Called by the serializer to serializer your given type
-	virtual QCborValue serialize(int propertyType, const QVariant &value, const SerializationHelper *helper) const = 0;
+	virtual QCborValue serialize(int propertyType, const QVariant &value) const = 0;
 	//! Called by the deserializer to serializer your given type
-	virtual QVariant deserializeCbor(int propertyType, const QCborValue &value, QObject *parent, const SerializationHelper *helper) const = 0;
-	virtual QVariant deserializeJson(int propertyType, const QCborValue &value, QObject *parent, const SerializationHelper *helper) const;
+	virtual QVariant deserializeCbor(int propertyType, const QCborValue &value, QObject *parent) const = 0;
+	virtual QVariant deserializeJson(int propertyType, const QCborValue &value, QObject *parent) const;
 
 private:
 	QScopedPointer<QJsonTypeConverterPrivate> d;
@@ -109,8 +111,7 @@ public:
 	//! @copydoc QJsonTypeConverter::canDeserialize
 	QJsonTypeConverter::DeserializationCapabilityResult canDeserialize(int &metaTypeId,
 																	   QCborTag tag,
-																	   QCborValue::Type dataType,
-																	   const QJsonTypeConverter::SerializationHelper *helper) const;
+																	   QCborValue::Type dataType) const;
 
 	//! The primary factory method to create converters
 	virtual QSharedPointer<QJsonTypeConverter> createConverter() const = 0;

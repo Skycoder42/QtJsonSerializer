@@ -14,8 +14,8 @@ public:
 	QList<QCborTag> allowedCborTags(int metaTypeId) const override;
 	QList<QCborValue::Type> allowedCborTypes(int metaTypeId, QCborTag tag) const override;
 	int guessType(QCborTag tag, QCborValue::Type dataType) const override;
-	QCborValue serialize(int propertyType, const QVariant &value, const SerializationHelper *helper) const override;
-	QVariant deserializeCbor(int propertyType, const QCborValue &value, QObject *parent, const SerializationHelper *helper) const override;
+	QCborValue serialize(int propertyType, const QVariant &value) const override;
+	QVariant deserializeCbor(int propertyType, const QCborValue &value, QObject *parent) const override;
 
 private:
 	using MetaDuration = std::variant<std::chrono::nanoseconds,
@@ -26,7 +26,7 @@ private:
 									  std::chrono::hours>;
 
 	QCborTag tagForType(int metaTypeId) const;
-	MetaDuration parseValue(int propertyType, const QCborValue &value, const SerializationHelper *helper) const;
+	MetaDuration parseValue(int propertyType, const QCborValue &value, const SerializationHelper *localHelper) const;
 
 	template <typename TDuration>
 	TDuration create(const QCborValue &value) const {

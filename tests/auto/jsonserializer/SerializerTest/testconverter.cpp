@@ -43,9 +43,8 @@ QList<QCborValue::Type> TestEnumConverter::allowedCborTypes(int metaTypeId, QCbo
 	return {QCborValue::String};
 }
 
-QCborValue TestEnumConverter::serialize(int propertyType, const QVariant &value, const QJsonTypeConverter::SerializationHelper *helper) const
+QCborValue TestEnumConverter::serialize(int propertyType, const QVariant &value) const
 {
-	Q_UNUSED(helper)
 	if (propertyType == qMetaTypeId<NormalEnum>()) {
 		const auto me = QMetaEnum::fromType<NormalEnum>();
 		return QString::fromUtf8(me.valueToKey(value.toInt()));
@@ -55,10 +54,9 @@ QCborValue TestEnumConverter::serialize(int propertyType, const QVariant &value,
 	}
 }
 
-QVariant TestEnumConverter::deserializeCbor(int propertyType, const QCborValue &value, QObject *parent, const QJsonTypeConverter::SerializationHelper *helper) const
+QVariant TestEnumConverter::deserializeCbor(int propertyType, const QCborValue &value, QObject *parent) const
 {
 	Q_UNUSED(parent)
-	Q_UNUSED(helper)
 	if (propertyType == qMetaTypeId<NormalEnum>()) {
 		const auto me = QMetaEnum::fromType<NormalEnum>();
 		return me.keyToValue(qUtf8Printable(value.toString()));
@@ -87,25 +85,25 @@ QList<QCborValue::Type> TestWrapperConverter::allowedCborTypes(int metaTypeId, Q
 	return {QCborValue::Map};
 }
 
-QCborValue TestWrapperConverter::serialize(int propertyType, const QVariant &value, const QJsonTypeConverter::SerializationHelper *helper) const
+QCborValue TestWrapperConverter::serialize(int propertyType, const QVariant &value) const
 {
 	auto mo = &EnumContainer::staticMetaObject;
 	auto container = value.value<EnumContainer>();
 	return QCborMap {
-		{QStringLiteral("0"), helper->serializeSubtype(mo->property(mo->propertyOffset()), static_cast<int>(container.normalEnum))},
-		{QStringLiteral("1"), helper->serializeSubtype(mo->property(mo->propertyOffset() + 1), static_cast<int>(container.enumFlags))}
+		{QStringLiteral("0"), helper()->serializeSubtype(mo->property(mo->propertyOffset()), static_cast<int>(container.normalEnum))},
+		{QStringLiteral("1"), helper()->serializeSubtype(mo->property(mo->propertyOffset() + 1), static_cast<int>(container.enumFlags))}
 	};
 }
 
-QVariant TestWrapperConverter::deserializeCbor(int propertyType, const QCborValue &value, QObject *parent, const QJsonTypeConverter::SerializationHelper *helper) const
+QVariant TestWrapperConverter::deserializeCbor(int propertyType, const QCborValue &value, QObject *parent) const
 {
 	auto mo = &EnumContainer::staticMetaObject;
 	auto map = value.toMap();
 	if (map.contains(QStringLiteral("error")))
-		helper->deserializeSubtype(propertyType, QCborValue{42}, parent, "test");
+		helper()->deserializeSubtype(propertyType, QCborValue{42}, parent, "test");
 	return QVariant::fromValue(EnumContainer {
-		static_cast<EnumContainer::NormalEnum>(helper->deserializeSubtype(mo->property(mo->propertyOffset()), map.value(QStringLiteral("0")), parent).toInt()),
-		static_cast<EnumContainer::EnumFlags>(helper->deserializeSubtype(mo->property(mo->propertyOffset() + 1), map.value(QStringLiteral("1")), parent).toInt())
+		static_cast<EnumContainer::NormalEnum>(helper()->deserializeSubtype(mo->property(mo->propertyOffset()), map.value(QStringLiteral("0")), parent).toInt()),
+		static_cast<EnumContainer::EnumFlags>(helper()->deserializeSubtype(mo->property(mo->propertyOffset() + 1), map.value(QStringLiteral("1")), parent).toInt())
 	});
 }
 

@@ -12,7 +12,9 @@ class Q_JSONSERIALIZER_EXPORT QCborSerializer : public QJsonSerializerBase
 public:
 	enum QCborExtendedTags : quint64 {
 		GenericObject = 27,
+		RationaleNumber = 30,
 		Identifier = 39,
+		Homogeneous = 41,
 		Set = 258,
 		ExplicitMap = 259,
 		NetworkAddress = 260,
