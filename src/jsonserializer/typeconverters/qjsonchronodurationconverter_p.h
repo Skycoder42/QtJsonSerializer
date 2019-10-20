@@ -7,8 +7,6 @@
 
 #include <chrono>
 
-#include <QDebug>
-
 class Q_JSONSERIALIZER_EXPORT QJsonChronoDurationConverter : public QJsonTypeConverter
 {
 public:

@@ -66,6 +66,16 @@ bool QJsonSerializer::validateBase64() const
 	return d->validateBase64;
 }
 
+std::variant<QCborValue, QJsonValue> QJsonSerializer::serializeGeneric(const QVariant &value) const
+{
+	return serialize(value);
+}
+
+QVariant QJsonSerializer::deserializeGeneric(const std::variant<QCborValue, QJsonValue> &value, int metaTypeId, QObject *parent) const
+{
+	return deserialize(std::get<QJsonValue>(value), metaTypeId, parent);
+}
+
 void QJsonSerializer::setValidateBase64(bool validateBase64)
 {
 	Q_D(QJsonSerializer);

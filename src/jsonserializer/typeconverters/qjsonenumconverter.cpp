@@ -16,53 +16,6 @@ Q_NORETURN inline void throwSer(QByteArray &&what, bool ser)
 
 }
 
-QCborValue QJsonEnumConverter::serializeEnum(const QMetaEnum &metaEnum, const QVariant &value, bool enumAsString)
-{
-	const auto tag = static_cast<QCborTag>(metaEnum.isFlag() ? QCborSerializer::Flags : QCborSerializer::Enum);
-	if (enumAsString) {
-		if(metaEnum.isFlag())
-			return {tag, QString::fromUtf8(metaEnum.valueToKeys(value.toInt()))};
-		else
-			return {tag, QString::fromUtf8(metaEnum.valueToKey(value.toInt()))};
-	} else
-		return {tag, value.toInt()};
-}
-
-QVariant QJsonEnumConverter::deserializeEnum(const QMetaEnum &metaEnum, const QCborValue &value)
-{
-	// TODO fix
-	if(value.isString()) {
-		auto result = -1;
-		auto ok = false;
-		if(metaEnum.isFlag())
-			result = metaEnum.keysToValue(qUtf8Printable(value.toString()), &ok);
-		else
-			result = metaEnum.keyToValue(qUtf8Printable(value.toString()), &ok);
-		if(ok)
-			return result;
-		else if(metaEnum.isFlag() && value.toString().isEmpty())
-			return 0x00;
-		else {
-			throw QJsonDeserializationException{QByteArray{"Invalid value for enum type \""} +
-												metaEnum.name() +
-												"\": " +
-												value.toString().toUtf8()};
-		}
-	} else {
-		const auto intValue = value.toInteger();
-		double intpart;
-		if(std::modf(value.toDouble(), &intpart) != 0.0) {
-			throw QJsonDeserializationException{"Invalid value (double) for enum type found: " +
-												QByteArray::number(value.toDouble())};
-		}
-		if(!metaEnum.isFlag() && metaEnum.valueToKey(intValue) == nullptr) {
-			throw QJsonDeserializationException{"Invalid integer value. Not a valid enum element: " +
-												QByteArray::number(intValue)};
-		}
-		return intValue;
-	}
-}
-
 QJsonEnumConverter::QJsonEnumConverter()
 {
 	setPriority(QJsonTypeConverter::Low);
@@ -74,23 +27,78 @@ bool QJsonEnumConverter::canConvert(int metaTypeId) const
 			testForEnum(metaTypeId);  // NOTE check once in a while if still needed
 }
 
-QList<QJsonValue::Type> QJsonEnumConverter::jsonTypes() const
+QList<QCborTag> QJsonEnumConverter::allowedCborTags(int metaTypeId) const
 {
-	return {QJsonValue::Double, QJsonValue::String};
+	const auto metaEnum = getEnum(metaTypeId, false);
+	if (metaEnum.isFlag())
+		return {static_cast<QCborTag>(QCborSerializer::Flags)};
+	else
+		return {static_cast<QCborTag>(QCborSerializer::Enum)};
 }
 
-QJsonValue QJsonEnumConverter::serialize(int propertyType, const QVariant &value, const QJsonTypeConverter::SerializationHelper *helper) const
+QList<QCborValue::Type> QJsonEnumConverter::allowedCborTypes(int metaTypeId, QCborTag tag) const
 {
-	return serializeEnum(getEnum(propertyType, true),
-						 value,
-						 helper->getProperty("enumAsString").toBool());
+	Q_UNUSED(metaTypeId)
+	Q_UNUSED(tag)
+	return {QCborValue::Integer, QCborValue::String};
 }
 
-QVariant QJsonEnumConverter::deserialize(int propertyType, const QJsonValue &value, QObject *parent, const QJsonTypeConverter::SerializationHelper *helper) const
+QCborValue QJsonEnumConverter::serialize(int propertyType, const QVariant &value, const QJsonTypeConverter::SerializationHelper *helper) const
+{
+	const auto metaEnum = getEnum(propertyType, true);
+	const auto tag = static_cast<QCborTag>(metaEnum.isFlag() ? QCborSerializer::Flags : QCborSerializer::Enum);
+	if (helper->getProperty("enumAsString").toBool()) {
+		if (metaEnum.isFlag())
+			return {tag, QString::fromUtf8(metaEnum.valueToKeys(value.toInt()))};
+		else
+			return {tag, QString::fromUtf8(metaEnum.valueToKey(value.toInt()))};
+	} else
+		return {tag, value.toInt()};
+}
+
+QVariant QJsonEnumConverter::deserializeCbor(int propertyType, const QCborValue &value, QObject *parent, const QJsonTypeConverter::SerializationHelper *helper) const
 {
 	Q_UNUSED(parent)
 	Q_UNUSED(helper)
-	return deserializeEnum(getEnum(propertyType, true), value);
+	const auto metaEnum = getEnum(propertyType, false);
+	auto cValue = value.isTag() ? value.taggedValue() : value;
+	if (cValue.isString()) {
+		auto result = -1;
+		auto ok = false;
+		if (metaEnum.isFlag())
+			result = metaEnum.keysToValue(qUtf8Printable(cValue.toString()), &ok);
+		else
+			result = metaEnum.keyToValue(qUtf8Printable(cValue.toString()), &ok);
+		if (ok)
+			return result;
+		else if(metaEnum.isFlag() && cValue.toString().isEmpty())
+			return 0;
+		else {
+			throw QJsonDeserializationException{QByteArray{"Invalid value for enum type \""} +
+												metaEnum.name() +
+												"\": " +
+												cValue.toString().toUtf8()};
+		}
+	} else {
+		const auto intValue = cValue.toInteger();
+		if (!metaEnum.isFlag() && metaEnum.valueToKey(intValue) == nullptr) {
+			throw QJsonDeserializationException{"Invalid integer value. Not a valid enum/flags element: " +
+												QByteArray::number(intValue)};
+		}
+		return static_cast<int>(intValue);
+	}
+}
+
+QVariant QJsonEnumConverter::deserializeJson(int propertyType, const QCborValue &value, QObject *parent, const QJsonTypeConverter::SerializationHelper *helper) const
+{
+	if (value.isDouble()) {
+		double intpart;
+		if (std::modf(value.toDouble(), &intpart) != 0.0) {
+			throw QJsonDeserializationException{"Invalid value (double) for enum type found: " +
+												QByteArray::number(value.toDouble())};
+		}
+	}
+	return deserializeCbor(propertyType, value, parent, helper);
 }
 
 bool QJsonEnumConverter::testForEnum(int metaTypeId) const

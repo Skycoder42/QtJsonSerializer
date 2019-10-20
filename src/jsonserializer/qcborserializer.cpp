@@ -71,6 +71,16 @@ QVariant QCborSerializer::deserializeFrom(const QByteArray &data, int metaTypeId
 	return deserializeVariant(metaTypeId, cbor, parent);
 }
 
+std::variant<QCborValue, QJsonValue> QCborSerializer::serializeGeneric(const QVariant &value) const
+{
+	return serialize(value);
+}
+
+QVariant QCborSerializer::deserializeGeneric(const std::variant<QCborValue, QJsonValue> &value, int metaTypeId, QObject *parent) const
+{
+	return deserialize(std::get<QCborValue>(value), metaTypeId, parent);
+}
+
 bool QCborSerializer::jsonMode() const
 {
 	return false;

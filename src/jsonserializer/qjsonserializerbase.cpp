@@ -11,7 +11,7 @@
 
 //#include "typeconverters/qjsonobjectconverter_p.h"
 //#include "typeconverters/qjsongadgetconverter_p.h"
-//#include "typeconverters/qjsonenumconverter_p.h"
+#include "typeconverters/qjsonenumconverter_p.h"
 //#include "typeconverters/qjsonmapconverter_p.h"
 //#include "typeconverters/qjsonmultimapconverter_p.h"
 //#include "typeconverters/qjsonlistconverter_p.h"
@@ -40,19 +40,6 @@ QJsonSerializerBase::QJsonSerializerBase(QObject *parent) :
 QJsonSerializerBase::QJsonSerializerBase(QJsonSerializerBasePrivate &dd, QObject *parent) :
 	QObject{dd, parent}
 {}
-
-QCborValue QJsonSerializerBase::serializeGeneric(const QVariant &value) const
-{
-	return serializeVariant(value.userType(), value);
-}
-
-QVariant QJsonSerializerBase::deserializeGeneric(const std::variant<QCborValue, QJsonValue> &value, int metaTypeId, QObject *parent) const
-{
-	if (std::holds_alternative<QJsonValue>(value))
-		return deserializeVariant(metaTypeId, QCborValue::fromJsonValue(std::get<QJsonValue>(value)), parent);
-	else
-		return deserializeVariant(metaTypeId, std::get<QCborValue>(value), parent);
-}
 
 bool QJsonSerializerBase::allowDefaultNull() const
 {
@@ -322,7 +309,6 @@ QHash<int, QByteArray> QJsonSerializerBasePrivate::typedefMapping;
 QJsonSerializerBasePrivate::ConverterStore<QJsonTypeConverterFactory> QJsonSerializerBasePrivate::typeConverterFactories {
 //	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonObjectConverter>>::create(),
 //	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonGadgetConverter>>::create(),
-//	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonEnumConverter>>::create(),
 //	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonMapConverter>>::create(),
 //	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonMultiMapConverter>>::create(),
 //	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonListConverter>>::create(),
@@ -341,7 +327,8 @@ QJsonSerializerBasePrivate::ConverterStore<QJsonTypeConverterFactory> QJsonSeria
 //	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonStdTupleConverter>>::create(),
 	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonChronoDurationConverter>>::create(),
 //	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonStdOptionalConverter>>::create(),
-//	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonStdVariantConverter>>::create()
+//	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonStdVariantConverter>>::create(),
+	QSharedPointer<QJsonTypeConverterStandardFactory<QJsonEnumConverter>>::create(),
 };
 
 QSharedPointer<QJsonTypeConverter> QJsonSerializerBasePrivate::findSerConverter(int propertyType) const

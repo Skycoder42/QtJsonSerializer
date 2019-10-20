@@ -6,7 +6,7 @@ SUBDIRS += \
 
 CONVERTER_TESTS = \
 #	BytearrayConverterTest \
-#	EnumConverterTest \
+	EnumConverterTest \
 #	GadgetConverterTest \
 #	GeomConverterTest \
 #	JsonConverterTest \

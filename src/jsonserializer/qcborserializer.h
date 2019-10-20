@@ -81,6 +81,9 @@ public:
 	template <typename T>
 	T deserializeFrom(const QByteArray &data, QObject *parent = nullptr) const;
 
+	std::variant<QCborValue, QJsonValue> serializeGeneric(const QVariant &value) const override;
+	QVariant deserializeGeneric(const std::variant<QCborValue, QJsonValue> &value, int metaTypeId, QObject *parent) const override;
+
 protected:
 	// protected implementation -> internal use for the type converters
 	bool jsonMode() const override;

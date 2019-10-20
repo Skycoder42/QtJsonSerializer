@@ -17,7 +17,6 @@ class Q_JSONSERIALIZER_EXPORT QJsonSerializer : public QJsonSerializerBase
 	Q_PROPERTY(bool validateBase64 READ validateBase64 WRITE setValidateBase64 NOTIFY validateBase64Changed)
 
 public:
-
 	explicit QJsonSerializer(QObject *parent = nullptr);
 
 	//! Serializers a QVariant value to a QJsonValue
@@ -56,6 +55,9 @@ public:
 
 	//! @readAcFn{QJsonSerializer::validateBase64}
 	bool validateBase64() const;
+
+	std::variant<QCborValue, QJsonValue> serializeGeneric(const QVariant &value) const override;
+	QVariant deserializeGeneric(const std::variant<QCborValue, QJsonValue> &value, int metaTypeId, QObject *parent) const override;
 
 public Q_SLOTS:
 	//! @writeAcFn{QJsonSerializer::validateBase64}
