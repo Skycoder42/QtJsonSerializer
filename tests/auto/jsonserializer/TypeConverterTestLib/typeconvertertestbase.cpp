@@ -47,7 +47,7 @@ void TypeConverterTestBase::testConverterIsRegistered_data() {}
 void TypeConverterTestBase::testConverterIsRegistered()
 {
 	const auto cOwn = converter();
-	for(const auto &factory : qAsConst(QJsonSerializerPrivate::typeConverterFactories.store)) {
+	for(const auto &factory : qAsConst(QJsonSerializerPrivate::typeConverterFactories)) {
 		const auto conv = factory->createConverter();
 		const auto cReg = conv.data();
 		if(typeid(*cOwn).hash_code() == typeid(*cReg).hash_code())

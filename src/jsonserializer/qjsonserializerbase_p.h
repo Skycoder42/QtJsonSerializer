@@ -36,17 +36,20 @@ public:
 	struct ConverterStore {
 		mutable QReadWriteLock lock {};
 		QList<QSharedPointer<TConverter>> store;
+		QAtomicInt factoryOffset = 0;
 
 		ConverterStore() = default;
 		ConverterStore(std::initializer_list<QSharedPointer<TConverter>> initData);
 
 		void insertSorted(const QSharedPointer<TConverter> &converter);
+		void insertSorted(const QSharedPointer<TConverter> &converter, QWriteLocker &locker);
 	};
 
 	static QReadWriteLock typedefLock;
 	static QHash<int, QByteArray> typedefMapping;
 
-	static ConverterStore<QJsonTypeConverterFactory> typeConverterFactories;
+	static QReadWriteLock typeConverterFactoryLock;
+	static QList<QJsonTypeConverterFactory*> typeConverterFactories;
 
 	bool allowNull = false;
 	bool keepObjectName = false;
@@ -66,6 +69,7 @@ public:
 
 	QSharedPointer<QJsonTypeConverter> findSerConverter(int propertyType) const;
 	QSharedPointer<QJsonTypeConverter> findDeserConverter(int &propertyType, QCborTag tag, QCborValue::Type type) const;
+	void updateConverterStore() const;
 
 	int getEnumId(QMetaEnum metaEnum, bool ser) const;
 	QCborValue serializeValue(int propertyType, const QVariant &value) const;
@@ -108,6 +112,13 @@ template<typename TConverter>
 void QJsonSerializerBasePrivate::ConverterStore<TConverter>::insertSorted(const QSharedPointer<TConverter> &converter)
 {
 	QWriteLocker _{&lock};
+	insertSorted(converter, _);
+}
+
+template<typename TConverter>
+void QJsonSerializerBasePrivate::ConverterStore<TConverter>::insertSorted(const QSharedPointer<TConverter> &converter, QWriteLocker &locker)
+{
+	Q_UNUSED(locker)
 	for(auto it = store.begin(); it != store.end(); ++it) {
 		if((*it)->priority() <= converter->priority()) {
 			store.insert(it, converter);

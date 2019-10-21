@@ -144,10 +144,10 @@ public:
 	template <typename TConverter, int Priority = QJsonTypeConverter::Priority::Standard>
 	static void addJsonTypeConverterFactory();
 	//! @copybrief QJsonSerializer::addJsonTypeConverterFactory()
-	static void addJsonTypeConverterFactory(const QSharedPointer<QJsonTypeConverterFactory> &factory);
+	static void addJsonTypeConverterFactory(QJsonTypeConverterFactory *factory);
 
 	//! Adds a custom type converter to this serializer
-	template <typename T>
+	template <typename TConverter>
 	void addJsonTypeConverter();
 	//! @copybrief QJsonSerializer::addJsonTypeConverter()
 	void addJsonTypeConverter(const QSharedPointer<QJsonTypeConverter> &converter);
@@ -429,14 +429,14 @@ template<typename TConverter, int Priority>
 void QJsonSerializerBase::addJsonTypeConverterFactory()
 {
 	static_assert(std::is_base_of<QJsonTypeConverter, TConverter>::value, "T must implement QJsonTypeConverter");
-	addJsonTypeConverterFactory(QSharedPointer<QJsonTypeConverterStandardFactory<TConverter, Priority>>::create());
+	addJsonTypeConverterFactory(new QJsonTypeConverterStandardFactory<TConverter, Priority>{});
 }
 
-template<typename T>
+template<typename TConverter>
 void QJsonSerializerBase::addJsonTypeConverter()
 {
-	static_assert(std::is_base_of<QJsonTypeConverter, T>::value, "T must implement QJsonTypeConverter");
-	addJsonTypeConverter(QSharedPointer<T>::create());
+	static_assert(std::is_base_of<QJsonTypeConverter, TConverter>::value, "T must implement QJsonTypeConverter");
+	addJsonTypeConverter(QSharedPointer<TConverter>::create());
 }
 
 //! @file qjsonserializerbase.h The QJsonSerializerBase header file

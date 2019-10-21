@@ -104,21 +104,8 @@ public:
 	QJsonTypeConverterFactory();
 	virtual ~QJsonTypeConverterFactory();
 
-	//! @copydoc QJsonTypeConverter::priority
-	int priority() const;
-	//! @copydoc QJsonTypeConverter::canConvert
-	bool canConvert(int metaTypeId) const;
-	//! @copydoc QJsonTypeConverter::canDeserialize
-	QJsonTypeConverter::DeserializationCapabilityResult canDeserialize(int &metaTypeId,
-																	   QCborTag tag,
-																	   QCborValue::Type dataType) const;
-
 	//! The primary factory method to create converters
 	virtual QSharedPointer<QJsonTypeConverter> createConverter() const = 0;
-
-private:
-	friend class QCborTypeConverterFactory;
-	mutable QSharedPointer<const QJsonTypeConverter> _statusConverter;
 };
 
 //! A template implementation of QJsonTypeConverterFactory to generically create simply converters

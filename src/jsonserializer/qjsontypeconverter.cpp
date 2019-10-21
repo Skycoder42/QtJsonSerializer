@@ -137,24 +137,3 @@ QJsonTypeConverter::SerializationHelper::~SerializationHelper() = default;
 QJsonTypeConverterFactory::QJsonTypeConverterFactory() = default;
 
 QJsonTypeConverterFactory::~QJsonTypeConverterFactory() = default;
-
-int QJsonTypeConverterFactory::priority() const
-{
-	if(!_statusConverter)
-		_statusConverter = createConverter();
-	return _statusConverter->priority();
-}
-
-bool QJsonTypeConverterFactory::canConvert(int metaTypeId) const
-{
-	if(!_statusConverter)
-		_statusConverter = createConverter();
-	return _statusConverter->canConvert(metaTypeId);
-}
-
-QJsonTypeConverter::DeserializationCapabilityResult QJsonTypeConverterFactory::canDeserialize(int &metaTypeId, QCborTag tag, QCborValue::Type dataType) const
-{
-	if(!_statusConverter)
-		_statusConverter = createConverter();
-	return _statusConverter->canDeserialize(metaTypeId, tag, dataType);
-}
