@@ -1,6 +1,8 @@
 #include "qjsontypeconverter.h"
 #include "qjsonserializerbase_p.h"
 
+constexpr QCborTag QJsonTypeConverter::NoTag;
+
 class QJsonTypeConverterPrivate
 {
 public:
