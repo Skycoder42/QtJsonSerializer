@@ -10,6 +10,7 @@ bool QJsonListConverter::canConvert(int metaTypeId) const
 {
 	return metaTypeId == QMetaType::QVariantList ||
 			metaTypeId == QMetaType::QStringList ||
+			metaTypeId == QMetaType::QByteArrayList ||
 			listTypeRegex.match(QString::fromUtf8(helper()->getCanonicalTypeName(metaTypeId))).hasMatch();
 }
 
@@ -35,16 +36,15 @@ QCborValue QJsonListConverter::serialize(int propertyType, const QVariant &value
 	auto isSet = false;
 	const auto metaType = getSubtype(propertyType, isSet);
 
-	auto cValue = value;
-	if (!cValue.convert(QVariant::List)) {
-		throw QJsonSerializationException(QByteArray("Failed to convert type ") +
+	if (!value.canConvert(QMetaType::QVariantList)) {
+		throw QJsonSerializationException(QByteArray("Given type ") +
 										  QMetaType::typeName(propertyType) +
-										  QByteArray(" to a variant list. Make shure to register list types via QJsonSerializer::registerListConverters (or QJsonSerializer::registerSetConverters)"));
+										  QByteArray(" cannot be processed via QSequentialIterable - make shure to register the container type via Q_DECLARE_SEQUENTIAL_CONTAINER_METATYPE"));
 	}
 
 	QCborArray array;
 	auto index = 0;
-	for (const auto &element : cValue.toList())
+	for (const auto &element : value.value<QSequentialIterable>())
 		array.append(helper()->serializeSubtype(metaType, element, "[" + QByteArray::number(index++) + "]"));
 	return {static_cast<QCborTag>(isSet ? QCborSerializer::Set : QCborSerializer::Homogeneous), array};
 }
@@ -67,6 +67,8 @@ int QJsonListConverter::getSubtype(int listType, bool &isSet) const
 	int metaType = QMetaType::UnknownType;
 	if (listType == QMetaType::QStringList)
 		metaType = QMetaType::QString;
+	else if (listType == QMetaType::QByteArrayList)
+		metaType = QMetaType::QByteArray;
 	else if (listType != QMetaType::QVariantList) {
 		auto match = listTypeRegex.match(QString::fromUtf8(helper()->getCanonicalTypeName(listType)));
 		if (match.hasMatch()) {

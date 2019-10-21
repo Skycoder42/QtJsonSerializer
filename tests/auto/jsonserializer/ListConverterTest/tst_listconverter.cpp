@@ -54,6 +54,11 @@ void ListConverterTest::addMetaData()
 							<< QCborValue::Array
 							<< true
 							<< QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+	QTest::newRow("bytearray") << static_cast<int>(QMetaType::QByteArrayList)
+							   << static_cast<QCborTag>(QCborSerializer::Homogeneous)
+							   << QCborValue::Array
+							   << true
+							   << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("variant") << static_cast<int>(QMetaType::QVariantList)
 							 << static_cast<QCborTag>(QCborSerializer::Homogeneous)
 							 << QCborValue::Array
@@ -135,6 +140,13 @@ void ListConverterTest::addCommonSerData()
 							<< QVariant{QStringList{QStringLiteral("test")}}
 							<< QCborValue{static_cast<QCborTag>(QCborSerializer::Homogeneous), QCborArray{QStringLiteral("tree")}}
 							<< QJsonValue{QJsonArray{QStringLiteral("tree")}};
+	QTest::newRow("bytearray") << QVariantHash{}
+							   << TestQ{{QMetaType::QByteArray, QByteArray("test"), QByteArray("tree")}}
+							   << static_cast<QObject*>(this)
+							   << static_cast<int>(QMetaType::QByteArrayList)
+							   << QVariant::fromValue(QByteArrayList{"test"})
+							   << QCborValue{static_cast<QCborTag>(QCborSerializer::Homogeneous), QCborArray{QByteArray("tree")}}
+							   << QJsonValue{QJsonValue::Undefined};
 	QTest::newRow("variant") << QVariantHash{}
 							 << TestQ{{QMetaType::UnknownType, true, false}}
 							 << static_cast<QObject*>(this)

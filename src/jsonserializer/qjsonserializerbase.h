@@ -253,13 +253,13 @@ void QJsonSerializerBase::registerInverseTypedef(const char *typeName)
 template <template<typename> class TContainer, typename TClass, typename TAppendRet>
 bool QJsonSerializerBase::registerListContainerConverters(TAppendRet (TContainer<TClass>::*appendMethod)(const TClass &), void (TContainer<TClass>::*reserveMethod)(int))
 {
-	return QMetaType::registerConverter<TContainer<TClass>, QVariantList>([](const TContainer<TClass> &list) -> QVariantList {
+	return /*QMetaType::registerConverter<TContainer<TClass>, QVariantList>([](const TContainer<TClass> &list) -> QVariantList {
 		QVariantList l;
 		l.reserve(list.size());
 		for(const auto &v : list)
 			l.append(QVariant::fromValue(v));
 		return l;
-	}) & QMetaType::registerConverter<QVariantList, TContainer<TClass>>([appendMethod, reserveMethod](const QVariantList &list) -> TContainer<TClass> {
+	}) &*/ QMetaType::registerConverter<QVariantList, TContainer<TClass>>([appendMethod, reserveMethod](const QVariantList &list) -> TContainer<TClass> {
 		TContainer<TClass> l;
 		if(reserveMethod)
 			(l.*reserveMethod)(list.size());
