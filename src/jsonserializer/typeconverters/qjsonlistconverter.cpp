@@ -4,7 +4,7 @@
 
 #include <QtCore/QJsonArray>
 
-const QRegularExpression QJsonListConverter::listTypeRegex(QStringLiteral(R"__(^(?:QList|QLinkedList|QVector|QStack|QQueue|QSet)<\s*(.*?)\s*>$)__"));
+const QRegularExpression QJsonListConverter::listTypeRegex(QStringLiteral(R"__(^(QList|QLinkedList|QVector|QStack|QQueue|QSet)<\s*(.*?)\s*>$)__"));
 
 bool QJsonListConverter::canConvert(int metaTypeId) const
 {
@@ -15,8 +15,12 @@ bool QJsonListConverter::canConvert(int metaTypeId) const
 
 QList<QCborTag> QJsonListConverter::allowedCborTags(int metaTypeId) const
 {
-	Q_UNUSED(metaTypeId)
-	return {static_cast<QCborTag>(QCborSerializer::Homogeneous)};
+	auto isSet = false;
+	getSubtype(metaTypeId, isSet);
+	QList<QCborTag> tags {static_cast<QCborTag>(QCborSerializer::Homogeneous)};
+	if (isSet)
+		tags.append(static_cast<QCborTag>(QCborSerializer::Set));
+	return tags;
 }
 
 QList<QCborValue::Type> QJsonListConverter::allowedCborTypes(int metaTypeId, QCborTag tag) const
@@ -28,7 +32,8 @@ QList<QCborValue::Type> QJsonListConverter::allowedCborTypes(int metaTypeId, QCb
 
 QCborValue QJsonListConverter::serialize(int propertyType, const QVariant &value) const
 {
-	auto metaType = getSubtype(propertyType);
+	auto isSet = false;
+	const auto metaType = getSubtype(propertyType, isSet);
 
 	auto cValue = value;
 	if (!cValue.convert(QVariant::List)) {
@@ -41,12 +46,13 @@ QCborValue QJsonListConverter::serialize(int propertyType, const QVariant &value
 	auto index = 0;
 	for (const auto &element : cValue.toList())
 		array.append(helper()->serializeSubtype(metaType, element, "[" + QByteArray::number(index++) + "]"));
-	return array;
+	return {static_cast<QCborTag>(isSet ? QCborSerializer::Set : QCborSerializer::Homogeneous), array};
 }
 
 QVariant QJsonListConverter::deserializeCbor(int propertyType, const QCborValue &value, QObject *parent) const
 {
-	auto metaType = getSubtype(propertyType);
+	auto isSet = false;
+	const auto metaType = getSubtype(propertyType, isSet);
 
 	//generate the list
 	QVariantList list;
@@ -56,15 +62,17 @@ QVariant QJsonListConverter::deserializeCbor(int propertyType, const QCborValue 
 	return list;
 }
 
-int QJsonListConverter::getSubtype(int listType) const
+int QJsonListConverter::getSubtype(int listType, bool &isSet) const
 {
 	int metaType = QMetaType::UnknownType;
 	if (listType == QMetaType::QStringList)
 		metaType = QMetaType::QString;
 	else if (listType != QMetaType::QVariantList) {
 		auto match = listTypeRegex.match(QString::fromUtf8(helper()->getCanonicalTypeName(listType)));
-		if (match.hasMatch())
-			metaType = QMetaType::type(match.captured(1).toUtf8().trimmed());
+		if (match.hasMatch()) {
+			isSet = match.captured(1) == QStringLiteral("QSet");
+			metaType = QMetaType::type(match.captured(2).toUtf8().trimmed());
+		}
 	}
 
 	return metaType;

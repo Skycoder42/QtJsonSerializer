@@ -336,7 +336,6 @@ QList<QJsonTypeConverterFactory*> QJsonSerializerBasePrivate::typeConverterFacto
 
 QSharedPointer<QJsonTypeConverter> QJsonSerializerBasePrivate::findSerConverter(int propertyType) const
 {
-	Q_Q(const QJsonSerializerBase);
 	// first: update converters from factories
 	updateConverterStore();
 
