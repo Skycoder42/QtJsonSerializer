@@ -522,14 +522,14 @@ void SerializerTest::testDeviceSerialization()
 
 	// to device
 	QBuffer buffer;
-	QVERIFY(buffer.open(QIODevice::ReadWrite | QIODevice::Text));
+	QVERIFY(buffer.open(QIODevice::ReadWrite));
 	cborSerializer->serializeTo(&buffer, data);
 	QCOMPARE(buffer.data(), cRes);
 	QVERIFY(buffer.seek(0));
 	QCOMPARE(cborSerializer->deserializeFrom<EnumContainer>(&buffer), data);
 	buffer.close();
 
-	QVERIFY(buffer.open(QIODevice::ReadWrite | QIODevice::Text));
+	QVERIFY(buffer.open(QIODevice::ReadWrite));
 	jsonSerializer->serializeTo(&buffer, data);
 	QCOMPARE(buffer.data(), jRes);
 	QVERIFY(buffer.seek(0));
