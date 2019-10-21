@@ -10,7 +10,7 @@ CONVERTER_TESTS = \
 #	GadgetConverterTest \
 #	GeomConverterTest \
 #	JsonConverterTest \
-#	ListConverterTest \
+	ListConverterTest \
 #	LocaleConverterTest \
 #	MapConverterTest \
 #	ObjectConverterTest \
