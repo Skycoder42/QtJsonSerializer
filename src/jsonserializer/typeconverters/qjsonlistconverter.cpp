@@ -19,7 +19,10 @@ QList<QCborTag> QJsonListConverter::allowedCborTags(int metaTypeId) const
 {
 	auto isSet = false;
 	getSubtype(metaTypeId, isSet);
-	QList<QCborTag> tags {static_cast<QCborTag>(QCborSerializer::Homogeneous)};
+	QList<QCborTag> tags {
+		NoTag,
+		static_cast<QCborTag>(QCborSerializer::Homogeneous)
+	};
 	if (isSet)
 		tags.append(static_cast<QCborTag>(QCborSerializer::Set));
 	return tags;

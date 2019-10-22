@@ -28,6 +28,7 @@ public:
 		Font = 10001,
 		Enum = 10002,
 		Flags = 10003,
+		ConstructedObject = 10004,
 
 		ChronoNanoSeconds = 10100,
 		ChronoMicroSeconds = 10101,

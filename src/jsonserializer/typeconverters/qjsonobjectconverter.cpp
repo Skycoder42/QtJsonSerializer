@@ -1,5 +1,6 @@
 #include "qjsonobjectconverter_p.h"
 #include "qjsonserializerexception.h"
+#include "qcborserializer.h"
 #include "qjsonserializerbase_p.h"
 
 #include <QtCore/QPointer>
@@ -14,46 +15,71 @@ bool QJsonObjectConverter::canConvert(int metaTypeId) const
 {
 	auto flags = QMetaType::typeFlags(metaTypeId);
 	return flags.testFlag(QMetaType::PointerToQObject) ||
-			flags.testFlag(QMetaType::SharedPointerToQObject) ||//weak ptr cannot be constructed
+			flags.testFlag(QMetaType::SharedPointerToQObject) ||  // weak ptr cannot be constructed
 			flags.testFlag(QMetaType::TrackingPointerToQObject);
 }
 
-QList<QJsonValue::Type> QJsonObjectConverter::jsonTypes() const
+QList<QCborTag> QJsonObjectConverter::allowedCborTags(int metaTypeId) const
 {
+	Q_UNUSED(metaTypeId)
 	return {
-		QJsonValue::Object,
-		QJsonValue::Null
+		NoTag,
+		static_cast<QCborTag>(QCborSerializer::GenericObject),
+		static_cast<QCborTag>(QCborSerializer::ConstructedObject)
 	};
 }
 
-QJsonValue QJsonObjectConverter::serialize(int propertyType, const QVariant &value, const QJsonTypeConverter::SerializationHelper *helper) const
+QList<QCborValue::Type> QJsonObjectConverter::allowedCborTypes(int metaTypeId, QCborTag tag) const
+{
+	Q_UNUSED(metaTypeId)
+	switch (static_cast<quint64>(tag)) {
+	case QCborSerializer::GenericObject:
+		return {QCborValue::Array};
+	default:
+		return {QCborValue::Map, QCborValue::Null};
+	}
+}
+
+int QJsonObjectConverter::guessType(QCborTag tag, QCborValue::Type dataType) const
+{
+	Q_UNUSED(dataType)
+	switch (static_cast<quint64>(tag)) {
+	case QCborSerializer::GenericObject:
+	case QCborSerializer::ConstructedObject:
+		return QMetaType::QObjectStar;
+	default:
+		return QMetaType::UnknownType;
+	}
+}
+
+QCborValue QJsonObjectConverter::serialize(int propertyType, const QVariant &value) const
 {
 	QObject *object = nullptr;
 	auto flags = QMetaType::typeFlags(propertyType);
-	if(flags.testFlag(QMetaType::PointerToQObject))
-	  object = extract<QObject*>(value);
-	else if(flags.testFlag(QMetaType::SharedPointerToQObject))
-	  object = extract<QSharedPointer<QObject>>(value).data();
-	else if(flags.testFlag(QMetaType::TrackingPointerToQObject))
-	  object = extract<QPointer<QObject>>(value).data();
+	if (flags.testFlag(QMetaType::PointerToQObject))
+		object = extract<QObject*>(value);
+	else if (flags.testFlag(QMetaType::SharedPointerToQObject))
+		object = extract<QSharedPointer<QObject>>(value).data();
+	else if (flags.testFlag(QMetaType::TrackingPointerToQObject))
+		object = extract<QPointer<QObject>>(value).data();
 	else
-	  Q_UNREACHABLE();
+		Q_UNREACHABLE();
 
-	if(!object)
-		return QJsonValue();
+	if (!object)
+		return QCborValue::Null;
 
 	//get the metaobject, based on polymorphism
 	const QMetaObject *meta = nullptr;
-	auto poly = static_cast<QJsonSerializerBase::Polymorphing>(helper->getProperty("polymorphing").toInt());
+	auto poly = static_cast<QJsonSerializerBase::Polymorphing>(helper()->getProperty("polymorphing").toInt());
 	auto isPoly = false;
 	switch (poly) {
-	case QJsonSerializerBase::Disabled:
+	case QJsonSerializerBase::Polymorphing::Disabled:
 		isPoly = false;
 		break;
-	case QJsonSerializerBase::Enabled:
+	case QJsonSerializerBase::Polymorphing::Enabled:
 		isPoly = polyMetaObject(object);
 		break;
-	case QJsonSerializerBase::Forced:
+	case QJsonSerializerBase::Polymorphing::Forced:
 		isPoly = true;
 		break;
 	default:
@@ -61,128 +87,95 @@ QJsonValue QJsonObjectConverter::serialize(int propertyType, const QVariant &val
 		break;
 	}
 
-	QJsonObject jsonObject;
+	QCborMap cborMap;
 
 	if(isPoly) {
 		meta = object->metaObject();
 		//first: pass the class name
-		jsonObject[QStringLiteral("@class")] = QString::fromUtf8(meta->className());
+		cborMap[QStringLiteral("@class")] = QString::fromUtf8(meta->className());
 	} else
 		meta = getMetaObject(propertyType);
 
 	//go through all properties and try to serialize them
-	const auto keepObjectName = helper->getProperty("keepObjectName").toBool();
-	const auto ignoreStoredAttribute = helper->getProperty("ignoreStoredAttribute").toBool();
+	const auto keepObjectName = helper()->getProperty("keepObjectName").toBool();
+	const auto ignoreStoredAttribute = helper()->getProperty("ignoreStoredAttribute").toBool();
 	auto i = QObject::staticMetaObject.indexOfProperty("objectName");
-	if(!keepObjectName)
-	   i++;
+	if (!keepObjectName)
+		i++;
 	for(; i < meta->propertyCount(); i++) {
 		auto property = meta->property(i);
-		if(ignoreStoredAttribute || property.isStored())
-			jsonObject[QString::fromUtf8(property.name())] = helper->serializeSubtype(property, property.read(object));
+		if (ignoreStoredAttribute || property.isStored())
+			cborMap[QString::fromUtf8(property.name())] = helper()->serializeSubtype(property, property.read(object));
 	}
 
-	return jsonObject;
+	return cborMap;
 }
 
-QVariant QJsonObjectConverter::deserialize(int propertyType, const QJsonValue &value, QObject *parent, const QJsonTypeConverter::SerializationHelper *helper) const
+QVariant QJsonObjectConverter::deserializeCbor(int propertyType, const QCborValue &value, QObject *parent) const
 {
-	if(value.isNull())
+	if ((value.isTag() ? value.taggedValue() : value).isNull())
 		return toVariant(nullptr, QMetaType::typeFlags(propertyType));
 
-	auto validationFlags = helper->getProperty("validationFlags").value<QJsonSerializerBase::ValidationFlags>();
-	auto keepObjectName = helper->getProperty("keepObjectName").toBool();
-	auto poly = static_cast<QJsonSerializerBase::Polymorphing>(helper->getProperty("polymorphing").toInt());
+	QCborMap cborMap;
+	if (value.isTag()) {
+		if (value.tag() == static_cast<QCborTag>(QCborSerializer::GenericObject))
+			return toVariant(deserializeGenericObject(value.taggedValue().toArray(), parent), QMetaType::typeFlags(propertyType));
+		else if (value.tag() == static_cast<QCborTag>(QCborSerializer::ConstructedObject))
+			return toVariant(deserializeConstructedObject(value.taggedValue(), parent), QMetaType::typeFlags(propertyType));
+		else
+			cborMap = value.taggedValue().toMap();
+	} else
+		cborMap = value.toMap();
+
+	auto poly = static_cast<QJsonSerializerBase::Polymorphing>(helper()->getProperty("polymorphing").toInt());
 
 	auto metaObject = getMetaObject(propertyType);
-	if(!metaObject)
+	if (!metaObject)
 		throw QJsonDeserializationException(QByteArray("Unable to get metaobject for type ") + QMetaType::typeName(propertyType));
 
-	//try to get the polymorphic metatype (if allowed)
-	auto jsonObject = value.toObject();
+	// try to get the polymorphic metatype (if allowed)
 	auto isPoly = false;
-	if(poly != QJsonSerializerBase::Disabled) {
-		if(jsonObject.contains(QStringLiteral("@class"))) {
+	if (poly != QJsonSerializerBase::Polymorphing::Disabled) {
+		if (cborMap.contains(QStringLiteral("@class"))) {
 			isPoly = true;
-			QByteArray classField = jsonObject[QStringLiteral("@class")].toString().toUtf8() + "*";//add the star
+			QByteArray classField = cborMap[QStringLiteral("@class")].toString().toUtf8() + "*";  // add the star
 			auto typeId = QMetaType::type(classField.constData());
 			auto nMeta = QMetaType::metaObjectForType(typeId);
-			if(!nMeta)
+			if (!nMeta)
 				throw QJsonDeserializationException("Unable to find class requested from json \"@class\" property: " + classField);
-			if(!nMeta->inherits(metaObject)) {
+			if (!nMeta->inherits(metaObject)) {
 				throw QJsonDeserializationException("Requested class from \"@class\" field, " +
 													classField +
 													QByteArray(", does not inhert the property type ") +
 													QMetaType::typeName(propertyType));
 			}
 			metaObject = nMeta;
-		} else if(poly == QJsonSerializerBase::Forced)
+		} else if (poly == QJsonSerializerBase::Polymorphing::Forced)
 			throw QJsonDeserializationException("Json does not contain the \"@class\" field, but forced polymorphism requires it");
 	}
 
-	//try to construct the object
+	// try to construct the object
 	auto object = metaObject->newInstance(Q_ARG(QObject*, parent));
-	if(!object) {
+	if (!object) {
 		throw QJsonDeserializationException(QByteArray("Failed to construct object of type ") +
 											metaObject->className() +
 											QByteArray(" (Does the constructor \"Q_INVOKABLE class(QObject*);\" exist?)"));
 	}
 
-	//collect required properties, if set
-	QSet<QByteArray> reqProps;
-	if(validationFlags.testFlag(QJsonSerializerBase::AllProperties)) {
-		const auto ignoreStoredAttribute = helper->getProperty("ignoreStoredAttribute").toBool();
-		auto i = QObject::staticMetaObject.indexOfProperty("objectName");
-		if(!keepObjectName)
-		   i++;
-		for(; i < metaObject->propertyCount(); i++) {
-			auto property = metaObject->property(i);
-			if(ignoreStoredAttribute || property.isStored())
-				reqProps.insert(property.name());
-		}
-	}
-
-	//now deserialize all json properties
-	for(auto it = jsonObject.constBegin(); it != jsonObject.constEnd(); it++) {
-		if(isPoly && it.key() == QStringLiteral("@class"))
-			continue;
-
-		auto propIndex = metaObject->indexOfProperty(qUtf8Printable(it.key()));
-		QVariant subValue;
-		if(propIndex != -1) {
-			auto property = metaObject->property(propIndex);
-			subValue = helper->deserializeSubtype(property, it.value(), object);
-			reqProps.remove(property.name());
-		} else if(validationFlags.testFlag(QJsonSerializerBase::NoExtraProperties)) {
-			throw QJsonDeserializationException("Found extra property " +
-												it.key().toUtf8() +
-												" but extra properties are not allowed");
-		} else
-			subValue = helper->deserializeSubtype(QMetaType::UnknownType, it.value(), object, it.key().toUtf8());
-		object->setProperty(qUtf8Printable(it.key()), subValue);
-	}
-
-	//make shure all required properties have been read
-	if(validationFlags.testFlag(QJsonSerializerBase::AllProperties) && !reqProps.isEmpty()) {
-		throw QJsonDeserializationException(QByteArray("Not all properties for ") +
-											metaObject->className() +
-											QByteArray(" are present in the json object Missing properties: ") +
-											reqProps.toList().join(", "));
-	}
-
+	deserializeProperties(metaObject, object, cborMap, isPoly);
 	return toVariant(object, QMetaType::typeFlags(propertyType));
 }
 
 const QMetaObject *QJsonObjectConverter::getMetaObject(int typeId) const
 {
 	auto flags = QMetaType::typeFlags(typeId);
-	if(flags.testFlag(QMetaType::PointerToQObject))
+	if (flags.testFlag(QMetaType::PointerToQObject))
 		return QMetaType::metaObjectForType(typeId);
 	else {
 		QRegularExpression regex;
-		if(flags.testFlag(QMetaType::SharedPointerToQObject))
+		if (flags.testFlag(QMetaType::SharedPointerToQObject))
 			regex = sharedTypeRegex;
-		else if(flags.testFlag(QMetaType::TrackingPointerToQObject))
+		else if (flags.testFlag(QMetaType::TrackingPointerToQObject))
 			regex = trackingTypeRegex;
 		else {
 			Q_UNREACHABLE();
@@ -190,8 +183,8 @@ const QMetaObject *QJsonObjectConverter::getMetaObject(int typeId) const
 		}
 
 		//extract template type, and if found, add the pointer star and find the meta type
-		auto match = regex.match(QString::fromUtf8(getCanonicalTypeName(typeId)));
-		if(match.hasMatch()) {
+		auto match = regex.match(QString::fromUtf8(helper()->getCanonicalTypeName(typeId)));
+		if (match.hasMatch()) {
 			auto type = QMetaType::type(match.captured(1).toUtf8().trimmed() + "*");
 			return QMetaType::metaObjectForType(type);
 		} else
@@ -203,7 +196,7 @@ template<typename T>
 T QJsonObjectConverter::extract(QVariant variant) const
 {
 	auto id = qMetaTypeId<T>();
-	if(variant.canConvert(id) && variant.convert(id))
+	if (variant.canConvert(id) && variant.convert(id))
 		return variant.value<T>();
 	else {
 		throw QJsonSerializationException(QByteArray("unable to get QObject pointer from type ") +
@@ -214,14 +207,14 @@ T QJsonObjectConverter::extract(QVariant variant) const
 
 QVariant QJsonObjectConverter::toVariant(QObject *object, QMetaType::TypeFlags flags) const
 {
-	if(flags.testFlag(QMetaType::PointerToQObject))
+	if (flags.testFlag(QMetaType::PointerToQObject))
 		return QVariant::fromValue(object);
-	else if(flags.testFlag(QMetaType::SharedPointerToQObject)) {
+	else if (flags.testFlag(QMetaType::SharedPointerToQObject)) {
 		//remove parent, as shared pointers and object tree exclude each other
-		if(object)
+		if (object)
 			object->setParent(nullptr);
 		return QVariant::fromValue(QSharedPointer<QObject>(object));
-	} else if(flags.testFlag(QMetaType::TrackingPointerToQObject))
+	} else if (flags.testFlag(QMetaType::TrackingPointerToQObject))
 		return QVariant::fromValue<QPointer<QObject>>(object);
 	else {
 		Q_UNREACHABLE();
@@ -234,18 +227,18 @@ bool QJsonObjectConverter::polyMetaObject(QObject *object) const
 	auto meta = object->metaObject();
 
 	//check the internal property
-	if(object->dynamicPropertyNames().contains("__qt_json_serializer_polymorphic")) {
+	if (object->dynamicPropertyNames().contains("__qt_json_serializer_polymorphic")) {
 		auto polyProp = object->property("__qt_json_serializer_polymorphic").toBool();
 		return polyProp;
 	}
 
 	//check the class info
 	auto polyIndex = meta->indexOfClassInfo("polymorphic");
-	if(polyIndex != -1) {
+	if (polyIndex != -1) {
 		auto info = meta->classInfo(polyIndex);
-		if(info.value() == QByteArray("true"))
+		if (info.value() == QByteArray("true"))
 			return true;// use the object
-		else if(info.value() == QByteArray("false"))
+		else if (info.value() == QByteArray("false"))
 			return false;// use the class
 		else
 			qWarning() << "Invalid value for polymorphic classinfo on object type" << meta->className() << "ignored";
@@ -253,4 +246,141 @@ bool QJsonObjectConverter::polyMetaObject(QObject *object) const
 
 	//default: the class
 	return false;// use the class
+}
+
+QObject *QJsonObjectConverter::deserializeGenericObject(const QCborArray &value, QObject *parent) const
+{
+	if (value.size() == 0)
+		throw QJsonDeserializationException{"A GenericObject requires at least one argument, specifying the object name"};
+
+	// find a meta object
+	QByteArray className = value.first().toString().toUtf8() + "*";  // add the star
+	auto typeId = QMetaType::type(className.constData());
+	auto metaObject = QMetaType::metaObjectForType(typeId);
+	if (!metaObject)
+		throw QJsonDeserializationException("Unable to find class requested from GenericObject tagged array: " + className);
+
+	// deserialize all arguments
+	QVariantList arguments;
+	arguments.reserve(static_cast<int>(value.size() - 1));
+	for (auto i = 1ll; i < value.size(); ++i)
+		arguments.append(helper()->deserializeSubtype(QMetaType::UnknownType, value[i], nullptr, className + "[" + QByteArray::number(i - 1) + "]"));
+
+	// find a matching constructor
+	for (auto i = 0; i < metaObject->constructorCount(); ++i) {
+		const auto constructor = metaObject->constructor(i);
+		// verify same argument count (but allow extra QObject argument for parenting)
+		auto extraObj = false;
+		if (constructor.parameterCount() != arguments.size()) {
+			if (constructor.parameterCount() == arguments.size() + 1 &&
+				constructor.parameterType(constructor.parameterCount() - 1) == QMetaType::QObjectStar)
+				extraObj = true;
+			else
+				continue;
+		}
+
+		// verify each argument can be converted (by converting it)
+		auto argCopy = arguments;
+		auto allOk = true;
+		for (auto j = 0; j < argCopy.size(); ++j) {
+			const auto pType = constructor.parameterType(j);
+			if (!argCopy[i].canConvert(pType) || !argCopy[i].convert(pType)) {
+				allOk = false;
+				break;
+			}
+		}
+
+		// if all arguments could be converted -> construct the object
+		if (allOk) {
+			if (extraObj)
+				argCopy.append(QVariant::fromValue(parent));
+			if (argCopy.size() > 10) {
+				throw QJsonDeserializationException{"Can only create objects from at most 10 constructor arguments, but " +
+													QByteArray::number(argCopy.size()) +
+													" where given"};
+			}
+
+			std::array<QGenericArgument, 10> gArgs;
+			for (auto j = 0; j < argCopy.size(); ++j)
+				gArgs[static_cast<size_t>(j)] = {argCopy[j].typeName(), argCopy[i].constData()};
+			auto object = metaObject->newInstance(gArgs[0], gArgs[1], gArgs[2], gArgs[3], gArgs[4],
+												  gArgs[5], gArgs[6], gArgs[7], gArgs[8], gArgs[9]);
+			if (!object) {
+				throw QJsonDeserializationException(QByteArray("Failed to construct object of type ") +
+													metaObject->className() +
+													QByteArray(" - deserialized constructor arguments are potentially invalid!"));
+			}
+			return object;
+		}
+	}
+
+	throw QJsonDeserializationException{"Unable to find any constructor for " +
+										className +
+										" with " +
+										QByteArray::number(arguments.size()) +
+										" arguments and matching types!"};
+}
+
+QObject *QJsonObjectConverter::deserializeConstructedObject(const QCborValue &value, QObject *parent) const
+{
+	if (value.isNull())
+		return nullptr;
+
+	const auto cborArray = value.toArray();
+	if (cborArray.size() != 2)
+		throw QJsonDeserializationException{"The ConstructedObject tagged array must have exactly two elements!"};
+
+	auto object = deserializeGenericObject(cborArray[0].toArray(), parent);
+	if (!object)
+		return nullptr;
+	if (!cborArray[1].isNull())
+		deserializeProperties(object->metaObject(), object, cborArray[1].toMap());
+	return object;
+}
+
+void QJsonObjectConverter::deserializeProperties(const QMetaObject *metaObject, QObject *object, const QCborMap &value, bool isPoly) const
+{
+	auto validationFlags = helper()->getProperty("validationFlags").value<QJsonSerializerBase::ValidationFlags>();
+	auto keepObjectName = helper()->getProperty("keepObjectName").toBool();
+
+	// collect required properties, if set
+	QSet<QByteArray> reqProps;
+	if (validationFlags.testFlag(QJsonSerializerBase::ValidationFlag::AllProperties)) {
+		const auto ignoreStoredAttribute = helper()->getProperty("ignoreStoredAttribute").toBool();
+		auto i = QObject::staticMetaObject.indexOfProperty("objectName");
+		if (!keepObjectName)
+			i++;
+		for (; i < metaObject->propertyCount(); i++) {
+			auto property = metaObject->property(i);
+			if(ignoreStoredAttribute || property.isStored())
+				reqProps.insert(property.name());
+		}
+	}
+
+	//now deserialize all json properties
+	for (auto it = value.constBegin(); it != value.constEnd(); it++) {
+		if (isPoly && it.key() == QStringLiteral("@class"))
+			continue;
+
+		const auto key = it.key().toString().toUtf8();
+		const auto propIndex = metaObject->indexOfProperty(key);
+		if (propIndex != -1) {
+			const auto property = metaObject->property(propIndex);
+			property.write(object, helper()->deserializeSubtype(property, it.value(), object));
+			reqProps.remove(property.name());
+		} else if (validationFlags.testFlag(QJsonSerializerBase::ValidationFlag::NoExtraProperties)) {
+			throw QJsonDeserializationException("Found extra property " +
+												key +
+												" but extra properties are not allowed");
+		} else
+			object->setProperty(key, helper()->deserializeSubtype(QMetaType::UnknownType, it.value(), object, key));
+	}
+
+	//make shure all required properties have been read
+	if (validationFlags.testFlag(QJsonSerializerBase::ValidationFlag::AllProperties) && !reqProps.isEmpty()) {
+		throw QJsonDeserializationException(QByteArray("Not all properties for ") +
+											metaObject->className() +
+											QByteArray(" are present in the json object Missing properties: ") +
+											reqProps.toList().join(", "));
+	}
 }

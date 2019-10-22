@@ -9,7 +9,7 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QCoreApplication>
 
-//#include "typeconverters/qjsonobjectconverter_p.h"
+#include "typeconverters/qjsonobjectconverter_p.h"
 //#include "typeconverters/qjsongadgetconverter_p.h"
 #include "typeconverters/qjsonenumconverter_p.h"
 //#include "typeconverters/qjsonmapconverter_p.h"
@@ -310,11 +310,12 @@ QReadWriteLock QJsonSerializerBasePrivate::typedefLock;
 QHash<int, QByteArray> QJsonSerializerBasePrivate::typedefMapping;
 QReadWriteLock QJsonSerializerBasePrivate::typeConverterFactoryLock;
 QList<QJsonTypeConverterFactory*> QJsonSerializerBasePrivate::typeConverterFactories {
-//	new QJsonTypeConverterStandardFactory<QJsonObjectConverter>{},
+	new QJsonTypeConverterStandardFactory<QJsonListConverter>{},
+	new QJsonTypeConverterStandardFactory<QJsonObjectConverter>{},
 //	new QJsonTypeConverterStandardFactory<QJsonGadgetConverter>{},
+	new QJsonTypeConverterStandardFactory<QJsonEnumConverter>{},
 //	new QJsonTypeConverterStandardFactory<QJsonMapConverter>{},
 //	new QJsonTypeConverterStandardFactory<QJsonMultiMapConverter>{},
-	new QJsonTypeConverterStandardFactory<QJsonListConverter>{},
 //	new QJsonTypeConverterStandardFactory<QJsonJsonValueConverter>{},
 //	new QJsonTypeConverterStandardFactory<QJsonJsonObjectConverter>{},
 //	new QJsonTypeConverterStandardFactory<QJsonJsonArrayConverter>{},
@@ -331,7 +332,6 @@ QList<QJsonTypeConverterFactory*> QJsonSerializerBasePrivate::typeConverterFacto
 	new QJsonTypeConverterStandardFactory<QJsonChronoDurationConverter>{},
 //	new QJsonTypeConverterStandardFactory<QJsonStdOptionalConverter>{},
 //	new QJsonTypeConverterStandardFactory<QJsonStdVariantConverter>{},
-	new QJsonTypeConverterStandardFactory<QJsonEnumConverter>{},
 };
 
 QSharedPointer<QJsonTypeConverter> QJsonSerializerBasePrivate::findSerConverter(int propertyType) const
