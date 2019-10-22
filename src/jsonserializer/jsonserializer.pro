@@ -4,6 +4,7 @@ QT = core core-private
 
 SOURCES += \
 	qcborserializer.cpp \
+	qcontainerwriters.cpp \
 	qjsonserializer.cpp \
 	qjsonserializerbase.cpp \
 	qjsonserializerexception.cpp \
@@ -13,6 +14,7 @@ SOURCES += \
 HEADERS += \
 	qcborserializer.h \
 	qcborserializer_p.h \
+	qcontainerwriters.h \
 	qjsonserializer.h \
 	qjsonserializer_p.h \
 	qjsonserializerbase.h \

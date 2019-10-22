@@ -5,6 +5,7 @@
 #include "QtJsonSerializer/qjsonserializerexception.h"
 #include "QtJsonSerializer/qjsontypeconverter.h"
 #include "QtJsonSerializer/qjsonserializer_helpertypes.h"
+#include "QtJsonSerializer/qcontainerwriters.h"
 
 #include <type_traits>
 #include <tuple>
@@ -84,10 +85,6 @@ public:
 	template<typename T>
 	static void registerInverseTypedef(const char *typeName);
 
-	//! Registers list converters for the given container type from and to QVariantList
-	template <template<typename> class TContainer, typename TClass, typename TAppendRet = void>
-	static bool registerListContainerConverters(TAppendRet (TContainer<TClass>::*appendMethod)(const TClass &) = &TContainer<TClass>::append,
-												void (TContainer<TClass>::*reserveMethod)(int) = &TContainer<TClass>::reserve);
 	//! Registers map converters for the given container type from and to QVariantMap
 	template <template<typename, typename> class TContainer, typename TClass, typename TInsertRet = typename TContainer<QString, TClass>::iterator>
 	static bool registerMapContainerConverters(TInsertRet (TContainer<QString, TClass>::*insertMethod)(const QString &, const TClass &) = &TContainer<QString, TClass>::insert,
@@ -250,29 +247,6 @@ void QJsonSerializerBase::registerInverseTypedef(const char *typeName)
 	registerInverseTypedefImpl(qMetaTypeId<T>(), QMetaObject::normalizedType(typeName));
 }
 
-template <template<typename> class TContainer, typename TClass, typename TAppendRet>
-bool QJsonSerializerBase::registerListContainerConverters(TAppendRet (TContainer<TClass>::*appendMethod)(const TClass &), void (TContainer<TClass>::*reserveMethod)(int))
-{
-	return QMetaType::registerConverter<QVariantList, TContainer<TClass>>([appendMethod, reserveMethod](const QVariantList &list) -> TContainer<TClass> {
-		TContainer<TClass> l;
-		if (reserveMethod)
-			(l.*reserveMethod)(list.size());
-		for (auto v : list) { // clazy:exclude=range-loop
-			const auto vt = v.type();
-			if (v.convert(qMetaTypeId<TClass>()))
-				(l.*appendMethod)(v.value<TClass>());
-			else {
-				qWarning() << "Conversion to"
-						   << QMetaType::typeName(qMetaTypeId<TContainer<TClass>>())
-						   << "failed, could not convert element of type"
-						   << QMetaType::typeName(vt);
-				(l.*appendMethod)(TClass());
-			}
-		}
-		return l;
-	});
-}
-
 template<template <typename, typename> class TContainer, typename TClass, typename TInsertRet>
 bool QJsonSerializerBase::registerMapContainerConverters(TInsertRet (TContainer<QString, TClass>::*insertMethod)(const QString &, const TClass &), bool asMultiMap)
 {
@@ -307,17 +281,19 @@ bool QJsonSerializerBase::registerMapContainerConverters(TInsertRet (TContainer<
 template<typename T>
 bool QJsonSerializerBase::registerListConverters()
 {
-	return registerListContainerConverters<QList, T>() &
-			registerListContainerConverters<QLinkedList, T>(&QLinkedList<T>::append, nullptr) &
-			registerListContainerConverters<QVector, T>() &
-			registerListContainerConverters<QStack, T>() &
-			registerListContainerConverters<QQueue, T>();
+	QSequentialWriter::registerWriter<QList, T>();
+	QSequentialWriter::registerWriter<QLinkedList, T>();
+	QSequentialWriter::registerWriter<QVector, T>();
+	QSequentialWriter::registerWriter<QStack, T>();
+	QSequentialWriter::registerWriter<QQueue, T>();
+	return true;
 }
 
 template<typename T>
 bool QJsonSerializerBase::registerSetConverters()
 {
-	return registerListContainerConverters<QSet, T>(&QSet<T>::insert);
+	QSequentialWriter::registerWriter<QSet, T>();
+	return true;
 }
 
 template<typename T, bool mapTypes, bool hashTypes>

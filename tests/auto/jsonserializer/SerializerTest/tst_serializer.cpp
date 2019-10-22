@@ -293,14 +293,22 @@ void SerializerTest::testVariantConversions()
 			auto i = 0;
 			for (const auto &itData : seqIt)
 				QCOMPARE(itData, variantList[i++]);
+
+			QVariant res{data.userType(), nullptr};
+			auto writer = QSequentialWriter::getWriter(res);
+			QVERIFY(writer.isValid());
+			writer.reserve(variantList.size());
+			for (const auto &vData : variantList)
+				writer.add(vData);
+			QCOMPARE(res, data);
 		}
 		convData = variantData;
 	} else {
 		QVERIFY(convData.convert(targetType));
 		QCOMPARE(convData, variantData);
+		QVERIFY(convData.convert(origType));
+		QCOMPARE(convData, data);
 	}
-	QVERIFY(convData.convert(origType));
-	QCOMPARE(convData, data);
 }
 
 void SerializerTest::testSerialization_data()
