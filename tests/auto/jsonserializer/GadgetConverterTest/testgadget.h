@@ -12,7 +12,7 @@ class TestGadget
 	Q_PROPERTY(int zhidden MEMBER zhidden STORED false)
 
 public:
-	TestGadget(int key = 0, double value = 0.0, int zhidden = 0);
+	TestGadget(int key = 0, double value = 0.0, int zhidden = 11);
 
 	int key;
 	double value;

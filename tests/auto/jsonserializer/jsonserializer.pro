@@ -8,7 +8,7 @@ CONVERTER_TESTS = \
 #	BytearrayConverterTest \
 	ChronoDurationConverterTest \
 	EnumConverterTest \
-#	GadgetConverterTest \
+	GadgetConverterTest \
 #	GeomConverterTest \
 #	JsonConverterTest \
 	ListConverterTest \

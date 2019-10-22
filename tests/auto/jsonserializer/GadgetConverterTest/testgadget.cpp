@@ -10,5 +10,6 @@ bool TestGadget::operator==(const TestGadget &other) const
 {
 	// exclude unstored properties
 	return key == other.key &&
-			qFuzzyCompare(value, other.value);
+		   qFuzzyCompare(value, other.value) &&
+		   zhidden == other.zhidden;
 }

@@ -21,107 +21,111 @@ bool QJsonGadgetConverter::canConvert(int metaTypeId) const
 			flags.testFlag(QMetaType::PointerToGadget);
 }
 
-QList<QJsonValue::Type> QJsonGadgetConverter::jsonTypes() const
+QList<QCborValue::Type> QJsonGadgetConverter::allowedCborTypes(int metaTypeId, QCborTag tag) const
 {
-	return {QJsonValue::Object, QJsonValue::Null};
+	Q_UNUSED(tag)
+	if (QMetaType::typeFlags(metaTypeId).testFlag(QMetaType::PointerToGadget))
+		return {QCborValue::Map, QCborValue::Null};
+	else
+		return {QCborValue::Map};
 }
 
-QJsonValue QJsonGadgetConverter::serialize(int propertyType, const QVariant &value, const QJsonTypeConverter::SerializationHelper *helper) const
+QCborValue QJsonGadgetConverter::serialize(int propertyType, const QVariant &value) const
 {
 	const auto metaObject = QMetaType::metaObjectForType(propertyType);
-	if(!metaObject)
+	if (!metaObject)
 		throw QJsonSerializationException(QByteArray("Unable to get metaobject for type ") + QMetaType::typeName(propertyType));
 	const auto isPtr = QMetaType::typeFlags(propertyType).testFlag(QMetaType::PointerToGadget);
 
 	auto gValue = value;
-	if(!gValue.convert(propertyType))
+	if (!gValue.convert(propertyType))
 		throw QJsonSerializationException(QByteArray("Data is not of the required gadget type ") + QMetaType::typeName(propertyType));
 	const void *gadget = nullptr;
-	if(isPtr) {
+	if (isPtr) {
 		// with pointers, null gadgets are allowed
 		gadget = *reinterpret_cast<const void* const *>(gValue.constData());
-		if(!gadget)
-			return QJsonValue::Null;
+		if (!gadget)
+			return QCborValue::Null;
 	} else
 		gadget = gValue.constData();
-	if(!gadget)
+	if (!gadget)
 		throw QJsonSerializationException(QByteArray("Unable to get address of gadget ") + QMetaType::typeName(propertyType));
 
-	QJsonObject jsonObject;
+	QCborMap cborMap;
 	//go through all properties and try to serialize them
-	const auto ignoreStoredAttribute = helper->getProperty("ignoreStoredAttribute").toBool();
-	for(auto i = 0; i < metaObject->propertyCount(); i++) {
+	const auto ignoreStoredAttribute = helper()->getProperty("ignoreStoredAttribute").toBool();
+	for (auto i = 0; i < metaObject->propertyCount(); i++) {
 		auto property = metaObject->property(i);
-		if(ignoreStoredAttribute || property.isStored())
-			jsonObject[QString::fromUtf8(property.name())] = helper->serializeSubtype(property, property.readOnGadget(gadget));
+		if (ignoreStoredAttribute || property.isStored())
+			cborMap[QString::fromUtf8(property.name())] = helper()->serializeSubtype(property, property.readOnGadget(gadget));
 	}
 
-	return jsonObject;
+	return cborMap;
 }
 
-QVariant QJsonGadgetConverter::deserialize(int propertyType, const QJsonValue &value, QObject *parent, const QJsonTypeConverter::SerializationHelper *helper) const
+QVariant QJsonGadgetConverter::deserializeCbor(int propertyType, const QCborValue &value, QObject *parent) const
 {
-	Q_UNUSED(parent)//gadgets neither have nor serve as parent
+	Q_UNUSED(parent)  // gadgets neither have nor serve as parent
 	const auto isPtr = QMetaType::typeFlags(propertyType).testFlag(QMetaType::PointerToGadget);
 
 	auto metaObject = QMetaType::metaObjectForType(propertyType);
-	if(!metaObject)
+	if (!metaObject)
 		throw QJsonDeserializationException(QByteArray("Unable to get metaobject for gadget type") + QMetaType::typeName(propertyType));
 
 	QVariant gadget;
 	void *gadgetPtr = nullptr;
-	if(isPtr) {
-		if(value.isNull())
-			return QVariant{propertyType, nullptr}; //initialize an empty (nullptr) variant
+	if (isPtr) {
+		if (value.isNull())
+			return QVariant{propertyType, nullptr};  // initialize an empty (nullptr) variant
 		const auto gadgetType = QMetaType::type(metaObject->className());
-		if(gadgetType == QMetaType::UnknownType)
+		if (gadgetType == QMetaType::UnknownType)
 			throw QJsonDeserializationException(QByteArray("Unable to get type of gadget from gadget-pointer type") + QMetaType::typeName(propertyType));
 		gadgetPtr = QMetaType::create(gadgetType);
 		gadget = QVariant{propertyType, &gadgetPtr};
 	} else {
-		if(value.isNull())
-			return QVariant{}; //will trigger a fail next stage as nullptr is not convertible to a gadget
+		if (value.isNull())
+			return QVariant{};  // return to allow default null for gadgets. If not allowed, this will fail, as a null variant cannot be converted to a gadget
 		gadget = QVariant{propertyType, nullptr};
 		gadgetPtr = gadget.data();
 	}
 
-	if(!gadgetPtr) {
+	if (!gadgetPtr) {
 		throw QJsonDeserializationException(QByteArray("Failed to construct gadget of type ") +
 											QMetaType::typeName(propertyType) +
-											QByteArray(". Does is have a default constructor?"));
+											QByteArray(". Does it have a default constructor?"));
 	}
 
-	auto jsonObject = value.toObject();
-	auto validationFlags = helper->getProperty("validationFlags").value<QJsonSerializerBase::ValidationFlags>();
+	const auto validationFlags = helper()->getProperty("validationFlags").value<QJsonSerializerBase::ValidationFlags>();
+	const auto ignoreStoredAttribute = helper()->getProperty("ignoreStoredAttribute").toBool();
 
-	//collect required properties, if set
+	// collect required properties, if set
 	QSet<QByteArray> reqProps;
-	const auto ignoreStoredAttribute = helper->getProperty("ignoreStoredAttribute").toBool();
-	if(validationFlags.testFlag(QJsonSerializerBase::AllProperties)) {
-		for(auto i = 0; i < metaObject->propertyCount(); i++) {
+	if (validationFlags.testFlag(QJsonSerializerBase::ValidationFlag::AllProperties)) {
+		for (auto i = 0; i < metaObject->propertyCount(); i++) {
 			auto property = metaObject->property(i);
-			if(ignoreStoredAttribute || property.isStored())
+			if (ignoreStoredAttribute || property.isStored())
 				reqProps.insert(property.name());
 		}
 	}
 
-	//now deserialize all json properties
-	for(auto it = jsonObject.constBegin(); it != jsonObject.constEnd(); it++) {
-		auto propIndex = metaObject->indexOfProperty(qUtf8Printable(it.key()));
-		if(propIndex != -1) {
-			auto property = metaObject->property(propIndex);
-			auto subValue = helper->deserializeSubtype(property, it.value(), nullptr);
-			property.writeOnGadget(gadgetPtr, subValue);
+	// now deserialize all json properties
+	const auto cborMap = value.toMap();
+	for (auto it = cborMap.constBegin(); it != cborMap.constEnd(); it++) {
+		const auto key = it.key().toString().toUtf8();
+		const auto propIndex = metaObject->indexOfProperty(key);
+		if (propIndex != -1) {
+			const auto property = metaObject->property(propIndex);
+			property.writeOnGadget(gadgetPtr, helper()->deserializeSubtype(property, it.value(), nullptr));
 			reqProps.remove(property.name());
-		} else if(validationFlags.testFlag(QJsonSerializerBase::NoExtraProperties)) {
+		} else if (validationFlags.testFlag(QJsonSerializerBase::ValidationFlag::NoExtraProperties)) {
 			throw QJsonDeserializationException("Found extra property " +
-												it.key().toUtf8() +
+												key +
 												" but extra properties are not allowed");
 		}
 	}
 
-	//make shure all required properties have been read
-	if(validationFlags.testFlag(QJsonSerializerBase::AllProperties) && !reqProps.isEmpty()) {
+	// make sure all required properties have been read
+	if (validationFlags.testFlag(QJsonSerializerBase::ValidationFlag::AllProperties) && !reqProps.isEmpty()) {
 		throw QJsonDeserializationException(QByteArray("Not all properties for ") +
 											metaObject->className() +
 											QByteArray(" are present in the json object. Missing properties: ") +
