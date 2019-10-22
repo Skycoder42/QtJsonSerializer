@@ -3,6 +3,8 @@
 #include "qcborserializer.h"
 #include "qjsonserializerbase_p.h"
 
+#include <array>
+
 #include <QtCore/QPointer>
 #include <QtCore/QSharedPointer>
 #include <QtCore/QRegularExpression>

@@ -16,7 +16,11 @@ class Q_JSONSERIALIZER_EXPORT QJsonTypeConverter
 {
 	Q_DISABLE_COPY(QJsonTypeConverter)
 public:
-	static Q_CONSTEXPR QCborTag NoTag = static_cast<QCborTag>(-1);
+#if defined(__MINGW64__) || defined(__MINGW32__)
+	static const QCborTag NoTag;
+#else
+	static constexpr QCborTag NoTag = static_cast<QCborTag>(-1);
+#endif
 
 	//! Sample values for a priority value (default converters are mostly Standard and are guaranteed to be between Low and High)
 	enum Priority : int {
