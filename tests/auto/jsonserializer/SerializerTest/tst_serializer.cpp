@@ -94,6 +94,7 @@ void SerializerTest::initTestCase()
 	QJsonSerializer_registerVariantConverters_named(bool, int, double);
 
 	//register list comparators, needed for test only!
+	QMetaType::registerEqualsComparator<QList<bool>>();
 	QMetaType::registerEqualsComparator<QList<int>>();
 	QMetaType::registerEqualsComparator<QList<TestObject*>>();
 	QMetaType::registerEqualsComparator<QList<QList<int>>>();
@@ -158,7 +159,7 @@ void SerializerTest::testVariantConversions_data()
 	QList<int> l3 = {6, 7, 8};
 	QTest::newRow("QList<QList<int>>") << QVariant::fromValue<QList<QList<int>>>({l1, l2, l3})
 									   << static_cast<int>(QMetaType::QVariantList)
-									   << QVariant{}
+									   << QVariant{QVariantList{QVariant::fromValue(l1), QVariant::fromValue(l2), QVariant::fromValue(l3)}}
 									   << true;
 	QTest::newRow("QStringList") << QVariant::fromValue<QStringList>({QStringLiteral("a"), QStringLiteral("b"), QStringLiteral("c")})
 								 << static_cast<int>(QMetaType::QVariantList)
@@ -198,7 +199,11 @@ void SerializerTest::testVariantConversions_data()
 																													 {QStringLiteral("m3"), m3}
 																												 })
 													   << static_cast<int>(QMetaType::QVariantMap)
-													   << QVariant{}
+													   << QVariant{QVariantMap{
+															  {QStringLiteral("m1"), QVariant::fromValue(m1)},
+															  {QStringLiteral("m2"), QVariant::fromValue(m2)},
+															  {QStringLiteral("m3"), QVariant::fromValue(m3)}
+														  }}
 													   << false;
 
 	QSharedPointer<TestObject> sPtr(new TestObject{});
@@ -219,13 +224,19 @@ void SerializerTest::testVariantConversions_data()
 
 	QTest::newRow("QPair<QList<bool>, bool>") << QVariant::fromValue<QPair<QList<bool>, bool>>({{true, false, true}, false})
 											  << qMetaTypeId<QPair<QVariant, QVariant>>()
-											  << QVariant{}
+											  << QVariant::fromValue(QPair<QVariant, QVariant>{
+													 QVariant::fromValue(QList<bool>{true, false, true}),
+													 false
+												 })
 											  << false;
 
 	QTest::newRow("QList<QPair<bool, bool>>") << QVariant::fromValue<QList<QPair<bool, bool>>>({{false, true}, {true, false}})
 											  << static_cast<int>(QMetaType::QVariantList)
-											  << QVariant{}
-											  << false;
+											  << QVariant{QVariantList{
+													 QVariant::fromValue(QPair<bool, bool>{false, true}),
+													 QVariant::fromValue(QPair<bool, bool>{true, false})
+												 }}
+											  << true;
 
 	QTest::newRow("std::tuple<int, QString, QList<int>>") << QVariant::fromValue<TestTuple>(std::make_tuple(42, QStringLiteral("Hello World"), QList<int>{1, 2, 3}))
 														  << static_cast<int>(QMetaType::QVariantList)
@@ -276,14 +287,17 @@ void SerializerTest::testVariantConversions()
 	if (iterable) {
 		QVERIFY(convData.canConvert(targetType));
 		if (targetType == QMetaType::QVariantList) {
+			const auto variantList = variantData.toList();
 			auto seqIt = convData.value<QSequentialIterable>();
-			QVERIFY(seqIt.begin() != seqIt.end());
+			QCOMPARE(seqIt.size(), variantList.size());
+			auto i = 0;
+			for (const auto &itData : seqIt)
+				QCOMPARE(itData, variantList[i++]);
 		}
 		convData = variantData;
 	} else {
 		QVERIFY(convData.convert(targetType));
-		if (variantData.isValid())
-			QCOMPARE(convData, variantData);
+		QCOMPARE(convData, variantData);
 	}
 	QVERIFY(convData.convert(origType));
 	QCOMPARE(convData, data);

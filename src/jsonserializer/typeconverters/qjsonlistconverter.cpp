@@ -8,6 +8,7 @@ const QRegularExpression QJsonListConverter::listTypeRegex(QStringLiteral(R"__(^
 
 bool QJsonListConverter::canConvert(int metaTypeId) const
 {
+	// NOTE with writeable iterators, only the `value.canConvert(QMetaType::QVariantList)` would be needed
 	return metaTypeId == QMetaType::QVariantList ||
 			metaTypeId == QMetaType::QStringList ||
 			metaTypeId == QMetaType::QByteArrayList ||
@@ -59,7 +60,16 @@ QVariant QJsonListConverter::deserializeCbor(int propertyType, const QCborValue 
 	auto index = 0;
 	for (auto element : (value.isTag() ? value.taggedValue() : value).toArray())
 		list.append(helper()->deserializeSubtype(metaType, element, parent, "[" + QByteArray::number(index++) + "]"));
-	return list;
+
+	// special handling for QByteArrayList
+	if (propertyType == QMetaType::QByteArrayList) {
+		QByteArrayList bal;
+		bal.reserve(list.size());
+		for (const auto &var : list)
+			bal.append(var.toByteArray());
+		return QVariant::fromValue(bal);
+	} else
+		return list;
 }
 
 int QJsonListConverter::getSubtype(int listType, bool &isSet) const
