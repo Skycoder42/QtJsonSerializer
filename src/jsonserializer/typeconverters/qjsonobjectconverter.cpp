@@ -35,6 +35,8 @@ QList<QCborValue::Type> QJsonObjectConverter::allowedCborTypes(int metaTypeId, Q
 	switch (static_cast<quint64>(tag)) {
 	case QCborSerializer::GenericObject:
 		return {QCborValue::Array};
+	case QCborSerializer::ConstructedObject:
+		return {QCborValue::Array, QCborValue::Null};
 	default:
 		return {QCborValue::Map, QCborValue::Null};
 	}
@@ -263,12 +265,12 @@ QObject *QJsonObjectConverter::deserializeGenericObject(const QCborArray &value,
 	// deserialize all arguments
 	QVariantList arguments;
 	arguments.reserve(static_cast<int>(value.size() - 1));
-	for (auto i = 1ll; i < value.size(); ++i)
-		arguments.append(helper()->deserializeSubtype(QMetaType::UnknownType, value[i], nullptr, className + "[" + QByteArray::number(i - 1) + "]"));
+	for (auto aIdx = 1ll; aIdx < value.size(); ++aIdx)
+		arguments.append(helper()->deserializeSubtype(QMetaType::UnknownType, value[aIdx], nullptr, className + "[" + QByteArray::number(aIdx - 1) + "]"));
 
 	// find a matching constructor
-	for (auto i = 0; i < metaObject->constructorCount(); ++i) {
-		const auto constructor = metaObject->constructor(i);
+	for (auto cIdx = 0; cIdx < metaObject->constructorCount(); ++cIdx) {
+		const auto constructor = metaObject->constructor(cIdx);
 		// verify same argument count (but allow extra QObject argument for parenting)
 		auto extraObj = false;
 		if (constructor.parameterCount() != arguments.size()) {
@@ -282,9 +284,9 @@ QObject *QJsonObjectConverter::deserializeGenericObject(const QCborArray &value,
 		// verify each argument can be converted (by converting it)
 		auto argCopy = arguments;
 		auto allOk = true;
-		for (auto j = 0; j < argCopy.size(); ++j) {
-			const auto pType = constructor.parameterType(j);
-			if (!argCopy[i].canConvert(pType) || !argCopy[i].convert(pType)) {
+		for (auto pIdx = 0; pIdx < argCopy.size(); ++pIdx) {
+			const auto pType = constructor.parameterType(pIdx);
+			if (!argCopy[pIdx].canConvert(pType) || !argCopy[pIdx].convert(pType)) {
 				allOk = false;
 				break;
 			}
@@ -294,15 +296,12 @@ QObject *QJsonObjectConverter::deserializeGenericObject(const QCborArray &value,
 		if (allOk) {
 			if (extraObj)
 				argCopy.append(QVariant::fromValue(parent));
-			if (argCopy.size() > 10) {
-				throw QJsonDeserializationException{"Can only create objects from at most 10 constructor arguments, but " +
-													QByteArray::number(argCopy.size()) +
-													" where given"};
-			}
+			Q_ASSERT(argCopy.size() <= 10);
 
 			std::array<QGenericArgument, 10> gArgs;
-			for (auto j = 0; j < argCopy.size(); ++j)
-				gArgs[static_cast<size_t>(j)] = {argCopy[j].typeName(), argCopy[i].constData()};
+			gArgs.fill(QGenericArgument{});
+			for (auto pIdx = 0; pIdx < argCopy.size(); ++pIdx)
+				gArgs[static_cast<size_t>(pIdx)] = {argCopy[pIdx].typeName(), argCopy[pIdx].constData()};
 			auto object = metaObject->newInstance(gArgs[0], gArgs[1], gArgs[2], gArgs[3], gArgs[4],
 												  gArgs[5], gArgs[6], gArgs[7], gArgs[8], gArgs[9]);
 			if (!object) {

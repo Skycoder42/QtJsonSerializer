@@ -14,11 +14,11 @@ class TestObject : public QObject
 
 public:
 	Q_INVOKABLE explicit TestObject(QObject *parent = nullptr);
-	explicit TestObject(int key, double value, int zhidden, QObject *parent = nullptr);
+	Q_INVOKABLE explicit TestObject(int key, double value, int zhidden = 11, QObject *parent = nullptr);
 
 	int key = 0;
 	double value = 0;
-	int zhidden = 0;
+	int zhidden = 11;
 
 	virtual bool compare(const TestObject *other) const;
 };

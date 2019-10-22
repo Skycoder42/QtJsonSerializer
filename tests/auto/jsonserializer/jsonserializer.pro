@@ -6,6 +6,7 @@ SUBDIRS += \
 
 CONVERTER_TESTS = \
 #	BytearrayConverterTest \
+	ChronoDurationConverterTest \
 	EnumConverterTest \
 #	GadgetConverterTest \
 #	GeomConverterTest \
@@ -13,13 +14,12 @@ CONVERTER_TESTS = \
 	ListConverterTest \
 #	LocaleConverterTest \
 #	MapConverterTest \
-#	ObjectConverterTest \
+	ObjectConverterTest \
 #	PairConverterTest \
 #	RegexConverterTest \
 #	TupleConverterTest \
 #	VersionConverterTest \
 #	MultiMapConverterTest \
-	ChronoDurationConverterTest \
 #	OptionalConverterTest \
 #	VariantConverterTest
 

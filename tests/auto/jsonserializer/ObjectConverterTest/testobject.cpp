@@ -15,9 +15,9 @@ TestObject::TestObject(int key, double value, int zhidden, QObject *parent) :
 
 bool TestObject::compare(const TestObject *other) const
 {
-	// exclude unstored properties
 	return key == other->key &&
-			qFuzzyCompare(value, other->value);
+		   qFuzzyCompare(value, other->value) &&
+		   zhidden == other->zhidden;
 }
 
 StaticPolyObject::StaticPolyObject(QObject *parent) :
