@@ -4,6 +4,10 @@
 #include <QtCore/QCborStreamReader>
 #include <QtCore/QCborStreamWriter>
 
+#if !defined(__MINGW64__) && !defined(__MINGW32__)
+static_assert(QJsonTypeConverter::NoTag == static_cast<QCborTag>(QCborSerializer::NoTag));
+#endif
+
 QCborSerializer::QCborSerializer(QObject *parent) :
 	QJsonSerializerBase{*new QCborSerializerPrivate{}, parent}
 {

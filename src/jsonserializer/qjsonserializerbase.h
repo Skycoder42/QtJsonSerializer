@@ -7,7 +7,6 @@
 #include "QtJsonSerializer/qjsonserializer_helpertypes.h"
 #include "QtJsonSerializer/qcontainerwriters.h"
 
-#include <type_traits>
 #include <tuple>
 #include <optional>
 #include <variant>

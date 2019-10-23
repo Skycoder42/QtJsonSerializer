@@ -574,7 +574,7 @@ QVariant QJsonSerializerBasePrivate::deserializeCborValue(int propertyType, cons
 		if (doThrow) {
 			throw QJsonDeserializationException(QByteArray("Failed to deserialze CBOR-value to type ") +
 												QMetaType::typeName(propertyType) +
-												QByteArray("because the given CBOR-value failed strict validation"));
+												QByteArray(" because the given CBOR-value failed strict validation"));
 		}
 	}
 

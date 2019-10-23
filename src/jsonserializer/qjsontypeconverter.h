@@ -3,6 +3,9 @@
 
 #include "QtJsonSerializer/qtjsonserializer_global.h"
 
+#include <type_traits>
+#include <limits>
+
 #include <QtCore/qmetatype.h>
 #include <QtCore/qmetaobject.h>
 #include <QtCore/qjsonvalue.h>
@@ -16,7 +19,11 @@ class Q_JSONSERIALIZER_EXPORT QJsonTypeConverter
 {
 	Q_DISABLE_COPY(QJsonTypeConverter)
 public:
-	static inline constexpr QCborTag NoTag = static_cast<QCborTag>(-1);
+#if defined(__MINGW64__) || defined(__MINGW32__)
+	static const QCborTag NoTag;
+#else
+	static constexpr auto NoTag = static_cast<QCborTag>(std::numeric_limits<std::underlying_type_t<QCborTag>>::max());
+#endif
 
 	//! Sample values for a priority value (default converters are mostly Standard and are guaranteed to be between Low and High)
 	enum Priority : int {

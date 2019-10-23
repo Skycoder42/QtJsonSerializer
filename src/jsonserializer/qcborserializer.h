@@ -10,7 +10,7 @@ class Q_JSONSERIALIZER_EXPORT QCborSerializer : public QJsonSerializerBase
 	Q_OBJECT
 
 public:
-	enum QCborExtendedTags : quint64 {
+	enum QCborExtendedTags : std::underlying_type_t<QCborTag> {
 		GenericObject = 27,
 		RationaleNumber = 30,
 		Identifier = 39,
@@ -23,7 +23,7 @@ public:
 	};
 	Q_ENUM(QCborExtendedTags)
 
-	enum QCborCustomTags : quint64 {
+	enum QCborCustomTags : std::underlying_type_t<QCborTag> {
 		Color = 10000,
 		Font = 10001,
 		Enum = 10002,
@@ -37,15 +37,15 @@ public:
 		ChronoMinutes = 10104,
 		ChronoHours = 10105,
 
-		NoTag = static_cast<quint64>(QJsonTypeConverter::NoTag)
+		NoTag = std::numeric_limits<std::underlying_type_t<QCborTag>>::max()
 	};
 	Q_ENUM(QCborCustomTags)
 
 	explicit QCborSerializer(QObject *parent = nullptr);
 
-	void setTypeTag(int metaTypeId, QCborTag tag = static_cast<QCborTag>(NoTag));
+	void setTypeTag(int metaTypeId, QCborTag tag = static_cast<QCborTag>(QCborCustomTags::NoTag));
 	template <typename T>
-	void setTypeTag(QCborTag tag = static_cast<QCborTag>(NoTag));
+	void setTypeTag(QCborTag tag = static_cast<QCborTag>(QCborCustomTags::NoTag));
 	QCborTag typeTag(int metaTypeId) const override;
 	template <typename T>
 	QCborTag typeTag() const;

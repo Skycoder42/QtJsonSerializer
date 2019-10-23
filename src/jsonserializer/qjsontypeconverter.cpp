@@ -1,6 +1,10 @@
 #include "qjsontypeconverter.h"
 #include "qjsonserializerbase_p.h"
 
+#if defined(__MINGW64__) || defined(__MINGW32__)
+const QCborTag QJsonTypeConverter::NoTag = static_cast<QCborTag>(std::numeric_limits<std::underlying_type_t<QCborTag>>::max());
+#endif
+
 class QJsonTypeConverterPrivate
 {
 public:

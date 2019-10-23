@@ -85,7 +85,7 @@ void ChronoDurationConverterTest::addMetaData()
 									   << true
 									   << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("nano.untagged") << qMetaTypeId<nanoseconds>()
-								   << static_cast<QCborTag>(QJsonTypeConverter::NoTag)
+								   << QJsonTypeConverter::NoTag
 								   << QCborValue::Double
 								   << true
 								   << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
@@ -126,7 +126,7 @@ void ChronoDurationConverterTest::addMetaData()
 										<< true
 										<< QJsonTypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("micro.untagged") << qMetaTypeId<microseconds>()
-									<< static_cast<QCborTag>(QJsonTypeConverter::NoTag)
+									<< QJsonTypeConverter::NoTag
 									<< QCborValue::Double
 									<< true
 									<< QJsonTypeConverter::DeserializationCapabilityResult::Positive;
@@ -167,7 +167,7 @@ void ChronoDurationConverterTest::addMetaData()
 										<< true
 										<< QJsonTypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("milli.untagged") << qMetaTypeId<milliseconds>()
-									<< static_cast<QCborTag>(QJsonTypeConverter::NoTag)
+									<< QJsonTypeConverter::NoTag
 									<< QCborValue::Double
 									<< true
 									<< QJsonTypeConverter::DeserializationCapabilityResult::Positive;
@@ -208,7 +208,7 @@ void ChronoDurationConverterTest::addMetaData()
 									   << true
 									   << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("secs.untagged") << qMetaTypeId<seconds>()
-								   << static_cast<QCborTag>(QJsonTypeConverter::NoTag)
+								   << QJsonTypeConverter::NoTag
 								   << QCborValue::Double
 								   << true
 								   << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
@@ -249,7 +249,7 @@ void ChronoDurationConverterTest::addMetaData()
 									   << true
 									   << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("mins.untagged") << qMetaTypeId<minutes>()
-								   << static_cast<QCborTag>(QJsonTypeConverter::NoTag)
+								   << QJsonTypeConverter::NoTag
 								   << QCborValue::Double
 								   << true
 								   << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
@@ -290,7 +290,7 @@ void ChronoDurationConverterTest::addMetaData()
 										<< true
 										<< QJsonTypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("hours.untagged") << qMetaTypeId<hours>()
-									<< static_cast<QCborTag>(QJsonTypeConverter::NoTag)
+									<< QJsonTypeConverter::NoTag
 									<< QCborValue::Double
 									<< true
 									<< QJsonTypeConverter::DeserializationCapabilityResult::Positive;
