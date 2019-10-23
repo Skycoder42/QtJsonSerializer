@@ -84,10 +84,6 @@ public:
 	template<typename T>
 	static void registerInverseTypedef(const char *typeName);
 
-	//! Registers map converters for the given container type from and to QVariantMap
-	template <template<typename, typename> class TContainer, typename TClass, typename TInsertRet = typename TContainer<QString, TClass>::iterator>
-	static bool registerMapContainerConverters(TInsertRet (TContainer<QString, TClass>::*insertMethod)(const QString &, const TClass &) = &TContainer<QString, TClass>::insert,
-											   bool asMultiMap = false);
 	//! Registers a custom type for list converisons
 	template<typename T>
 	static inline bool registerListConverters();
@@ -95,7 +91,7 @@ public:
 	template<typename T>
 	static inline bool registerSetConverters();
 	//! Registers a custom type for map converisons
-	template<typename T, bool mapTypes = true, bool hashTypes = true>
+	template<typename TKey, typename TValue, bool mapTypes = true, bool hashTypes = true>
 	static inline bool registerMapConverters();
 	//! Registers a custom type for QSharedPointer and QPointer converisons
 	template<typename T>
@@ -246,37 +242,6 @@ void QJsonSerializerBase::registerInverseTypedef(const char *typeName)
 	registerInverseTypedefImpl(qMetaTypeId<T>(), QMetaObject::normalizedType(typeName));
 }
 
-template<template <typename, typename> class TContainer, typename TClass, typename TInsertRet>
-bool QJsonSerializerBase::registerMapContainerConverters(TInsertRet (TContainer<QString, TClass>::*insertMethod)(const QString &, const TClass &), bool asMultiMap)
-{
-	return QMetaType::registerConverter<TContainer<QString, TClass>, QVariantMap>([asMultiMap](const TContainer<QString, TClass> &map) -> QVariantMap {
-		QVariantMap m;
-		for(auto it = map.constBegin(); it != map.constEnd(); ++it) {
-			if(asMultiMap)
-				m.insertMulti(it.key(), QVariant::fromValue(it.value()));
-			else
-				m.insert(it.key(), QVariant::fromValue(it.value()));
-		}
-		return m;
-	}) & QMetaType::registerConverter<QVariantMap, TContainer<QString, TClass>>([insertMethod](const QVariantMap &map) -> TContainer<QString, TClass> {
-		TContainer<QString, TClass> m;
-		for(auto it = map.constBegin(); it != map.constEnd(); ++it) {
-			auto v = it.value();
-			const auto vt = v.type();
-			if(v.convert(qMetaTypeId<TClass>()))
-				(m.*insertMethod)(it.key(), v.value<TClass>());
-			else {
-				qWarning() << "Conversion to"
-						   << QMetaType::typeName(qMetaTypeId<TContainer<QString, TClass>>())
-						   << "failed, could not convert element value of type"
-						   << QMetaType::typeName(vt);
-				(m.*insertMethod)(it.key(), TClass());
-			}
-		}
-		return m;
-	});
-}
-
 template<typename T>
 bool QJsonSerializerBase::registerListConverters()
 {
@@ -295,15 +260,18 @@ bool QJsonSerializerBase::registerSetConverters()
 	return true;
 }
 
-template<typename T, bool mapTypes, bool hashTypes>
+template<typename TKey, typename TValue, bool mapTypes, bool hashTypes>
 bool QJsonSerializerBase::registerMapConverters()
 {
-	auto ok = true;
-	if constexpr (mapTypes)
-		ok &= registerMapContainerConverters<QMap, T>() & registerMapContainerConverters<QMultiMap, T>(&QMultiMap<QString, T>::insert, true);
-	if constexpr (hashTypes)
-		ok &= registerMapContainerConverters<QHash, T>() & registerMapContainerConverters<QMultiHash, T>(&QMultiHash<QString, T>::insert, true);
-	return ok;
+	if constexpr (mapTypes) {
+		QAssociativeWriter::registerWriter<QMap, TKey, TValue>();
+		QAssociativeWriter::registerWriter<QMultiMap, TKey, TValue>();
+	}
+	if constexpr (hashTypes) {
+		QAssociativeWriter::registerWriter<QHash, TKey, TValue>();
+		QAssociativeWriter::registerWriter<QMultiHash, TKey, TValue>();
+	}
+	return true;
 }
 
 template<typename T>
@@ -317,7 +285,7 @@ bool QJsonSerializerBase::registerBasicConverters()
 	} else {
 		return registerListConverters<T>() &
 				registerSetConverters<T>() &
-				registerMapConverters<T>();
+				registerMapConverters<QString, T>();
 	}
 }
 

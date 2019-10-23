@@ -4,7 +4,7 @@
 
 #include <QtCore/QJsonObject>
 
-const QRegularExpression QJsonMapConverter::mapTypeRegex(QStringLiteral(R"__(^(?:QMap|QHash)<\s*QString\s*,\s*(.*?)\s*>$)__"));
+const QRegularExpression QJsonMapConverter::mapTypeRegex(QStringLiteral(R"__(^(?:QMap|QHash)<(.*?)>$)__"));
 
 bool QJsonMapConverter::canConvert(int metaTypeId) const
 {
@@ -28,41 +28,73 @@ QList<QCborValue::Type> QJsonMapConverter::allowedCborTypes(int metaTypeId, QCbo
 
 QCborValue QJsonMapConverter::serialize(int propertyType, const QVariant &value) const
 {
-	const auto metaType = getSubtype(propertyType);
+	const auto [keyType, valueType] = getSubtype(propertyType);
 
-	auto cValue = value;
-	if (!cValue.convert(QVariant::Map)) {
-		throw QJsonSerializationException(QByteArray("Failed to convert type ") +
+	if (!value.canConvert(QMetaType::QVariantMap) &&
+		!value.canConvert(QMetaType::QVariantHash)) {
+		throw QJsonSerializationException(QByteArray("Given type ") +
 										  QMetaType::typeName(propertyType) +
-										  QByteArray(" to a variant map. Make shure to register map types via QJsonSerializer::registerMapConverters"));
+										  QByteArray(" cannot be processed via QAssociativeIterable - make shure to register the container type via Q_DECLARE_ASSOCIATIVE_CONTAINER_METATYPE"));
 	}
 
-	const auto map = cValue.toMap();
+	const auto iterable = value.value<QAssociativeIterable>();
 	QCborMap cborMap;
-	for (auto it = map.constBegin(); it != map.constEnd(); ++it)
-		cborMap.insert(it.key(), helper()->serializeSubtype(metaType, it.value(), it.key().toUtf8()));
+	for (auto it = iterable.begin(), end = iterable.end(); it != end; ++it) {
+		const QByteArray keyStr = "[" + it.key().toString().toUtf8() + "]";
+		cborMap.insert(helper()->serializeSubtype(keyType, it.key(), keyStr + ".key"),
+					   helper()->serializeSubtype(valueType, it.value(), keyStr + ".value"));
+	}
 	return cborMap;
 }
 
 QVariant QJsonMapConverter::deserializeCbor(int propertyType, const QCborValue &value, QObject *parent) const
 {
-	const auto metaType = getSubtype(propertyType);
+	const auto [keyType, valueType] = getSubtype(propertyType);
 
 	//generate the map
-	QVariantMap map;
+	QVariant map{propertyType, nullptr};
+	auto writer = QAssociativeWriter::getWriter(map);
+	if (!writer.isValid()) {
+		throw QJsonSerializationException(QByteArray("Given type ") +
+										  QMetaType::typeName(propertyType) +
+										  QByteArray(" cannot be accessed via QAssociativeWriter - make shure to register it via QJsonSerializerBase::registerMapConverters"));
+	}
+
 	const auto cborMap = value.toMap();
-	for (auto it = cborMap.constBegin(); it != cborMap.constEnd(); ++it) {
-		const auto key = it.key().toString();
-		map.insert(key, helper()->deserializeSubtype(metaType, it.value(), parent, key.toUtf8()));
+	for (const auto entry : cborMap) {
+		const QByteArray keyStr = "[" + entry.first.toVariant().toString().toUtf8() + "]";
+		writer.add(helper()->deserializeSubtype(keyType, entry.first, parent, keyStr + ".key"),
+				   helper()->deserializeSubtype(valueType, entry.second, parent, keyStr + ".value"));
 	}
 	return map;
 }
 
-int QJsonMapConverter::getSubtype(int mapType) const
+std::pair<int, int> QJsonMapConverter::getSubtype(int mapType) const
 {
-	int metaType = QMetaType::UnknownType;
+	if (mapType == QMetaType::QVariantMap ||
+		mapType == QMetaType::QVariantHash)
+		return std::make_pair(QMetaType::QString, QMetaType::QVariant);
+
+	int keyType = QMetaType::UnknownType;
+	int valueType = QMetaType::UnknownType;
 	auto match = mapTypeRegex.match(QString::fromUtf8(helper()->getCanonicalTypeName(mapType)));
-	if (match.hasMatch())
-		metaType = QMetaType::type(match.captured(1).toUtf8().trimmed());
-	return metaType;
+	if (match.hasMatch()) {
+		// parse match, using <> and , rules
+		const auto matchStr = match.captured(1);
+		auto bCount = 0;
+		for (auto i = 0; i < matchStr.size(); ++i) {
+			const auto &c = matchStr[i];
+			if (c == QLatin1Char('<'))
+				++bCount;
+			else if (c == QLatin1Char('>'))
+				--bCount;
+			else if (bCount == 0 && c == QLatin1Char(',')) {
+				keyType = QMetaType::type(matchStr.mid(0, i).trimmed().toUtf8());
+				valueType = QMetaType::type(matchStr.mid(i + 1).trimmed().toUtf8());
+				break;
+			}
+		}
+	}
+
+	return std::make_pair(keyType, valueType);
 }

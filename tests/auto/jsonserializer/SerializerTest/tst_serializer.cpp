@@ -81,8 +81,8 @@ void SerializerTest::initTestCase()
 	QJsonSerializer::registerPointerConverters<TestObject>();
 	QJsonSerializer::registerListConverters<TestObject*>();
 	QJsonSerializer::registerListConverters<QList<int>>();
-	QJsonSerializer::registerMapConverters<TestObject*>();
-	QJsonSerializer::registerMapConverters<QMap<QString, int>>();
+	QJsonSerializer::registerMapConverters<QString, TestObject*>();
+	QJsonSerializer::registerMapConverters<QString, QMap<QString, int>>();
 	QJsonSerializer::registerPairConverters<int, QString>();
 	QJsonSerializer::registerPairConverters<bool, bool>();
 	QJsonSerializer::registerPairConverters<QList<bool>, bool>();

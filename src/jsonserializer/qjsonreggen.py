@@ -51,7 +51,10 @@ def create_hook(file_name, class_name, *modes):
 		file.write("\tbool ok;\n")
 		for mode_name in modes:
 			mode = Mode[mode_name.upper()]
-			file.write("\tok = QJsonSerializer::{}<{}>();\n".format(mode_fn(mode), class_name))
+			if mode == Mode.MAP:
+				file.write("\tok = QJsonSerializer::{}<QString, {}>();\n".format(mode_fn(mode), class_name))
+			else:
+				file.write("\tok = QJsonSerializer::{}<{}>();\n".format(mode_fn(mode), class_name))
 			file.write('\tQ_ASSERT_X(ok, Q_FUNC_INFO, "Failed to register {} converters for type " QT_JSON_SERIALIZER_NAMED({}));\n'.format(mode_name, class_name))
 		file.write("}\n\n")
 

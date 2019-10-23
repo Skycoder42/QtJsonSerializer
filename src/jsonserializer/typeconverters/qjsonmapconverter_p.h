@@ -18,7 +18,7 @@ public:
 private:
 	static const QRegularExpression mapTypeRegex;
 
-	int getSubtype(int mapType) const;
+	std::pair<int, int> getSubtype(int mapType) const;
 };
 
 #endif // QJSONMAPCONVERTER_P_H

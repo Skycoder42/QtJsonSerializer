@@ -30,6 +30,23 @@ private:
 	QSequentialWriter(QSharedPointer<QSequentialWriterPrivate> &&dd = {});
 };
 
+class QAssociativeWriterPrivate;
+class Q_JSONSERIALIZER_EXPORT QAssociativeWriter
+{
+public:
+	template <template<typename, typename> class TContainer, typename TKey, typename TValue>
+	static void registerWriter();
+	static QAssociativeWriter getWriter(QVariant &data);
+
+	bool isValid() const;
+	void add(const QVariant &key, const QVariant &value);
+
+private:
+	QSharedPointer<QAssociativeWriterPrivate> d;
+
+	QAssociativeWriter(QSharedPointer<QAssociativeWriterPrivate> &&dd = {});
+};
+
 // private stuff
 
 class Q_JSONSERIALIZER_EXPORT QSequentialWriterPrivate
@@ -70,8 +87,8 @@ public:
 	static QReadWriteLock lock;
 	static QHash<int, QSequentialWriterPrivateFactory*> factories;
 
-	QSequentialWriterPrivateFactory() = default;
-	virtual ~QSequentialWriterPrivateFactory() = default;
+	QSequentialWriterPrivateFactory();
+	virtual ~QSequentialWriterPrivateFactory();
 	virtual QSharedPointer<QSequentialWriterPrivate> create(void *data) const = 0;
 };
 
@@ -84,15 +101,56 @@ public:
 	}
 };
 
-template<template<typename> class TContainer, typename TClass>
-void QSequentialWriter::registerWriter()
+class Q_JSONSERIALIZER_EXPORT QAssociativeWriterPrivate
 {
-	QWriteLocker _{&QSequentialWriterPrivateFactory::lock};
-	QSequentialWriterPrivateFactory::factories.insert(qMetaTypeId<TContainer<TClass>>(),
-													  new QSequentialWriterPrivateFactoryImpl<TContainer, TClass>{});
-}
+	Q_DISABLE_COPY(QAssociativeWriterPrivate)
 
-// specializations
+public:
+	QAssociativeWriterPrivate();
+	virtual ~QAssociativeWriterPrivate();
+	virtual void addImpl(const QVariant &key, const QVariant &value) = 0;
+};
+
+template <template<typename, typename> class TContainer, typename TKey, typename TValue>
+class QAssociativeWriterPrivateImpl : public QAssociativeWriterPrivate
+{
+public:
+	QAssociativeWriterPrivateImpl(TContainer<TKey, TValue> *data)
+		: _data{data}
+	{}
+
+	void addImpl(const QVariant &key, const QVariant &value) override {
+		_data->insert(key.template value<TKey>(),
+					  value.template value<TValue>());
+	}
+
+private:
+	TContainer<TKey, TValue> *_data;
+};
+
+class Q_JSONSERIALIZER_EXPORT QAssociativeWriterPrivateFactory
+{
+	Q_DISABLE_COPY(QAssociativeWriterPrivateFactory)
+
+public:
+	static QReadWriteLock lock;
+	static QHash<int, QAssociativeWriterPrivateFactory*> factories;
+
+	QAssociativeWriterPrivateFactory();
+	virtual ~QAssociativeWriterPrivateFactory();
+	virtual QSharedPointer<QAssociativeWriterPrivate> create(void *data) const = 0;
+};
+
+template <template<typename, typename> class TContainer, typename TKey, typename TValue>
+class QAssociativeWriterPrivateFactoryImpl : public QAssociativeWriterPrivateFactory
+{
+public:
+	QSharedPointer<QAssociativeWriterPrivate> create(void *data) const final {
+		return QSharedPointer<QAssociativeWriterPrivateImpl<TContainer, TKey, TValue>>::create(reinterpret_cast<TContainer<TKey, TValue>*>(data));
+	}
+};
+
+// specializations and implementations
 
 template <typename TClass>
 class QSequentialWriterPrivateImpl<QSet, TClass> : public QSequentialWriterPrivate
@@ -130,17 +188,20 @@ private:
 	QLinkedList<TClass> *_data;
 };
 
-template <>
-class QSequentialWriterPrivateImpl<QList, QVariant> : public QSequentialWriterPrivate
+template<template<typename> class TContainer, typename TClass>
+void QSequentialWriter::registerWriter()
 {
-public:
-	QSequentialWriterPrivateImpl(QVariantList *data);
+	QWriteLocker _{&QSequentialWriterPrivateFactory::lock};
+	QSequentialWriterPrivateFactory::factories.insert(qMetaTypeId<TContainer<TClass>>(),
+													  new QSequentialWriterPrivateFactoryImpl<TContainer, TClass>{});
+}
 
-	void reserveImpl(int size) override;
-	void addImpl(const QVariant &value) override;
-
-private:
-	QVariantList *_data;
-};
+template<template<typename, typename> class TContainer, typename TKey, typename TValue>
+void QAssociativeWriter::registerWriter()
+{
+	QWriteLocker _{&QAssociativeWriterPrivateFactory::lock};
+	QAssociativeWriterPrivateFactory::factories.insert(qMetaTypeId<TContainer<TKey, TValue>>(),
+													   new QAssociativeWriterPrivateFactoryImpl<TContainer, TKey, TValue>{});
+}
 
 #endif // QCONTAINERWRITERS_H
