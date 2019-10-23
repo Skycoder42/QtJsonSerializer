@@ -13,7 +13,7 @@ CONVERTER_TESTS = \
 #	JsonConverterTest \
 	ListConverterTest \
 #	LocaleConverterTest \
-#	MapConverterTest \
+	MapConverterTest \
 	ObjectConverterTest \
 #	PairConverterTest \
 #	RegexConverterTest \

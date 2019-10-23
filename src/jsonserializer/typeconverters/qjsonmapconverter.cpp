@@ -1,5 +1,6 @@
 #include "qjsonmapconverter_p.h"
 #include "qjsonserializerexception.h"
+#include "qcborserializer.h"
 
 #include <QtCore/QJsonObject>
 
@@ -8,50 +9,60 @@ const QRegularExpression QJsonMapConverter::mapTypeRegex(QStringLiteral(R"__(^(?
 bool QJsonMapConverter::canConvert(int metaTypeId) const
 {
 	return metaTypeId == QMetaType::QVariantMap ||
-			metaTypeId == QMetaType::QVariantHash ||
-			mapTypeRegex.match(QString::fromUtf8(getCanonicalTypeName(metaTypeId))).hasMatch();
+		   metaTypeId == QMetaType::QVariantHash ||
+		   mapTypeRegex.match(QString::fromUtf8(helper()->getCanonicalTypeName(metaTypeId))).hasMatch();
 }
 
-QList<QJsonValue::Type> QJsonMapConverter::jsonTypes() const
+QList<QCborTag> QJsonMapConverter::allowedCborTags(int metaTypeId) const
 {
-	return {QJsonValue::Object};
+	Q_UNUSED(metaTypeId)
+	return {NoTag, static_cast<QCborTag>(QCborSerializer::ExplicitMap)};
 }
 
-QJsonValue QJsonMapConverter::serialize(int propertyType, const QVariant &value, const QJsonTypeConverter::SerializationHelper *helper) const
+QList<QCborValue::Type> QJsonMapConverter::allowedCborTypes(int metaTypeId, QCborTag tag) const
 {
-	auto metaType = getSubtype(propertyType);
+	Q_UNUSED(metaTypeId)
+	Q_UNUSED(tag)
+	return {QCborValue::Map};
+}
+
+QCborValue QJsonMapConverter::serialize(int propertyType, const QVariant &value) const
+{
+	const auto metaType = getSubtype(propertyType);
 
 	auto cValue = value;
-	if(!cValue.convert(QVariant::Map)) {
+	if (!cValue.convert(QVariant::Map)) {
 		throw QJsonSerializationException(QByteArray("Failed to convert type ") +
 										  QMetaType::typeName(propertyType) +
 										  QByteArray(" to a variant map. Make shure to register map types via QJsonSerializer::registerMapConverters"));
 	}
-	auto map = cValue.toMap();
 
-	QJsonObject object;
-	for(auto it = map.constBegin(); it != map.constEnd(); ++it)
-		object.insert(it.key(), helper->serializeSubtype(metaType, it.value(), it.key().toUtf8()));
-	return object;
+	const auto map = cValue.toMap();
+	QCborMap cborMap;
+	for (auto it = map.constBegin(); it != map.constEnd(); ++it)
+		cborMap.insert(it.key(), helper()->serializeSubtype(metaType, it.value(), it.key().toUtf8()));
+	return cborMap;
 }
 
-QVariant QJsonMapConverter::deserialize(int propertyType, const QJsonValue &value, QObject *parent, const QJsonTypeConverter::SerializationHelper *helper) const
+QVariant QJsonMapConverter::deserializeCbor(int propertyType, const QCborValue &value, QObject *parent) const
 {
-	auto metaType = getSubtype(propertyType);
+	const auto metaType = getSubtype(propertyType);
 
 	//generate the map
 	QVariantMap map;
-	auto object = value.toObject();
-	for(auto it = object.constBegin(); it != object.constEnd(); ++it)
-		map.insert(it.key(), helper->deserializeSubtype(metaType, it.value(), parent, it.key().toUtf8()));
+	const auto cborMap = value.toMap();
+	for (auto it = cborMap.constBegin(); it != cborMap.constEnd(); ++it) {
+		const auto key = it.key().toString();
+		map.insert(key, helper()->deserializeSubtype(metaType, it.value(), parent, key.toUtf8()));
+	}
 	return map;
 }
 
 int QJsonMapConverter::getSubtype(int mapType) const
 {
 	int metaType = QMetaType::UnknownType;
-	auto match = mapTypeRegex.match(QString::fromUtf8(getCanonicalTypeName(mapType)));
-	if(match.hasMatch())
+	auto match = mapTypeRegex.match(QString::fromUtf8(helper()->getCanonicalTypeName(mapType)));
+	if (match.hasMatch())
 		metaType = QMetaType::type(match.captured(1).toUtf8().trimmed());
 	return metaType;
 }
