@@ -43,9 +43,9 @@ public:
 
 	explicit QCborSerializer(QObject *parent = nullptr);
 
-	void setTypeTag(int metaTypeId, QCborTag tag = static_cast<QCborTag>(QCborCustomTags::NoTag));
+	void setTypeTag(int metaTypeId, QCborTag tag = static_cast<QCborTag>(NoTag));
 	template <typename T>
-	void setTypeTag(QCborTag tag = static_cast<QCborTag>(QCborCustomTags::NoTag));
+	void setTypeTag(QCborTag tag = static_cast<QCborTag>(NoTag));
 	QCborTag typeTag(int metaTypeId) const override;
 	template <typename T>
 	QCborTag typeTag() const;
