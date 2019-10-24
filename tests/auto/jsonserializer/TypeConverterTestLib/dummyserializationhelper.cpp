@@ -1,6 +1,7 @@
 #include "dummyserializationhelper.h"
 #include <QtTest>
 #include <QJsonSerializerException>
+#include <QCborSerializer>
 #include <QtJsonSerializer/private/qjsonexceptioncontext_p.h>
 
 DummySerializationHelper::DummySerializationHelper(QObject *parent) :
@@ -19,7 +20,7 @@ QVariant DummySerializationHelper::getProperty(const char *name) const
 
 QCborTag DummySerializationHelper::typeTag(int metaTypeId) const
 {
-	return typeMap.value(metaTypeId, QJsonTypeConverter::NoTag);
+	return typeMap.value(metaTypeId, static_cast<QCborTag>(QCborSerializer::NoTag));
 }
 
 QByteArray DummySerializationHelper::getCanonicalTypeName(int propertyType) const

@@ -75,7 +75,7 @@ void ListConverterTest::addMetaData()
 						  << true
 						  << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("untagged") << qMetaTypeId<QList<int>>()
-							  << QJsonTypeConverter::NoTag
+							  << static_cast<QCborTag>(QCborSerializer::NoTag)
 							  << QCborValue::Array
 							  << true
 							  << QJsonTypeConverter::DeserializationCapabilityResult::Positive;

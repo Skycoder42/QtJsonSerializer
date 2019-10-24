@@ -54,7 +54,7 @@ void EnumConverterTest::addMetaData()
 									 << true
 									 << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("enum.int.untagged") << qMetaTypeId<TestClass::TestEnum>()
-									   << QJsonTypeConverter::NoTag
+									   << static_cast<QCborTag>(QCborSerializer::NoTag)
 									   << QCborValue::Double
 									   << true
 									   << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
@@ -69,7 +69,7 @@ void EnumConverterTest::addMetaData()
 										<< true
 										<< QJsonTypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("enum.string.untagged") << qMetaTypeId<TestClass::TestEnum>()
-										  << QJsonTypeConverter::NoTag
+										  << static_cast<QCborTag>(QCborSerializer::NoTag)
 										  << QCborValue::String
 										  << true
 										  << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
@@ -85,7 +85,7 @@ void EnumConverterTest::addMetaData()
 									  << true
 									  << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("flags.int.untagged") << qMetaTypeId<TestClass::TestFlags>()
-										<< QJsonTypeConverter::NoTag
+										<< static_cast<QCborTag>(QCborSerializer::NoTag)
 										<< QCborValue::Double
 										<< true
 										<< QJsonTypeConverter::DeserializationCapabilityResult::Positive;
@@ -100,7 +100,7 @@ void EnumConverterTest::addMetaData()
 										 << true
 										 << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("flags.string.untagged") << qMetaTypeId<TestClass::TestFlags>()
-										   << QJsonTypeConverter::NoTag
+										   << static_cast<QCborTag>(QCborSerializer::NoTag)
 										   << QCborValue::String
 										   << true
 										   << QJsonTypeConverter::DeserializationCapabilityResult::Positive;

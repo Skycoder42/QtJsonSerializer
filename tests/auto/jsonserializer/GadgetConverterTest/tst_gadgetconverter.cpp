@@ -44,47 +44,47 @@ void GadgetConverterTest::addMetaData()
 {
 
 	QTest::newRow("basic") << qMetaTypeId<TestGadget>()
-						   << QJsonTypeConverter::NoTag
+						   << static_cast<QCborTag>(QCborSerializer::NoTag)
 						   << QCborValue::Map
 						   << true
 						   << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("basic.null") << qMetaTypeId<TestGadget>()
-								<< QJsonTypeConverter::NoTag
+								<< static_cast<QCborTag>(QCborSerializer::NoTag)
 								<< QCborValue::Null
 								<< true
 								<< QJsonTypeConverter::DeserializationCapabilityResult::Negative;
 	QTest::newRow("ptr") << qMetaTypeId<TestGadget*>()
-						 << QJsonTypeConverter::NoTag
+						 << static_cast<QCborTag>(QCborSerializer::NoTag)
 						 << QCborValue::Map
 						 << true
 						 << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("ptr.null") << qMetaTypeId<TestGadget*>()
-							  << QJsonTypeConverter::NoTag
+							  << static_cast<QCborTag>(QCborSerializer::NoTag)
 							  << QCborValue::Null
 							  << true
 							  << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("excluded.keysequence") << static_cast<int>(QMetaType::QKeySequence)
-										  << QJsonTypeConverter::NoTag
+										  << static_cast<QCborTag>(QCborSerializer::NoTag)
 										  << QCborValue::Map
 										  << false
 										  << QJsonTypeConverter::DeserializationCapabilityResult::Negative;
 	QTest::newRow("excluded.font") << static_cast<int>(QMetaType::QFont)
-								   << QJsonTypeConverter::NoTag
+								   << static_cast<QCborTag>(QCborSerializer::NoTag)
 								   << QCborValue::Map
 								   << false
 								   << QJsonTypeConverter::DeserializationCapabilityResult::Negative;
 	QTest::newRow("excluded.locale") << static_cast<int>(QMetaType::QLocale)
-									 << QJsonTypeConverter::NoTag
+									 << static_cast<QCborTag>(QCborSerializer::NoTag)
 									 << QCborValue::Map
 									 << false
 									 << QJsonTypeConverter::DeserializationCapabilityResult::Negative;
 	QTest::newRow("invalid.none") << qMetaTypeId<OpaqueDummy>()
-								  << QJsonTypeConverter::NoTag
+								  << static_cast<QCborTag>(QCborSerializer::NoTag)
 								  << QCborValue::Map
 								  << false
 								  << QJsonTypeConverter::DeserializationCapabilityResult::Negative;
 	QTest::newRow("invalid.object") << static_cast<int>(QMetaType::QObjectStar)
-									<< QJsonTypeConverter::NoTag
+									<< static_cast<QCborTag>(QCborSerializer::NoTag)
 									<< QCborValue::Map
 									<< false
 									<< QJsonTypeConverter::DeserializationCapabilityResult::Negative;

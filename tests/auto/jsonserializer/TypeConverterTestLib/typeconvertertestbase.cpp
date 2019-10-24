@@ -89,7 +89,7 @@ void TypeConverterTestBase::testMetaTypeDetection()
 	QFETCH(bool, canSer);
 	QFETCH(QJsonTypeConverter::DeserializationCapabilityResult, canDeser);
 
-	helper->json = tag == QJsonTypeConverter::NoTag;
+	helper->json = tag == static_cast<QCborTag>(QCborSerializer::NoTag);
 	converter()->setHelper(helper);
 	QCOMPARE(converter()->canConvert(metatype), canSer);
 	QCOMPARE(converter()->canDeserialize(metatype, tag, type), canDeser);

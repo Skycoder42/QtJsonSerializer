@@ -51,27 +51,27 @@ void ObjectConverterTest::addConverterData()
 void ObjectConverterTest::addMetaData()
 {
 	QTest::newRow("basic") << qMetaTypeId<TestObject*>()
-						   << QJsonTypeConverter::NoTag
+						   << static_cast<QCborTag>(QCborSerializer::NoTag)
 						   << QCborValue::Map
 						   << true
 						   << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("null") << qMetaTypeId<TestObject*>()
-						  << QJsonTypeConverter::NoTag
+						  << static_cast<QCborTag>(QCborSerializer::NoTag)
 						  << QCborValue::Null
 						  << true
 						  << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("base") << static_cast<int>(QMetaType::QObjectStar)
-						  << QJsonTypeConverter::NoTag
+						  << static_cast<QCborTag>(QCborSerializer::NoTag)
 						  << QCborValue::Map
 						  << true
 						  << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("tracking") << qMetaTypeId<QPointer<TestObject>>()
-							  << QJsonTypeConverter::NoTag
+							  << static_cast<QCborTag>(QCborSerializer::NoTag)
 							  << QCborValue::Map
 							  << true
 							  << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("shared") << qMetaTypeId<QSharedPointer<TestObject>>()
-							<< QJsonTypeConverter::NoTag
+							<< static_cast<QCborTag>(QCborSerializer::NoTag)
 							<< QCborValue::Map
 							<< true
 							<< QJsonTypeConverter::DeserializationCapabilityResult::Positive;
@@ -93,12 +93,12 @@ void ObjectConverterTest::addMetaData()
 									  << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
 
 	QTest::newRow("invalid.type1") << qMetaTypeId<OpaqueDummyGadget*>()
-								   << QJsonTypeConverter::NoTag
+								   << static_cast<QCborTag>(QCborSerializer::NoTag)
 								   << QCborValue::Map
 								   << false
 								   << QJsonTypeConverter::DeserializationCapabilityResult::Negative;
 	QTest::newRow("invalid.type2") << qMetaTypeId<OpaqueDummyGadget>()
-								   << QJsonTypeConverter::NoTag
+								   << static_cast<QCborTag>(QCborSerializer::NoTag)
 								   << QCborValue::Map
 								   << false
 								   << QJsonTypeConverter::DeserializationCapabilityResult::Negative;
