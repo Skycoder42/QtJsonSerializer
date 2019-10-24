@@ -124,35 +124,35 @@ void ListConverterTest::addCommonSerData()
 						   << static_cast<QObject*>(nullptr)
 						   << qMetaTypeId<QList<int>>()
 						   << QVariant::fromValue(QList<int>{})
-						   << QCborValue{static_cast<QCborTag>(QCborSerializer::Homogeneous), QCborArray{}}
+						   << QCborValue{QCborArray{}}
 						   << QJsonValue{QJsonArray{}};
 	QTest::newRow("filled") << QVariantHash{}
 							<< TestQ{{QMetaType::Int, 1, 2}, {QMetaType::Int, 3, 4}, {QMetaType::Int, 5, 6}}
 							<< static_cast<QObject*>(this)
 							<< qMetaTypeId<QList<int>>()
 							<< QVariant::fromValue(QList<int>{1, 3, 5})
-							<< QCborValue{static_cast<QCborTag>(QCborSerializer::Homogeneous), QCborArray{2, 4, 6}}
+							<< QCborValue{QCborArray{2, 4, 6}}
 							<< QJsonValue{QJsonArray{2, 4, 6}};
 	QTest::newRow("string") << QVariantHash{}
 							<< TestQ{{QMetaType::QString, QStringLiteral("test"), QStringLiteral("tree")}}
 							<< static_cast<QObject*>(this)
 							<< static_cast<int>(QMetaType::QStringList)
 							<< QVariant{QStringList{QStringLiteral("test")}}
-							<< QCborValue{static_cast<QCborTag>(QCborSerializer::Homogeneous), QCborArray{QStringLiteral("tree")}}
+							<< QCborValue{QCborArray{QStringLiteral("tree")}}
 							<< QJsonValue{QJsonArray{QStringLiteral("tree")}};
 	QTest::newRow("bytearray") << QVariantHash{}
 							   << TestQ{{QMetaType::QByteArray, QByteArray("test"), QByteArray("tree")}}
 							   << static_cast<QObject*>(this)
 							   << static_cast<int>(QMetaType::QByteArrayList)
 							   << QVariant::fromValue(QByteArrayList{"test"})
-							   << QCborValue{static_cast<QCborTag>(QCborSerializer::Homogeneous), QCborArray{QByteArray("tree")}}
+							   << QCborValue{QCborArray{QByteArray("tree")}}
 							   << QJsonValue{QJsonValue::Undefined};
 	QTest::newRow("variant") << QVariantHash{}
 							 << TestQ{{QMetaType::UnknownType, true, false}}
 							 << static_cast<QObject*>(this)
 							 << static_cast<int>(QMetaType::QVariantList)
 							 << QVariant{QVariantList{true}}
-							 << QCborValue{static_cast<QCborTag>(QCborSerializer::Homogeneous), QCborArray{false}}
+							 << QCborValue{QCborArray{false}}
 							 << QJsonValue{QJsonArray{false}};
 
 	QTest::newRow("linkedList") << QVariantHash{}
@@ -160,14 +160,14 @@ void ListConverterTest::addCommonSerData()
 								<< static_cast<QObject*>(this)
 								<< qMetaTypeId<QLinkedList<int>>()
 								<< QVariant::fromValue(QLinkedList<int>{1, 3, 5})
-								<< QCborValue{static_cast<QCborTag>(QCborSerializer::Homogeneous), QCborArray{2, 4, 6}}
+								<< QCborValue{QCborArray{2, 4, 6}}
 								<< QJsonValue{QJsonArray{2, 4, 6}};
 	QTest::newRow("vector") << QVariantHash{}
 							<< TestQ{{QMetaType::Int, 1, 2}, {QMetaType::Int, 3, 4}, {QMetaType::Int, 5, 6}}
 							<< static_cast<QObject*>(this)
 							<< qMetaTypeId<QVector<int>>()
 							<< QVariant::fromValue(QVector<int>{1, 3, 5})
-							<< QCborValue{static_cast<QCborTag>(QCborSerializer::Homogeneous), QCborArray{2, 4, 6}}
+							<< QCborValue{QCborArray{2, 4, 6}}
 							<< QJsonValue{QJsonArray{2, 4, 6}};
 
 	{
@@ -180,7 +180,7 @@ void ListConverterTest::addCommonSerData()
 							   << static_cast<QObject*>(this)
 							   << qMetaTypeId<QStack<int>>()
 							   << QVariant::fromValue(s)
-							   << QCborValue{static_cast<QCborTag>(QCborSerializer::Homogeneous), QCborArray{2, 4, 6}}
+							   << QCborValue{QCborArray{2, 4, 6}}
 							   << QJsonValue{QJsonArray{2, 4, 6}};
 	}
 
@@ -194,7 +194,7 @@ void ListConverterTest::addCommonSerData()
 							   << static_cast<QObject*>(this)
 							   << qMetaTypeId<QQueue<int>>()
 							   << QVariant::fromValue(q)
-							   << QCborValue{static_cast<QCborTag>(QCborSerializer::Homogeneous), QCborArray{2, 4, 6}}
+							   << QCborValue{QCborArray{2, 4, 6}}
 							   << QJsonValue{QJsonArray{2, 4, 6}};
 	}
 
@@ -227,18 +227,25 @@ void ListConverterTest::addSerData()
 
 void ListConverterTest::addDeserData()
 {
+	QTest::newRow("homogeneous.list") << QVariantHash{}
+									  << TestQ{{QMetaType::Int, 1, 2}, {QMetaType::Int, 3, 4}, {QMetaType::Int, 5, 6}}
+									  << static_cast<QObject*>(this)
+									  << qMetaTypeId<QList<int>>()
+									  << QVariant::fromValue(QList<int>{1, 3, 5})
+									  << QCborValue{static_cast<QCborTag>(QCborSerializer::Homogeneous), QCborArray{2, 4, 6}}
+									  << QJsonValue{QJsonArray{2, 4, 6}};
 	QSet<int> s{1, 3, 5};
 	TestQ q;
 	auto ctr = 0;
 	for(const auto &v : qAsConst(s))
 		q.append({QMetaType::Int, v, (++ctr)*2});
-	QTest::newRow("set.homogeneous") << QVariantHash{}
-									 << q
-									 << static_cast<QObject*>(this)
-									 << qMetaTypeId<QSet<int>>()
-									 << QVariant::fromValue(s)
-									 << QCborValue{static_cast<QCborTag>(QCborSerializer::Homogeneous), QCborArray{2, 4, 6}}
-									 << QJsonValue{QJsonArray{2, 4, 6}};
+	QTest::newRow("omogeneous.set") << QVariantHash{}
+									<< q
+									<< static_cast<QObject*>(this)
+									<< qMetaTypeId<QSet<int>>()
+									<< QVariant::fromValue(s)
+									<< QCborValue{static_cast<QCborTag>(QCborSerializer::Homogeneous), QCborArray{2, 4, 6}}
+									<< QJsonValue{QJsonArray{2, 4, 6}};
 }
 
 QTEST_MAIN(ListConverterTest)

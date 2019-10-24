@@ -17,8 +17,7 @@ bool QJsonListConverter::canConvert(int metaTypeId) const
 
 QList<QCborTag> QJsonListConverter::allowedCborTags(int metaTypeId) const
 {
-	auto isSet = false;
-	getSubtype(metaTypeId, isSet);
+	const auto isSet = getSubtype(metaTypeId).second;
 	QList<QCborTag> tags {
 		NoTag,
 		static_cast<QCborTag>(QCborSerializer::Homogeneous)
@@ -37,8 +36,7 @@ QList<QCborValue::Type> QJsonListConverter::allowedCborTypes(int metaTypeId, QCb
 
 QCborValue QJsonListConverter::serialize(int propertyType, const QVariant &value) const
 {
-	auto isSet = false;
-	const auto metaType = getSubtype(propertyType, isSet);
+	const auto [metaType, isSet] = getSubtype(propertyType);
 
 	if (!value.canConvert(QMetaType::QVariantList)) {
 		throw QJsonSerializationException(QByteArray("Given type ") +
@@ -50,13 +48,15 @@ QCborValue QJsonListConverter::serialize(int propertyType, const QVariant &value
 	auto index = 0;
 	for (const auto &element : value.value<QSequentialIterable>())
 		array.append(helper()->serializeSubtype(metaType, element, "[" + QByteArray::number(index++) + "]"));
-	return {static_cast<QCborTag>(isSet ? QCborSerializer::Set : QCborSerializer::Homogeneous), array};
+	if (isSet)
+		return {static_cast<QCborTag>(QCborSerializer::Set), array};
+	else
+		return array;
 }
 
 QVariant QJsonListConverter::deserializeCbor(int propertyType, const QCborValue &value, QObject *parent) const
 {
-	auto isSet = false;
-	const auto metaType = getSubtype(propertyType, isSet);
+	const auto metaType = getSubtype(propertyType).first;
 
 	//generate the list
 	QVariant list{propertyType, nullptr};
@@ -75,9 +75,10 @@ QVariant QJsonListConverter::deserializeCbor(int propertyType, const QCborValue 
 	return list;
 }
 
-int QJsonListConverter::getSubtype(int listType, bool &isSet) const
+std::pair<int, bool> QJsonListConverter::getSubtype(int listType) const
 {
 	int metaType = QMetaType::UnknownType;
+	auto isSet = false;
 	if (listType == QMetaType::QStringList)
 		metaType = QMetaType::QString;
 	else if (listType == QMetaType::QByteArrayList)
@@ -90,5 +91,5 @@ int QJsonListConverter::getSubtype(int listType, bool &isSet) const
 		}
 	}
 
-	return metaType;
+	return std::make_pair(metaType, isSet);
 }

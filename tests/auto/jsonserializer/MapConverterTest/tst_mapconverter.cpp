@@ -24,11 +24,13 @@ private:
 void MapConverterTest::initTest()
 {
 	QJsonSerializerBase::registerMapConverters<int, double>();
+	QJsonSerializerBase::registerMapConverters<QPair<int, int>, double>();
 
 	QMetaType::registerEqualsComparator<QMap<QString, int>>();
 	QMetaType::registerEqualsComparator<QHash<QString, bool>>();
 	QMetaType::registerEqualsComparator<QMap<int, double>>();
 	QMetaType::registerEqualsComparator<QHash<int, double>>();
+	QMetaType::registerEqualsComparator<QMap<QPair<int, int>, double>>();
 }
 
 QJsonTypeConverter *MapConverterTest::converter()
@@ -68,11 +70,11 @@ void MapConverterTest::addMetaData()
 						  << QCborValue::Map
 						  << true
 						  << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
-	QTest::newRow("pair") << qMetaTypeId<QMap<QString, QPair<int, bool>>>()
-						  << static_cast<QCborTag>(QCborSerializer::NoTag)
-						  << QCborValue::Map
-						  << true
-						  << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+	QTest::newRow("complex") << qMetaTypeId<QMap<QPair<int, int>, QPair<int, bool>>>()
+							 << static_cast<QCborTag>(QCborSerializer::NoTag)
+							 << QCborValue::Map
+							 << true
+							 << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
 
 	QTest::newRow("hash") << qMetaTypeId<QHash<QString, int>>()
 						  << static_cast<QCborTag>(QCborSerializer::NoTag)
@@ -210,6 +212,29 @@ void MapConverterTest::addCommonSerData()
 								  << QVariant{QVariantHash{{QStringLiteral("tree"), true}}}
 								  << QCborValue{QCborMap{{QStringLiteral("baum"), false}}}
 								  << QJsonValue{QJsonObject{{QStringLiteral("baum"), false}}};
+
+	QTest::newRow("complex") << QVariantHash{}
+							 << TestQ{
+									{qMetaTypeId<QPair<int, int>>(), QVariant::fromValue<QPair<int, int>>({1, 2}), QCborArray{12, 21}},
+									{qMetaTypeId<QPair<int, int>>(), QVariant::fromValue<QPair<int, int>>({4, 5}), QCborArray{45, 54}},
+									{qMetaTypeId<QPair<int, int>>(), QVariant::fromValue<QPair<int, int>>({7, 8}), QCborArray{78, 87}},
+									{QMetaType::Double, 3.3, 33.33},
+									{QMetaType::Double, 6.6, 66.66},
+									{QMetaType::Double, 9.9, 99.99}
+								}
+							 << static_cast<QObject*>(this)
+							 << qMetaTypeId<QMap<QPair<int, int>, double>>()
+							 << QVariant::fromValue(QMap<QPair<int, int>, double>{
+									{{1, 2}, 3.3},
+									{{4, 5}, 6.6},
+									{{7, 8}, 9.9},
+								})
+							 << QCborValue{QCborMap{
+									{QCborArray{12, 21}, 33.33},
+									{QCborArray{45, 54}, 66.66},
+									{QCborArray{78, 87}, 99.99},
+								}}
+							 << QJsonValue{QJsonValue::Undefined};
 }
 
 void MapConverterTest::addSerData()

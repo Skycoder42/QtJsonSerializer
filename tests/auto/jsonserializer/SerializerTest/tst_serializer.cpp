@@ -83,6 +83,7 @@ void SerializerTest::initTestCase()
 	QJsonSerializer::registerListConverters<QList<int>>();
 	QJsonSerializer::registerMapConverters<QString, TestObject*>();
 	QJsonSerializer::registerMapConverters<QString, QMap<QString, int>>();
+	QJsonSerializer::registerMapConverters<int, double>();
 	QJsonSerializer::registerPairConverters<int, QString>();
 	QJsonSerializer::registerPairConverters<bool, bool>();
 	QJsonSerializer::registerPairConverters<QList<bool>, bool>();
@@ -98,9 +99,12 @@ void SerializerTest::initTestCase()
 	QMetaType::registerEqualsComparator<QList<int>>();
 	QMetaType::registerEqualsComparator<QList<TestObject*>>();
 	QMetaType::registerEqualsComparator<QList<QList<int>>>();
+	QMetaType::registerEqualsComparator<QVector<int>>();
 	QMetaType::registerEqualsComparator<QMap<QString, int>>();
+	QMetaType::registerEqualsComparator<QHash<QString, int>>();
 	QMetaType::registerEqualsComparator<QMap<QString, TestObject*>>();
 	QMetaType::registerEqualsComparator<QMap<QString, QMap<QString, int>>>();
+	QMetaType::registerEqualsComparator<QMap<int, double>>();
 	QMetaType::registerEqualsComparator<QPair<QVariant, QVariant>>();
 	QMetaType::registerEqualsComparator<QPair<int, QString>>();
 	QMetaType::registerEqualsComparator<QPair<QList<bool>, bool>>();
@@ -165,6 +169,22 @@ void SerializerTest::testVariantConversions_data()
 								 << static_cast<int>(QMetaType::QVariantList)
 								 << QVariant{QVariantList{QStringLiteral("a"), QStringLiteral("b"), QStringLiteral("c")}}
 								 << true;
+	QTest::newRow("QByteArrayList") << QVariant::fromValue<QByteArrayList>({"3", "7", "13"})
+									<< static_cast<int>(QMetaType::QVariantList)
+									<< QVariant{QVariantList{
+										   QByteArray("3"),
+										   QByteArray("7"),
+										   QByteArray("13")
+									   }}
+									<< true;
+	QTest::newRow("QVariantList") << QVariant{QVariantList{1, true, 3.4}}
+								  << static_cast<int>(QMetaType::QVariantList)
+								  << QVariant{QVariantList{1, true, 3.4}}
+								  << true;
+	QTest::newRow("QVector<int>") << QVariant::fromValue<QVector<int>>({3, 7, 13})
+								  << static_cast<int>(QMetaType::QVariantList)
+								  << QVariant{QVariantList{3, 7, 13}}
+								  << true;
 
 	QTest::newRow("QMap<QString, int>") << QVariant::fromValue<QMap<QString, int>>({
 																					   {QStringLiteral("baum"), 42},
@@ -177,7 +197,19 @@ void SerializerTest::testVariantConversions_data()
 												{QStringLiteral("devil"), 666},
 												{QStringLiteral("fun"), 0}
 											}}
-										<< false;
+										<< true;
+	QTest::newRow("QHash<QString, int>") << QVariant::fromValue<QHash<QString, int>>({
+																					   {QStringLiteral("baum"), 42},
+																					   {QStringLiteral("devil"), 666},
+																					   {QStringLiteral("fun"), 0}
+																				   })
+										 << static_cast<int>(QMetaType::QVariantHash)
+										 << QVariant{QVariantHash {
+												{QStringLiteral("baum"), 42},
+												{QStringLiteral("devil"), 666},
+												{QStringLiteral("fun"), 0}
+											}}
+										 << true;
 	QTest::newRow("QMap<QString, TestObject*>") << QVariant::fromValue<QMap<QString, TestObject*>>({
 													   {QStringLiteral("baum"), nullptr},
 													   {QStringLiteral("devil"), to},
@@ -189,7 +221,7 @@ void SerializerTest::testVariantConversions_data()
 													   {QStringLiteral("devil"), QVariant::fromValue(to)},
 													   {QStringLiteral("fun"), QVariant::fromValue<TestObject*>(nullptr)}
 												   }}
-												<< false;
+												<< true;
 	QMap<QString, int> m1 = {{QStringLiteral("v0"), 0}, {QStringLiteral("v1"), 1}, {QStringLiteral("v2"), 2}};
 	QMap<QString, int> m2 = {{QStringLiteral("v3"), 3}, {QStringLiteral("v4"), 4}, {QStringLiteral("v5"), 5}};
 	QMap<QString, int> m3 = {{QStringLiteral("v6"), 6}, {QStringLiteral("v7"), 7}, {QStringLiteral("v8"), 8}};
@@ -204,7 +236,43 @@ void SerializerTest::testVariantConversions_data()
 															  {QStringLiteral("m2"), QVariant::fromValue(m2)},
 															  {QStringLiteral("m3"), QVariant::fromValue(m3)}
 														  }}
-													   << false;
+													   << true;
+	QTest::newRow("QMap<int, double>") << QVariant::fromValue<QMap<int, double>>({
+											   {1, 4.2},
+											   {11, 66.6},
+											   {111, 0.0}
+										   })
+										<< static_cast<int>(QMetaType::QVariantMap)
+										<< QVariant{QVariantMap {
+											   {QStringLiteral("1"), 4.2},
+											   {QStringLiteral("11"), 66.6},
+											   {QStringLiteral("111"), 0.0}
+										   }}
+										<< true;
+	QTest::newRow("QVariantMap") << QVariant{QVariantMap {
+										{QStringLiteral("baum"), 1},
+										{QStringLiteral("devil"), true},
+										{QStringLiteral("fun"), 3.4}
+									}}
+								 << static_cast<int>(QMetaType::QVariantMap)
+								 << QVariant{QVariantMap {
+										{QStringLiteral("baum"), 1},
+										{QStringLiteral("devil"), true},
+										{QStringLiteral("fun"), 3.4}
+									}}
+								 << true;
+	QTest::newRow("QVariantHash") << QVariant{QVariantHash {
+										 {QStringLiteral("baum"), 1},
+										 {QStringLiteral("devil"), true},
+										 {QStringLiteral("fun"), 3.4}
+									 }}
+								  << static_cast<int>(QMetaType::QVariantHash)
+								  << QVariant{QVariantHash {
+										 {QStringLiteral("baum"), 1},
+										 {QStringLiteral("devil"), true},
+										 {QStringLiteral("fun"), 3.4}
+									 }}
+								  << true;
 
 	QSharedPointer<TestObject> sPtr(new TestObject{});
 	QTest::newRow("QSharedPointer<TestObject>") << QVariant::fromValue(sPtr)
@@ -300,6 +368,22 @@ void SerializerTest::testVariantConversions()
 			writer.reserve(variantList.size());
 			for (const auto &vData : variantList)
 				writer.add(vData);
+			QCOMPARE(res, data);
+		} else if (targetType == QMetaType::QVariantMap ||
+				   targetType == QMetaType::QVariantHash) {
+			const auto variantMap = variantData.toMap();
+			auto asocIt = convData.value<QAssociativeIterable>();
+			QCOMPARE(asocIt.size(), variantMap.size());
+			for (auto it = asocIt.begin(), end = asocIt.end(); it != end; ++it) {
+				const auto key = it.key().toString();
+				QVERIFY(variantMap.contains(key));
+				QCOMPARE(it.value(), variantMap.value(key));
+			}
+
+			QVariant res{data.userType(), nullptr};
+			auto writer = QAssociativeWriter::getWriter(res);
+			for (auto it = variantMap.begin(), end = variantMap.end(); it != end; ++it)
+				writer.add(it.key(), it.value());
 			QCOMPARE(res, data);
 		}
 		convData = variantData;

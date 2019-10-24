@@ -18,7 +18,7 @@ public:
 private:
 	static const QRegularExpression listTypeRegex;
 
-	int getSubtype(int listType, bool &isSet) const;
+	std::pair<int, bool> getSubtype(int listType) const;  // (metType, isQSet)
 };
 
 #endif // QJSONLISTCONVERTER_P_H
