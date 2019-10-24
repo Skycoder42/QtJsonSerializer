@@ -30,6 +30,7 @@ QCborValue QJsonMapConverter::serialize(int propertyType, const QVariant &value)
 {
 	const auto [keyType, valueType] = getSubtype(propertyType);
 
+	// verify is readable
 	if (!value.canConvert(QMetaType::QVariantMap) &&
 		!value.canConvert(QMetaType::QVariantHash)) {
 		throw QJsonSerializationException(QByteArray("Given type ") +
@@ -37,6 +38,7 @@ QCborValue QJsonMapConverter::serialize(int propertyType, const QVariant &value)
 										  QByteArray(" cannot be processed via QAssociativeIterable - make shure to register the container type via Q_DECLARE_ASSOCIATIVE_CONTAINER_METATYPE"));
 	}
 
+	// write from map to cbor
 	const auto iterable = value.value<QAssociativeIterable>();
 	QCborMap cborMap;
 	for (auto it = iterable.begin(), end = iterable.end(); it != end; ++it) {
@@ -55,11 +57,12 @@ QVariant QJsonMapConverter::deserializeCbor(int propertyType, const QCborValue &
 	QVariant map{propertyType, nullptr};
 	auto writer = QAssociativeWriter::getWriter(map);
 	if (!writer.isValid()) {
-		throw QJsonSerializationException(QByteArray("Given type ") +
-										  QMetaType::typeName(propertyType) +
-										  QByteArray(" cannot be accessed via QAssociativeWriter - make shure to register it via QJsonSerializerBase::registerMapConverters"));
+		throw QJsonDeserializationException(QByteArray("Given type ") +
+											QMetaType::typeName(propertyType) +
+											QByteArray(" cannot be accessed via QAssociativeWriter - make shure to register it via QJsonSerializerBase::registerMapConverters"));
 	}
 
+	// write from cbor into the map
 	const auto cborMap = (value.isTag() ? value.taggedValue() : value).toMap();
 	for (const auto entry : cborMap) {
 		const QByteArray keyStr = "[" + entry.first.toVariant().toString().toUtf8() + "]";

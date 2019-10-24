@@ -30,6 +30,7 @@ public:
 		Flags = 10003,
 		ConstructedObject = 10004,
 		Pair = 10005,
+		MultiMap = 10006,
 
 		ChronoNanoSeconds = 10100,
 		ChronoMicroSeconds = 10101,

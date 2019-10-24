@@ -15,7 +15,6 @@ protected:
 	void addConverterData() override;
 	void addMetaData() override;
 	void addCommonSerData() override;
-	void addSerData() override;
 	void addDeserData() override;
 
 private:
@@ -214,17 +213,6 @@ void ListConverterTest::addCommonSerData()
 	}
 }
 
-void ListConverterTest::addSerData()
-{
-	QTest::newRow("unconvertible") << QVariantHash{}
-								   << TestQ{}
-								   << static_cast<QObject*>(nullptr)
-								   << qMetaTypeId<QList<OpaqueDummy>>()
-								   << QVariant::fromValue(QList<OpaqueDummy>{{}, {}, {}})
-								   << QCborValue{}
-								   << QJsonValue{QJsonValue::Undefined};
-}
-
 void ListConverterTest::addDeserData()
 {
 	QTest::newRow("homogeneous.list") << QVariantHash{}
@@ -239,13 +227,20 @@ void ListConverterTest::addDeserData()
 	auto ctr = 0;
 	for(const auto &v : qAsConst(s))
 		q.append({QMetaType::Int, v, (++ctr)*2});
-	QTest::newRow("omogeneous.set") << QVariantHash{}
+	QTest::newRow("homogeneous.set") << QVariantHash{}
 									<< q
 									<< static_cast<QObject*>(this)
 									<< qMetaTypeId<QSet<int>>()
 									<< QVariant::fromValue(s)
 									<< QCborValue{static_cast<QCborTag>(QCborSerializer::Homogeneous), QCborArray{2, 4, 6}}
 									<< QJsonValue{QJsonArray{2, 4, 6}};
+	QTest::newRow("unwritable") << QVariantHash{}
+								<< TestQ{}
+								<< static_cast<QObject*>(nullptr)
+								<< qMetaTypeId<QList<OpaqueDummy>>()
+								<< QVariant{}
+								<< QCborValue{QCborArray{}}
+								<< QJsonValue{QJsonArray{}};
 }
 
 QTEST_MAIN(ListConverterTest)

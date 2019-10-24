@@ -62,9 +62,9 @@ QVariant QJsonListConverter::deserializeCbor(int propertyType, const QCborValue 
 	QVariant list{propertyType, nullptr};
 	auto writer = QSequentialWriter::getWriter(list);
 	if (!writer.isValid()) {
-		throw QJsonSerializationException(QByteArray("Given type ") +
-										  QMetaType::typeName(propertyType) +
-										  QByteArray(" cannot be accessed via QSequentialWriter - make shure to register it via QJsonSerializerBase::registerListConverters or QJsonSerializerBase::registerSetConverters"));
+		throw QJsonDeserializationException(QByteArray("Given type ") +
+											QMetaType::typeName(propertyType) +
+											QByteArray(" cannot be accessed via QSequentialWriter - make shure to register it via QJsonSerializerBase::registerListConverters or QJsonSerializerBase::registerSetConverters"));
 	}
 
 	const auto array = (value.isTag() ? value.taggedValue() : value).toArray();

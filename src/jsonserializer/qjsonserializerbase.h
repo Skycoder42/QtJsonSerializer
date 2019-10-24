@@ -76,7 +76,8 @@ public:
 	//! Enum to specify how multi maps and sets should be serialized
 	enum class MultiMapMode {
 		Map, //!< Store them as json object, with each element beeing a json array containing the actual values
-		List  //!< Store a list of pairs, where for each pair the first element is the key and the second the value
+		List,  //!< Store a list of pairs, where for each pair the first element is the key and the second the value
+		DenseMap
 	};
 	Q_ENUM(MultiMapMode)
 

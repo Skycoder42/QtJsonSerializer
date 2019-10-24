@@ -14,7 +14,7 @@ CONVERTER_TESTS = \
 	ListConverterTest \
 #	LocaleConverterTest \
 	MapConverterTest \
-#	MultiMapConverterTest \
+	MultiMapConverterTest \
 	ObjectConverterTest \
 #	OptionalConverterTest \
 	PairConverterTest \

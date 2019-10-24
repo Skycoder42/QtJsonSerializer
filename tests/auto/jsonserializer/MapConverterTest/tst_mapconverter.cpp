@@ -15,7 +15,7 @@ protected:
 	void addConverterData() override;
 	void addMetaData() override;
 	void addCommonSerData() override;
-	void addSerData() override;
+	void addDeserData() override;
 
 private:
 	QJsonMapConverter _converter;
@@ -237,15 +237,15 @@ void MapConverterTest::addCommonSerData()
 							 << QJsonValue{QJsonValue::Undefined};
 }
 
-void MapConverterTest::addSerData()
+void MapConverterTest::addDeserData()
 {
-	QTest::newRow("unconvertible") << QVariantHash{}
-								   << TestQ{}
-								   << static_cast<QObject*>(nullptr)
-								   << qMetaTypeId<QMap<QString, OpaqueDummy>>()
-								   << QVariant::fromValue(QMap<QString, OpaqueDummy>{{QStringLiteral("d"), {}}})
-								   << QCborValue{}
-								   << QJsonValue{QJsonValue::Undefined};
+	QTest::newRow("unwritable") << QVariantHash{}
+								<< TestQ{}
+								<< static_cast<QObject*>(nullptr)
+								<< qMetaTypeId<QMap<QString, OpaqueDummy>>()
+								<< QVariant{}
+								<< QCborValue{QCborMap{}}
+								<< QJsonValue{QJsonObject{}};
 }
 
 QTEST_MAIN(MapConverterTest)

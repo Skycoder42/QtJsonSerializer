@@ -1,49 +1,91 @@
 #include "qjsonmultimapconverter_p.h"
 #include "qjsonserializerexception.h"
-#include "qjsonserializerbase.h"
+#include "qcborserializer.h"
 
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
 
-const QRegularExpression QJsonMultiMapConverter::mapTypeRegex(QStringLiteral(R"__(^(?:QMultiMap|QMultiHash)<\s*QString\s*,\s*(.*?)\s*>$)__"));
+const QRegularExpression QJsonMultiMapConverter::mapTypeRegex(QStringLiteral(R"__(^(?:QMultiMap|QMultiHash)<(.*?)>$)__"));
 
 bool QJsonMultiMapConverter::canConvert(int metaTypeId) const
 {
-	return mapTypeRegex.match(QString::fromUtf8(getCanonicalTypeName(metaTypeId))).hasMatch();
+	return mapTypeRegex.match(QString::fromUtf8(helper()->getCanonicalTypeName(metaTypeId))).hasMatch();
 }
 
-QList<QJsonValue::Type> QJsonMultiMapConverter::jsonTypes() const
+QList<QCborTag> QJsonMultiMapConverter::allowedCborTags(int metaTypeId) const
 {
-	return {QJsonValue::Object, QJsonValue::Array};
+	Q_UNUSED(metaTypeId)
+	return {
+		NoTag,
+		static_cast<QCborTag>(QCborSerializer::MultiMap),
+		static_cast<QCborTag>(QCborSerializer::ExplicitMap)
+	};
 }
 
-QJsonValue QJsonMultiMapConverter::serialize(int propertyType, const QVariant &value, const QJsonTypeConverter::SerializationHelper *helper) const
+QList<QCborValue::Type> QJsonMultiMapConverter::allowedCborTypes(int metaTypeId, QCborTag tag) const
 {
-	const auto metaType = getSubtype(propertyType);
+	Q_UNUSED(metaTypeId)
+	Q_UNUSED(tag)
+	return {QCborValue::Map, QCborValue::Array};
+}
 
-	auto cValue = value;
-	if(!cValue.convert(QVariant::Map)) {
-		throw QJsonSerializationException(QByteArray("Failed to convert type ") +
+QCborValue QJsonMultiMapConverter::serialize(int propertyType, const QVariant &value) const
+{
+	const auto [keyType, valueType] = getSubtype(propertyType);
+
+	// verify is readable
+	if (!value.canConvert(QMetaType::QVariantMap) &&
+		!value.canConvert(QMetaType::QVariantHash)) {
+		throw QJsonSerializationException(QByteArray("Given type ") +
 										  QMetaType::typeName(propertyType) +
-										  QByteArray(" to a variant map. Make shure to register map types via QJsonSerializer::registerMapConverters"));
+										  QByteArray(" cannot be processed via QAssociativeIterable - make shure to register the container type via Q_DECLARE_ASSOCIATIVE_CONTAINER_METATYPE"));
 	}
-	const auto map = cValue.toMap();
 
-	switch (helper->getProperty("multiMapMode").value<QJsonSerializerBase::MultiMapMode>()) {
-	case QJsonSerializerBase::MultiMapMode::Map: {
-		QJsonObject object;
-		for(auto it = map.constBegin(); it != map.constEnd(); ++it) {
-			auto vArray = object.value(it.key()).toArray();
-			vArray.append(helper->serializeSubtype(metaType, it.value(), it.key().toUtf8()));
-			object.insert(it.key(), vArray);
+	// write from map to cbor
+	const auto mapMode = helper()->getProperty("multiMapMode").value<QJsonSerializerBase::MultiMapMode>();
+	const auto iterable = value.value<QAssociativeIterable>();
+	switch (mapMode) {
+	case QJsonSerializerBase::MultiMapMode::Map:
+	case QJsonSerializerBase::MultiMapMode::DenseMap: {
+		QCborMap cborMap;
+		for (auto it = iterable.begin(), end = iterable.end(); it != end; ++it) {
+			const QByteArray keyStr = "[" + it.key().toString().toUtf8() + "]";
+			const auto key = helper()->serializeSubtype(keyType, it.key(), keyStr + ".key");
+			auto mValueRef = cborMap[key];
+			const auto vType = mapMode == QJsonSerializerBase::MultiMapMode::DenseMap ?
+				mValueRef.type() :
+				QCborValue::Array;
+			switch (vType) {
+			case QCborValue::Array: {
+				auto mArray = mValueRef.toArray();
+				mValueRef = QCborValue{}; // "clear" the array spot, reducing the ref cnt on mArray to 1, so stuff is added without copying
+				mArray.append(helper()->serializeSubtype(valueType, it.value(), keyStr + ".value"));
+				mValueRef = mArray;
+				break;
+			}
+			case QCborValue::Undefined:
+				mValueRef = helper()->serializeSubtype(valueType, it.value(), keyStr + ".value");
+				break;
+			default: {
+				QCborArray mArray {mValueRef};
+				mArray.append(helper()->serializeSubtype(valueType, it.value(), keyStr + ".value"));
+				mValueRef = mArray;
+				break;
+			}
+			}
 		}
-		return object;
+		return {static_cast<QCborTag>(QCborSerializer::MultiMap), cborMap};
 	}
 	case QJsonSerializerBase::MultiMapMode::List: {
-		QJsonArray array;
-		for(auto it = map.constBegin(); it != map.constEnd(); ++it)
-			array.append(QJsonArray {it.key(), helper->serializeSubtype(metaType, it.value(), it.key().toUtf8())});
-		return array;
+		QCborArray cborArray;
+		for (auto it = iterable.begin(), end = iterable.end(); it != end; ++it) {
+			const QByteArray keyStr = "[" + it.key().toString().toUtf8() + "]";
+			cborArray.append(QCborArray{
+				helper()->serializeSubtype(keyType, it.key(), keyStr + ".key"),
+				helper()->serializeSubtype(valueType, it.value(), keyStr + ".value")
+			});
+		}
+		return {static_cast<QCborTag>(QCborSerializer::MultiMap), cborArray};
 	}
 	default:
 		Q_UNREACHABLE();
@@ -51,43 +93,75 @@ QJsonValue QJsonMultiMapConverter::serialize(int propertyType, const QVariant &v
 	}
 }
 
-QVariant QJsonMultiMapConverter::deserialize(int propertyType, const QJsonValue &value, QObject *parent, const QJsonTypeConverter::SerializationHelper *helper) const
+QVariant QJsonMultiMapConverter::deserializeCbor(int propertyType, const QCborValue &value, QObject *parent) const
 {
-	const auto metaType = getSubtype(propertyType);
+	const auto [keyType, valueType] = getSubtype(propertyType);
 
-	switch (value.type()) {
-	case QJsonValue::Object: {
-		QVariantMap map;
-		const auto object = value.toObject();
-		for(auto it = object.constBegin(); it != object.constEnd(); ++it) {
-			if(it->isArray()) {
-				for(const auto aValue : it->toArray())
-					map.insertMulti(it.key(), helper->deserializeSubtype(metaType, aValue, parent, it.key().toUtf8()));
-			} else
-				map.insertMulti(it.key(), helper->deserializeSubtype(metaType, it.value(), parent, it.key().toUtf8()));
-		}
-		return map;
+	// generate the map
+	QVariant map{propertyType, nullptr};
+	auto writer = QAssociativeWriter::getWriter(map);
+	if (!writer.isValid()) {
+		throw QJsonDeserializationException(QByteArray("Given type ") +
+											QMetaType::typeName(propertyType) +
+											QByteArray(" cannot be accessed via QAssociativeWriter - make shure to register it via QJsonSerializerBase::registerMapConverters"));
 	}
-	case QJsonValue::Array: {
-		QVariantMap map;
-		for(const auto aValue : value.toArray()) {
-			auto vPair = aValue.toArray();
-			if(vPair.size() != 2)
-				throw QJsonDeserializationException("Json array must have exactly 2 elements to be read as a value of a multi map");
-			map.insertMulti(vPair[0].toString(), helper->deserializeSubtype(metaType, vPair[1], parent, vPair[0].toString().toUtf8()));
+
+	// write from cbor into the map
+	const auto cValue = (value.isTag() ? value.taggedValue() : value);
+	switch (cValue.type()) {
+	case QCborValue::Map: {
+		for (const auto entry : cValue.toMap()) {
+			const QByteArray keyStr = "[" + entry.first.toVariant().toString().toUtf8() + "]";
+			const auto key = helper()->deserializeSubtype(keyType, entry.first, parent, keyStr + ".key");
+			if (entry.second.isArray()) {
+				auto cnt = 0;
+				for (const auto aValue : entry.second.toArray())
+					writer.add(key, helper()->deserializeSubtype(valueType, aValue, parent, keyStr + ".value[" + QByteArray::number(cnt++) + "]"));
+			} else
+				writer.add(key, helper()->deserializeSubtype(valueType, entry.second, parent, keyStr + ".value"));
 		}
-		return map;
+		break;
+	}
+	case QCborValue::Array: {
+		for (const auto aValue : cValue.toArray()) {
+			const auto vPair = aValue.toArray();
+			if (vPair.size() != 2)
+				throw QJsonDeserializationException("CBOR/JSON array must have exactly 2 elements to be read as a value of a multi map");
+			const QByteArray keyStr = "[" + vPair[0].toVariant().toString().toUtf8() + "]";
+			writer.add(helper()->deserializeSubtype(keyType, vPair[0], parent, keyStr + ".key"),
+					   helper()->deserializeSubtype(valueType, vPair[1], parent, keyStr + ".value"));
+		}
+		break;
 	}
 	default:
-		throw QJsonDeserializationException("Unsupported JSON-Type: " + QByteArray::number(value.type()));
+		throw QJsonDeserializationException("Unsupported CBOR/JSON-Type: " + QByteArray::number(value.type()));
 	}
+
+	return map;
 }
 
-int QJsonMultiMapConverter::getSubtype(int mapType) const
+std::pair<int, int> QJsonMultiMapConverter::getSubtype(int mapType) const
 {
-	int metaType = QMetaType::UnknownType;
-	auto match = mapTypeRegex.match(QString::fromUtf8(getCanonicalTypeName(mapType)));
-	if(match.hasMatch())
-		metaType = QMetaType::type(match.captured(1).toUtf8().trimmed());
-	return metaType;
+	int keyType = QMetaType::UnknownType;
+	int valueType = QMetaType::UnknownType;
+	auto match = mapTypeRegex.match(QString::fromUtf8(helper()->getCanonicalTypeName(mapType)));
+	if (match.hasMatch()) {
+		// parse match, using <> and , rules
+		const auto matchStr = match.captured(1);
+		auto bCount = 0;
+		for (auto i = 0; i < matchStr.size(); ++i) {
+			const auto &c = matchStr[i];
+			if (c == QLatin1Char('<'))
+				++bCount;
+			else if (c == QLatin1Char('>'))
+				--bCount;
+			else if (bCount == 0 && c == QLatin1Char(',')) {
+				keyType = QMetaType::type(matchStr.mid(0, i).trimmed().toUtf8());
+				valueType = QMetaType::type(matchStr.mid(i + 1).trimmed().toUtf8());
+				break;
+			}
+		}
+	}
+
+	return std::make_pair(keyType, valueType);
 }
