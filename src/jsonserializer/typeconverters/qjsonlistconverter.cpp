@@ -70,7 +70,7 @@ QVariant QJsonListConverter::deserializeCbor(int propertyType, const QCborValue 
 	const auto array = (value.isTag() ? value.taggedValue() : value).toArray();
 	auto index = 0;
 	writer.reserve(static_cast<int>(array.size()));
-	for (auto element : (value.isTag() ? value.taggedValue() : value).toArray())
+	for (auto element : array)
 		writer.add(helper()->deserializeSubtype(metaType, element, parent, "[" + QByteArray::number(index++) + "]"));
 	return list;
 }

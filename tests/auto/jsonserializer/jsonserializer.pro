@@ -14,14 +14,14 @@ CONVERTER_TESTS = \
 	ListConverterTest \
 #	LocaleConverterTest \
 	MapConverterTest \
+#	MultiMapConverterTest \
 	ObjectConverterTest \
-#	PairConverterTest \
+#	OptionalConverterTest \
+	PairConverterTest \
 #	RegexConverterTest \
 #	TupleConverterTest \
-#	VersionConverterTest \
-#	MultiMapConverterTest \
-#	OptionalConverterTest \
-#	VariantConverterTest
+#	VariantConverterTest \
+#	VersionConverterTest
 
 for(test, CONVERTER_TESTS) {
 	SUBDIRS += $$test

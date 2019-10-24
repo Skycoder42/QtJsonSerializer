@@ -1,59 +1,82 @@
 #include "qjsonpairconverter_p.h"
 #include "qjsonserializerexception.h"
+#include <QCborSerializer>
 
-#include <QtCore/QJsonArray>
+#include <QtCore/QCborArray>
 
-const QRegularExpression QJsonPairConverter::pairTypeRegex(QStringLiteral(R"__(^(?:QPair|std::pair)<\s*(.*?)\s*,\s*(.*?)\s*>$)__"));
+const QRegularExpression QJsonPairConverter::pairTypeRegex(QStringLiteral(R"__(^(?:QPair|std::pair)<(.*?)>$)__"));
 
 bool QJsonPairConverter::canConvert(int metaTypeId) const
 {
-	return pairTypeRegex.match(QString::fromUtf8(getCanonicalTypeName(metaTypeId))).hasMatch();
+	return pairTypeRegex.match(QString::fromUtf8(helper()->getCanonicalTypeName(metaTypeId))).hasMatch();
 }
 
-QList<QJsonValue::Type> QJsonPairConverter::jsonTypes() const
+QList<QCborTag> QJsonPairConverter::allowedCborTags(int metaTypeId) const
 {
-	return {QJsonValue::Array};
+	Q_UNUSED(metaTypeId)
+	return {NoTag, static_cast<QCborTag>(QCborSerializer::Pair)};
 }
 
-QJsonValue QJsonPairConverter::serialize(int propertyType, const QVariant &value, const QJsonTypeConverter::SerializationHelper *helper) const
+QList<QCborValue::Type> QJsonPairConverter::allowedCborTypes(int metaTypeId, QCborTag tag) const
 {
-	auto types = getPairTypes(propertyType);
-	auto targetType = qMetaTypeId<QPair<QVariant, QVariant>>();
+	Q_UNUSED(metaTypeId)
+	Q_UNUSED(tag)
+	return {QCborValue::Array};
+}
+
+QCborValue QJsonPairConverter::serialize(int propertyType, const QVariant &value) const
+{
+	const auto types = getPairTypes(propertyType);
+	const auto targetType = qMetaTypeId<QPair<QVariant, QVariant>>();
 	auto cValue = value;
-	if(!cValue.canConvert(targetType) || !cValue.convert(targetType)) {
+	if (!cValue.canConvert(targetType) || !cValue.convert(targetType)) {
 		throw QJsonSerializationException(QByteArray("Failed to convert type ") +
 										  QMetaType::typeName(propertyType) +
 										  QByteArray(" to QPair<QVariant, QVariant>. Make shure to register pair types via QJsonSerializer::registerPairConverters"));
 	}
 
 	auto variant = cValue.value<QPair<QVariant, QVariant>>();
-	QJsonArray array;
-	array.append(helper->serializeSubtype(types.first, variant.first, "first"));
-	array.append(helper->serializeSubtype(types.second, variant.second, "second"));
-	return array;
+	return {
+		static_cast<QCborTag>(QCborSerializer::Pair),
+		QCborArray {
+			helper()->serializeSubtype(types.first, variant.first, "first"),
+			helper()->serializeSubtype(types.second, variant.second, "second")
+		}
+	};
 }
 
-QVariant QJsonPairConverter::deserialize(int propertyType, const QJsonValue &value, QObject *parent, const QJsonTypeConverter::SerializationHelper *helper) const
+QVariant QJsonPairConverter::deserializeCbor(int propertyType, const QCborValue &value, QObject *parent) const
 {
-	auto types = getPairTypes(propertyType);
-	auto array = value.toArray();
-	if(array.size() != 2)
-		throw QJsonDeserializationException("Json array must have exactly 2 elements to be read as a pair");
+	const auto types = getPairTypes(propertyType);
+	const auto array = (value.isTag() ? value.taggedValue() : value).toArray();
+	if (array.size() != 2)
+		throw QJsonDeserializationException("CBOR/JSON array must have exactly 2 elements to be read as a pair");
 
 	QPair<QVariant, QVariant> vPair;
-	vPair.first = helper->deserializeSubtype(types.first, array[0], parent, "first");
-	vPair.second = helper->deserializeSubtype(types.second, array[1], parent, "second");
+	vPair.first = helper()->deserializeSubtype(types.first, array[0], parent, "first");
+	vPair.second = helper()->deserializeSubtype(types.second, array[1], parent, "second");
 	return QVariant::fromValue(vPair);
 }
 
-QPair<int, int> QJsonPairConverter::getPairTypes(int metaType) const
+std::pair<int, int> QJsonPairConverter::getPairTypes(int metaType) const
 {
-	auto match = pairTypeRegex.match(QString::fromUtf8(getCanonicalTypeName(metaType)));
-	if(match.hasMatch()) {
-		QPair<int, int> types;
-		types.first = QMetaType::type(match.captured(1).toUtf8().trimmed());
-		types.second = QMetaType::type(match.captured(2).toUtf8().trimmed());
-		return types;
-	} else
-		return {QMetaType::UnknownType, QMetaType::UnknownType};
+	auto match = pairTypeRegex.match(QString::fromUtf8(helper()->getCanonicalTypeName(metaType)));
+	if (match.hasMatch()) {
+		// parse match, using <> and , rules
+		const auto matchStr = match.captured(1);
+		auto bCount = 0;
+		for (auto i = 0; i < matchStr.size(); ++i) {
+			const auto &c = matchStr[i];
+			if (c == QLatin1Char('<'))
+				++bCount;
+			else if (c == QLatin1Char('>'))
+				--bCount;
+			else if (bCount == 0 && c == QLatin1Char(',')) {
+				return std::make_pair(QMetaType::type(matchStr.mid(0, i).trimmed().toUtf8()),
+									  QMetaType::type(matchStr.mid(i + 1).trimmed().toUtf8()));
+			}
+		}
+	}
+
+	return std::make_pair(QMetaType::UnknownType, QMetaType::UnknownType);
 }

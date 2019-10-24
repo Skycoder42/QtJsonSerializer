@@ -60,7 +60,7 @@ QVariant QJsonMapConverter::deserializeCbor(int propertyType, const QCborValue &
 										  QByteArray(" cannot be accessed via QAssociativeWriter - make shure to register it via QJsonSerializerBase::registerMapConverters"));
 	}
 
-	const auto cborMap = value.toMap();
+	const auto cborMap = (value.isTag() ? value.taggedValue() : value).toMap();
 	for (const auto entry : cborMap) {
 		const QByteArray keyStr = "[" + entry.first.toVariant().toString().toUtf8() + "]";
 		writer.add(helper()->deserializeSubtype(keyType, entry.first, parent, keyStr + ".key"),

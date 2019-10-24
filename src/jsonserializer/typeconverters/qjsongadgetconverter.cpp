@@ -72,10 +72,11 @@ QVariant QJsonGadgetConverter::deserializeCbor(int propertyType, const QCborValu
 	if (!metaObject)
 		throw QJsonDeserializationException(QByteArray("Unable to get metaobject for gadget type") + QMetaType::typeName(propertyType));
 
+	auto cValue = value.isTag() ? value.taggedValue() : value;
 	QVariant gadget;
 	void *gadgetPtr = nullptr;
 	if (isPtr) {
-		if (value.isNull())
+		if (cValue.isNull())
 			return QVariant{propertyType, nullptr};  // initialize an empty (nullptr) variant
 		const auto gadgetType = QMetaType::type(metaObject->className());
 		if (gadgetType == QMetaType::UnknownType)
@@ -83,7 +84,7 @@ QVariant QJsonGadgetConverter::deserializeCbor(int propertyType, const QCborValu
 		gadgetPtr = QMetaType::create(gadgetType);
 		gadget = QVariant{propertyType, &gadgetPtr};
 	} else {
-		if (value.isNull())
+		if (cValue.isNull())
 			return QVariant{};  // return to allow default null for gadgets. If not allowed, this will fail, as a null variant cannot be converted to a gadget
 		gadget = QVariant{propertyType, nullptr};
 		gadgetPtr = gadget.data();
@@ -109,7 +110,7 @@ QVariant QJsonGadgetConverter::deserializeCbor(int propertyType, const QCborValu
 	}
 
 	// now deserialize all json properties
-	const auto cborMap = value.toMap();
+	const auto cborMap = cValue.toMap();
 	for (auto it = cborMap.constBegin(); it != cborMap.constEnd(); it++) {
 		const auto key = it.key().toString().toUtf8();
 		const auto propIndex = metaObject->indexOfProperty(key);

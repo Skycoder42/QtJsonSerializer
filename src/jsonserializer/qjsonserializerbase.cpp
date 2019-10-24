@@ -15,9 +15,9 @@
 #include "typeconverters/qjsonlistconverter_p.h"
 #include "typeconverters/qjsonmapconverter_p.h"
 #include "typeconverters/qjsonobjectconverter_p.h"
+#include "typeconverters/qjsonpairconverter_p.h"
 //#include "typeconverters/qjsonmultimapconverter_p.h"
 //#include "typeconverters/qjsonjsonconverter_p.h"
-//#include "typeconverters/qjsonpairconverter_p.h"
 //#include "typeconverters/qjsonbytearrayconverter_p.h"
 //#include "typeconverters/qjsonversionnumberconverter_p.h"
 //#include "typeconverters/qjsongeomconverter_p.h"
@@ -315,11 +315,11 @@ QList<QJsonTypeConverterFactory*> QJsonSerializerBasePrivate::typeConverterFacto
 	new QJsonTypeConverterStandardFactory<QJsonGadgetConverter>{},
 	new QJsonTypeConverterStandardFactory<QJsonEnumConverter>{},
 	new QJsonTypeConverterStandardFactory<QJsonMapConverter>{},
+	new QJsonTypeConverterStandardFactory<QJsonPairConverter>{},
 //	new QJsonTypeConverterStandardFactory<QJsonMultiMapConverter>{},
 //	new QJsonTypeConverterStandardFactory<QJsonJsonValueConverter>{},
 //	new QJsonTypeConverterStandardFactory<QJsonJsonObjectConverter>{},
 //	new QJsonTypeConverterStandardFactory<QJsonJsonArrayConverter>{},
-//	new QJsonTypeConverterStandardFactory<QJsonPairConverter>{},
 //	new QJsonTypeConverterStandardFactory<QJsonBytearrayConverter>{},
 //	new QJsonTypeConverterStandardFactory<QJsonVersionNumberConverter>{},
 //	new QJsonTypeConverterStandardFactory<QJsonSizeConverter>{},
@@ -329,9 +329,9 @@ QList<QJsonTypeConverterFactory*> QJsonSerializerBasePrivate::typeConverterFacto
 //	new QJsonTypeConverterStandardFactory<QJsonLocaleConverter>{},
 //	new QJsonTypeConverterStandardFactory<QJsonRegularExpressionConverter>{},
 //	new QJsonTypeConverterStandardFactory<QJsonStdTupleConverter>{},
-	new QJsonTypeConverterStandardFactory<QJsonChronoDurationConverter>{},
 //	new QJsonTypeConverterStandardFactory<QJsonStdOptionalConverter>{},
 //	new QJsonTypeConverterStandardFactory<QJsonStdVariantConverter>{},
+	new QJsonTypeConverterStandardFactory<QJsonChronoDurationConverter>{},
 };
 
 QSharedPointer<QJsonTypeConverter> QJsonSerializerBasePrivate::findSerConverter(int propertyType) const
