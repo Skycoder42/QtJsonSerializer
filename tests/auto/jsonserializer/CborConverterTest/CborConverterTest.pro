@@ -4,11 +4,11 @@ QT = core testlib jsonserializer
 CONFIG += console
 CONFIG -= app_bundle
 
-TARGET = tst_jsonconverter
+TARGET = tst_cborconverter
 
 include(../convlib.pri)
 
 SOURCES += \
-	tst_jsonconverter.cpp
+	tst_cborconverter.cpp
 
 include(../../testrun.pri)

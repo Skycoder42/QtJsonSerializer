@@ -9,6 +9,7 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QCoreApplication>
 
+#include "typeconverters/qjsoncborconverter_p.h"
 #include "typeconverters/qjsonchronodurationconverter_p.h"
 #include "typeconverters/qjsonenumconverter_p.h"
 #include "typeconverters/qjsongadgetconverter_p.h"
@@ -17,7 +18,6 @@
 #include "typeconverters/qjsonmultimapconverter_p.h"
 #include "typeconverters/qjsonobjectconverter_p.h"
 #include "typeconverters/qjsonpairconverter_p.h"
-//#include "typeconverters/qjsonjsonconverter_p.h"
 //#include "typeconverters/qjsonbytearrayconverter_p.h"
 //#include "typeconverters/qjsonversionnumberconverter_p.h"
 //#include "typeconverters/qjsongeomconverter_p.h"
@@ -316,8 +316,8 @@ QList<QJsonTypeConverterFactory*> QJsonSerializerBasePrivate::typeConverterFacto
 	new QJsonTypeConverterStandardFactory<QJsonEnumConverter>{},
 	new QJsonTypeConverterStandardFactory<QJsonMapConverter>{},
 	new QJsonTypeConverterStandardFactory<QJsonPairConverter>{},
+	new QJsonTypeConverterStandardFactory<QJsonCborConverter>{},
 	new QJsonTypeConverterStandardFactory<QJsonMultiMapConverter>{},
-//	new QJsonTypeConverterStandardFactory<QJsonJsonValueConverter>{},
 //	new QJsonTypeConverterStandardFactory<QJsonJsonObjectConverter>{},
 //	new QJsonTypeConverterStandardFactory<QJsonJsonArrayConverter>{},
 //	new QJsonTypeConverterStandardFactory<QJsonBytearrayConverter>{},

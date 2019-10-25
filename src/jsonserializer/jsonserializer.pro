@@ -2,15 +2,6 @@ TARGET = QtJsonSerializer
 
 QT = core core-private
 
-SOURCES += \
-	qcborserializer.cpp \
-	qcontainerwriters.cpp \
-	qjsonserializer.cpp \
-	qjsonserializerbase.cpp \
-	qjsonserializerexception.cpp \
-	qjsontypeconverter.cpp \
-	qjsonexceptioncontext.cpp
-
 HEADERS += \
 	qcborserializer.h \
 	qcborserializer_p.h \
@@ -25,6 +16,15 @@ HEADERS += \
 	qjsontypeconverter.h \
 	qjsonexceptioncontext_p.h \
 	qjsonserializerexception_p.h
+
+SOURCES += \
+	qcborserializer.cpp \
+	qcontainerwriters.cpp \
+	qjsonserializer.cpp \
+	qjsonserializerbase.cpp \
+	qjsonserializerexception.cpp \
+	qjsontypeconverter.cpp \
+	qjsonexceptioncontext.cpp
 
 include(typeconverters/typeconverters.pri)
 

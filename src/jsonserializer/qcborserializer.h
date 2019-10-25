@@ -19,7 +19,6 @@ public:
 		ExplicitMap = 259,
 		NetworkAddress = 260,
 		NetworkAddressPrefix = 261,
-		EmbeddedJSON = 262,
 	};
 	Q_ENUM(QCborExtendedTags)
 

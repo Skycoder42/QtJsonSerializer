@@ -6,11 +6,11 @@ SUBDIRS += \
 
 CONVERTER_TESTS = \
 #	BytearrayConverterTest \
+	CborConverterTest \
 	ChronoDurationConverterTest \
 	EnumConverterTest \
 	GadgetConverterTest \
 #	GeomConverterTest \
-#	JsonConverterTest \
 	ListConverterTest \
 #	LocaleConverterTest \
 	MapConverterTest \
