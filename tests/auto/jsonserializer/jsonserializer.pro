@@ -5,7 +5,7 @@ SUBDIRS += \
 	SerializerTest
 
 CONVERTER_TESTS = \
-#	BytearrayConverterTest \
+	BytearrayConverterTest \
 	CborConverterTest \
 	ChronoDurationConverterTest \
 	EnumConverterTest \

@@ -139,7 +139,11 @@ void TypeConverterTestBase::testSerialization()
 			if (!jResult.isUndefined()) {
 				helper->json = true;
 				helper->serData = serData;
-				auto res = converter()->serialize(type, data).toJsonValue();
+				auto cRes = converter()->serialize(type, data);
+				if (const auto tag = helper->typeTag(type); tag != static_cast<QCborTag>(QCborSerializer::NoTag))
+					cRes = {tag, cRes.isTag() ? cRes.taggedValue() : cRes};
+				const auto res = cRes.toJsonValue();
+				qDebug() << res << jResult << cRes;
 				QCOMPARE(res, jResult);
 			}
 		}
@@ -199,7 +203,7 @@ void TypeConverterTestBase::testDeserialization()
 			if (!jData.isUndefined()) {
 				helper->json = true;
 				helper->deserData = deserData;
-				auto res = converter()->deserializeCbor(type, QCborValue::fromJsonValue(jData), this);
+				auto res = converter()->deserializeJson(type, QCborValue::fromJsonValue(jData), this);
 				QVERIFY(res.convert(type));
 				SELF_COMPARE(type, res, result);
 			}

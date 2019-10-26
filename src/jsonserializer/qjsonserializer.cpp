@@ -60,6 +60,12 @@ QVariant QJsonSerializer::deserializeFrom(const QByteArray &data, int metaTypeId
 	return res;
 }
 
+QJsonSerializer::ByteArrayFormat QJsonSerializer::byteArrayFormat() const
+{
+	Q_D(const QJsonSerializer);
+	return d->byteArrayFormat;
+}
+
 bool QJsonSerializer::validateBase64() const
 {
 	Q_D(const QJsonSerializer);
@@ -74,6 +80,16 @@ std::variant<QCborValue, QJsonValue> QJsonSerializer::serializeGeneric(const QVa
 QVariant QJsonSerializer::deserializeGeneric(const std::variant<QCborValue, QJsonValue> &value, int metaTypeId, QObject *parent) const
 {
 	return deserialize(std::get<QJsonValue>(value), metaTypeId, parent);
+}
+
+void QJsonSerializer::setByteArrayFormat(QJsonSerializer::ByteArrayFormat byteArrayFormat)
+{
+	Q_D(QJsonSerializer);
+	if(d->byteArrayFormat == byteArrayFormat)
+		return;
+
+	d->byteArrayFormat = byteArrayFormat;
+	emit byteArrayFormatChanged(d->byteArrayFormat, {});
 }
 
 void QJsonSerializer::setValidateBase64(bool validateBase64)
@@ -93,8 +109,20 @@ bool QJsonSerializer::jsonMode() const
 
 QCborTag QJsonSerializer::typeTag(int metaTypeId) const
 {
-	Q_UNUSED(metaTypeId)
-	return QJsonTypeConverter::NoTag;
+	Q_D(const QJsonSerializer);
+	if (metaTypeId == QMetaType::QByteArray) {
+		switch (d->byteArrayFormat) {
+		case ByteArrayFormat::Base64:
+			return static_cast<QCborTag>(QCborKnownTags::ExpectedBase64);
+		case ByteArrayFormat::Base64url:
+			return static_cast<QCborTag>(QCborKnownTags::ExpectedBase64url);
+		case ByteArrayFormat::Base16:
+			return static_cast<QCborTag>(QCborKnownTags::ExpectedBase16);
+		default:
+			Q_UNREACHABLE();
+		}
+	} else
+		return QJsonTypeConverter::NoTag;
 }
 
 QList<int> QJsonSerializer::typesForTag(QCborTag tag) const

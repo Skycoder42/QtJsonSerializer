@@ -13,10 +13,18 @@ class Q_JSONSERIALIZER_EXPORT QJsonSerializer : public QJsonSerializerBase
 {
 	Q_OBJECT
 
+	Q_PROPERTY(ByteArrayFormat byteArrayFormat READ byteArrayFormat WRITE setByteArrayFormat NOTIFY byteArrayFormatChanged)
 	//! Specify whether deserializing a QByteArray should verify the data as base64 instead of silent discarding
 	Q_PROPERTY(bool validateBase64 READ validateBase64 WRITE setValidateBase64 NOTIFY validateBase64Changed)
 
 public:
+	enum class ByteArrayFormat {
+		Base64,
+		Base64url,
+		Base16
+	};
+	Q_ENUM(ByteArrayFormat)
+
 	explicit QJsonSerializer(QObject *parent = nullptr);
 
 	//! Serializers a QVariant value to a QJsonValue
@@ -53,6 +61,8 @@ public:
 	template <typename T>
 	T deserializeFrom(const QByteArray &data, QObject *parent = nullptr) const;
 
+	//! @readAcFn{QJsonSerializer::byteArrayFormat}
+	ByteArrayFormat byteArrayFormat() const;
 	//! @readAcFn{QJsonSerializer::validateBase64}
 	bool validateBase64() const;
 
@@ -60,10 +70,14 @@ public:
 	QVariant deserializeGeneric(const std::variant<QCborValue, QJsonValue> &value, int metaTypeId, QObject *parent) const override;
 
 public Q_SLOTS:
+	//! @writeAcFn{QJsonSerializer::byteArrayFormat}
+	void setByteArrayFormat(ByteArrayFormat byteArrayFormat);
 	//! @writeAcFn{QJsonSerializer::validateBase64}
 	void setValidateBase64(bool validateBase64);
 
 Q_SIGNALS:
+	//! @notifyAcFn{QJsonSerializer::byteArrayFormat}
+	void byteArrayFormatChanged(ByteArrayFormat byteArrayFormat, QPrivateSignal);
 	//! @notifyAcFn{QJsonSerializer::validateBase64}
 	void validateBase64Changed(bool validateBase64, QPrivateSignal);
 

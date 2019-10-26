@@ -27,20 +27,61 @@ QJsonTypeConverter *BytearrayConverterTest::converter()
 
 void BytearrayConverterTest::addConverterData()
 {
-	QTest::newRow("bytearray") << static_cast<int>(QJsonTypeConverter::Standard)
-							   << QList<QJsonValue::Type>{QJsonValue::String};
+	QTest::newRow("bytearray") << static_cast<int>(QJsonTypeConverter::Standard);
 }
 
 void BytearrayConverterTest::addMetaData()
 {
-	QTest::newRow("bytearray") << static_cast<int>(QMetaType::QByteArray)
-							   << true;
-	QTest::newRow("invalid.string") << static_cast<int>(QMetaType::QString)
-									<< false;
-	QTest::newRow("invalid.char") << static_cast<int>(QMetaType::Char)
-								  << false;
-	QTest::newRow("invalid.string") << static_cast<int>(QMetaType::Int)
-									<< false;
+	QTest::newRow("base64") << static_cast<int>(QMetaType::QByteArray)
+							<< static_cast<QCborTag>(QCborKnownTags::ExpectedBase64)
+							<< QCborValue::ByteArray
+							<< true
+							<< QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+	QTest::newRow("base64url") << static_cast<int>(QMetaType::QByteArray)
+							   << static_cast<QCborTag>(QCborKnownTags::ExpectedBase64url)
+							   << QCborValue::ByteArray
+							   << true
+							   << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+	QTest::newRow("base16") << static_cast<int>(QMetaType::QByteArray)
+							<< static_cast<QCborTag>(QCborKnownTags::ExpectedBase16)
+							<< QCborValue::ByteArray
+							<< true
+							<< QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+	QTest::newRow("json") << static_cast<int>(QMetaType::QByteArray)
+						  << static_cast<QCborTag>(QCborSerializer::NoTag)
+						  << QCborValue::String
+						  << true
+						  << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+	QTest::newRow("guess.base64") << static_cast<int>(QMetaType::UnknownType)
+								  << static_cast<QCborTag>(QCborKnownTags::ExpectedBase64)
+								  << QCborValue::ByteArray
+								  << false
+								  << QJsonTypeConverter::DeserializationCapabilityResult::Guessed;
+	QTest::newRow("guess.base64url") << static_cast<int>(QMetaType::UnknownType)
+									 << static_cast<QCborTag>(QCborKnownTags::ExpectedBase64url)
+									 << QCborValue::ByteArray
+									 << false
+									 << QJsonTypeConverter::DeserializationCapabilityResult::Guessed;
+	QTest::newRow("guess.base16") << static_cast<int>(QMetaType::UnknownType)
+								  << static_cast<QCborTag>(QCborKnownTags::ExpectedBase16)
+								  << QCborValue::ByteArray
+								  << false
+								  << QJsonTypeConverter::DeserializationCapabilityResult::Guessed;
+	QTest::newRow("invalid.type") << static_cast<int>(QMetaType::QString)
+								  << static_cast<QCborTag>(QCborKnownTags::ExpectedBase64url)
+								  << QCborValue::ByteArray
+								  << false
+								  << QJsonTypeConverter::DeserializationCapabilityResult::Negative;
+	QTest::newRow("invalid.value") << static_cast<int>(QMetaType::QByteArray)
+								   << static_cast<QCborTag>(QCborKnownTags::ExpectedBase64)
+								   << QCborValue::String
+								   << true
+								   << QJsonTypeConverter::DeserializationCapabilityResult::Negative;
+	QTest::newRow("invalid.tag") << static_cast<int>(QMetaType::QByteArray)
+								 << static_cast<QCborTag>(QCborKnownTags::Base64)
+								 << QCborValue::ByteArray
+								 << true
+								 << QJsonTypeConverter::DeserializationCapabilityResult::WrongTag    ;
 }
 
 void BytearrayConverterTest::addCommonSerData()
@@ -50,36 +91,122 @@ void BytearrayConverterTest::addCommonSerData()
 						   << static_cast<QObject*>(nullptr)
 						   << static_cast<int>(QMetaType::QByteArray)
 						   << QVariant{QByteArrayLiteral("Hello World")}
-						   << QJsonValue{QStringLiteral("SGVsbG8gV29ybGQ=")};
+						   << QCborValue{QByteArrayLiteral("Hello World")}
+						   << QJsonValue{QStringLiteral("SGVsbG8gV29ybGQ")};
+	QTest::newRow("base64") << QVariantHash{
+		{QStringLiteral("typeTag"), QVariant::fromValue(static_cast<QCborTag>(QCborKnownTags::ExpectedBase64))},
+		{QStringLiteral("byteArrayFormat"), QVariant::fromValue(QJsonSerializer::ByteArrayFormat::Base64)}
+	}
+							<< TestQ{}
+							<< static_cast<QObject*>(nullptr)
+							<< static_cast<int>(QMetaType::QByteArray)
+							<< QVariant{QByteArrayLiteral("Hello World")}
+							<< QCborValue{}
+							<< QJsonValue{QStringLiteral("SGVsbG8gV29ybGQ=")};
+	QTest::newRow("base64url") << QVariantHash{
+		{QStringLiteral("typeTag"), QVariant::fromValue(static_cast<QCborTag>(QCborKnownTags::ExpectedBase64url))},
+		{QStringLiteral("byteArrayFormat"), QVariant::fromValue(QJsonSerializer::ByteArrayFormat::Base64url)}
+	}
+							   << TestQ{}
+							   << static_cast<QObject*>(nullptr)
+							   << static_cast<int>(QMetaType::QByteArray)
+							   << QVariant{QByteArrayLiteral("Hello World")}
+							   << QCborValue{}
+							   << QJsonValue{QStringLiteral("SGVsbG8gV29ybGQ")};
+	QTest::newRow("base16") << QVariantHash{
+		{QStringLiteral("typeTag"), QVariant::fromValue(static_cast<QCborTag>(QCborKnownTags::ExpectedBase16))},
+		{QStringLiteral("byteArrayFormat"), QVariant::fromValue(QJsonSerializer::ByteArrayFormat::Base16)}
+	}
+							<< TestQ{}
+							<< static_cast<QObject*>(nullptr)
+							<< static_cast<int>(QMetaType::QByteArray)
+							<< QVariant{QByteArrayLiteral("Hello World")}
+							<< QCborValue{}
+							<< QJsonValue{QStringLiteral("48656c6c6f20576f726c64")};
 }
 
 void BytearrayConverterTest::addDeserData()
 {
-
-	QTest::newRow("invalid") << QVariantHash{{QStringLiteral("validateBase64"), false}}
-							 << TestQ{}
-							 << static_cast<QObject*>(nullptr)
-							 << static_cast<int>(QMetaType::QByteArray)
-							 << QVariant{QByteArrayLiteral("Hello World8")}
-							 << QJsonValue{QStringLiteral("SGVsbG8#'gV29ybGQ=42")};
-	QTest::newRow("validated1") << QVariantHash{{QStringLiteral("validateBase64"), true}}
-								<< TestQ{}
-								<< static_cast<QObject*>(nullptr)
-								<< static_cast<int>(QMetaType::QByteArray)
-								<< QVariant{}
-								<< QJsonValue{QStringLiteral("SGVsbG8#'gV29ybGQ=42")};
-	QTest::newRow("validated2") << QVariantHash{{QStringLiteral("validateBase64"), true}}
-								<< TestQ{}
-								<< static_cast<QObject*>(nullptr)
-								<< static_cast<int>(QMetaType::QByteArray)
-								<< QVariant{}
-								<< QJsonValue{QStringLiteral("SGVsbG8gV29ybGQ2=")};
-	QTest::newRow("validated3") << QVariantHash{{QStringLiteral("validateBase64"), true}}
-								<< TestQ{}
-								<< static_cast<QObject*>(nullptr)
-								<< static_cast<int>(QMetaType::QByteArray)
-								<< QVariant{}
-								<< QJsonValue{QStringLiteral("SGVsbG%gV29ybGQ=")};
+	QTest::newRow("validated.base64.invalid") << QVariantHash{
+		{QStringLiteral("validateBase64"), false},
+		{QStringLiteral("byteArrayFormat"), QVariant::fromValue(QJsonSerializer::ByteArrayFormat::Base64)}
+	}
+											  << TestQ{}
+											  << static_cast<QObject*>(nullptr)
+											  << static_cast<int>(QMetaType::QByteArray)
+											  << QVariant{QByteArrayLiteral("Hello World8")}
+											  << QCborValue{}
+											  << QJsonValue{QStringLiteral("SGVsbG8#'gV29ybGQ=42")};
+	QTest::newRow("validated.base64.1") << QVariantHash{
+		{QStringLiteral("validateBase64"), true},
+		{QStringLiteral("byteArrayFormat"), QVariant::fromValue(QJsonSerializer::ByteArrayFormat::Base64)}
+	}
+										<< TestQ{}
+										<< static_cast<QObject*>(nullptr)
+										<< static_cast<int>(QMetaType::QByteArray)
+										<< QVariant{}
+										<< QCborValue{}
+										<< QJsonValue{QStringLiteral("SGVsbG8#'gV29ybGQ=42")};
+	QTest::newRow("validated.base64.2") << QVariantHash{
+		{QStringLiteral("validateBase64"), true},
+		{QStringLiteral("byteArrayFormat"), QVariant::fromValue(QJsonSerializer::ByteArrayFormat::Base64)}
+	}
+										<< TestQ{}
+										<< static_cast<QObject*>(nullptr)
+										<< static_cast<int>(QMetaType::QByteArray)
+										<< QVariant{}
+										<< QCborValue{}
+										<< QJsonValue{QStringLiteral("SGVsbG8gV29ybGQ2=")};
+	QTest::newRow("validated.base64.3") << QVariantHash{
+		{QStringLiteral("validateBase64"), true},
+		{QStringLiteral("byteArrayFormat"), QVariant::fromValue(QJsonSerializer::ByteArrayFormat::Base64)}
+	}
+										<< TestQ{}
+										<< static_cast<QObject*>(nullptr)
+										<< static_cast<int>(QMetaType::QByteArray)
+										<< QVariant{}
+										<< QCborValue{}
+										<< QJsonValue{QStringLiteral("SGVsbG%gV29ybGQ=")};
+	QTest::newRow("validated.base64url.invalid") << QVariantHash{
+		{QStringLiteral("validateBase64"), false},
+		{QStringLiteral("byteArrayFormat"), QVariant::fromValue(QJsonSerializer::ByteArrayFormat::Base64url)}
+	}
+												 << TestQ{}
+												 << static_cast<QObject*>(nullptr)
+												 << static_cast<int>(QMetaType::QByteArray)
+												 << QVariant{QByteArrayLiteral("Hello World")}
+												 << QCborValue{}
+												 << QJsonValue{QStringLiteral("SGVsbG8#'gV29ybGQ")};
+	QTest::newRow("validated.base64url") << QVariantHash{
+		{QStringLiteral("validateBase64"), true},
+		{QStringLiteral("byteArrayFormat"), QVariant::fromValue(QJsonSerializer::ByteArrayFormat::Base64url)}
+	}
+										 << TestQ{}
+										 << static_cast<QObject*>(nullptr)
+										 << static_cast<int>(QMetaType::QByteArray)
+										 << QVariant{}
+										 << QCborValue{}
+										 << QJsonValue{QStringLiteral("SGVsbG8#'gV29ybGQ")};
+	QTest::newRow("validated.base16.1") << QVariantHash{
+		{QStringLiteral("validateBase64"), true},
+		{QStringLiteral("byteArrayFormat"), QVariant::fromValue(QJsonSerializer::ByteArrayFormat::Base16)}
+	}
+										<< TestQ{}
+										<< static_cast<QObject*>(nullptr)
+										<< static_cast<int>(QMetaType::QByteArray)
+										<< QVariant{}
+										<< QCborValue{}
+										<< QJsonValue{QStringLiteral("48656ggc6c6f2057,nmn6f726c64")};
+	QTest::newRow("validated.base16.2") << QVariantHash{
+		{QStringLiteral("validateBase64"), true},
+		{QStringLiteral("byteArrayFormat"), QVariant::fromValue(QJsonSerializer::ByteArrayFormat::Base16)}
+	}
+										<< TestQ{}
+										<< static_cast<QObject*>(nullptr)
+										<< static_cast<int>(QMetaType::QByteArray)
+										<< QVariant{}
+										<< QCborValue{}
+										<< QJsonValue{QStringLiteral("48656c6c6f20576f726c647")};
 }
 
 QTEST_MAIN(BytearrayConverterTest)

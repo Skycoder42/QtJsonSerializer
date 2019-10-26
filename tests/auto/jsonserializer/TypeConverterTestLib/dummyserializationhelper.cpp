@@ -20,7 +20,10 @@ QVariant DummySerializationHelper::getProperty(const char *name) const
 
 QCborTag DummySerializationHelper::typeTag(int metaTypeId) const
 {
-	return typeMap.value(metaTypeId, static_cast<QCborTag>(QCborSerializer::NoTag));
+	Q_UNUSED(metaTypeId)
+	return properties.value(QStringLiteral("typeTag"),
+							QVariant::fromValue(static_cast<QCborTag>(QCborSerializer::NoTag)))
+		.value<QCborTag>();
 }
 
 QByteArray DummySerializationHelper::getCanonicalTypeName(int propertyType) const

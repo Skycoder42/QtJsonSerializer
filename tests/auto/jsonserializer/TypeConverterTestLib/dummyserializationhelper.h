@@ -23,7 +23,6 @@ public:
 
 	bool json = false;
 	QVariantHash properties;
-	QHash<int, QCborTag> typeMap;
 	struct SerInfo {
 		int typeId;
 		QVariant variant;
