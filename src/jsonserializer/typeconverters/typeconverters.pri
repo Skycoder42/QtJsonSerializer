@@ -14,7 +14,6 @@ HEADERS += \
 #    $$PWD/qjsonbytearrayconverter_p.h \
 #    $$PWD/qjsongeomconverter_p.h \
 #    $$PWD/qjsonlocaleconverter_p.h \
-#    $$PWD/qjsonregularexpressionconverter_p.h \
 #    $$PWD/qjsonstdtupleconverter_p.h \
 
 SOURCES += \
@@ -33,5 +32,4 @@ SOURCES += \
 #    $$PWD/qjsonbytearrayconverter.cpp \
 #    $$PWD/qjsongeomconverter.cpp \
 #    $$PWD/qjsonlocaleconverter.cpp \
-#    $$PWD/qjsonregularexpressionconverter.cpp \
 #    $$PWD/qjsonstdtupleconverter.cpp \

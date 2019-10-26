@@ -492,13 +492,13 @@ void SerializerTest::testDeserialization_data()
 									  << QVariantHash {
 											 {QStringLiteral("validationFlags"), QVariant::fromValue<QJsonSerializer::ValidationFlags>(QJsonSerializer::ValidationFlag::StandardValidation)}
 										 };
-//	QTest::newRow("null.invalid.regex") << QVariant{QRegularExpression()}
-//										<< QCborValue{QCborValue::Null}
-//										<< QJsonValue{QJsonValue::Null}
-//										<< false
-//										<< QVariantHash {
-//											   {QStringLiteral("validationFlags"), QVariant::fromValue<QJsonSerializer::ValidationFlags>(QJsonSerializer::ValidationFlag::StandardValidation)}
-//										   };
+	QTest::newRow("null.invalid.regex") << QVariant{QRegularExpression()}
+										<< QCborValue{QCborValue::Null}
+										<< QJsonValue{QJsonValue::Null}
+										<< false
+										<< QVariantHash {
+											   {QStringLiteral("validationFlags"), QVariant::fromValue<QJsonSerializer::ValidationFlags>(QJsonSerializer::ValidationFlag::StandardValidation)}
+										   };
 
 	QTest::newRow("null.valid.bool") << QVariant{false}
 									 << QCborValue{QCborValue::Null}
@@ -548,14 +548,14 @@ void SerializerTest::testDeserialization_data()
 										   {QStringLiteral("allowDefaultNull"), true},
 										   {QStringLiteral("validationFlags"), QVariant::fromValue<QJsonSerializer::ValidationFlags>(QJsonSerializer::ValidationFlag::StandardValidation)}
 									   };
-//	QTest::newRow("null.valid.regex") << QVariant{QRegularExpression()}
-//									  << QCborValue{}
-//									  << QJsonValue{QJsonValue::Null}
-//									  << true
-//									  << QVariantHash {
-//											 {QStringLiteral("allowDefaultNull"), true},
-//											 {QStringLiteral("validationFlags"), QVariant::fromValue<QJsonSerializer::ValidationFlags>(QJsonSerializer::ValidationFlag::StandardValidation)}
-//										 };
+	QTest::newRow("null.valid.regex") << QVariant{QRegularExpression()}
+									  << QCborValue{}
+									  << QJsonValue{QJsonValue::Null}
+									  << true
+									  << QVariantHash {
+											 {QStringLiteral("allowDefaultNull"), true},
+											 {QStringLiteral("validationFlags"), QVariant::fromValue<QJsonSerializer::ValidationFlags>(QJsonSerializer::ValidationFlag::StandardValidation)}
+										 };
 
 	QTest::newRow("strict.bool.invalid") << QVariant{false}
 										 << QCborValue{0}
@@ -597,11 +597,11 @@ void SerializerTest::testDeserialization_data()
 								 << QJsonValue{true}
 								 << false
 								 << QVariantHash{};
-//	QTest::newRow("strict.regex") << QVariant{QRegularExpression{}}
-//								  << QCborValue{42}
-//								  << QJsonValue{42}
-//								  << false
-//								  << QVariantHash{};
+	QTest::newRow("strict.regex") << QVariant{QRegularExpression{}}
+								  << QCborValue{42}
+								  << QJsonValue{42}
+								  << false
+								  << QVariantHash{};
 }
 
 void SerializerTest::testDeserialization()
@@ -739,16 +739,16 @@ void SerializerTest::addCommonData()
 								 << QJsonValue{QString{}}
 								 << true
 								 << QVariantHash{};
-//	QTest::newRow("regex.valid") << QVariant{QRegularExpression{QStringLiteral(R"__(^[Hh]ello\s+world!?$)__")}}
-//								 << QCborValue{QRegularExpression{QStringLiteral(R"__(^[Hh]ello\s+world!?$)__")}}
-//								 << QJsonValue{QStringLiteral(R"__(^[Hh]ello\s+world!?$)__")}
-//								 << true
-//								 << QVariantHash{};
-//	QTest::newRow("regex.invalid") << QVariant{QRegularExpression{}}
-//								   << QCborValue{QRegularExpression{}}
-//								   << QJsonValue{QString{}}
-//								   << true
-//								   << QVariantHash{};
+	QTest::newRow("regex.valid") << QVariant{QRegularExpression{QStringLiteral(R"__(^[Hh]ello\s+world!?$)__")}}
+								 << QCborValue{QRegularExpression{QStringLiteral(R"__(^[Hh]ello\s+world!?$)__")}}
+								 << QJsonValue{QStringLiteral(R"__(^[Hh]ello\s+world!?$)__")}
+								 << true
+								 << QVariantHash{};
+	QTest::newRow("regex.invalid") << QVariant{QRegularExpression{}}
+								   << QCborValue{QRegularExpression{}}
+								   << QJsonValue{QString{}}
+								   << true
+								   << QVariantHash{};
 
 	// gui types
 	QTest::newRow("color.rgb") << QVariant::fromValue(QColor{0xAA, 0xBB, 0xCC})

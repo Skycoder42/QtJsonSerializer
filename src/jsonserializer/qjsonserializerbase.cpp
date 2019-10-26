@@ -646,5 +646,10 @@ QVariant QJsonSerializerBasePrivate::deserializeJsonValue(int propertyType, cons
 		}
 	}
 
-	return value.toVariant();
+	// special case: QRegularExpression, is missing a converter (and cannot be registered)
+	if (propertyType == QMetaType::QRegularExpression &&
+		value.isString())
+		return QRegularExpression{value.toString()};
+	else
+		return value.toVariant();
 }
