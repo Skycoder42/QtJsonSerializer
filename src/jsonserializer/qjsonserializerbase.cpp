@@ -14,13 +14,13 @@
 #include "typeconverters/qjsonchronodurationconverter_p.h"
 #include "typeconverters/qjsonenumconverter_p.h"
 #include "typeconverters/qjsongadgetconverter_p.h"
+#include "typeconverters/qjsongeomconverter_p.h"
 #include "typeconverters/qjsonlistconverter_p.h"
 #include "typeconverters/qjsonmapconverter_p.h"
 #include "typeconverters/qjsonmultimapconverter_p.h"
 #include "typeconverters/qjsonobjectconverter_p.h"
 #include "typeconverters/qjsonpairconverter_p.h"
 #include "typeconverters/qjsonversionnumberconverter_p.h"
-//#include "typeconverters/qjsongeomconverter_p.h"
 //#include "typeconverters/qjsonlocaleconverter_p.h"
 //#include "typeconverters/qjsonregularexpressionconverter_p.h"
 //#include "typeconverters/qjsonstdtupleconverter_p.h"
@@ -335,11 +335,8 @@ QList<QJsonTypeConverterFactory*> QJsonSerializerBasePrivate::typeConverterFacto
 	new QJsonTypeConverterStandardFactory<QJsonPairConverter>{},
 	new QJsonTypeConverterStandardFactory<QJsonCborConverter>{},
 	new QJsonTypeConverterStandardFactory<QJsonVersionNumberConverter>{},
+	new QJsonTypeConverterStandardFactory<QJsonGeomConverter>{},
 	new QJsonTypeConverterStandardFactory<QJsonMultiMapConverter>{},
-//	new QJsonTypeConverterStandardFactory<QJsonSizeConverter>{},
-//	new QJsonTypeConverterStandardFactory<QJsonPointConverter>{},
-//	new QJsonTypeConverterStandardFactory<QJsonLineConverter>{},
-//	new QJsonTypeConverterStandardFactory<QJsonRectConverter>{},
 //	new QJsonTypeConverterStandardFactory<QJsonLocaleConverter>{},
 //	new QJsonTypeConverterStandardFactory<QJsonRegularExpressionConverter>{},
 //	new QJsonTypeConverterStandardFactory<QJsonStdTupleConverter>{},

@@ -1,234 +1,223 @@
 #include "qjsongeomconverter_p.h"
 #include "qjsonserializerexception.h"
+#include "qcborserializer.h"
 
-#include <QtCore/QJsonObject>
-#include <QtCore/QSize>
-#include <QtCore/QPoint>
-#include <QtCore/QLine>
-#include <QtCore/QRect>
-
-bool QJsonSizeConverter::canConvert(int metaTypeId) const
+bool QJsonGeomConverter::canConvert(int metaTypeId) const
 {
-	return metaTypeId == QMetaType::QSize ||
-			metaTypeId == QMetaType::QSizeF;
+	static const QVector<int> types {
+		QMetaType::QSize,
+		QMetaType::QSizeF,
+		QMetaType::QPoint,
+		QMetaType::QPointF,
+		QMetaType::QLine,
+		QMetaType::QLineF,
+		QMetaType::QRect,
+		QMetaType::QRectF,
+	};
+	return types.contains(metaTypeId);
 }
 
-QList<QJsonValue::Type> QJsonSizeConverter::jsonTypes() const
+QList<QCborTag> QJsonGeomConverter::allowedCborTags(int metaTypeId) const
 {
-	return {QJsonValue::Object};
+	switch (metaTypeId) {
+	case QMetaType::QSize:
+	case QMetaType::QSizeF:
+		return {static_cast<QCborTag>(QCborSerializer::GeomSize)};
+	case QMetaType::QPoint:
+	case QMetaType::QPointF:
+		return {static_cast<QCborTag>(QCborSerializer::GeomPoint)};
+	case QMetaType::QLine:
+	case QMetaType::QLineF:
+		return {static_cast<QCborTag>(QCborSerializer::GeomLine)};
+	case QMetaType::QRect:
+	case QMetaType::QRectF:
+		return {static_cast<QCborTag>(QCborSerializer::GeomRect)};
+	default:
+		return {};
+	}
 }
 
-QJsonValue QJsonSizeConverter::serialize(int propertyType, const QVariant &value, const QJsonTypeConverter::SerializationHelper *helper) const
+QList<QCborValue::Type> QJsonGeomConverter::allowedCborTypes(int metaTypeId, QCborTag tag) const
 {
-	Q_UNUSED(helper)
-
-	QJsonValue w;
-	QJsonValue h;
-	if(propertyType == QMetaType::QSize) {
-		auto size = value.toSize();
-		w = size.width();
-		h = size.height();
-	} else if(propertyType == QMetaType::QSizeF) {
-		auto size = value.toSizeF();
-		w = size.width();
-		h = size.height();
-	} else
-		throw QJsonSerializationException(QByteArray("Invalid metatype: ") + QMetaType::typeName(propertyType));
-
-	QJsonObject object;
-	object[QStringLiteral("width")] = w;
-	object[QStringLiteral("height")] = h;
-	return object;
+	Q_UNUSED(metaTypeId)
+	Q_UNUSED(tag)
+	return {QCborValue::Array};
 }
 
-QVariant QJsonSizeConverter::deserialize(int propertyType, const QJsonValue &value, QObject *parent, const QJsonTypeConverter::SerializationHelper *helper) const
+int QJsonGeomConverter::guessType(QCborTag tag, QCborValue::Type dataType) const
+{
+	if (dataType != QCborValue::Array)
+		return QMetaType::UnknownType;
+	switch (tag) {
+	case static_cast<QCborTag>(QCborSerializer::GeomSize):
+		return QMetaType::QSizeF;
+	case static_cast<QCborTag>(QCborSerializer::GeomPoint):
+		return QMetaType::QPointF;
+	case static_cast<QCborTag>(QCborSerializer::GeomLine):
+		return QMetaType::QLineF;
+	case static_cast<QCborTag>(QCborSerializer::GeomRect):
+		return QMetaType::QRectF;
+	default:
+		return QMetaType::UnknownType;
+	}
+}
+
+QCborValue QJsonGeomConverter::serialize(int propertyType, const QVariant &value) const
+{
+	switch (propertyType) {
+	case QMetaType::QSize:
+		return serializeSize(value.toSize());
+	case QMetaType::QSizeF:
+		return serializeSize(value.toSizeF());
+	case QMetaType::QPoint:
+		return serializePoint(value.toPoint());
+	case QMetaType::QPointF:
+		return serializePoint(value.toPointF());
+	case QMetaType::QLine:
+		return serializeLine(value.toLine());
+	case QMetaType::QLineF:
+		return serializeLine(value.toLineF());
+	case QMetaType::QRect:
+		return serializeRect(value.toRect());
+	case QMetaType::QRectF:
+		return serializeRect(value.toRectF());
+	default:
+		throw QJsonSerializationException{"Invalid type id"};
+	}
+}
+
+QVariant QJsonGeomConverter::deserializeCbor(int propertyType, const QCborValue &value, QObject *parent) const
 {
 	Q_UNUSED(parent)
-	Q_UNUSED(helper)
-
-	auto object = value.toObject();
-	if(object.keys().size() != 2 ||
-	   !object.keys().contains(QStringLiteral("width")) ||
-	   !object.keys().contains(QStringLiteral("height")))
-		throw QJsonDeserializationException("Json object has no width or height properties or does have extra properties");
-
-	auto w = object.value(QStringLiteral("width"));
-	auto h = object.value(QStringLiteral("height"));
-	if(!w.isDouble() || !h.isDouble())
-		throw QJsonDeserializationException("Object properties width and height must be numbers");
-
-	if(propertyType == QMetaType::QSize)
-		return QSize(w.toInt(), h.toInt());
-	else if(propertyType == QMetaType::QSizeF)
-		return QSizeF(w.toDouble(), h.toDouble());
-	else
-		throw QJsonDeserializationException(QByteArray("Invalid metatype: ") + QMetaType::typeName(propertyType));
+	const auto array = (value.isTag() ? value.taggedValue() : value).toArray();
+	switch (propertyType) {
+	case QMetaType::QSize:
+		return deserializeSize<QSize>(array);
+	case QMetaType::QSizeF:
+		return deserializeSize<QSizeF>(array);
+	case QMetaType::QPoint:
+		return deserializePoint<QPoint>(array);
+	case QMetaType::QPointF:
+		return deserializePoint<QPointF>(array);
+	case QMetaType::QLine:
+		return deserializeLine<QLine>(array);
+	case QMetaType::QLineF:
+		return deserializeLine<QLineF>(array);
+	case QMetaType::QRect:
+		return deserializeRect<QRect>(array);
+	case QMetaType::QRectF:
+		return deserializeRect<QRectF>(array);
+	default:
+		throw QJsonDeserializationException{"Invalid type id"};
+	}
 }
 
-
-
-bool QJsonPointConverter::canConvert(int metaTypeId) const
+QCborValue QJsonGeomConverter::serializeSize(const std::variant<QSize, QSizeF> &size) const
 {
-	return metaTypeId == QMetaType::QPoint ||
-			metaTypeId == QMetaType::QPointF;
+	return {
+		static_cast<QCborTag>(QCborSerializer::GeomSize),
+		std::visit([](const auto &s) -> QCborArray {
+			return {s.width(), s.height()};
+		}, size)
+	};
 }
 
-QList<QJsonValue::Type> QJsonPointConverter::jsonTypes() const
+QCborValue QJsonGeomConverter::serializePoint(const std::variant<QPoint, QPointF> &point) const
 {
-	return {QJsonValue::Object};
+	return {
+		static_cast<QCborTag>(QCborSerializer::GeomPoint),
+		std::visit([](const auto &p) -> QCborArray {
+			return {p.x(), p.y()};
+		}, point)
+	};
 }
 
-QJsonValue QJsonPointConverter::serialize(int propertyType, const QVariant &value, const QJsonTypeConverter::SerializationHelper *helper) const
+QCborValue QJsonGeomConverter::serializeLine(const std::variant<QLine, QLineF> &line) const
 {
-	Q_UNUSED(helper)
-
-	QJsonValue x;
-	QJsonValue y;
-	if(propertyType == QMetaType::QPoint) {
-		auto point = value.toPoint();
-		x = point.x();
-		y = point.y();
-	} else if(propertyType == QMetaType::QPointF) {
-		auto point = value.toPointF();
-		x = point.x();
-		y = point.y();
-	} else
-		throw QJsonSerializationException(QByteArray("Invalid metatype: ") + QMetaType::typeName(propertyType));
-
-	QJsonObject object;
-	object[QStringLiteral("x")] = x;
-	object[QStringLiteral("y")] = y;
-	return object;
+	return {
+		static_cast<QCborTag>(QCborSerializer::GeomLine),
+		std::visit([this](const auto &l) -> QCborArray {
+			return {
+				helper()->serializeSubtype(qMetaTypeId<std::decay_t<decltype(l.p1())>>(), l.p1(), "p1"),
+				helper()->serializeSubtype(qMetaTypeId<std::decay_t<decltype(l.p2())>>(), l.p2(), "p2")
+			};
+		}, line)
+	};
 }
 
-QVariant QJsonPointConverter::deserialize(int propertyType, const QJsonValue &value, QObject *parent, const QJsonTypeConverter::SerializationHelper *helper) const
+QCborValue QJsonGeomConverter::serializeRect(const std::variant<QRect, QRectF> &rect) const
 {
-	Q_UNUSED(parent)
-	Q_UNUSED(helper)
-
-	auto object = value.toObject();
-	if(object.keys().size() != 2 ||
-	   !object.keys().contains(QStringLiteral("x")) ||
-	   !object.keys().contains(QStringLiteral("y")))
-		throw QJsonDeserializationException("Json object has no x or y properties or does have extra properties");
-
-	auto x = object.value(QStringLiteral("x"));
-	auto y = object.value(QStringLiteral("y"));
-	if(!x.isDouble() || !y.isDouble())
-		throw QJsonDeserializationException("Object properties x and y must be numbers");
-
-	if(propertyType == QMetaType::QPoint)
-		return QPoint(x.toInt(), y.toInt());
-	else if(propertyType == QMetaType::QPointF)
-		return QPointF(x.toDouble(), y.toDouble());
-	else
-		throw QJsonDeserializationException(QByteArray("Invalid metatype: ") + QMetaType::typeName(propertyType));
+	return {
+		static_cast<QCborTag>(QCborSerializer::GeomRect),
+		std::visit([this](const auto &r) -> QCborArray {
+			return {
+				helper()->serializeSubtype(qMetaTypeId<std::decay_t<decltype(r.topLeft())>>(), r.topLeft(), "topLeft"),
+				helper()->serializeSubtype(qMetaTypeId<std::decay_t<decltype(r.size())>>(), r.size(), "size")
+			};
+		}, rect)
+	};
 }
 
-bool QJsonLineConverter::canConvert(int metaTypeId) const
+template<typename TSize>
+TSize QJsonGeomConverter::deserializeSize(const QCborArray &array) const
 {
-	return metaTypeId == QMetaType::QLine ||
-			metaTypeId == QMetaType::QLineF;
+	if (array.size() != 2)
+		throw QJsonDeserializationException{"A size requires an array with exactly two numbers"};
+	return {
+		extract<std::decay_t<decltype(TSize{}.width())>>(array[0]),
+		extract<std::decay_t<decltype(TSize{}.height())>>(array[1])
+	};
 }
 
-QList<QJsonValue::Type> QJsonLineConverter::jsonTypes() const
+template<typename TPoint>
+TPoint QJsonGeomConverter::deserializePoint(const QCborArray &array) const
 {
-	return {QJsonValue::Object};
+	if (array.size() != 2)
+		throw QJsonDeserializationException{"A point requires an array with exactly two numbers"};
+	return {
+		extract<std::decay_t<decltype(TPoint{}.x())>>(array[0]),
+		extract<std::decay_t<decltype(TPoint{}.y())>>(array[1])
+	};
 }
 
-QJsonValue QJsonLineConverter::serialize(int propertyType, const QVariant &value, const QJsonTypeConverter::SerializationHelper *helper) const
+template<typename TLine>
+TLine QJsonGeomConverter::deserializeLine(const QCborArray &array) const
 {
-	QJsonValue p1;
-	QJsonValue p2;
-	if(propertyType == QMetaType::QLine) {
-		auto line = value.toLine();
-		p1 = helper->serializeSubtype(QMetaType::QPoint, line.p1(), "p1");
-		p2 = helper->serializeSubtype(QMetaType::QPoint, line.p2(), "p2");
-	} else if(propertyType == QMetaType::QLineF) {
-		auto line = value.toLineF();
-		p1 = helper->serializeSubtype(QMetaType::QPointF, line.p1(), "p1");
-		p2 = helper->serializeSubtype(QMetaType::QPointF, line.p2(), "p2");
-	} else
-		throw QJsonSerializationException(QByteArray("Invalid metatype: ") + QMetaType::typeName(propertyType));
-
-	QJsonObject object;
-	object[QStringLiteral("p1")] = p1;
-	object[QStringLiteral("p2")] = p2;
-	return object;
+	using TP1 = std::decay_t<decltype(TLine{}.p1())>;
+	using TP2 = std::decay_t<decltype(TLine{}.p2())>;
+	if (array.size() != 2)
+		throw QJsonDeserializationException{"A line requires an array with exactly two points"};
+	return {
+		helper()->deserializeSubtype(qMetaTypeId<TP1>(), array[0], nullptr, "p1").template value<TP1>(),
+		helper()->deserializeSubtype(qMetaTypeId<TP2>(), array[1], nullptr, "p2").template value<TP2>()
+	};
 }
 
-QVariant QJsonLineConverter::deserialize(int propertyType, const QJsonValue &value, QObject *parent, const QJsonTypeConverter::SerializationHelper *helper) const
+template<typename TRect>
+TRect QJsonGeomConverter::deserializeRect(const QCborArray &array) const
 {
-	auto object = value.toObject();
-	if(object.keys().size() != 2 ||
-	   !object.keys().contains(QStringLiteral("p1")) ||
-	   !object.keys().contains(QStringLiteral("p2")))
-		throw QJsonDeserializationException("Json object has no p1 or p2 properties or does have extra properties");
-
-	auto v1 = object.value(QStringLiteral("p1"));
-	auto v2 = object.value(QStringLiteral("p2"));
-	if(propertyType == QMetaType::QLine) {
-		auto p1 = helper->deserializeSubtype(QMetaType::QPoint, v1, parent, "p1");
-		auto p2 = helper->deserializeSubtype(QMetaType::QPoint, v2, parent, "p1");
-		return QLine(p1.toPoint(), p2.toPoint());
-	} else if(propertyType == QMetaType::QLineF) {
-		auto p1 = helper->deserializeSubtype(QMetaType::QPointF, v1, parent, "p1");
-		auto p2 = helper->deserializeSubtype(QMetaType::QPointF, v2, parent, "p1");
-		return QLineF(p1.toPointF(), p2.toPointF());
-	} else
-		throw QJsonDeserializationException(QByteArray("Invalid metatype: ") + QMetaType::typeName(propertyType));
+	using TTL = std::decay_t<decltype(TRect{}.topLeft())>;
+	using TS = std::decay_t<decltype(TRect{}.size())>;
+	if (array.size() != 2)
+		throw QJsonDeserializationException{"A line requires an array with exactly two points"};
+	return {
+		helper()->deserializeSubtype(qMetaTypeId<TTL>(), array[0], nullptr, "topLeft").template value<TTL>(),
+		helper()->deserializeSubtype(qMetaTypeId<TS>(), array[1], nullptr, "size").template value<TS>()
+	};
 }
 
-bool QJsonRectConverter::canConvert(int metaTypeId) const
+template<>
+int QJsonGeomConverter::extract(const QCborValue &value) const
 {
-	return metaTypeId == QMetaType::QRect ||
-			metaTypeId == QMetaType::QRectF;
+	if (!value.isInteger())
+		throw QJsonDeserializationException{"Expected integer, but got type " + QByteArray::number(value.type())};
+	return static_cast<int>(value.toInteger());
 }
 
-QList<QJsonValue::Type> QJsonRectConverter::jsonTypes() const
+template<>
+qreal QJsonGeomConverter::extract(const QCborValue &value) const
 {
-	return {QJsonValue::Object};
-}
-
-QJsonValue QJsonRectConverter::serialize(int propertyType, const QVariant &value, const QJsonTypeConverter::SerializationHelper *helper) const
-{
-	QJsonValue p1;
-	QJsonValue p2;
-	if(propertyType == QMetaType::QRect) {
-		auto rect = value.toRect();
-		p1 = helper->serializeSubtype(QMetaType::QPoint, rect.topLeft(), "topLeft");
-		p2 = helper->serializeSubtype(QMetaType::QPoint, rect.bottomRight(), "bottomRight");
-	} else if(propertyType == QMetaType::QRectF) {
-		auto rect = value.toRectF();
-		p1 = helper->serializeSubtype(QMetaType::QPointF, rect.topLeft(), "topLeft");
-		p2 = helper->serializeSubtype(QMetaType::QPointF, rect.bottomRight(), "bottomRight");
-	} else
-		throw QJsonSerializationException(QByteArray("Invalid metatype: ") + QMetaType::typeName(propertyType));
-
-	QJsonObject object;
-	object[QStringLiteral("topLeft")] = p1;
-	object[QStringLiteral("bottomRight")] = p2;
-	return object;
-}
-
-QVariant QJsonRectConverter::deserialize(int propertyType, const QJsonValue &value, QObject *parent, const QJsonTypeConverter::SerializationHelper *helper) const
-{
-	auto object = value.toObject();
-	if(object.keys().size() != 2 ||
-	   !object.keys().contains(QStringLiteral("topLeft")) ||
-	   !object.keys().contains(QStringLiteral("bottomRight")))
-		throw QJsonDeserializationException("Json object has no topLeft or bottomRight properties or does have extra properties");
-
-	auto v1 = object.value(QStringLiteral("topLeft"));
-	auto v2 = object.value(QStringLiteral("bottomRight"));
-	if(propertyType == QMetaType::QRect) {
-		auto topLeft = helper->deserializeSubtype(QMetaType::QPoint, v1, parent, "topLeft");
-		auto bottomRight = helper->deserializeSubtype(QMetaType::QPoint, v2, parent, "bottomRight");
-		return QRect(topLeft.toPoint(), bottomRight.toPoint());
-	} else if(propertyType == QMetaType::QRectF) {
-		auto topLeft = helper->deserializeSubtype(QMetaType::QPointF, v1, parent, "topLeft");
-		auto bottomRight = helper->deserializeSubtype(QMetaType::QPointF, v2, parent, "bottomRight");
-		return QRectF(topLeft.toPointF(), bottomRight.toPointF());
-	} else
-		throw QJsonDeserializationException(QByteArray("Invalid metatype: ") + QMetaType::typeName(propertyType));
+	if (!value.isDouble() && !value.isInteger())
+		throw QJsonDeserializationException{"Expected double, but got type " + QByteArray::number(value.type())};
+	return value.toDouble();
 }

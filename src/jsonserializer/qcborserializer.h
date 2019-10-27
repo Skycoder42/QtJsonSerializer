@@ -32,12 +32,17 @@ public:
 		MultiMap = 10006,
 		VersionNumber = 10007,
 
-		ChronoNanoSeconds = 10100,
-		ChronoMicroSeconds = 10101,
-		ChronoMilliSeconds = 10102,
-		ChronoSeconds = 10103,
-		ChronoMinutes = 10104,
-		ChronoHours = 10105,
+		GeomSize = 10100,
+		GeomPoint = 10101,
+		GeomLine = 10102,
+		GeomRect = 10103,
+
+		ChronoNanoSeconds = 10110,
+		ChronoMicroSeconds = 10111,
+		ChronoMilliSeconds = 10112,
+		ChronoSeconds = 10113,
+		ChronoMinutes = 10114,
+		ChronoHours = 10115,
 
 		NoTag = std::numeric_limits<std::underlying_type_t<QCborTag>>::max()
 	};
