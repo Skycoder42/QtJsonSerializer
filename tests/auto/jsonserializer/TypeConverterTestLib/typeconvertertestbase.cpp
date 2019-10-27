@@ -143,7 +143,6 @@ void TypeConverterTestBase::testSerialization()
 				if (const auto tag = helper->typeTag(type); tag != static_cast<QCborTag>(QCborSerializer::NoTag))
 					cRes = {tag, cRes.isTag() ? cRes.taggedValue() : cRes};
 				const auto res = cRes.toJsonValue();
-				qDebug() << res << jResult << cRes;
 				QCOMPARE(res, jResult);
 			}
 		}

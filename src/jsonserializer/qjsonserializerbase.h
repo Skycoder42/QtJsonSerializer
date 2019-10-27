@@ -39,6 +39,7 @@ class Q_JSONSERIALIZER_EXPORT QJsonSerializerBase : public QObject, protected QJ
 	Q_PROPERTY(bool keepObjectName READ keepObjectName WRITE setKeepObjectName NOTIFY keepObjectNameChanged)
 	//! Specifies, whether enums should be serialized as integer or as string
 	Q_PROPERTY(bool enumAsString READ enumAsString WRITE setEnumAsString NOTIFY enumAsStringChanged)
+	Q_PROPERTY(bool versionAsString READ versionAsString WRITE setVersionAsString NOTIFY versionAsStringChanged)
 	//! Specify whether serializing a QLocale should use the bcp47 format
 	Q_PROPERTY(bool useBcp47Locale READ useBcp47Locale WRITE setUseBcp47Locale NOTIFY useBcp47LocaleChanged)
 	//! Specify how strictly the serializer should verify data when deserializing
@@ -122,6 +123,8 @@ public:
 	bool keepObjectName() const;
 	//! @readAcFn{QJsonSerializer::enumAsString}
 	bool enumAsString() const;
+	//! @readAcFn{QJsonSerializer::versionAsString}
+	bool versionAsString() const;
 	//! @readAcFn{QJsonSerializer::useBcp47Locale}
 	bool useBcp47Locale() const;
 	//! @readAcFn{QJsonSerializer::validationFlags}
@@ -152,6 +155,8 @@ public Q_SLOTS:
 	void setKeepObjectName(bool keepObjectName);
 	//! @writeAcFn{QJsonSerializer::enumAsString}
 	void setEnumAsString(bool enumAsString);
+	//! @writeAcFn{QJsonSerializer::versionAsString}
+	void setVersionAsString(bool versionAsString);
 	//! @writeAcFn{QJsonSerializer::useBcp47Locale}
 	void setUseBcp47Locale(bool useBcp47Locale);
 	//! @writeAcFn{QJsonSerializer::validationFlags}
@@ -170,6 +175,8 @@ Q_SIGNALS:
 	void keepObjectNameChanged(bool keepObjectName, QPrivateSignal);
 	//! @notifyAcFn{QJsonSerializer::enumAsString}
 	void enumAsStringChanged(bool enumAsString, QPrivateSignal);
+	//! @notifyAcFn{QJsonSerializer::versionAsString}
+	void versionAsStringChanged(bool versionAsString, QPrivateSignal);
 	//! @notifyAcFn{QJsonSerializer::useBcp47Locale}
 	void useBcp47LocaleChanged(bool useBcp47Locale, QPrivateSignal);
 	//! @notifyAcFn{QJsonSerializer::validationFlags}

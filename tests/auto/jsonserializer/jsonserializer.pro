@@ -21,7 +21,7 @@ CONVERTER_TESTS = \
 #	RegexConverterTest \
 #	TupleConverterTest \
 #	VariantConverterTest \
-#	VersionConverterTest
+	VersionConverterTest
 
 for(test, CONVERTER_TESTS) {
 	SUBDIRS += $$test

@@ -19,7 +19,7 @@
 #include "typeconverters/qjsonmultimapconverter_p.h"
 #include "typeconverters/qjsonobjectconverter_p.h"
 #include "typeconverters/qjsonpairconverter_p.h"
-//#include "typeconverters/qjsonversionnumberconverter_p.h"
+#include "typeconverters/qjsonversionnumberconverter_p.h"
 //#include "typeconverters/qjsongeomconverter_p.h"
 //#include "typeconverters/qjsonlocaleconverter_p.h"
 //#include "typeconverters/qjsonregularexpressionconverter_p.h"
@@ -57,6 +57,12 @@ bool QJsonSerializerBase::enumAsString() const
 {
 	Q_D(const QJsonSerializerBase);
 	return d->enumAsString;
+}
+
+bool QJsonSerializerBase::versionAsString() const
+{
+	Q_D(const QJsonSerializerBase);
+	return d->versionAsString;
 }
 
 bool QJsonSerializerBase::useBcp47Locale() const
@@ -133,6 +139,16 @@ void QJsonSerializerBase::setEnumAsString(bool enumAsString)
 
 	d->enumAsString = enumAsString;
 	emit enumAsStringChanged(d->enumAsString, {});
+}
+
+void QJsonSerializerBase::setVersionAsString(bool versionAsString)
+{
+	Q_D(QJsonSerializerBase);
+	if(d->versionAsString == versionAsString)
+		return;
+
+	d->versionAsString = versionAsString;
+	emit versionAsStringChanged(d->versionAsString, {});
 }
 
 void QJsonSerializerBase::setUseBcp47Locale(bool useBcp47Locale)
@@ -318,8 +334,8 @@ QList<QJsonTypeConverterFactory*> QJsonSerializerBasePrivate::typeConverterFacto
 	new QJsonTypeConverterStandardFactory<QJsonMapConverter>{},
 	new QJsonTypeConverterStandardFactory<QJsonPairConverter>{},
 	new QJsonTypeConverterStandardFactory<QJsonCborConverter>{},
+	new QJsonTypeConverterStandardFactory<QJsonVersionNumberConverter>{},
 	new QJsonTypeConverterStandardFactory<QJsonMultiMapConverter>{},
-//	new QJsonTypeConverterStandardFactory<QJsonVersionNumberConverter>{},
 //	new QJsonTypeConverterStandardFactory<QJsonSizeConverter>{},
 //	new QJsonTypeConverterStandardFactory<QJsonPointConverter>{},
 //	new QJsonTypeConverterStandardFactory<QJsonLineConverter>{},

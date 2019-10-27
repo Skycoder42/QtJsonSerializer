@@ -30,6 +30,7 @@ public:
 		ConstructedObject = 10004,
 		Pair = 10005,
 		MultiMap = 10006,
+		VersionNumber = 10007,
 
 		ChronoNanoSeconds = 10100,
 		ChronoMicroSeconds = 10101,
