@@ -768,6 +768,37 @@ void SerializerTest::addCommonData()
 //						  << true
 //						  << QVariantHash{};
 
+	// bytearrays
+	QTest::newRow("bytearray") << QVariant::fromValue(QByteArrayLiteral("test123"))
+							   << QCborValue{QByteArrayLiteral("test123")}
+							   << QJsonValue{QStringLiteral("dGVzdDEyMw==")}
+							   << true
+							   << QVariantHash{};
+	QTest::newRow("bytearray.base64") << QVariant::fromValue(QByteArrayLiteral("test123"))
+									  << QCborValue{}
+									  << QJsonValue{QStringLiteral("dGVzdDEyMw==")}
+									  << true
+									  << QVariantHash{
+											 {QStringLiteral("byteArrayFormat"), QVariant::fromValue(QJsonSerializer::ByteArrayFormat::Base64)},
+											 {QStringLiteral("validateBase64"), true}
+										 };
+	QTest::newRow("bytearray.base64url") << QVariant::fromValue(QByteArrayLiteral("test123"))
+										 << QCborValue{}
+										 << QJsonValue{QStringLiteral("dGVzdDEyMw")}
+										 << true
+										 << QVariantHash{
+												{QStringLiteral("byteArrayFormat"), QVariant::fromValue(QJsonSerializer::ByteArrayFormat::Base64url)},
+												{QStringLiteral("validateBase64"), true}
+											};
+	QTest::newRow("bytearray.base16") << QVariant::fromValue(QByteArrayLiteral("test123"))
+									  << QCborValue{}
+									  << QJsonValue{QStringLiteral("74657374313233")}
+									  << true
+									  << QVariantHash{
+											 {QStringLiteral("byteArrayFormat"), QVariant::fromValue(QJsonSerializer::ByteArrayFormat::Base16)},
+											 {QStringLiteral("validateBase64"), true}
+										 };
+
 
 	// type converters
 	QTest::newRow("converter") << QVariant::fromValue(EnumContainer{EnumContainer::Normal1, EnumContainer::FlagX})
@@ -788,15 +819,19 @@ void SerializerTest::resetProps()
 	for (auto ser : {
 			 static_cast<QJsonSerializerBase*>(jsonSerializer),
 			 static_cast<QJsonSerializerBase*>(cborSerializer)}) {
-		jsonSerializer->setAllowDefaultNull(false);
+		ser->setAllowDefaultNull(false);
 		ser->setKeepObjectName(false);
 		ser->setEnumAsString(false);
+		ser->setVersionAsString(false);
 		ser->setUseBcp47Locale(true);
 		ser->setValidationFlags(QJsonSerializer::ValidationFlag::StrictBasicTypes);
 		ser->setPolymorphing(QJsonSerializer::Polymorphing::Enabled);
+		ser->setMultiMapMode(QJsonSerializerBase::MultiMapMode::Map);
+		ser->setIgnoreStoredAttribute(false);
 	}
 
 	jsonSerializer->setValidateBase64(true);
+	jsonSerializer->setByteArrayFormat(QJsonSerializer::ByteArrayFormat::Base64);
 }
 
 namespace  {

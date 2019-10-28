@@ -30,6 +30,7 @@ QList<QCborValue::Type> QJsonBytearrayConverter::allowedCborTypes(int metaTypeId
 
 int QJsonBytearrayConverter::guessType(QCborTag tag, QCborValue::Type dataType) const
 {
+	Q_UNUSED(dataType)
 	switch (tag) {
 	case static_cast<QCborTag>(QCborKnownTags::ExpectedBase64):
 	case static_cast<QCborTag>(QCborKnownTags::ExpectedBase64url):
@@ -55,6 +56,7 @@ QVariant QJsonBytearrayConverter::deserializeCbor(int propertyType, const QCborV
 
 QVariant QJsonBytearrayConverter::deserializeJson(int propertyType, const QCborValue &value, QObject *parent) const
 {
+	Q_UNUSED(propertyType)
 	Q_UNUSED(parent)
 
 	const auto mode = helper()->getProperty("byteArrayFormat").value<QJsonSerializer::ByteArrayFormat>();
