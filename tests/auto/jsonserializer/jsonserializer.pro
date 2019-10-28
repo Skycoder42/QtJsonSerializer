@@ -10,7 +10,7 @@ CONVERTER_TESTS = \
 	ChronoDurationConverterTest \
 	EnumConverterTest \
 	GadgetConverterTest \
-#	GeomConverterTest \
+	GeomConverterTest \
 	ListConverterTest \
 #	LocaleConverterTest \
 	MapConverterTest \
