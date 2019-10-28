@@ -22,6 +22,8 @@ void TypeConverterTestBase::initTest() {}
 
 void TypeConverterTestBase::cleanupTest() {}
 
+void TypeConverterTestBase::addCommonSerData() {}
+
 void TypeConverterTestBase::addSerData() {}
 
 void TypeConverterTestBase::addDeserData() {}

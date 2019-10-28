@@ -28,7 +28,7 @@ protected:
 
 	virtual void addConverterData() = 0;
 	virtual void addMetaData() = 0;
-	virtual void addCommonSerData() = 0;
+	virtual void addCommonSerData();
 	virtual void addSerData();
 	virtual void addDeserData();
 

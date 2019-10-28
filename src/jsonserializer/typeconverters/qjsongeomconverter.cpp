@@ -161,22 +161,26 @@ QCborValue QJsonGeomConverter::serializeRect(const std::variant<QRect, QRectF> &
 template<typename TSize>
 TSize QJsonGeomConverter::deserializeSize(const QCborArray &array) const
 {
+	using TW = std::decay_t<decltype(TSize{}.width())>;
+	using TH = std::decay_t<decltype(TSize{}.height())>;
 	if (array.size() != 2)
 		throw QJsonDeserializationException{"A size requires an array with exactly two numbers"};
 	return {
-		extract<std::decay_t<decltype(TSize{}.width())>>(array[0]),
-		extract<std::decay_t<decltype(TSize{}.height())>>(array[1])
+		extract<TW>(array[0]),
+		extract<TH>(array[1])
 	};
 }
 
 template<typename TPoint>
 TPoint QJsonGeomConverter::deserializePoint(const QCborArray &array) const
 {
+	using TX = std::decay_t<decltype(TPoint{}.x())>;
+	using TY = std::decay_t<decltype(TPoint{}.y())>;
 	if (array.size() != 2)
 		throw QJsonDeserializationException{"A point requires an array with exactly two numbers"};
 	return {
-		extract<std::decay_t<decltype(TPoint{}.x())>>(array[0]),
-		extract<std::decay_t<decltype(TPoint{}.y())>>(array[1])
+		extract<TX>(array[0]),
+		extract<TY>(array[1])
 	};
 }
 

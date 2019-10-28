@@ -15,6 +15,7 @@
 #include "typeconverters/qjsonenumconverter_p.h"
 #include "typeconverters/qjsongadgetconverter_p.h"
 #include "typeconverters/qjsongeomconverter_p.h"
+#include "typeconverters/qjsonlegacygeomconverter_p.h"
 #include "typeconverters/qjsonlistconverter_p.h"
 #include "typeconverters/qjsonmapconverter_p.h"
 #include "typeconverters/qjsonmultimapconverter_p.h"
@@ -343,6 +344,8 @@ QList<QJsonTypeConverterFactory*> QJsonSerializerBasePrivate::typeConverterFacto
 //	new QJsonTypeConverterStandardFactory<QJsonStdOptionalConverter>{},
 //	new QJsonTypeConverterStandardFactory<QJsonStdVariantConverter>{},
 	new QJsonTypeConverterStandardFactory<QJsonChronoDurationConverter>{},
+
+	new QJsonTypeConverterStandardFactory<QJsonLegacyGeomConverter>{}
 };
 
 QSharedPointer<QJsonTypeConverter> QJsonSerializerBasePrivate::findSerConverter(int propertyType) const

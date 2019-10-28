@@ -4,6 +4,7 @@
 #include "qtjsonserializer_global.h"
 #include "qjsontypeconverter.h"
 
+#include <QtCore/QCborArray>
 #include <QtCore/QSize>
 #include <QtCore/QPoint>
 #include <QtCore/QLine>
@@ -24,7 +25,6 @@ private:
 	QCborValue serializePoint(const std::variant<QPoint, QPointF> &point) const;
 	QCborValue serializeLine(const std::variant<QLine, QLineF> &line) const;
 	QCborValue serializeRect(const std::variant<QRect, QRectF> &rect) const;
-
 
 	template <typename TSize>
 	TSize deserializeSize(const QCborArray &array) const;

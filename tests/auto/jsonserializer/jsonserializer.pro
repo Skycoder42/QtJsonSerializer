@@ -11,6 +11,7 @@ CONVERTER_TESTS = \
 	EnumConverterTest \
 	GadgetConverterTest \
 	GeomConverterTest \
+	LegacyGeomConverterTest \
 	ListConverterTest \
 #	LocaleConverterTest \
 	MapConverterTest \

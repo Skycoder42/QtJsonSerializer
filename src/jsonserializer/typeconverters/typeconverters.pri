@@ -5,6 +5,7 @@ HEADERS += \
 	$$PWD/qjsonenumconverter_p.h \
 	$$PWD/qjsongadgetconverter_p.h \
 	$$PWD/qjsongeomconverter_p.h \
+	$$PWD/qjsonlegacygeomconverter_p.h \
 	$$PWD/qjsonlistconverter_p.h \
 	$$PWD/qjsonmapconverter_p.h \
 	$$PWD/qjsonmultimapconverter_p.h \
@@ -23,6 +24,7 @@ SOURCES += \
 	$$PWD/qjsonenumconverter.cpp \
 	$$PWD/qjsongadgetconverter.cpp \
 	$$PWD/qjsongeomconverter.cpp \
+	$$PWD/qjsonlegacygeomconverter.cpp \
 	$$PWD/qjsonlistconverter.cpp \
 	$$PWD/qjsonmapconverter.cpp \
 	$$PWD/qjsonmultimapconverter.cpp \
