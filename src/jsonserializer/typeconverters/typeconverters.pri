@@ -7,6 +7,7 @@ HEADERS += \
 	$$PWD/qjsongeomconverter_p.h \
 	$$PWD/qjsonlegacygeomconverter_p.h \
 	$$PWD/qjsonlistconverter_p.h \
+	$$PWD/qjsonlocaleconverter_p.h \
 	$$PWD/qjsonmapconverter_p.h \
 	$$PWD/qjsonmultimapconverter_p.h \
 	$$PWD/qjsonobjectconverter_p.h \
@@ -14,7 +15,6 @@ HEADERS += \
 	$$PWD/qjsonversionnumberconverter_p.h \
 #	$$PWD/qjsonstdoptionalconverter_p.h \
 #	$$PWD/qjsonstdvariantconverter_p.h \
-#    $$PWD/qjsonlocaleconverter_p.h \
 #    $$PWD/qjsonstdtupleconverter_p.h \
 
 SOURCES += \
@@ -26,6 +26,7 @@ SOURCES += \
 	$$PWD/qjsongeomconverter.cpp \
 	$$PWD/qjsonlegacygeomconverter.cpp \
 	$$PWD/qjsonlistconverter.cpp \
+	$$PWD/qjsonlocaleconverter.cpp \
 	$$PWD/qjsonmapconverter.cpp \
 	$$PWD/qjsonmultimapconverter.cpp \
 	$$PWD/qjsonobjectconverter.cpp \
@@ -33,5 +34,4 @@ SOURCES += \
 	$$PWD/qjsonversionnumberconverter.cpp \
 #	$$PWD/qjsonstdoptionalconverter.cpp \
 #	$$PWD/qjsonstdvariantconverter.cpp \
-#    $$PWD/qjsonlocaleconverter.cpp \
 #    $$PWD/qjsonstdtupleconverter.cpp \

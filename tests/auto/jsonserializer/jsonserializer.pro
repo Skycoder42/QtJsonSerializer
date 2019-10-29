@@ -13,13 +13,12 @@ CONVERTER_TESTS = \
 	GeomConverterTest \
 	LegacyGeomConverterTest \
 	ListConverterTest \
-#	LocaleConverterTest \
+	LocaleConverterTest \
 	MapConverterTest \
 	MultiMapConverterTest \
 	ObjectConverterTest \
 #	OptionalConverterTest \
 	PairConverterTest \
-#	RegexConverterTest \
 #	TupleConverterTest \
 #	VariantConverterTest \
 	VersionConverterTest

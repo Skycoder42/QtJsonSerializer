@@ -120,8 +120,8 @@ template<typename TConverter>
 void QJsonSerializerBasePrivate::ConverterStore<TConverter>::insertSorted(const QSharedPointer<TConverter> &converter, QWriteLocker &locker)
 {
 	Q_UNUSED(locker)
-	for(auto it = store.begin(); it != store.end(); ++it) {
-		if((*it)->priority() <= converter->priority()) {
+	for (auto it = store.begin(); it != store.end(); ++it) {
+		if ((*it)->priority() < converter->priority()) {
 			store.insert(it, converter);
 			return;
 		}
