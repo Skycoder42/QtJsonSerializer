@@ -8,6 +8,8 @@ public:
 	const QJsonTypeConverter::SerializationHelper *helper = nullptr;
 };
 
+
+
 QJsonTypeConverter::QJsonTypeConverter() :
 	d{new QJsonTypeConverterPrivate{}}
 {}
@@ -137,3 +139,14 @@ QJsonTypeConverter::SerializationHelper::~SerializationHelper() = default;
 QJsonTypeConverterFactory::QJsonTypeConverterFactory() = default;
 
 QJsonTypeConverterFactory::~QJsonTypeConverterFactory() = default;
+
+
+
+QJsonTypeExtractor::QJsonTypeExtractor() = default;
+
+QJsonTypeExtractor::~QJsonTypeExtractor() = default;
+
+QList<int> QJsonTypeExtractor::subtypes() const
+{
+	return {};
+}

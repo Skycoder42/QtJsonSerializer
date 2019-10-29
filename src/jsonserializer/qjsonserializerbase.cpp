@@ -41,6 +41,11 @@ QJsonSerializerBase::QJsonSerializerBase(QJsonSerializerBasePrivate &dd, QObject
 	QObject{dd, parent}
 {}
 
+void QJsonSerializerBase::registerExtractor(int metaTypeId, const QSharedPointer<QJsonTypeExtractor> &extractor)
+{
+	QJsonSerializerBasePrivate::extractors.add(metaTypeId, extractor);
+}
+
 bool QJsonSerializerBase::allowDefaultNull() const
 {
 	Q_D(const QJsonSerializerBase);
@@ -206,10 +211,9 @@ QVariant QJsonSerializerBase::getProperty(const char *name) const
 	return property(name);
 }
 
-QByteArray QJsonSerializerBase::getCanonicalTypeName(int propertyType) const
+QSharedPointer<const QJsonTypeExtractor> QJsonSerializerBase::extractor(int metaTypeId) const
 {
-	QReadLocker lock{&QJsonSerializerBasePrivate::typedefLock};
-	return QJsonSerializerBasePrivate::typedefMapping.value(propertyType, QMetaType::typeName(propertyType));
+	return QJsonSerializerBasePrivate::extractors.get(metaTypeId);
 }
 
 QCborValue QJsonSerializerBase::serializeSubtype(const QMetaProperty &property, const QVariant &value) const
@@ -314,16 +318,9 @@ QVariant QJsonSerializerBase::deserializeVariant(int propertyType, const QCborVa
 		return variant;
 }
 
-void QJsonSerializerBase::registerInverseTypedefImpl(int typeId, const char *normalizedTypeName)
-{
-	QWriteLocker lock{&QJsonSerializerBasePrivate::typedefLock};
-	QJsonSerializerBasePrivate::typedefMapping.insert(typeId, normalizedTypeName);
-}
-
 // ------------- private implementation -------------
 
-QReadWriteLock QJsonSerializerBasePrivate::typedefLock;
-QHash<int, QByteArray> QJsonSerializerBasePrivate::typedefMapping;
+QJsonSerializerBasePrivate::ThreadSafeStore<QJsonTypeExtractor> QJsonSerializerBasePrivate::extractors;
 QReadWriteLock QJsonSerializerBasePrivate::typeConverterFactoryLock;
 QList<QJsonTypeConverterFactory*> QJsonSerializerBasePrivate::typeConverterFactories {
 	new QJsonTypeConverterStandardFactory<QJsonBytearrayConverter>{},

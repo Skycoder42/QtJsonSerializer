@@ -13,6 +13,20 @@
 #include <QtCore/qvariant.h>
 #include <QtCore/qsharedpointer.h>
 
+class Q_JSONSERIALIZER_EXPORT QJsonTypeExtractor
+{
+	Q_DISABLE_COPY(QJsonTypeExtractor)
+
+public:
+	QJsonTypeExtractor();
+	virtual ~QJsonTypeExtractor();
+
+	virtual QByteArray baseType() const = 0;
+	virtual QList<int> subtypes() const = 0;
+	virtual QVariant extract(const QVariant &value, int index) const = 0;
+	virtual void emplace(QVariant &target, int index, const QVariant &value) const = 0;
+};
+
 class QJsonTypeConverterPrivate;
 //! An interface to create custom serializer type converters
 class Q_JSONSERIALIZER_EXPORT QJsonTypeConverter
@@ -51,7 +65,7 @@ public:
 		//! Returns a property from the serializer
 		virtual QVariant getProperty(const char *name) const = 0;
 		virtual QCborTag typeTag(int metaTypeId) const = 0;
-		virtual QByteArray getCanonicalTypeName(int propertyType) const = 0;
+		virtual QSharedPointer<const QJsonTypeExtractor> extractor(int metaTypeId) const = 0;
 
 		//! Serialize a subvalue, represented by a meta property
 		virtual QCborValue serializeSubtype(const QMetaProperty &property, const QVariant &value) const = 0;

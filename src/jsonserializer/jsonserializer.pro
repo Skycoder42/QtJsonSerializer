@@ -6,11 +6,13 @@ HEADERS += \
 	qcborserializer.h \
 	qcborserializer_p.h \
 	qcontainerwriters.h \
+	qcontainerwriters_p.h \
 	qjsonserializer.h \
 	qjsonserializer_p.h \
 	qjsonserializerbase.h \
 	qjsonserializerbase_p.h \
 	qjsonserializerexception.h \
+	qjsontypeextractors.h \
 	qtjsonserializer_global.h \
 	qjsonserializer_helpertypes.h \
 	qjsontypeconverter.h \

@@ -12,22 +12,41 @@
 #include <QtCore/qset.h>
 #include <QtCore/qlinkedlist.h>
 
-class QSequentialWriterPrivate;
+class QSequentialWriterFactory;
 class Q_JSONSERIALIZER_EXPORT QSequentialWriter
 {
+	Q_DISABLE_COPY(QSequentialWriter)
+
 public:
+	struct SequenceInfo {
+		int type;
+		bool isSet;
+	};
+
 	template <template<typename> class TContainer, typename TClass>
 	static void registerWriter();
-	static QSequentialWriter getWriter(QVariant &data);
+	static void registerWriter(int metaTypeId, QSequentialWriterFactory *factory);
+	static bool canWrite(int metaTypeId);
+	static QSharedPointer<QSequentialWriter> getWriter(QVariant &data);
+	static SequenceInfo getSequenceInfo(int metaTypeId);
 
-	bool isValid() const;
-	void reserve(int size);
-	void add(const QVariant &value);
+	virtual ~QSequentialWriter();
+	virtual SequenceInfo info() const = 0;
+	virtual void reserve(int size) = 0;
+	virtual void add(const QVariant &value) = 0;
 
-private:
-	QSharedPointer<QSequentialWriterPrivate> d;
+protected:
+	QSequentialWriter();
+};
 
-	QSequentialWriter(QSharedPointer<QSequentialWriterPrivate> &&dd = {});
+class Q_JSONSERIALIZER_EXPORT QSequentialWriterFactory
+{
+	Q_DISABLE_COPY(QSequentialWriterFactory)
+
+public:
+	QSequentialWriterFactory();
+	virtual ~QSequentialWriterFactory();
+	virtual QSharedPointer<QSequentialWriter> create(void *data) const = 0;
 };
 
 class QAssociativeWriterPrivate;
@@ -36,9 +55,11 @@ class Q_JSONSERIALIZER_EXPORT QAssociativeWriter
 public:
 	template <template<typename, typename> class TContainer, typename TKey, typename TValue>
 	static void registerWriter();
+	static bool canWrite(int metaTypeId);
 	static QAssociativeWriter getWriter(QVariant &data);
 
 	bool isValid() const;
+	std::pair<int, int> mapTypes() const;
 	void add(const QVariant &key, const QVariant &value);
 
 private:
@@ -47,31 +68,25 @@ private:
 	QAssociativeWriter(QSharedPointer<QAssociativeWriterPrivate> &&dd = {});
 };
 
-// private stuff
-
-class Q_JSONSERIALIZER_EXPORT QSequentialWriterPrivate
-{
-	Q_DISABLE_COPY(QSequentialWriterPrivate)
-
-public:
-	QSequentialWriterPrivate();
-	virtual ~QSequentialWriterPrivate();
-	virtual void reserveImpl(int size) = 0;
-	virtual void addImpl(const QVariant &value) = 0;
-};
+// Generic Implementations
 
 template <template<typename> class TContainer, typename TClass>
-class QSequentialWriterPrivateImpl : public QSequentialWriterPrivate
+class QSequentialWriterImpl : public QSequentialWriter
 {
 public:
-	QSequentialWriterPrivateImpl(TContainer<TClass> *data)
+	QSequentialWriterImpl(TContainer<TClass> *data)
 		: _data{data}
 	{}
 
-	void reserveImpl(int size) override {
+	SequenceInfo info() const override {
+		return {qMetaTypeId<TClass>(), false};
+	}
+
+	void reserve(int size) override {
 		_data->reserve(size);
 	}
-	void addImpl(const QVariant &value) override {
+
+	void add(const QVariant &value) override {
 		_data->append(value.template value<TClass>());
 	}
 
@@ -79,25 +94,12 @@ private:
 	TContainer<TClass> *_data;
 };
 
-class Q_JSONSERIALIZER_EXPORT QSequentialWriterPrivateFactory
-{
-	Q_DISABLE_COPY(QSequentialWriterPrivateFactory)
-
-public:
-	static QReadWriteLock lock;
-	static QHash<int, QSequentialWriterPrivateFactory*> factories;
-
-	QSequentialWriterPrivateFactory();
-	virtual ~QSequentialWriterPrivateFactory();
-	virtual QSharedPointer<QSequentialWriterPrivate> create(void *data) const = 0;
-};
-
 template <template<typename> class TContainer, typename TClass>
-class QSequentialWriterPrivateFactoryImpl : public QSequentialWriterPrivateFactory
+class QSequentialWriterFactoryImpl : public QSequentialWriterFactory
 {
 public:
-	QSharedPointer<QSequentialWriterPrivate> create(void *data) const final {
-		return QSharedPointer<QSequentialWriterPrivateImpl<TContainer, TClass>>::create(reinterpret_cast<TContainer<TClass>*>(data));
+	QSharedPointer<QSequentialWriter> create(void *data) const final {
+		return QSharedPointer<QSequentialWriterImpl<TContainer, TClass>>::create(reinterpret_cast<TContainer<TClass>*>(data));
 	}
 };
 
@@ -108,6 +110,7 @@ class Q_JSONSERIALIZER_EXPORT QAssociativeWriterPrivate
 public:
 	QAssociativeWriterPrivate();
 	virtual ~QAssociativeWriterPrivate();
+	virtual std::pair<int, int> mapTypesImpl() const = 0;
 	virtual void addImpl(const QVariant &key, const QVariant &value) = 0;
 };
 
@@ -118,6 +121,10 @@ public:
 	QAssociativeWriterPrivateImpl(TContainer<TKey, TValue> *data)
 		: _data{data}
 	{}
+
+	std::pair<int, int> mapTypesImpl() const override {
+		return std::make_pair(qMetaTypeId<TKey>(), qMetaTypeId<TValue>());
+	}
 
 	void addImpl(const QVariant &key, const QVariant &value) override {
 		_data->insert(key.template value<TKey>(),
@@ -153,17 +160,22 @@ public:
 // specializations and implementations
 
 template <typename TClass>
-class QSequentialWriterPrivateImpl<QSet, TClass> : public QSequentialWriterPrivate
+class QSequentialWriterImpl<QSet, TClass> : public QSequentialWriter
 {
 public:
-	QSequentialWriterPrivateImpl(QSet<TClass> *data)
+	QSequentialWriterImpl(QSet<TClass> *data)
 		: _data{data}
 	{}
 
-	void reserveImpl(int size) override {
+	SequenceInfo info() const override {
+		return {qMetaTypeId<TClass>(), true};
+	}
+
+	void reserve(int size) override {
 		_data->reserve(size);
 	}
-	void addImpl(const QVariant &value) override {
+
+	void add(const QVariant &value) override {
 		_data->insert(value.template value<TClass>());
 	}
 
@@ -172,15 +184,20 @@ private:
 };
 
 template <typename TClass>
-class QSequentialWriterPrivateImpl<QLinkedList, TClass> : public QSequentialWriterPrivate
+class QSequentialWriterImpl<QLinkedList, TClass> : public QSequentialWriter
 {
 public:
-	QSequentialWriterPrivateImpl(QLinkedList<TClass> *data)
+	QSequentialWriterImpl(QLinkedList<TClass> *data)
 		: _data{data}
 	{}
 
-	void reserveImpl(int) override {}
-	void addImpl(const QVariant &value) override {
+	SequenceInfo info() const override {
+		return {qMetaTypeId<TClass>(), false};
+	}
+
+	void reserve(int) override {}
+
+	void add(const QVariant &value) override {
 		_data->append(value.template value<TClass>());
 	}
 
@@ -191,9 +208,8 @@ private:
 template<template<typename> class TContainer, typename TClass>
 void QSequentialWriter::registerWriter()
 {
-	QWriteLocker _{&QSequentialWriterPrivateFactory::lock};
-	QSequentialWriterPrivateFactory::factories.insert(qMetaTypeId<TContainer<TClass>>(),
-													  new QSequentialWriterPrivateFactoryImpl<TContainer, TClass>{});
+	registerWriter(qMetaTypeId<TContainer<TClass>>(),
+				   new QSequentialWriterFactoryImpl<TContainer, TClass>{});
 }
 
 template<template<typename, typename> class TContainer, typename TKey, typename TValue>

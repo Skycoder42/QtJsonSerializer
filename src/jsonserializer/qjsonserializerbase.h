@@ -6,6 +6,7 @@
 #include "QtJsonSerializer/qjsontypeconverter.h"
 #include "QtJsonSerializer/qjsonserializer_helpertypes.h"
 #include "QtJsonSerializer/qcontainerwriters.h"
+#include "QtJsonSerializer/qjsontypeextractors.h"
 
 #include <tuple>
 #include <optional>
@@ -82,37 +83,37 @@ public:
 	};
 	Q_ENUM(MultiMapMode)
 
-	//! Registers a the original name of a declared typedef
-	template<typename T>
-	static void registerInverseTypedef(const char *typeName);
+	template<typename TType, typename TExtractor>
+	static void registerExtractor();
+	static void registerExtractor(int metaTypeId, const QSharedPointer<QJsonTypeExtractor> &extractor);
 
 	//! Registers a custom type for list converisons
 	template<typename T>
-	static inline bool registerListConverters();
+	static inline void registerListConverters();
 	//! Registers a custom type for set converisons
 	template<typename T>
-	static inline bool registerSetConverters();
+	static inline void registerSetConverters();
 	//! Registers a custom type for map converisons
 	template<typename TKey, typename TValue, bool mapTypes = true, bool hashTypes = true>
-	static inline bool registerMapConverters();
+	static inline void registerMapConverters();
 	//! Registers a custom type for QSharedPointer and QPointer converisons
 	template<typename T>
-	static inline bool registerPointerConverters();
+	static inline void registerPointerConverters();
 	//! Registers a custom type for list, set map and optional converisons. Also include pointer converters, if applicable
 	template<typename T>
-	static inline bool registerBasicConverters();
+	static inline void registerBasicConverters();
 	//! Registers two types for pair conversion
 	template<typename T, typename U>
-	static inline bool registerPairConverters(const char *originalTypeName = nullptr);
+	static inline void registerPairConverters();
 	//! Registers a number of types for std::tuple conversion
 	template<typename... TArgs>
-	static inline bool registerTupleConverters(const char *originalTypeName = nullptr);
+	static inline void registerTupleConverters();
 	//! Registers a custom type for std::optional converisons
 	template<typename T>
-	static inline bool registerOptionalConverters(const char *originalTypeName = nullptr);
+	static inline void registerOptionalConverters();
 	//! Registers a custom type for std::variant converisons
 	template<typename... TArgs>
-	static inline bool registerVariantConverters(const char *originalTypeName = nullptr);
+	static inline void registerVariantConverters();
 
 	virtual std::variant<QCborValue, QJsonValue> serializeGeneric(const QVariant &value) const = 0;
 	virtual QVariant deserializeGeneric(const std::variant<QCborValue, QJsonValue> &value, int metaTypeId, QObject *parent = nullptr) const = 0;
@@ -196,7 +197,7 @@ protected:
 
 	// protected implementation -> internal use for the type converters
 	QVariant getProperty(const char *name) const override;
-	QByteArray getCanonicalTypeName(int propertyType) const override;
+	QSharedPointer<const QJsonTypeExtractor> extractor(int metaTypeId) const override;
 	QCborValue serializeSubtype(const QMetaProperty &property, const QVariant &value) const override;
 	QCborValue serializeSubtype(int propertyType, const QVariant &value, const QByteArray &traceHint) const override;
 	QVariant deserializeSubtype(const QMetaProperty &property, const QCborValue &value, QObject *parent) const override;
@@ -221,55 +222,32 @@ Q_DECLARE_ASSOCIATIVE_CONTAINER_METATYPE(QMultiHash)
 	static_assert(std::is_same<decltype(x), bool>::value, "x must be bool"); \
 	Q_CLASSINFO("polymorphic", #x)
 
-//! A macro to register a QPair of types, including the original typenames in case of a typedef
-#define QJsonSerializer_registerQPairConverters_named(...) \
-	QJsonSerializer::registerPairConverters<__VA_ARGS__>("QPair<" #__VA_ARGS__ ">")
-
-//! A macro to register a std::pair of types, including the original typenames in case of a typedef
-#define QJsonSerializer_registerStdPairConverters_named(...) \
-	QJsonSerializer::registerPairConverters<__VA_ARGS__>("std::pair<" #__VA_ARGS__ ">")
-
-//! A macro to register a std::tuple of types, including the original typenames in case of a typedef
-#define QJsonSerializer_registerTupleConverters_named(...) \
-	QJsonSerializer::registerTupleConverters<__VA_ARGS__>("std::tuple<" #__VA_ARGS__ ">")
-
-//! A macro to register a std::optional of a type, including the original typename in case of a typedef
-#define QJsonSerializer_registerOptionalConverters_named(...) \
-	QJsonSerializer::registerOptionalConverters<__VA_ARGS__>("std::optional<" #__VA_ARGS__ ">")
-
-//! A macro to register a std::variant of types, including the original typenames in case of a typedef
-#define QJsonSerializer_registerVariantConverters_named(...) \
-	QJsonSerializer::registerVariantConverters<__VA_ARGS__>("std::variant<" #__VA_ARGS__ ">")
-
 // ------------- Generic Implementation -------------
 
-template<typename T>
-void QJsonSerializerBase::registerInverseTypedef(const char *typeName)
+template<typename TType, typename TExtractor>
+void QJsonSerializerBase::registerExtractor()
 {
-	qRegisterMetaType<T>(typeName);
-	registerInverseTypedefImpl(qMetaTypeId<T>(), QMetaObject::normalizedType(typeName));
+	registerExtractor(qMetaTypeId<TType>(), QSharedPointer<TExtractor>::create());
 }
 
 template<typename T>
-bool QJsonSerializerBase::registerListConverters()
+void QJsonSerializerBase::registerListConverters()
 {
 	QSequentialWriter::registerWriter<QList, T>();
 	QSequentialWriter::registerWriter<QLinkedList, T>();
 	QSequentialWriter::registerWriter<QVector, T>();
 	QSequentialWriter::registerWriter<QStack, T>();
 	QSequentialWriter::registerWriter<QQueue, T>();
-	return true;
 }
 
 template<typename T>
-bool QJsonSerializerBase::registerSetConverters()
+void QJsonSerializerBase::registerSetConverters()
 {
 	QSequentialWriter::registerWriter<QSet, T>();
-	return true;
 }
 
 template<typename TKey, typename TValue, bool mapTypes, bool hashTypes>
-bool QJsonSerializerBase::registerMapConverters()
+void QJsonSerializerBase::registerMapConverters()
 {
 	if constexpr (mapTypes) {
 		QAssociativeWriter::registerWriter<QMap, TKey, TValue>();
@@ -279,95 +257,64 @@ bool QJsonSerializerBase::registerMapConverters()
 		QAssociativeWriter::registerWriter<QHash, TKey, TValue>();
 		QAssociativeWriter::registerWriter<QMultiHash, TKey, TValue>();
 	}
-	return true;
 }
 
 template<typename T>
-bool QJsonSerializerBase::registerBasicConverters()
-{
-	if constexpr (std::is_base_of_v<QObject, T>) {
-		return registerBasicConverters<T*>() &
-				(registerPointerConverters<T>() &&
-				 (registerBasicConverters<QSharedPointer<T>>() &
-				  registerBasicConverters<QPointer<T>>()));
-	} else {
-		return registerListConverters<T>() &
-				registerSetConverters<T>() &
-				registerMapConverters<QString, T>();
-	}
-}
-
-template<typename T>
-bool QJsonSerializerBase::registerPointerConverters()
+void QJsonSerializerBase::registerPointerConverters()
 {
 	static_assert(std::is_base_of_v<QObject, T>, "T must inherit QObject");
-	return QMetaType::registerConverter<QSharedPointer<QObject>, QSharedPointer<T>>([](const QSharedPointer<QObject> &object) -> QSharedPointer<T> {
+	QMetaType::registerConverter<QSharedPointer<QObject>, QSharedPointer<T>>([](const QSharedPointer<QObject> &object) -> QSharedPointer<T> {
 		return object.objectCast<T>();
-	}) & QMetaType::registerConverter<QSharedPointer<T>, QSharedPointer<QObject>>([](const QSharedPointer<T> &object) -> QSharedPointer<QObject> {
-		return object.template staticCast<QObject>();//must work, because of static assert
-	}) & QMetaType::registerConverter<QPointer<QObject>, QPointer<T>>([](const QPointer<QObject> &object) -> QPointer<T> {
+	});
+	QMetaType::registerConverter<QSharedPointer<T>, QSharedPointer<QObject>>([](const QSharedPointer<T> &object) -> QSharedPointer<QObject> {
+		return object.template staticCast<QObject>();  // must work, because of static assert
+	});
+	QMetaType::registerConverter<QPointer<QObject>, QPointer<T>>([](const QPointer<QObject> &object) -> QPointer<T> {
 		return qobject_cast<T*>(object.data());
-	}) & QMetaType::registerConverter<QPointer<T>, QPointer<QObject>>([](const QPointer<T> &object) -> QPointer<QObject> {
+	});
+	QMetaType::registerConverter<QPointer<T>, QPointer<QObject>>([](const QPointer<T> &object) -> QPointer<QObject> {
 		return static_cast<QObject*>(object.data());
 	});
 }
 
-template<typename T1, typename T2>
-bool QJsonSerializerBase::registerPairConverters(const char *originalTypeName)
+template<typename T>
+void QJsonSerializerBase::registerBasicConverters()
 {
-	if(originalTypeName)
-		registerInverseTypedef<std::pair<T1, T2>>(originalTypeName);
-	return QMetaType::registerConverter<QPair<T1, T2>, QPair<QVariant, QVariant>>([](const QPair<T1, T2> &pair) -> QPair<QVariant, QVariant> {
-		return {
-			QVariant::fromValue(pair.first),
-			QVariant::fromValue(pair.second)
-		};
-	}) & QMetaType::registerConverter<QPair<QVariant, QVariant>, QPair<T1, T2>>([](const QPair<QVariant, QVariant> &pair) -> QPair<T1, T2> {
-		return {
-			pair.first.value<T1>(),
-			pair.second.value<T2>()
-		};
-	}) & QMetaType::registerConverter<std::pair<T1, T2>, QPair<QVariant, QVariant>>([](const std::pair<T1, T2> &pair) -> QPair<QVariant, QVariant> {
-		return {
-			QVariant::fromValue(pair.first),
-			QVariant::fromValue(pair.second)
-		};
-	}) & QMetaType::registerConverter<QPair<QVariant, QVariant>, std::pair<T1, T2>>([](const QPair<QVariant, QVariant> &pair) -> std::pair<T1, T2> {
-		return {
-			pair.first.value<T1>(),
-			pair.second.value<T2>()
-		};
-	});
+	if constexpr (std::is_base_of_v<QObject, T>) {
+		registerBasicConverters<T*>() &
+			(registerPointerConverters<T>() &&
+			 (registerBasicConverters<QSharedPointer<T>>() &
+			  registerBasicConverters<QPointer<T>>()));
+	} else {
+		registerListConverters<T>() &
+			registerSetConverters<T>() &
+			registerMapConverters<QString, T>();
+	}
+}
+
+template<typename T1, typename T2>
+void QJsonSerializerBase::registerPairConverters()
+{
+	registerExtractor<QPair<T1, T2>, QJsonTypeExtractors::PairExtractor<QPair, T1, T2>>();
+	registerExtractor<std::pair<T1, T2>, QJsonTypeExtractors::PairExtractor<std::pair, T1, T2>>();
 }
 
 template<typename... TArgs>
-bool QJsonSerializerBase::registerTupleConverters(const char *originalTypeName)
+void QJsonSerializerBase::registerTupleConverters()
 {
-	if(originalTypeName)
-		registerInverseTypedef<std::tuple<TArgs...>>(originalTypeName);
-	return QMetaType::registerConverter<std::tuple<TArgs...>, QVariantList>(&_qjsonserializer_helpertypes::tplToList<TArgs...>) &
-			QMetaType::registerConverter<QVariantList, std::tuple<TArgs...>>(&_qjsonserializer_helpertypes::listToTpl<TArgs...>);
+	registerExtractor<std::tuple<TArgs...>, QJsonTypeExtractors::TupleExtractor<TArgs...>>();
 }
 
 template<typename T>
-bool QJsonSerializerBase::registerOptionalConverters(const char *originalTypeName)
+void QJsonSerializerBase::registerOptionalConverters()
 {
-	if(originalTypeName)
-		registerInverseTypedef<std::optional<T>>(originalTypeName);
-	return QMetaType::registerConverter<std::optional<T>, QVariant>([](const std::optional<T> &opt) -> QVariant {
-		return opt ? QVariant::fromValue(*opt) : QVariant::fromValue(nullptr);
-	}) & QMetaType::registerConverter<QVariant, std::optional<T>>([](const QVariant &var) -> std::optional<T> {
-		return var.userType() == QMetaType::Nullptr ? std::optional<T>{std::nullopt} : var.value<T>();
-	});
+	registerExtractor<std::optional<T>, QJsonTypeExtractors::OptionalExtractor<T>>();
 }
 
 template<typename... TArgs>
-bool QJsonSerializerBase::registerVariantConverters(const char *originalTypeName)
+void QJsonSerializerBase::registerVariantConverters()
 {
-	if(originalTypeName)
-		registerInverseTypedef<std::variant<TArgs...>>(originalTypeName);
-	return QMetaType::registerConverter<std::variant<TArgs...>, QVariant>(&_qjsonserializer_helpertypes::varToQVar<TArgs...>) &
-			QMetaType::registerConverter<QVariant, std::variant<TArgs...>>(&_qjsonserializer_helpertypes::qVarToVar<TArgs...>);
+	registerExtractor<std::variant<TArgs...>, QJsonTypeExtractors::VariantExtractor<TArgs...>>();
 }
 
 template<typename TConverter, int Priority>

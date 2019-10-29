@@ -1,27 +1,30 @@
 #include "qcontainerwriters.h"
+#include "qcontainerwriters_p.h"
 #include <QDebug>
 
-class QSequentialWriterPrivateFactoryQStringList : public QSequentialWriterPrivateFactory
+namespace {
+
+class QSequentialWriterFactoryQStringList : public QSequentialWriterFactory
 {
 public:
-	QSharedPointer<QSequentialWriterPrivate> create(void *data) const final {
-		return QSharedPointer<QSequentialWriterPrivateImpl<QList, QString>>::create(reinterpret_cast<QStringList*>(data));
+	QSharedPointer<QSequentialWriter> create(void *data) const final {
+		return QSharedPointer<QSequentialWriterImpl<QList, QString>>::create(reinterpret_cast<QStringList*>(data));
 	}
 };
 
-class QSequentialWriterPrivateFactoryQByteArrayList : public QSequentialWriterPrivateFactory
+class QSequentialWriterFactoryQByteArrayList : public QSequentialWriterFactory
 {
 public:
-	QSharedPointer<QSequentialWriterPrivate> create(void *data) const final {
-		return QSharedPointer<QSequentialWriterPrivateImpl<QList, QByteArray>>::create(reinterpret_cast<QByteArrayList*>(data));
+	QSharedPointer<QSequentialWriter> create(void *data) const final {
+		return QSharedPointer<QSequentialWriterImpl<QList, QByteArray>>::create(reinterpret_cast<QByteArrayList*>(data));
 	}
 };
 
-class QSequentialWriterPrivateFactoryQVariantList : public QSequentialWriterPrivateFactory
+class QSequentialWriterFactoryQVariantList : public QSequentialWriterFactory
 {
 public:
-	QSharedPointer<QSequentialWriterPrivate> create(void *data) const final {
-		return QSharedPointer<QSequentialWriterPrivateImpl<QList, QVariant>>::create(reinterpret_cast<QVariantList*>(data));
+	QSharedPointer<QSequentialWriter> create(void *data) const final {
+		return QSharedPointer<QSequentialWriterImpl<QList, QVariant>>::create(reinterpret_cast<QVariantList*>(data));
 	}
 };
 
@@ -41,49 +44,62 @@ public:
 	}
 };
 
-QReadWriteLock QSequentialWriterPrivateFactory::lock;
-QHash<int, QSequentialWriterPrivateFactory*> QSequentialWriterPrivateFactory::factories {
-	{QMetaType::QStringList, new QSequentialWriterPrivateFactoryQStringList{}},
-	{QMetaType::QByteArrayList, new QSequentialWriterPrivateFactoryQByteArrayList{}},
-	{QMetaType::QVariantList, new QSequentialWriterPrivateFactoryQVariantList{}}
-};
+}
 
-QSequentialWriter QSequentialWriter::getWriter(QVariant &data)
+
+
+void QSequentialWriter::registerWriter(int metaTypeId, QSequentialWriterFactory *factory)
 {
-	QReadLocker _{&QSequentialWriterPrivateFactory::lock};
-	const auto factory = QSequentialWriterPrivateFactory::factories.value(data.userType());
+	Q_ASSERT(factory);
+	QWriteLocker _{&QContainerWritersPrivate::sequenceLock};
+	QContainerWritersPrivate::sequenceFactories.insert(metaTypeId, factory);
+}
+
+bool QSequentialWriter::canWrite(int metaTypeId)
+{
+	QReadLocker _{&QContainerWritersPrivate::sequenceLock};
+	return QContainerWritersPrivate::sequenceFactories.contains(metaTypeId);
+}
+
+QSharedPointer<QSequentialWriter> QSequentialWriter::getWriter(QVariant &data)
+{
+	QReadLocker _{&QContainerWritersPrivate::sequenceLock};
+	const auto factory = QContainerWritersPrivate::sequenceFactories.value(data.userType());
 	if (factory)
 		return factory->create(data.data());
 	else
 		return {};
 }
 
-bool QSequentialWriter::isValid() const
+QSequentialWriter::SequenceInfo QSequentialWriter::getSequenceInfo(int metaTypeId)
 {
-	return d;
+	QReadLocker _{&QContainerWritersPrivate::sequenceLock};
+	const auto factory = QContainerWritersPrivate::sequenceFactories.value(metaTypeId);
+	if (factory)
+		return factory->create(nullptr)->info();
+	else
+		return {};
 }
 
-void QSequentialWriter::reserve(int size)
-{
-	d->reserveImpl(size);
-}
+QSequentialWriter::~QSequentialWriter() = default;
 
-void QSequentialWriter::add(const QVariant &value)
-{
-	d->addImpl(value);
-}
+QSequentialWriter::QSequentialWriter() = default;
 
-QSequentialWriter::QSequentialWriter(QSharedPointer<QSequentialWriterPrivate> &&dd)
-	: d{std::move(dd)}
-{}
 
-QSequentialWriterPrivate::QSequentialWriterPrivate() = default;
 
-QSequentialWriterPrivate::~QSequentialWriterPrivate() = default;
+QSequentialWriterFactory::QSequentialWriterFactory() = default;
 
-QSequentialWriterPrivateFactory::QSequentialWriterPrivateFactory() = default;
+QSequentialWriterFactory::~QSequentialWriterFactory() = default;
 
-QSequentialWriterPrivateFactory::~QSequentialWriterPrivateFactory() = default;
+
+
+QReadWriteLock QContainerWritersPrivate::sequenceLock;
+QHash<int, QSequentialWriterFactory*> QContainerWritersPrivate::sequenceFactories {
+	{QMetaType::QStringList, new QSequentialWriterFactoryQStringList{}},
+	{QMetaType::QByteArrayList, new QSequentialWriterFactoryQByteArrayList{}},
+	{QMetaType::QVariantList, new QSequentialWriterFactoryQVariantList{}}
+};
+
 
 
 
@@ -92,6 +108,12 @@ QHash<int, QAssociativeWriterPrivateFactory*> QAssociativeWriterPrivateFactory::
 	{QMetaType::QVariantMap, new QAssociativeWriterPrivateFactoryQVariantMap{}},
 	{QMetaType::QVariantHash, new QAssociativeWriterPrivateFactoryQVariantHash{}}
 };
+
+bool QAssociativeWriter::canWrite(int metaTypeId)
+{
+	QReadLocker _{&QAssociativeWriterPrivateFactory::lock};
+	return QAssociativeWriterPrivateFactory::factories.contains(metaTypeId);
+}
 
 QAssociativeWriter QAssociativeWriter::getWriter(QVariant &data)
 {
@@ -106,6 +128,11 @@ QAssociativeWriter QAssociativeWriter::getWriter(QVariant &data)
 bool QAssociativeWriter::isValid() const
 {
 	return d;
+}
+
+std::pair<int, int> QAssociativeWriter::mapTypes() const
+{
+	return d->mapTypesImpl();
 }
 
 void QAssociativeWriter::add(const QVariant &key, const QVariant &value)

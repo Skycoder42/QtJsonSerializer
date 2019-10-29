@@ -20,16 +20,19 @@ public:
 	using MultiMapMode = QJsonSerializerBase::MultiMapMode;
 
 	template <typename TConverter>
-	class ConverterCache {
+	class ThreadSafeStore {
 	public:
+		ThreadSafeStore() = default;
+		ThreadSafeStore(std::initializer_list<std::pair<int, QSharedPointer<TConverter>>> initData);
+
 		QSharedPointer<TConverter> get(int metaTypeId) const;
 		void add(int metaTypeId, const QSharedPointer<TConverter> &converter);
 
 		void clear();
 
 	private:
-		mutable QReadWriteLock lock {};
-		QHash<int, QSharedPointer<TConverter>> cache;
+		mutable QReadWriteLock _lock {};
+		QHash<int, QSharedPointer<TConverter>> _store;
 	};
 
 	template <typename TConverter>
@@ -45,8 +48,7 @@ public:
 		void insertSorted(const QSharedPointer<TConverter> &converter, QWriteLocker &locker);
 	};
 
-	static QReadWriteLock typedefLock;
-	static QHash<int, QByteArray> typedefMapping;
+	static ThreadSafeStore<QJsonTypeExtractor> extractors;
 
 	static QReadWriteLock typeConverterFactoryLock;
 	static QList<QJsonTypeConverterFactory*> typeConverterFactories;
@@ -62,8 +64,8 @@ public:
 	bool ignoreStoredAttribute = false;
 
 	mutable ConverterStore<QJsonTypeConverter> typeConverters;
-	mutable ConverterCache<QJsonTypeConverter> serCache;
-	mutable ConverterCache<QJsonTypeConverter> deserCache;
+	mutable ThreadSafeStore<QJsonTypeConverter> serCache;
+	mutable ThreadSafeStore<QJsonTypeConverter> deserCache;
 
 	template <typename TConverter>
 	void insertSorted(const QSharedPointer<TConverter> &converter, QList<QSharedPointer<TConverter>> &list) const;
@@ -79,24 +81,29 @@ public:
 };
 
 template<typename TConverter>
-QSharedPointer<TConverter> QJsonSerializerBasePrivate::ConverterCache<TConverter>::get(int metaTypeId) const
+QJsonSerializerBasePrivate::ThreadSafeStore<TConverter>::ThreadSafeStore(std::initializer_list<std::pair<int, QSharedPointer<TConverter>>> initData)
+	: _store{std::move(initData)}
+{}
+
+template<typename TConverter>
+QSharedPointer<TConverter> QJsonSerializerBasePrivate::ThreadSafeStore<TConverter>::get(int metaTypeId) const
 {
-	QReadLocker _{&lock};
-	return cache.value(metaTypeId, nullptr);
+	QReadLocker _{&_lock};
+	return _store.value(metaTypeId, nullptr);
 }
 
 template<typename TConverter>
-void QJsonSerializerBasePrivate::ConverterCache<TConverter>::add(int metaTypeId, const QSharedPointer<TConverter> &converter)
+void QJsonSerializerBasePrivate::ThreadSafeStore<TConverter>::add(int metaTypeId, const QSharedPointer<TConverter> &converter)
 {
-	QWriteLocker _{&lock};
-	cache.insert(metaTypeId, converter);
+	QWriteLocker _{&_lock};
+	_store.insert(metaTypeId, converter);
 }
 
 template<typename TConverter>
-void QJsonSerializerBasePrivate::ConverterCache<TConverter>::clear()
+void QJsonSerializerBasePrivate::ThreadSafeStore<TConverter>::clear()
 {
-	QWriteLocker _{&lock};
-	cache.clear();
+	QWriteLocker _{&_lock};
+	_store.clear();
 }
 
 template<typename TConverter>

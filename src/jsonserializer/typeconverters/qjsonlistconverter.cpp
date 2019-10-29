@@ -8,11 +8,8 @@ const QRegularExpression QJsonListConverter::listTypeRegex(QStringLiteral(R"__(^
 
 bool QJsonListConverter::canConvert(int metaTypeId) const
 {
-	// NOTE with writeable iterators, only the `value.canConvert(QMetaType::QVariantList)` would be needed
-	return metaTypeId == QMetaType::QVariantList ||
-			metaTypeId == QMetaType::QStringList ||
-			metaTypeId == QMetaType::QByteArrayList ||
-			listTypeRegex.match(QString::fromUtf8(helper()->getCanonicalTypeName(metaTypeId))).hasMatch();
+	return QVariant{metaTypeId, nullptr}.canConvert(QMetaType::QVariantList) &&
+		   QSequentialWriter::canWrite(metaTypeId);
 }
 
 QList<QCborTag> QJsonListConverter::allowedCborTags(int metaTypeId) const

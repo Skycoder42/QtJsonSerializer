@@ -9,26 +9,27 @@ const QRegularExpression QJsonStdOptionalConverter::optionalTypeRegex(QStringLit
 
 bool QJsonStdOptionalConverter::canConvert(int metaTypeId) const
 {
-	return optionalTypeRegex.match(QString::fromUtf8(getCanonicalTypeName(metaTypeId))).hasMatch();
+	return optionalTypeRegex.match(QString::fromUtf8(helper()->getCanonicalTypeName(metaTypeId))).hasMatch();
 }
 
-QList<QJsonValue::Type> QJsonStdOptionalConverter::jsonTypes() const
+QList<QCborValue::Type> QJsonStdOptionalConverter::allowedCborTypes(int metaTypeId, QCborTag tag) const
 {
-	// allow all values
-	return {
-		QJsonValue::Null,
-		QJsonValue::Bool,
-		QJsonValue::Double,
-		QJsonValue::String,
-		QJsonValue::Array,
-		QJsonValue::Object
-	};
+	Q_UNUSED(metaTypeId)
+	Q_UNUSED(tag)
+	QList<QCborValue::Type> types;
+	const auto metaEnum = QMetaEnum::fromType<QCborValue::Type>();
+	types.reserve(metaEnum.keyCount());
+	for (auto i = 0; i < metaEnum.keyCount(); ++i) {
+		if (const auto value = metaEnum.value(i); value != QCborValue::Invalid)
+			types.append(static_cast<QCborValue::Type>(value));
+	}
+	return types;
 }
 
-QJsonValue QJsonStdOptionalConverter::serialize(int propertyType, const QVariant &value, const QJsonTypeConverter::SerializationHelper *helper) const
+QCborValue QJsonStdOptionalConverter::serialize(int propertyType, const QVariant &value) const
 {
 	auto cValue = value;
-	if(!cValue.convert(QMetaType::QVariant)) {
+	if (!cValue.convert(QMetaType::QVariant)) {
 		throw QJsonSerializationException(QByteArray("Failed to convert type ") +
 										  QMetaType::typeName(propertyType) +
 										  QByteArray(" to a QVariant. Make shure to register optional types via QJsonSerializer::registerOptionalConverters"));
@@ -36,36 +37,25 @@ QJsonValue QJsonStdOptionalConverter::serialize(int propertyType, const QVariant
 	cValue = cValue.value<QVariant>();
 
 	if (cValue.userType() == QMetaType::Nullptr)
-		return QJsonValue::Null;
-	else {
-		const auto metaType = getSubtype(propertyType);
-		if (cValue.userType() != metaType) {
-			throw QJsonSerializationException(QByteArray("Invalid value given for type ") +
-											  QMetaType::typeName(propertyType) +
-											  QByteArray(" - was ") +
-											  value.typeName() +
-											  QByteArray(", which is not the optionals value type (") +
-											  QMetaType::typeName(metaType) +
-											  QByteArray(")"));
-		}
-		return helper->serializeSubtype(metaType, cValue, "value");
-	}
+		return QCborValue::Null;
+	else
+		return helper()->serializeSubtype(getSubtype(propertyType), cValue, "value");
 }
 
-QVariant QJsonStdOptionalConverter::deserialize(int propertyType, const QJsonValue &value, QObject *parent, const QJsonTypeConverter::SerializationHelper *helper) const
+QVariant QJsonStdOptionalConverter::deserializeCbor(int propertyType, const QCborValue &value, QObject *parent) const
 {
 	QVariant result;
 	if (value.isNull())
 		result = QVariant::fromValue(nullptr);
 	else
-		result = helper->deserializeSubtype(getSubtype(propertyType), value, parent, "value");
+		result = helper()->deserializeSubtype(getSubtype(propertyType), value, parent, "value");
 	return QVariant{QMetaType::QVariant, &result};
 }
 
 int QJsonStdOptionalConverter::getSubtype(int optionalType) const
 {
-	auto match = optionalTypeRegex.match(QString::fromUtf8(getCanonicalTypeName(optionalType)));
-	if(match.hasMatch())
+	auto match = optionalTypeRegex.match(QString::fromUtf8(helper()->getCanonicalTypeName(optionalType)));
+	if (match.hasMatch())
 		return QMetaType::type(match.captured(1).toUtf8().trimmed());
 	else
 		return QMetaType::UnknownType;
