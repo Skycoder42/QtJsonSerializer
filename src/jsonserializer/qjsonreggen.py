@@ -40,7 +40,7 @@ def create_hook(file_name, class_name, *modes):
 
 	with open(file_name, "w") as file:
 		file.write('#include "qtjsonserializer_global.h"\n')
-		file.write('#include "qjsonserializer.h"\n')
+		file.write('#include "qjsonserializerbase.h"\n')
 		file.write("#include <QtCore/QtCore>\n\n")
 
 		file.write("#define QT_JSON_SERIALIZER_NAMED(T) #T\n\n")
@@ -48,14 +48,12 @@ def create_hook(file_name, class_name, *modes):
 		file.write("namespace _qjsonserializer_helpertypes::converter_hooks {\n\n")
 
 		file.write("void register_{}_converters() {{\n".format(escaped(class_name)))
-		file.write("\tbool ok;\n")
 		for mode_name in modes:
 			mode = Mode[mode_name.upper()]
 			if mode == Mode.MAP:
-				file.write("\tok = QJsonSerializer::{}<QString, {}>();\n".format(mode_fn(mode), class_name))
+				file.write("\tQJsonSerializerBase::{}<QString, {}>();\n".format(mode_fn(mode), class_name))
 			else:
-				file.write("\tok = QJsonSerializer::{}<{}>();\n".format(mode_fn(mode), class_name))
-			file.write('\tQ_ASSERT_X(ok, Q_FUNC_INFO, "Failed to register {} converters for type " QT_JSON_SERIALIZER_NAMED({}));\n'.format(mode_name, class_name))
+				file.write("\tQJsonSerializerBase::{}<{}>();\n".format(mode_fn(mode), class_name))
 		file.write("}\n\n")
 
 		file.write("}\n")

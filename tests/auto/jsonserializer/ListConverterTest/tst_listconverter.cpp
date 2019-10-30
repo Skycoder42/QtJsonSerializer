@@ -23,6 +23,9 @@ private:
 
 void ListConverterTest::initTest()
 {
+	QJsonSerializerBase::registerListConverters<QList<bool>>();
+	QJsonSerializerBase::registerListConverters<QPair<int, bool>>();
+
 	QMetaType::registerEqualsComparator<QList<int>>();
 	QMetaType::registerEqualsComparator<QLinkedList<int>>();
 	QMetaType::registerEqualsComparator<QVector<int>>();

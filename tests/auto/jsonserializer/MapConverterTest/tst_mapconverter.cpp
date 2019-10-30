@@ -25,6 +25,8 @@ void MapConverterTest::initTest()
 {
 	QJsonSerializerBase::registerMapConverters<int, double>();
 	QJsonSerializerBase::registerMapConverters<QPair<int, int>, double>();
+	QJsonSerializerBase::registerMapConverters<QString, QList<int>>();
+	QJsonSerializerBase::registerMapConverters<QPair<int, int>, QPair<int, bool>>();
 
 	QMetaType::registerEqualsComparator<QMap<QString, int>>();
 	QMetaType::registerEqualsComparator<QHash<QString, bool>>();
@@ -181,9 +183,9 @@ void MapConverterTest::addCommonSerData()
 										{QMetaType::QString, QStringLiteral("a"), QStringLiteral("A")},
 										{QMetaType::QString, QStringLiteral("b"), QStringLiteral("B")},
 										{QMetaType::QString, QStringLiteral("c"), QStringLiteral("C")},
-										{QMetaType::QVariant, 1, 2},
-										{QMetaType::QVariant, 3, 4},
-										{QMetaType::QVariant, 5, 6}
+										{QMetaType::UnknownType, 1, 2},
+										{QMetaType::UnknownType, 3, 4},
+										{QMetaType::UnknownType, 5, 6}
 									}
 								 << static_cast<QObject*>(this)
 								 << static_cast<int>(QMetaType::QVariantMap)
@@ -205,7 +207,7 @@ void MapConverterTest::addCommonSerData()
 	QTest::newRow("variant.hash") << QVariantHash{}
 								  << TestQ{
 										 {QMetaType::QString, QStringLiteral("tree"), QStringLiteral("baum")},
-										 {QMetaType::QVariant, true, false},
+										 {QMetaType::UnknownType, true, false},
 									 }
 								  << static_cast<QObject*>(this)
 								  << static_cast<int>(QMetaType::QVariantHash)

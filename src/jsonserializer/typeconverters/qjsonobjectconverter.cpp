@@ -5,14 +5,6 @@
 
 #include <array>
 
-#include <QtCore/QPointer>
-#include <QtCore/QSharedPointer>
-#include <QtCore/QRegularExpression>
-#include <QtCore/QDebug>
-
-const QRegularExpression QJsonObjectConverter::sharedTypeRegex(QStringLiteral(R"__(^QSharedPointer<\s*(.*?)\s*>$)__"));
-const QRegularExpression QJsonObjectConverter::trackingTypeRegex(QStringLiteral(R"__(^QPointer<\s*(.*?)\s*>$)__"));
-
 bool QJsonObjectConverter::canConvert(int metaTypeId) const
 {
 	auto flags = QMetaType::typeFlags(metaTypeId);
@@ -58,16 +50,19 @@ int QJsonObjectConverter::guessType(QCborTag tag, QCborValue::Type dataType) con
 
 QCborValue QJsonObjectConverter::serialize(int propertyType, const QVariant &value) const
 {
+	QSharedPointer<const QJsonTypeExtractor> extractor;
 	QObject *object = nullptr;
-	auto flags = QMetaType::typeFlags(propertyType);
-	if (flags.testFlag(QMetaType::PointerToQObject))
-		object = extract<QObject*>(value);
-	else if (flags.testFlag(QMetaType::SharedPointerToQObject))
-		object = extract<QSharedPointer<QObject>>(value).data();
-	else if (flags.testFlag(QMetaType::TrackingPointerToQObject))
-		object = extract<QPointer<QObject>>(value).data();
-	else
-		Q_UNREACHABLE();
+	if (QMetaType::typeFlags(propertyType).testFlag(QMetaType::PointerToQObject))
+		object = value.value<QObject*>();
+	else {
+		extractor = helper()->extractor(propertyType);
+		if (!extractor) {
+			throw QJsonSerializationException(QByteArray("Failed to get extractor for type ") +
+											  QMetaType::typeName(propertyType) +
+											  QByteArray(". Make shure to register pair types via QJsonSerializer::registerPointerConverters"));
+		}
+		object = extractor->extract(value).value<QObject*>();
+	}
 
 	if (!object)
 		return QCborValue::Null;
@@ -98,7 +93,7 @@ QCborValue QJsonObjectConverter::serialize(int propertyType, const QVariant &val
 		//first: pass the class name
 		cborMap[QStringLiteral("@class")] = QString::fromUtf8(meta->className());
 	} else
-		meta = getMetaObject(propertyType);
+		meta = getMetaObject(propertyType, extractor);
 
 	//go through all properties and try to serialize them
 	const auto keepObjectName = helper()->getProperty("keepObjectName").toBool();
@@ -117,15 +112,25 @@ QCborValue QJsonObjectConverter::serialize(int propertyType, const QVariant &val
 
 QVariant QJsonObjectConverter::deserializeCbor(int propertyType, const QCborValue &value, QObject *parent) const
 {
+	QSharedPointer<const QJsonTypeExtractor> extractor;
+	if (!QMetaType::typeFlags(propertyType).testFlag(QMetaType::PointerToQObject)) {
+		extractor = helper()->extractor(propertyType);
+		if (!extractor) {
+			throw QJsonDeserializationException(QByteArray("Failed to get extractor for type ") +
+												QMetaType::typeName(propertyType) +
+												QByteArray(". Make shure to register pair types via QJsonSerializer::registerPointerConverters"));
+		}
+	}
+
 	if ((value.isTag() ? value.taggedValue() : value).isNull())
-		return toVariant(nullptr, QMetaType::typeFlags(propertyType));
+		return toVariant(nullptr, extractor);
 
 	QCborMap cborMap;
 	if (value.isTag()) {
 		if (value.tag() == static_cast<QCborTag>(QCborSerializer::GenericObject))
-			return toVariant(deserializeGenericObject(value.taggedValue().toArray(), parent), QMetaType::typeFlags(propertyType));
+			return toVariant(deserializeGenericObject(value.taggedValue().toArray(), parent), extractor);
 		else if (value.tag() == static_cast<QCborTag>(QCborSerializer::ConstructedObject))
-			return toVariant(deserializeConstructedObject(value.taggedValue(), parent), QMetaType::typeFlags(propertyType));
+			return toVariant(deserializeConstructedObject(value.taggedValue(), parent), extractor);
 		else
 			cborMap = value.taggedValue().toMap();
 	} else
@@ -133,7 +138,7 @@ QVariant QJsonObjectConverter::deserializeCbor(int propertyType, const QCborValu
 
 	auto poly = static_cast<QJsonSerializerBase::Polymorphing>(helper()->getProperty("polymorphing").toInt());
 
-	auto metaObject = getMetaObject(propertyType);
+	auto metaObject = getMetaObject(propertyType, extractor);
 	if (!metaObject)
 		throw QJsonDeserializationException(QByteArray("Unable to get metaobject for type ") + QMetaType::typeName(propertyType));
 
@@ -167,63 +172,28 @@ QVariant QJsonObjectConverter::deserializeCbor(int propertyType, const QCborValu
 	}
 
 	deserializeProperties(metaObject, object, cborMap, isPoly);
-	return toVariant(object, QMetaType::typeFlags(propertyType));
+	return toVariant(object, extractor);
 }
 
-const QMetaObject *QJsonObjectConverter::getMetaObject(int typeId) const
+const QMetaObject *QJsonObjectConverter::getMetaObject(int typeId, const QSharedPointer<const QJsonTypeExtractor> &extractor) const
 {
 	auto flags = QMetaType::typeFlags(typeId);
 	if (flags.testFlag(QMetaType::PointerToQObject))
 		return QMetaType::metaObjectForType(typeId);
-	else {
-		QRegularExpression regex;
-		if (flags.testFlag(QMetaType::SharedPointerToQObject))
-			regex = sharedTypeRegex;
-		else if (flags.testFlag(QMetaType::TrackingPointerToQObject))
-			regex = trackingTypeRegex;
-		else {
-			Q_UNREACHABLE();
-			return nullptr;
-		}
-
-		//extract template type, and if found, add the pointer star and find the meta type
-		auto match = regex.match(QString::fromUtf8(helper()->getCanonicalTypeName(typeId)));
-		if (match.hasMatch()) {
-			auto type = QMetaType::type(match.captured(1).toUtf8().trimmed() + "*");
-			return QMetaType::metaObjectForType(type);
-		} else
-			return nullptr;
-	}
+	else if (extractor)
+		return QMetaType::metaObjectForType(extractor->subtypes()[0]);
+	else
+		return nullptr;
 }
 
-template<typename T>
-T QJsonObjectConverter::extract(QVariant variant) const
+QVariant QJsonObjectConverter::toVariant(QObject *object, const QSharedPointer<const QJsonTypeExtractor> &extractor) const
 {
-	auto id = qMetaTypeId<T>();
-	if (variant.canConvert(id) && variant.convert(id))
-		return variant.value<T>();
-	else {
-		throw QJsonSerializationException(QByteArray("unable to get QObject pointer from type ") +
-										  QMetaType::typeName(id) +
-										  QByteArray(". Make shure to register pointer converters via QJsonSerializer::registerPointerConverters"));
-	}
-}
-
-QVariant QJsonObjectConverter::toVariant(QObject *object, QMetaType::TypeFlags flags) const
-{
-	if (flags.testFlag(QMetaType::PointerToQObject))
+	if (extractor) {
+		QVariant res;
+		extractor->emplace(res, QVariant::fromValue(object));
+		return res;
+	} else
 		return QVariant::fromValue(object);
-	else if (flags.testFlag(QMetaType::SharedPointerToQObject)) {
-		//remove parent, as shared pointers and object tree exclude each other
-		if (object)
-			object->setParent(nullptr);
-		return QVariant::fromValue(QSharedPointer<QObject>(object));
-	} else if (flags.testFlag(QMetaType::TrackingPointerToQObject))
-		return QVariant::fromValue<QPointer<QObject>>(object);
-	else {
-		Q_UNREACHABLE();
-		return QVariant();
-	}
 }
 
 bool QJsonObjectConverter::polyMetaObject(QObject *object) const

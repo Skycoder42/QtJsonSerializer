@@ -87,6 +87,7 @@ QList<QCborValue::Type> TestWrapperConverter::allowedCborTypes(int metaTypeId, Q
 
 QCborValue TestWrapperConverter::serialize(int propertyType, const QVariant &value) const
 {
+	Q_UNUSED(propertyType)
 	auto mo = &EnumContainer::staticMetaObject;
 	auto container = value.value<EnumContainer>();
 	return QCborMap {

@@ -23,8 +23,8 @@ public:
 
 	virtual QByteArray baseType() const = 0;
 	virtual QList<int> subtypes() const = 0;
-	virtual QVariant extract(const QVariant &value, int index) const = 0;
-	virtual void emplace(QVariant &target, int index, const QVariant &value) const = 0;
+	virtual QVariant extract(const QVariant &value, int index = -1) const = 0;
+	virtual void emplace(QVariant &target, const QVariant &value, int index = -1) const = 0;
 };
 
 class QJsonTypeConverterPrivate;

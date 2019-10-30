@@ -15,13 +15,8 @@ public:
 	QVariant deserializeCbor(int propertyType, const QCborValue &value, QObject *parent) const override;
 
 private:
-	static const QRegularExpression sharedTypeRegex;
-	static const QRegularExpression trackingTypeRegex;
-
-	template<typename T>
-	T extract(QVariant variant) const;
-	const QMetaObject *getMetaObject(int typeId) const;
-	QVariant toVariant(QObject *object, QMetaType::TypeFlags flags) const;
+	const QMetaObject *getMetaObject(int typeId, const QSharedPointer<const QJsonTypeExtractor> &extractor) const;
+	QVariant toVariant(QObject *object, const QSharedPointer<const QJsonTypeExtractor> &extractor) const;
 	bool polyMetaObject(QObject *object) const;
 
 	QObject *deserializeGenericObject(const QCborArray &value, QObject *parent) const;

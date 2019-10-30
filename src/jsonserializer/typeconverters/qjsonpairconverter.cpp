@@ -4,11 +4,10 @@
 
 #include <QtCore/QCborArray>
 
-const QRegularExpression QJsonPairConverter::pairTypeRegex(QStringLiteral(R"__(^(?:QPair|std::pair)<(.*?)>$)__"));
-
 bool QJsonPairConverter::canConvert(int metaTypeId) const
 {
-	return pairTypeRegex.match(QString::fromUtf8(helper()->getCanonicalTypeName(metaTypeId))).hasMatch();
+	const auto extractor = helper()->extractor(metaTypeId);
+	return extractor && extractor->baseType() == "pair";
 }
 
 QList<QCborTag> QJsonPairConverter::allowedCborTags(int metaTypeId) const
@@ -26,57 +25,39 @@ QList<QCborValue::Type> QJsonPairConverter::allowedCborTypes(int metaTypeId, QCb
 
 QCborValue QJsonPairConverter::serialize(int propertyType, const QVariant &value) const
 {
-	const auto types = getPairTypes(propertyType);
-	const auto targetType = qMetaTypeId<QPair<QVariant, QVariant>>();
-	auto cValue = value;
-	if (!cValue.canConvert(targetType) || !cValue.convert(targetType)) {
-		throw QJsonSerializationException(QByteArray("Failed to convert type ") +
+	const auto extractor = helper()->extractor(propertyType);
+	if (!extractor) {
+		throw QJsonSerializationException(QByteArray("Failed to get extractor for type ") +
 										  QMetaType::typeName(propertyType) +
-										  QByteArray(" to QPair<QVariant, QVariant>. Make shure to register pair types via QJsonSerializer::registerPairConverters"));
+										  QByteArray(". Make shure to register pair types via QJsonSerializer::registerPairConverters"));
 	}
 
-	auto variant = cValue.value<QPair<QVariant, QVariant>>();
+	const auto subTypes = extractor->subtypes();
 	return {
 		static_cast<QCborTag>(QCborSerializer::Pair),
 		QCborArray {
-			helper()->serializeSubtype(types.first, variant.first, "first"),
-			helper()->serializeSubtype(types.second, variant.second, "second")
+			helper()->serializeSubtype(subTypes[0], extractor->extract(value, 0), "first"),
+			helper()->serializeSubtype(subTypes[1], extractor->extract(value, 1), "second")
 		}
 	};
 }
 
 QVariant QJsonPairConverter::deserializeCbor(int propertyType, const QCborValue &value, QObject *parent) const
 {
-	const auto types = getPairTypes(propertyType);
+	const auto extractor = helper()->extractor(propertyType);
+	if (!extractor) {
+		throw QJsonDeserializationException(QByteArray("Failed to get extractor for type ") +
+											QMetaType::typeName(propertyType) +
+											QByteArray(". Make shure to register pair types via QJsonSerializer::registerPairConverters"));
+	}
+
 	const auto array = (value.isTag() ? value.taggedValue() : value).toArray();
 	if (array.size() != 2)
 		throw QJsonDeserializationException("CBOR/JSON array must have exactly 2 elements to be read as a pair");
 
-	QPair<QVariant, QVariant> vPair;
-	vPair.first = helper()->deserializeSubtype(types.first, array[0], parent, "first");
-	vPair.second = helper()->deserializeSubtype(types.second, array[1], parent, "second");
-	return QVariant::fromValue(vPair);
-}
-
-std::pair<int, int> QJsonPairConverter::getPairTypes(int metaType) const
-{
-	auto match = pairTypeRegex.match(QString::fromUtf8(helper()->getCanonicalTypeName(metaType)));
-	if (match.hasMatch()) {
-		// parse match, using <> and , rules
-		const auto matchStr = match.captured(1);
-		auto bCount = 0;
-		for (auto i = 0; i < matchStr.size(); ++i) {
-			const auto &c = matchStr[i];
-			if (c == QLatin1Char('<'))
-				++bCount;
-			else if (c == QLatin1Char('>'))
-				--bCount;
-			else if (bCount == 0 && c == QLatin1Char(',')) {
-				return std::make_pair(QMetaType::type(matchStr.mid(0, i).trimmed().toUtf8()),
-									  QMetaType::type(matchStr.mid(i + 1).trimmed().toUtf8()));
-			}
-		}
-	}
-
-	return std::make_pair(QMetaType::UnknownType, QMetaType::UnknownType);
+	const auto subTypes = extractor->subtypes();
+	QVariant resPair{propertyType, nullptr};
+	extractor->emplace(resPair, helper()->deserializeSubtype(subTypes[0], array[0], parent, "first"), 0);
+	extractor->emplace(resPair, helper()->deserializeSubtype(subTypes[1], array[1], parent, "second"), 1);
+	return resPair;
 }

@@ -1,58 +1,14 @@
 #include "qcontainerwriters.h"
 #include "qcontainerwriters_p.h"
-#include <QDebug>
 
-namespace {
-
-class QSequentialWriterFactoryQStringList : public QSequentialWriterFactory
-{
-public:
-	QSharedPointer<QSequentialWriter> create(void *data) const final {
-		return QSharedPointer<QSequentialWriterImpl<QList, QString>>::create(reinterpret_cast<QStringList*>(data));
-	}
-};
-
-class QSequentialWriterFactoryQByteArrayList : public QSequentialWriterFactory
-{
-public:
-	QSharedPointer<QSequentialWriter> create(void *data) const final {
-		return QSharedPointer<QSequentialWriterImpl<QList, QByteArray>>::create(reinterpret_cast<QByteArrayList*>(data));
-	}
-};
-
-class QSequentialWriterFactoryQVariantList : public QSequentialWriterFactory
-{
-public:
-	QSharedPointer<QSequentialWriter> create(void *data) const final {
-		return QSharedPointer<QSequentialWriterImpl<QList, QVariant>>::create(reinterpret_cast<QVariantList*>(data));
-	}
-};
-
-class QAssociativeWriterPrivateFactoryQVariantMap : public QAssociativeWriterPrivateFactory
-{
-public:
-	QSharedPointer<QAssociativeWriterPrivate> create(void *data) const final {
-		return QSharedPointer<QAssociativeWriterPrivateImpl<QMap, QString, QVariant>>::create(reinterpret_cast<QVariantMap*>(data));
-	}
-};
-
-class QAssociativeWriterPrivateFactoryQVariantHash : public QAssociativeWriterPrivateFactory
-{
-public:
-	QSharedPointer<QAssociativeWriterPrivate> create(void *data) const final {
-		return QSharedPointer<QAssociativeWriterPrivateImpl<QHash, QString, QVariant>>::create(reinterpret_cast<QVariantHash*>(data));
-	}
-};
-
-}
-
-
+#include <QtCore/QRegularExpression>
 
 void QSequentialWriter::registerWriter(int metaTypeId, QSequentialWriterFactory *factory)
 {
 	Q_ASSERT(factory);
 	QWriteLocker _{&QContainerWritersPrivate::sequenceLock};
 	QContainerWritersPrivate::sequenceFactories.insert(metaTypeId, factory);
+	QContainerWritersPrivate::sequenceInfoCache.remove(metaTypeId);
 }
 
 bool QSequentialWriter::canWrite(int metaTypeId)
@@ -71,14 +27,22 @@ QSharedPointer<QSequentialWriter> QSequentialWriter::getWriter(QVariant &data)
 		return {};
 }
 
-QSequentialWriter::SequenceInfo QSequentialWriter::getSequenceInfo(int metaTypeId)
+QSequentialWriter::SequenceInfo QSequentialWriter::getInfo(int metaTypeId)
 {
-	QReadLocker _{&QContainerWritersPrivate::sequenceLock};
-	const auto factory = QContainerWritersPrivate::sequenceFactories.value(metaTypeId);
-	if (factory)
-		return factory->create(nullptr)->info();
-	else
-		return {};
+	QReadLocker rLocker{&QContainerWritersPrivate::sequenceLock};
+	auto it = QContainerWritersPrivate::sequenceInfoCache.find(metaTypeId);
+	if (it != QContainerWritersPrivate::sequenceInfoCache.end())
+		return *it;
+	else {
+		rLocker.unlock();
+		QWriteLocker wLocker{&QContainerWritersPrivate::sequenceLock};
+		const auto factory = QContainerWritersPrivate::sequenceFactories.value(metaTypeId);
+		if (factory)
+			it = QContainerWritersPrivate::sequenceInfoCache.insert(metaTypeId, factory->create(nullptr)->info());
+		else
+			it = QContainerWritersPrivate::sequenceInfoCache.insert(metaTypeId, QContainerWritersPrivate::tryParseSequenceInfo(metaTypeId));
+		return *it;
+	}
 }
 
 QSequentialWriter::~QSequentialWriter() = default;
@@ -93,61 +57,181 @@ QSequentialWriterFactory::~QSequentialWriterFactory() = default;
 
 
 
-QReadWriteLock QContainerWritersPrivate::sequenceLock;
-QHash<int, QSequentialWriterFactory*> QContainerWritersPrivate::sequenceFactories {
-	{QMetaType::QStringList, new QSequentialWriterFactoryQStringList{}},
-	{QMetaType::QByteArrayList, new QSequentialWriterFactoryQByteArrayList{}},
-	{QMetaType::QVariantList, new QSequentialWriterFactoryQVariantList{}}
-};
-
-
-
-
-QReadWriteLock QAssociativeWriterPrivateFactory::lock;
-QHash<int, QAssociativeWriterPrivateFactory*> QAssociativeWriterPrivateFactory::factories {
-	{QMetaType::QVariantMap, new QAssociativeWriterPrivateFactoryQVariantMap{}},
-	{QMetaType::QVariantHash, new QAssociativeWriterPrivateFactoryQVariantHash{}}
-};
+void QAssociativeWriter::registerWriter(int metaTypeId, QAssociativeWriterFactory *factory)
+{
+	Q_ASSERT(factory);
+	QWriteLocker _{&QContainerWritersPrivate::associationLock};
+	QContainerWritersPrivate::associationFactories.insert(metaTypeId, factory);
+	QContainerWritersPrivate::associationInfoCache.remove(metaTypeId);
+}
 
 bool QAssociativeWriter::canWrite(int metaTypeId)
 {
-	QReadLocker _{&QAssociativeWriterPrivateFactory::lock};
-	return QAssociativeWriterPrivateFactory::factories.contains(metaTypeId);
+	QReadLocker _{&QContainerWritersPrivate::associationLock};
+	return QContainerWritersPrivate::associationFactories.contains(metaTypeId);
 }
 
-QAssociativeWriter QAssociativeWriter::getWriter(QVariant &data)
+QSharedPointer<QAssociativeWriter> QAssociativeWriter::getWriter(QVariant &data)
 {
-	QReadLocker _{&QAssociativeWriterPrivateFactory::lock};
-	const auto factory = QAssociativeWriterPrivateFactory::factories.value(data.userType());
+	QReadLocker _{&QContainerWritersPrivate::associationLock};
+	const auto factory = QContainerWritersPrivate::associationFactories.value(data.userType());
 	if (factory)
 		return factory->create(data.data());
 	else
 		return {};
 }
 
-bool QAssociativeWriter::isValid() const
+QAssociativeWriter::AssociationInfo QAssociativeWriter::getInfo(int metaTypeId)
 {
-	return d;
+	QReadLocker rLocker{&QContainerWritersPrivate::associationLock};
+	auto it = QContainerWritersPrivate::associationInfoCache.find(metaTypeId);
+	if (it != QContainerWritersPrivate::associationInfoCache.end())
+		return *it;
+	else {
+		rLocker.unlock();
+		QWriteLocker wLocker{&QContainerWritersPrivate::associationLock};
+		const auto factory = QContainerWritersPrivate::associationFactories.value(metaTypeId);
+		if (factory)
+			it = QContainerWritersPrivate::associationInfoCache.insert(metaTypeId, factory->create(nullptr)->info());
+		else
+			it = QContainerWritersPrivate::associationInfoCache.insert(metaTypeId, QContainerWritersPrivate::tryParseAssociationInfo(metaTypeId));
+		return *it;
+	}
 }
 
-std::pair<int, int> QAssociativeWriter::mapTypes() const
-{
-	return d->mapTypesImpl();
-}
+QAssociativeWriter::~QAssociativeWriter() = default;
 
-void QAssociativeWriter::add(const QVariant &key, const QVariant &value)
-{
-	d->addImpl(key, value);
-}
+QAssociativeWriter::QAssociativeWriter() = default;
 
-QAssociativeWriter::QAssociativeWriter(QSharedPointer<QAssociativeWriterPrivate> &&dd)
-	: d{std::move(dd)}
+
+
+QAssociativeWriterFactory::QAssociativeWriterFactory() = default;
+
+QAssociativeWriterFactory::~QAssociativeWriterFactory() = default;
+
+
+
+QSequentialWriterImpl<QList, QVariant>::QSequentialWriterImpl(QVariantList *data)
+	: _data{data}
 {}
 
-QAssociativeWriterPrivate::QAssociativeWriterPrivate() = default;
+QSequentialWriter::SequenceInfo QSequentialWriterImpl<QList, QVariant>::info() const
+{
+	return {QMetaType::UnknownType, false};
+}
 
-QAssociativeWriterPrivate::~QAssociativeWriterPrivate() = default;
+void QSequentialWriterImpl<QList, QVariant>::reserve(int size)
+{
+	_data->reserve(size);
+}
 
-QAssociativeWriterPrivateFactory::QAssociativeWriterPrivateFactory() = default;
+void QSequentialWriterImpl<QList, QVariant>::add(const QVariant &value)
+{
+	_data->append(value);
+}
 
-QAssociativeWriterPrivateFactory::~QAssociativeWriterPrivateFactory() = default;
+
+
+QAssociativeWriterImpl<QMap, QString, QVariant>::QAssociativeWriterImpl(QVariantMap *data)
+	: _data{data}
+{}
+
+QAssociativeWriter::AssociationInfo QAssociativeWriterImpl<QMap, QString, QVariant>::info() const
+{
+	return {QMetaType::QString, QMetaType::UnknownType};
+}
+
+void QAssociativeWriterImpl<QMap, QString, QVariant>::add(const QVariant &key, const QVariant &value)
+{
+	_data->insert(key.toString(), value);
+}
+
+QAssociativeWriterImpl<QHash, QString, QVariant>::QAssociativeWriterImpl(QVariantHash *data)
+	: _data{data}
+{}
+
+QAssociativeWriter::AssociationInfo QAssociativeWriterImpl<QHash, QString, QVariant>::info() const
+{
+	return {QMetaType::QString, QMetaType::UnknownType};
+}
+
+void QAssociativeWriterImpl<QHash, QString, QVariant>::add(const QVariant &key, const QVariant &value)
+{
+	_data->insert(key.toString(), value);
+}
+
+// ------------- private implementation -------------
+
+QReadWriteLock QContainerWritersPrivate::sequenceLock;
+QHash<int, QSequentialWriterFactory*> QContainerWritersPrivate::sequenceFactories {
+	{QMetaType::QStringList, new QSequentialWriterFactoryQStringList{}},
+	{QMetaType::QByteArrayList, new QSequentialWriterFactoryQByteArrayList{}},
+	{QMetaType::QVariantList, new QSequentialWriterFactoryQVariantList{}}
+};
+QHash<int, QSequentialWriter::SequenceInfo> QContainerWritersPrivate::sequenceInfoCache;
+
+QReadWriteLock QContainerWritersPrivate::associationLock;
+QHash<int, QAssociativeWriterFactory*> QContainerWritersPrivate::associationFactories {
+	{QMetaType::QVariantMap, new QAssociativeWriterFactoryQVariantMap{}},
+	{QMetaType::QVariantHash, new QAssociativeWriterFactoryQVariantHash{}}
+};
+QHash<int, QAssociativeWriter::AssociationInfo> QContainerWritersPrivate::associationInfoCache;
+
+QSequentialWriter::SequenceInfo QContainerWritersPrivate::tryParseSequenceInfo(int metaTypeId)
+{
+	if (metaTypeId == QMetaType::QStringList)
+		return {QMetaType::QString, false};
+	else if (metaTypeId == QMetaType::QByteArrayList)
+		return {QMetaType::QByteArray, false};
+	else if (metaTypeId == QMetaType::QVariantList)
+		return {QMetaType::UnknownType, false};
+	else {
+		static const QRegularExpression listTypeRegex{
+			QStringLiteral(R"__(^((?![0-9_])(?:\w|::)*\w)\s*<\s*(.*?)\s*>$)__"),
+			QRegularExpression::UseUnicodePropertiesOption
+		};
+		auto match = listTypeRegex.match(QString::fromUtf8(QMetaType::typeName(metaTypeId)));
+		if (match.hasMatch()) {
+			return {
+				QMetaType::type(match.captured(2).toUtf8().trimmed()),
+				match.captured(1) == QStringLiteral("QSet")
+			};
+		}
+	}
+
+	return {QMetaType::UnknownType, false};
+}
+
+QAssociativeWriter::AssociationInfo QContainerWritersPrivate::tryParseAssociationInfo(int metaTypeId)
+{
+	if (metaTypeId == QMetaType::QVariantMap ||
+		metaTypeId == QMetaType::QVariantHash)
+		return {QMetaType::QString, QMetaType::UnknownType};
+	else {
+		static const QRegularExpression mapTypeRegex{
+			QStringLiteral(R"__(^(?![0-9_])(?:\w|::)*\w\s*<\s*(.*?)\s*>$)__"),
+			QRegularExpression::UseUnicodePropertiesOption
+		};
+		auto match = mapTypeRegex.match(QString::fromUtf8(QMetaType::typeName(metaTypeId)));
+		if (match.hasMatch()) {
+			// parse match, using <> and , rules
+			const auto matchStr = match.captured(1);
+			auto bCount = 0;
+			for (auto i = 0; i < matchStr.size(); ++i) {
+				const auto &c = matchStr[i];
+				if (c == QLatin1Char('<'))
+					++bCount;
+				else if (c == QLatin1Char('>'))
+					--bCount;
+				else if (bCount == 0 && c == QLatin1Char(',')) {
+					return {
+						QMetaType::type(matchStr.mid(0, i).trimmed().toUtf8()),
+						QMetaType::type(matchStr.mid(i + 1).trimmed().toUtf8())
+					};
+				}
+			}
+		}
+	}
+
+	return {QMetaType::UnknownType, QMetaType::UnknownType};
+}

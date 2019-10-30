@@ -24,7 +24,11 @@ private:
 
 void PairConverterTest::initTest()
 {
+	QJsonSerializer::registerPairConverters<QString, int>();
+	QJsonSerializer::registerPairConverters<int, int>();
 	QJsonSerializer::registerPairConverters<bool, int>();
+	QJsonSerializer::registerPairConverters<QList<int>, QList<int>>();
+	QJsonSerializer::registerPairConverters<QPair<int, int>, QPair<bool, bool>>();
 	QJsonSerializer::registerPairConverters<QMap<int, int>, QList<int>>();
 
 	QMetaType::registerEqualsComparator<QPair<bool, int>>();
@@ -66,7 +70,7 @@ void PairConverterTest::addMetaData()
 							 << QCborValue::Array
 							 << true
 							 << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
-	QTest::newRow("qt.map") << qMetaTypeId<QPair<QMap<QString, int>, QList<int>>>()
+	QTest::newRow("qt.map") << qMetaTypeId<QPair<QMap<int, int>, QList<int>>>()
 							<< static_cast<QCborTag>(QCborSerializer::Pair)
 							<< QCborValue::Array
 							<< true

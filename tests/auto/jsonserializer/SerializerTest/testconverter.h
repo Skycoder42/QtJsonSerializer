@@ -73,12 +73,8 @@ public:
 	TestObject(QObject *parent = nullptr);
 };
 
-using IntAlias = int;
-using ListAlias = QList<TestObject*>;
-
 Q_DECLARE_OPERATORS_FOR_FLAGS(EnumContainer::EnumFlags)
 
 Q_DECLARE_METATYPE(EnumContainer)
-Q_DECLARE_METATYPE(ListAlias)
 
 #endif // TESTCONVERTER_H

@@ -6,6 +6,8 @@
 
 #include "testconverter.h"
 
+#include <QtJsonSerializer/private/qjsonserializerbase_p.h>
+
 using TestTuple = std::tuple<int, QString, QList<int>>;
 using TestPair = std::pair<bool, int>;
 using TestVariant = std::variant<bool, int, double>;
@@ -13,33 +15,6 @@ Q_DECLARE_METATYPE(TestTuple)
 Q_DECLARE_METATYPE(TestPair)
 Q_DECLARE_METATYPE(std::optional<int>)
 Q_DECLARE_METATYPE(TestVariant)
-
-class AliasHelper : public QJsonSerializerBase
-{
-public:
-	QByteArray getNameHelper(int propertyType) const {
-		return getCanonicalTypeName(propertyType);
-	}
-
-	std::variant<QCborValue, QJsonValue> serializeGeneric(const QVariant &value) const override {
-		return QCborValue::fromVariant(value);
-	}
-
-	QVariant deserializeGeneric(const std::variant<QCborValue, QJsonValue> &value, int, QObject *) const override {
-		return std::get<QCborValue>(value).toVariant();
-	}
-
-protected:
-	bool jsonMode() const override {
-		return true;
-	}
-	QCborTag typeTag(int) const override {
-		return static_cast<QCborTag>(-1);
-	}
-	QList<int> typesForTag(QCborTag) const override {
-		return {};
-	}
-};
 
 class SerializerTest : public QObject
 {
@@ -49,7 +24,6 @@ private Q_SLOTS:
 	void initTestCase();
 	void cleanupTestCase();
 
-	void testAliasName();
 	void testVariantConversions_data();
 	void testVariantConversions();
 
@@ -62,7 +36,6 @@ private Q_SLOTS:
 	void testExceptionTrace();
 
 private:
-	AliasHelper *helper;
 	QJsonSerializer *jsonSerializer = nullptr;
 	QCborSerializer *cborSerializer = nullptr;
 
@@ -72,11 +45,6 @@ private:
 
 void SerializerTest::initTestCase()
 {
-	//aliases
-	qRegisterMetaType<IntAlias>("IntAlias");
-	qRegisterMetaType<ListAlias>();
-	QJsonSerializer::registerInverseTypedef<ListAlias>("QList<TestObject*>");
-
 	// converters
 	QJsonSerializer::registerPointerConverters<TestObject>();
 	QJsonSerializer::registerListConverters<TestObject*>();
@@ -89,10 +57,10 @@ void SerializerTest::initTestCase()
 	QJsonSerializer::registerPairConverters<QList<bool>, bool>();
 	QJsonSerializer::registerListConverters<QPair<bool, bool>>();
 
-	QJsonSerializer_registerTupleConverters_named(int, QString, QList<int>);
-	QJsonSerializer_registerStdPairConverters_named(bool, int);
+	QJsonSerializer::registerTupleConverters<int, QString, QList<int>>();
+	QJsonSerializer::registerPairConverters<bool, int>();
 	QJsonSerializer::registerOptionalConverters<int>();
-	QJsonSerializer_registerVariantConverters_named(bool, int, double);
+	QJsonSerializer::registerVariantConverters<bool, int, double>();
 
 	//register list comparators, needed for test only!
 	QMetaType::registerEqualsComparator<QList<bool>>();
@@ -115,7 +83,6 @@ void SerializerTest::initTestCase()
 	QMetaType::registerEqualsComparator<std::optional<int>>();
 	QMetaType::registerEqualsComparator<std::variant<bool, int, double>>();
 
-	helper = new AliasHelper{};
 	jsonSerializer = new QJsonSerializer{this};
 	jsonSerializer->addJsonTypeConverter<TestEnumConverter>();
 	jsonSerializer->addJsonTypeConverter<TestWrapperConverter>();
@@ -130,12 +97,6 @@ void SerializerTest::cleanupTestCase()
 	jsonSerializer = nullptr;
 	delete jsonSerializer;
 	jsonSerializer = nullptr;
-}
-
-void SerializerTest::testAliasName()
-{
-	QCOMPARE(QMetaType::typeName(qMetaTypeId<ListAlias>()), "ListAlias");
-	QCOMPARE(helper->getNameHelper(qMetaTypeId<ListAlias>()), "QList<TestObject*>");
 }
 
 void SerializerTest::testVariantConversions_data()
@@ -364,10 +325,10 @@ void SerializerTest::testVariantConversions()
 
 			QVariant res{data.userType(), nullptr};
 			auto writer = QSequentialWriter::getWriter(res);
-			QVERIFY(writer.isValid());
-			writer.reserve(variantList.size());
+			QVERIFY(writer);
+			writer->reserve(variantList.size());
 			for (const auto &vData : variantList)
-				writer.add(vData);
+				writer->add(vData);
 			QCOMPARE(res, data);
 		} else if (targetType == QMetaType::QVariantMap ||
 				   targetType == QMetaType::QVariantHash) {
@@ -382,16 +343,15 @@ void SerializerTest::testVariantConversions()
 
 			QVariant res{data.userType(), nullptr};
 			auto writer = QAssociativeWriter::getWriter(res);
+			QVERIFY(writer);
 			for (auto it = variantMap.begin(), end = variantMap.end(); it != end; ++it)
-				writer.add(it.key(), it.value());
+				writer->add(it.key(), it.value());
 			QCOMPARE(res, data);
 		}
 		convData = variantData;
 	} else {
-		QVERIFY(convData.convert(targetType));
-		QCOMPARE(convData, variantData);
-		QVERIFY(convData.convert(origType));
-		QCOMPARE(convData, data);
+		auto extractor = QJsonSerializerBasePrivate::extractors.get(origType);
+		QVERIFY(extractor);
 	}
 }
 

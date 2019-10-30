@@ -19,8 +19,8 @@ class Q_JSONSERIALIZER_EXPORT QSequentialWriter
 
 public:
 	struct SequenceInfo {
-		int type;
-		bool isSet;
+		int type = QMetaType::UnknownType;
+		bool isSet = false;
 	};
 
 	template <template<typename> class TContainer, typename TClass>
@@ -28,7 +28,7 @@ public:
 	static void registerWriter(int metaTypeId, QSequentialWriterFactory *factory);
 	static bool canWrite(int metaTypeId);
 	static QSharedPointer<QSequentialWriter> getWriter(QVariant &data);
-	static SequenceInfo getSequenceInfo(int metaTypeId);
+	static SequenceInfo getInfo(int metaTypeId);
 
 	virtual ~QSequentialWriter();
 	virtual SequenceInfo info() const = 0;
@@ -49,44 +49,63 @@ public:
 	virtual QSharedPointer<QSequentialWriter> create(void *data) const = 0;
 };
 
-class QAssociativeWriterPrivate;
+
+
+class QAssociativeWriterFactory;
 class Q_JSONSERIALIZER_EXPORT QAssociativeWriter
 {
+	Q_DISABLE_COPY(QAssociativeWriter)
+
 public:
+	struct AssociationInfo {
+		int keyType = QMetaType::UnknownType;
+		int valueType = QMetaType::UnknownType;
+	};
+
 	template <template<typename, typename> class TContainer, typename TKey, typename TValue>
 	static void registerWriter();
+	static void registerWriter(int metaTypeId, QAssociativeWriterFactory *factory);
 	static bool canWrite(int metaTypeId);
-	static QAssociativeWriter getWriter(QVariant &data);
+	static QSharedPointer<QAssociativeWriter> getWriter(QVariant &data);
+	static AssociationInfo getInfo(int metaTypeId);
 
-	bool isValid() const;
-	std::pair<int, int> mapTypes() const;
-	void add(const QVariant &key, const QVariant &value);
+	virtual ~QAssociativeWriter();
+	virtual AssociationInfo info() const = 0;
+	virtual void add(const QVariant &key, const QVariant &value) = 0;
 
-private:
-	QSharedPointer<QAssociativeWriterPrivate> d;
-
-	QAssociativeWriter(QSharedPointer<QAssociativeWriterPrivate> &&dd = {});
+protected:
+	QAssociativeWriter();
 };
 
-// Generic Implementations
+class Q_JSONSERIALIZER_EXPORT QAssociativeWriterFactory
+{
+	Q_DISABLE_COPY(QAssociativeWriterFactory)
+
+public:
+	QAssociativeWriterFactory();
+	virtual ~QAssociativeWriterFactory();
+	virtual QSharedPointer<QAssociativeWriter> create(void *data) const = 0;
+};
+
+// ------------- Generic Implementation classes -------------
 
 template <template<typename> class TContainer, typename TClass>
-class QSequentialWriterImpl : public QSequentialWriter
+class QSequentialWriterImpl final : public QSequentialWriter
 {
 public:
 	QSequentialWriterImpl(TContainer<TClass> *data)
 		: _data{data}
 	{}
 
-	SequenceInfo info() const override {
+	SequenceInfo info() const final {
 		return {qMetaTypeId<TClass>(), false};
 	}
 
-	void reserve(int size) override {
+	void reserve(int size) final {
 		_data->reserve(size);
 	}
 
-	void add(const QVariant &value) override {
+	void add(const QVariant &value) final {
 		_data->append(value.template value<TClass>());
 	}
 
@@ -95,7 +114,7 @@ private:
 };
 
 template <template<typename> class TContainer, typename TClass>
-class QSequentialWriterFactoryImpl : public QSequentialWriterFactory
+class QSequentialWriterFactoryImpl final : public QSequentialWriterFactory
 {
 public:
 	QSharedPointer<QSequentialWriter> create(void *data) const final {
@@ -103,30 +122,21 @@ public:
 	}
 };
 
-class Q_JSONSERIALIZER_EXPORT QAssociativeWriterPrivate
-{
-	Q_DISABLE_COPY(QAssociativeWriterPrivate)
 
-public:
-	QAssociativeWriterPrivate();
-	virtual ~QAssociativeWriterPrivate();
-	virtual std::pair<int, int> mapTypesImpl() const = 0;
-	virtual void addImpl(const QVariant &key, const QVariant &value) = 0;
-};
 
 template <template<typename, typename> class TContainer, typename TKey, typename TValue>
-class QAssociativeWriterPrivateImpl : public QAssociativeWriterPrivate
+class QAssociativeWriterImpl final : public QAssociativeWriter
 {
 public:
-	QAssociativeWriterPrivateImpl(TContainer<TKey, TValue> *data)
+	QAssociativeWriterImpl(TContainer<TKey, TValue> *data)
 		: _data{data}
 	{}
 
-	std::pair<int, int> mapTypesImpl() const override {
-		return std::make_pair(qMetaTypeId<TKey>(), qMetaTypeId<TValue>());
+	AssociationInfo info() const final {
+		return {qMetaTypeId<TKey>(), qMetaTypeId<TValue>()};
 	}
 
-	void addImpl(const QVariant &key, const QVariant &value) override {
+	void add(const QVariant &key, const QVariant &value) final {
 		_data->insert(key.template value<TKey>(),
 					  value.template value<TValue>());
 	}
@@ -135,47 +145,34 @@ private:
 	TContainer<TKey, TValue> *_data;
 };
 
-class Q_JSONSERIALIZER_EXPORT QAssociativeWriterPrivateFactory
-{
-	Q_DISABLE_COPY(QAssociativeWriterPrivateFactory)
-
-public:
-	static QReadWriteLock lock;
-	static QHash<int, QAssociativeWriterPrivateFactory*> factories;
-
-	QAssociativeWriterPrivateFactory();
-	virtual ~QAssociativeWriterPrivateFactory();
-	virtual QSharedPointer<QAssociativeWriterPrivate> create(void *data) const = 0;
-};
-
 template <template<typename, typename> class TContainer, typename TKey, typename TValue>
-class QAssociativeWriterPrivateFactoryImpl : public QAssociativeWriterPrivateFactory
+class QAssociativeWriterFactoryImpl final : public QAssociativeWriterFactory
 {
 public:
-	QSharedPointer<QAssociativeWriterPrivate> create(void *data) const final {
-		return QSharedPointer<QAssociativeWriterPrivateImpl<TContainer, TKey, TValue>>::create(reinterpret_cast<TContainer<TKey, TValue>*>(data));
+	QSharedPointer<QAssociativeWriter> create(void *data) const final {
+		return QSharedPointer<QAssociativeWriterImpl<TContainer, TKey, TValue>>::create(reinterpret_cast<TContainer<TKey, TValue>*>(data));
 	}
 };
 
-// specializations and implementations
+// ------------- Specializations and base generic implementations -------------
 
 template <typename TClass>
-class QSequentialWriterImpl<QSet, TClass> : public QSequentialWriter
+class QSequentialWriterImpl<QSet, TClass> final : public QSequentialWriter
 {
 public:
 	QSequentialWriterImpl(QSet<TClass> *data)
 		: _data{data}
 	{}
 
-	SequenceInfo info() const override {
+	SequenceInfo info() const final {
 		return {qMetaTypeId<TClass>(), true};
 	}
 
-	void reserve(int size) override {
+	void reserve(int size) final {
 		_data->reserve(size);
 	}
 
-	void add(const QVariant &value) override {
+	void add(const QVariant &value) final {
 		_data->insert(value.template value<TClass>());
 	}
 
@@ -184,26 +181,70 @@ private:
 };
 
 template <typename TClass>
-class QSequentialWriterImpl<QLinkedList, TClass> : public QSequentialWriter
+class QSequentialWriterImpl<QLinkedList, TClass> final : public QSequentialWriter
 {
 public:
 	QSequentialWriterImpl(QLinkedList<TClass> *data)
 		: _data{data}
 	{}
 
-	SequenceInfo info() const override {
+	SequenceInfo info() const final {
 		return {qMetaTypeId<TClass>(), false};
 	}
 
-	void reserve(int) override {}
+	void reserve(int) final {}
 
-	void add(const QVariant &value) override {
+	void add(const QVariant &value) final {
 		_data->append(value.template value<TClass>());
 	}
 
 private:
 	QLinkedList<TClass> *_data;
 };
+
+template <>
+class QSequentialWriterImpl<QList, QVariant> final : public QSequentialWriter
+{
+public:
+	QSequentialWriterImpl(QVariantList *data);
+
+	SequenceInfo info() const final;
+	void reserve(int size) final;
+	void add(const QVariant &value) final;
+
+private:
+	QVariantList *_data;
+};
+
+
+
+template <>
+class QAssociativeWriterImpl<QMap, QString, QVariant> final : public QAssociativeWriter
+{
+public:
+	QAssociativeWriterImpl(QVariantMap *data);
+
+	AssociationInfo info() const final;
+	void add(const QVariant &key, const QVariant &value) final;
+
+private:
+	QVariantMap *_data;
+};
+
+template <>
+class QAssociativeWriterImpl<QHash, QString, QVariant> final : public QAssociativeWriter
+{
+public:
+	QAssociativeWriterImpl(QVariantHash *data);
+
+	AssociationInfo info() const final;
+	void add(const QVariant &key, const QVariant &value) final;
+
+private:
+	QVariantHash *_data;
+};
+
+
 
 template<template<typename> class TContainer, typename TClass>
 void QSequentialWriter::registerWriter()
@@ -215,9 +256,8 @@ void QSequentialWriter::registerWriter()
 template<template<typename, typename> class TContainer, typename TKey, typename TValue>
 void QAssociativeWriter::registerWriter()
 {
-	QWriteLocker _{&QAssociativeWriterPrivateFactory::lock};
-	QAssociativeWriterPrivateFactory::factories.insert(qMetaTypeId<TContainer<TKey, TValue>>(),
-													   new QAssociativeWriterPrivateFactoryImpl<TContainer, TKey, TValue>{});
+	registerWriter(qMetaTypeId<TContainer<TKey, TValue>>(),
+				   new QAssociativeWriterFactoryImpl<TContainer, TKey, TValue>{});
 }
 
 #endif // QCONTAINERWRITERS_H

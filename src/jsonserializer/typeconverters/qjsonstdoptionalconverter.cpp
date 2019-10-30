@@ -5,11 +5,10 @@
 
 // WORKAROUND for now, nullptr is used instead of nullopt, as nullopt_t cannot be registered as metatype
 
-const QRegularExpression QJsonStdOptionalConverter::optionalTypeRegex(QStringLiteral(R"__(^std::optional<\s*(.*?)\s*>$)__"));
-
 bool QJsonStdOptionalConverter::canConvert(int metaTypeId) const
 {
-	return optionalTypeRegex.match(QString::fromUtf8(helper()->getCanonicalTypeName(metaTypeId))).hasMatch();
+	const auto extractor = helper()->extractor(metaTypeId);
+	return extractor && extractor->baseType() == "optional";
 }
 
 QList<QCborValue::Type> QJsonStdOptionalConverter::allowedCborTypes(int metaTypeId, QCborTag tag) const
@@ -28,35 +27,34 @@ QList<QCborValue::Type> QJsonStdOptionalConverter::allowedCborTypes(int metaType
 
 QCborValue QJsonStdOptionalConverter::serialize(int propertyType, const QVariant &value) const
 {
-	auto cValue = value;
-	if (!cValue.convert(QMetaType::QVariant)) {
-		throw QJsonSerializationException(QByteArray("Failed to convert type ") +
+	const auto extractor = helper()->extractor(propertyType);
+	if (!extractor) {
+		throw QJsonSerializationException(QByteArray("Failed to get extractor for type ") +
 										  QMetaType::typeName(propertyType) +
-										  QByteArray(" to a QVariant. Make shure to register optional types via QJsonSerializer::registerOptionalConverters"));
+										  QByteArray(". Make shure to register std::optional types via QJsonSerializer::registerOptionalConverters"));
 	}
-	cValue = cValue.value<QVariant>();
 
+	const auto cValue = extractor->extract(value);
 	if (cValue.userType() == QMetaType::Nullptr)
 		return QCborValue::Null;
 	else
-		return helper()->serializeSubtype(getSubtype(propertyType), cValue, "value");
+		return helper()->serializeSubtype(extractor->subtypes()[0], cValue, "value");
 }
 
 QVariant QJsonStdOptionalConverter::deserializeCbor(int propertyType, const QCborValue &value, QObject *parent) const
 {
+	const auto extractor = helper()->extractor(propertyType);
+	if (!extractor) {
+		throw QJsonDeserializationException(QByteArray("Failed to get extractor for type ") +
+											QMetaType::typeName(propertyType) +
+											QByteArray(". Make shure to register std::optional types via QJsonSerializer::registerOptionalConverters"));
+	}
+
 	QVariant result;
 	if (value.isNull())
 		result = QVariant::fromValue(nullptr);
 	else
-		result = helper()->deserializeSubtype(getSubtype(propertyType), value, parent, "value");
-	return QVariant{QMetaType::QVariant, &result};
-}
-
-int QJsonStdOptionalConverter::getSubtype(int optionalType) const
-{
-	auto match = optionalTypeRegex.match(QString::fromUtf8(helper()->getCanonicalTypeName(optionalType)));
-	if (match.hasMatch())
-		return QMetaType::type(match.captured(1).toUtf8().trimmed());
-	else
-		return QMetaType::UnknownType;
+		result = helper()->deserializeSubtype(extractor->subtypes()[0], value, parent, "value");
+	extractor->emplace(result, result);
+	return result;
 }

@@ -15,7 +15,7 @@ public:
 	bool jsonMode() const override;
 	QVariant getProperty(const char *name) const override;
 	QCborTag typeTag(int metaTypeId) const override;
-	QByteArray getCanonicalTypeName(int propertyType) const override;
+	QSharedPointer<const QJsonTypeExtractor> extractor(int metaTypeId) const override;
 	QCborValue serializeSubtype(const QMetaProperty &property, const QVariant &value) const override;
 	QCborValue serializeSubtype(int propertyType, const QVariant &value, const QByteArray &traceHint) const override;
 	QVariant deserializeSubtype(const QMetaProperty &property, const QCborValue &value, QObject *parent) const override;

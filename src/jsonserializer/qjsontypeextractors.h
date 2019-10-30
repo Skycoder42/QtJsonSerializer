@@ -12,20 +12,71 @@
 
 namespace QJsonTypeExtractors {
 
-template <template <typename, typename> class TPair, typename TFirst, typename TSecond>
-class PairExtractor : public QJsonTypeExtractor
+template <template <typename> class TSmartPointer, typename TType>
+class SmartPointerExtractor final : public QJsonTypeExtractor
 {
 public:
-	QByteArray baseType() const override {
+	using Pointer = TType*;
+	using Type = TSmartPointer<TType>;
+
+	QByteArray baseType() const final {
+		return QByteArrayLiteral("pointer");
+	}
+
+	QList<int> subtypes() const final {
+		return {qMetaTypeId<Pointer>()};
+	}
+
+	QVariant extract(const QVariant &value, int) const final {
+		return QVariant::fromValue<Pointer>(value.value<Type>().get());
+	}
+
+	void emplace(QVariant &target, const QVariant &value, int) const final {
+		target = QVariant::fromValue(Type{value.value<Pointer>()});
+	}
+};
+
+template <typename TType>
+class SmartPointerExtractor<QPointer, TType> final : public QJsonTypeExtractor
+{
+	static_assert(std::is_base_of_v<QObject, TType>, "QPointer can only handle QObject types");
+public:
+	using Pointer = TType*;
+	using Type = QPointer<TType>;
+
+	QByteArray baseType() const final {
+		return QByteArrayLiteral("pointer");
+	}
+
+	QList<int> subtypes() const final {
+		return {qMetaTypeId<Pointer>()};
+	}
+
+	QVariant extract(const QVariant &value, int) const final {
+		return QVariant::fromValue<Pointer>(value.value<Type>().data());
+	}
+
+	void emplace(QVariant &target, const QVariant &value, int) const final {
+		target = QVariant::fromValue(Type{value.value<Pointer>()});
+	}
+};
+
+template <template <typename, typename> class TPair, typename TFirst, typename TSecond>
+class PairExtractor final : public QJsonTypeExtractor
+{
+public:
+	using Type = TPair<TFirst, TSecond>;
+
+	QByteArray baseType() const final {
 		return QByteArrayLiteral("pair");
 	}
 
-	QList<int> subtypes() const override {
+	QList<int> subtypes() const final {
 		return {qMetaTypeId<TFirst>(), qMetaTypeId<TSecond>()};
 	}
 
-	QVariant extract(const QVariant &value, int index) const override {
-		const auto vPair = value.value<TPair<TFirst, TSecond>>();
+	QVariant extract(const QVariant &value, int index) const final {
+		const auto vPair = value.value<Type>();
 		switch (index) {
 		case 0:
 			return QVariant::fromValue(vPair.first);
@@ -36,16 +87,15 @@ public:
 		}
 	}
 
-	void emplace(QVariant &target, int index, const QVariant &value) const override {
-		using TFull = TPair<TFirst, TSecond>;
-		Q_ASSERT(target.userType() == qMetaTypeId<TFull>());
-		const auto vPair = reinterpret_cast<TFull*>(target.data());
+	void emplace(QVariant &target, const QVariant &value, int index) const final {
+		Q_ASSERT(target.userType() == qMetaTypeId<Type>());
+		const auto vPair = reinterpret_cast<Type*>(target.data());
 		switch (index) {
 		case 0:
-			vPair.first = value.value<TFirst>();
+			vPair->first = value.value<TFirst>();
 			break;
 		case 1:
-			vPair.second = value.value<TSecond>();
+			vPair->second = value.value<TSecond>();
 			break;
 		default:
 			break;
@@ -54,25 +104,27 @@ public:
 };
 
 template <typename TValue>
-class OptionalExtractor : public QJsonTypeExtractor
+class OptionalExtractor final : public QJsonTypeExtractor
 {
 public:
-	QByteArray baseType() const override {
+	using Type = std::optional<TValue>;
+
+	QByteArray baseType() const final {
 		return QByteArrayLiteral("optional");
 	}
 
-	QList<int> subtypes() const override {
+	QList<int> subtypes() const final {
 		return {qMetaTypeId<TValue>()};
 	}
 
-	QVariant extract(const QVariant &value, int) const override {
+	QVariant extract(const QVariant &value, int) const final {
 		if (const auto opt = value.value<std::optional<TValue>>(); opt)
 			return QVariant::fromValue(*opt);
 		else
 			return QVariant::fromValue(nullptr);
 	}
 
-	void emplace(QVariant &target, int, const QVariant &value) const override {
+	void emplace(QVariant &target, const QVariant &value, int) const final {
 		if (value.isNull())
 			target = QVariant::fromValue<std::optional<TValue>>(std::nullopt);
 		else
@@ -81,15 +133,18 @@ public:
 };
 
 template <typename... TValues>
-class TupleExtractor : public QJsonTypeExtractor
+class TupleExtractor final : public QJsonTypeExtractor
 {
+public:
+	using Type = std::tuple<TValues...>;
+
 private:
 	template <size_t Index>
-	inline QVariant getIf(const std::tuple<TValues...> &, size_t) const {
+	inline QVariant getIf(const Type &, size_t) const {
 		return {};
 	}
 	template <size_t Index, typename TValue, typename... TRest>
-	inline QVariant getIf(const std::tuple<TValues...> &tpl, size_t index) const {
+	inline QVariant getIf(const Type &tpl, size_t index) const {
 		if (Index == index)
 			return QVariant::fromValue(std::get<Index>(tpl));
 		else
@@ -97,9 +152,9 @@ private:
 	}
 
 	template <size_t Index>
-	inline void setIf(std::tuple<TValues...> *, size_t, const QVariant &) const {}
+	inline void setIf(Type *, size_t, const QVariant &) const {}
 	template <size_t Index, typename TValue, typename... TRest>
-	inline void setIf(std::tuple<TValues...> *tpl, size_t index, const QVariant &value) const {
+	inline void setIf(Type *tpl, size_t index, const QVariant &value) const {
 		if (Index == index)
 			std::get<Index>(*tpl) = value.value<TValue>();
 		else
@@ -107,33 +162,35 @@ private:
 	}
 
 public:
-	QByteArray baseType() const override {
+	QByteArray baseType() const final {
 		return QByteArrayLiteral("tuple");
 	}
 
-	QList<int> subtypes() const override {
+	QList<int> subtypes() const final {
 		return {qMetaTypeId<TValues>()...};
 	}
 
-	QVariant extract(const QVariant &value, int index) const override {
-		return getIf<0, TValues...>(value.value<std::tuple<TValues...>>(), static_cast<size_t>(index));
+	QVariant extract(const QVariant &value, int index) const final {
+		return getIf<0, TValues...>(value.value<Type>(), static_cast<size_t>(index));
 	}
 
-	void emplace(QVariant &target, int index, const QVariant &value) const override {
-		using TFull = std::tuple<TValues...>;
-		Q_ASSERT(target.userType() == qMetaTypeId<TFull>());
-		setIf<0, TValues...>(reinterpret_cast<TFull*>(target.data()), static_cast<size_t>(index), value);
+	void emplace(QVariant &target, const QVariant &value, int index) const final {
+		Q_ASSERT(target.userType() == qMetaTypeId<Type>());
+		setIf<0, TValues...>(reinterpret_cast<Type*>(target.data()), static_cast<size_t>(index), value);
 	}
 };
 
 template <typename... TValues>
-class VariantExtractor : public QJsonTypeExtractor
+class VariantExtractor final : public QJsonTypeExtractor
 {
+public:
+	using Type = std::variant<TValues...>;
+
 private:
-	template <int _>
-	inline std::variant<TValues...> constructIfType(const QVariant &) { return {}; }
-	template <int _, typename TValue, typename... TArgs>
-	inline std::variant<TValues...> constructIfType(const QVariant &var) {
+	template <typename _>
+	inline Type constructIfType(const QVariant &) const { return {}; }
+	template <typename _, typename TValue, typename... TArgs>
+	inline Type constructIfType(const QVariant &var) const {
 		if (var.userType() == qMetaTypeId<TValue>())
 			return var.value<TValue>();
 		else
@@ -141,22 +198,22 @@ private:
 	}
 
 public:
-	QByteArray baseType() const override {
+	QByteArray baseType() const final {
 		return QByteArrayLiteral("variant");
 	}
 
-	QList<int> subtypes() const override {
+	QList<int> subtypes() const final {
 		return {qMetaTypeId<TValues>()...};
 	}
 
-	QVariant extract(const QVariant &value, int) const override {
+	QVariant extract(const QVariant &value, int) const final {
 		return std::visit([](const auto &x) {
 			return QVariant::fromValue(x);
-		}, value.value<std::variant<TValues...>>());
+		}, value.value<Type>());
 	}
 
-	void emplace(QVariant &target, int, const QVariant &value) const override {
-		target = QVariant::fromValue(constructIfType<0, TValues...>(value));
+	void emplace(QVariant &target, const QVariant &value, int) const final {
+		target = QVariant::fromValue(constructIfType<void, TValues...>(value));
 	}
 };
 

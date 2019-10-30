@@ -2,6 +2,8 @@
 #include <QtTest>
 #include <QJsonSerializerException>
 #include <QCborSerializer>
+
+#include <QtJsonSerializer/private/qjsonserializerbase_p.h>
 #include <QtJsonSerializer/private/qjsonexceptioncontext_p.h>
 
 DummySerializationHelper::DummySerializationHelper(QObject *parent) :
@@ -23,12 +25,12 @@ QCborTag DummySerializationHelper::typeTag(int metaTypeId) const
 	Q_UNUSED(metaTypeId)
 	return properties.value(QStringLiteral("typeTag"),
 							QVariant::fromValue(static_cast<QCborTag>(QCborSerializer::NoTag)))
-		.value<QCborTag>();
+			.value<QCborTag>();
 }
 
-QByteArray DummySerializationHelper::getCanonicalTypeName(int propertyType) const
+QSharedPointer<const QJsonTypeExtractor> DummySerializationHelper::extractor(int metaTypeId) const
 {
-	return QMetaType::typeName(propertyType);
+	return QJsonSerializerBasePrivate::extractors.get(metaTypeId);
 }
 
 QCborValue DummySerializationHelper::serializeSubtype(const QMetaProperty &property, const QVariant &value) const
@@ -58,7 +60,7 @@ QCborValue DummySerializationHelper::serializeSubtype(int propertyType, const QV
 			throw QJsonSerializationException{"Data comparison failed"};
 	}
 
-	throw QJsonSerializationException{QByteArrayLiteral("Unable to find data of type") + QMetaType::typeName(propertyType) + QByteArrayLiteral("in serData")};
+	throw QJsonSerializationException{QByteArrayLiteral("Unable to find data of type ") + QMetaType::typeName(propertyType) + QByteArrayLiteral(" in serData")};
 }
 
 QVariant DummySerializationHelper::deserializeSubtype(const QMetaProperty &property, const QCborValue &value, QObject *parent) const

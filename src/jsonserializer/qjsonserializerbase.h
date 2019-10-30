@@ -262,33 +262,22 @@ void QJsonSerializerBase::registerMapConverters()
 template<typename T>
 void QJsonSerializerBase::registerPointerConverters()
 {
-	static_assert(std::is_base_of_v<QObject, T>, "T must inherit QObject");
-	QMetaType::registerConverter<QSharedPointer<QObject>, QSharedPointer<T>>([](const QSharedPointer<QObject> &object) -> QSharedPointer<T> {
-		return object.objectCast<T>();
-	});
-	QMetaType::registerConverter<QSharedPointer<T>, QSharedPointer<QObject>>([](const QSharedPointer<T> &object) -> QSharedPointer<QObject> {
-		return object.template staticCast<QObject>();  // must work, because of static assert
-	});
-	QMetaType::registerConverter<QPointer<QObject>, QPointer<T>>([](const QPointer<QObject> &object) -> QPointer<T> {
-		return qobject_cast<T*>(object.data());
-	});
-	QMetaType::registerConverter<QPointer<T>, QPointer<QObject>>([](const QPointer<T> &object) -> QPointer<QObject> {
-		return static_cast<QObject*>(object.data());
-	});
+	registerExtractor<QSharedPointer<T>, QJsonTypeExtractors::SmartPointerExtractor<QSharedPointer, T>>();
+	registerExtractor<QPointer<T>, QJsonTypeExtractors::SmartPointerExtractor<QPointer, T>>();
 }
 
 template<typename T>
 void QJsonSerializerBase::registerBasicConverters()
 {
 	if constexpr (std::is_base_of_v<QObject, T>) {
-		registerBasicConverters<T*>() &
-			(registerPointerConverters<T>() &&
-			 (registerBasicConverters<QSharedPointer<T>>() &
-			  registerBasicConverters<QPointer<T>>()));
+		registerBasicConverters<T*>();
+		registerPointerConverters<T>();
+		registerBasicConverters<QSharedPointer<T>>();
+		registerBasicConverters<QPointer<T>>();
 	} else {
-		registerListConverters<T>() &
-			registerSetConverters<T>() &
-			registerMapConverters<QString, T>();
+		registerListConverters<T>();
+		registerSetConverters<T>();
+		registerMapConverters<QString, T>();
 	}
 }
 

@@ -4,8 +4,6 @@
 #include "QtJsonSerializer/qtjsonserializer_global.h"
 #include "QtJsonSerializer/qjsontypeconverter.h"
 
-#include <QtCore/QRegularExpression>
-
 class Q_JSONSERIALIZER_EXPORT QJsonListConverter : public QJsonTypeConverter
 {
 public:
@@ -14,11 +12,6 @@ public:
 	QList<QCborValue::Type> allowedCborTypes(int metaTypeId, QCborTag tag) const override;
 	QCborValue serialize(int propertyType, const QVariant &value) const override;
 	QVariant deserializeCbor(int propertyType, const QCborValue &value, QObject *parent) const override;
-
-private:
-	static const QRegularExpression listTypeRegex;
-
-	std::pair<int, bool> getSubtype(int listType) const;  // (metType, isQSet)
 };
 
 #endif // QJSONLISTCONVERTER_P_H

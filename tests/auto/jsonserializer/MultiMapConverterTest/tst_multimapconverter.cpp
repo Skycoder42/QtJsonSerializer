@@ -52,6 +52,10 @@ private:
 
 void MultiMapConverterTest::initTest()
 {
+	QJsonSerializerBase::registerMapConverters<int, int>();
+	QJsonSerializerBase::registerMapConverters<QString, QList<bool>>();
+	QJsonSerializerBase::registerMapConverters<int, QPair<int, bool>>();
+
 	QMetaType::registerEqualsComparator<QMultiMap<QString, int>>();
 	QMetaType::registerEqualsComparator<QMultiHash<QString, int>>();
 }
@@ -88,7 +92,7 @@ void MultiMapConverterTest::addMetaData()
 							<< QCborValue::Map
 							<< true
 							<< QJsonTypeConverter::DeserializationCapabilityResult::Positive;
-	QTest::newRow("list") << qMetaTypeId<QMultiMap<QString, QMap<QString, bool>>>()
+	QTest::newRow("list") << qMetaTypeId<QMultiMap<QString, QList<bool>>>()
 						  << static_cast<QCborTag>(QCborSerializer::NoTag)
 						  << QCborValue::Array
 						  << true
