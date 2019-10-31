@@ -12,6 +12,7 @@ HEADERS += \
 	$$PWD/qjsonmultimapconverter_p.h \
 	$$PWD/qjsonobjectconverter_p.h \
 	$$PWD/qjsonpairconverter_p.h \
+	$$PWD/qjsonsmartpointerconverter_p.h \
 	$$PWD/qjsonstdoptionalconverter_p.h \
 	$$PWD/qjsonversionnumberconverter_p.h
 #	$$PWD/qjsonstdvariantconverter_p.h \
@@ -31,6 +32,7 @@ SOURCES += \
 	$$PWD/qjsonmultimapconverter.cpp \
 	$$PWD/qjsonobjectconverter.cpp \
 	$$PWD/qjsonpairconverter.cpp \
+	$$PWD/qjsonsmartpointerconverter.cpp \
 	$$PWD/qjsonstdoptionalconverter.cpp \
 	$$PWD/qjsonversionnumberconverter.cpp
 #	$$PWD/qjsonstdvariantconverter.cpp \

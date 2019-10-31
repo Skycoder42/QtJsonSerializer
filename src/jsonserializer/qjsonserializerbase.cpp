@@ -22,6 +22,7 @@
 #include "typeconverters/qjsonmultimapconverter_p.h"
 #include "typeconverters/qjsonobjectconverter_p.h"
 #include "typeconverters/qjsonpairconverter_p.h"
+#include "typeconverters/qjsonsmartpointerconverter_p.h"
 #include "typeconverters/qjsonversionnumberconverter_p.h"
 //#include "typeconverters/qjsonstdtupleconverter_p.h"
 //#include "typeconverters/qjsonstdoptionalconverter_p.h"
@@ -329,6 +330,7 @@ QList<QJsonTypeConverterFactory*> QJsonSerializerBasePrivate::typeConverterFacto
 	new QJsonTypeConverterStandardFactory<QJsonGadgetConverter>{},
 	new QJsonTypeConverterStandardFactory<QJsonEnumConverter>{},
 	new QJsonTypeConverterStandardFactory<QJsonMapConverter>{},
+	new QJsonTypeConverterStandardFactory<QJsonSmartPointerConverter>{},
 	new QJsonTypeConverterStandardFactory<QJsonPairConverter>{},
 	new QJsonTypeConverterStandardFactory<QJsonVersionNumberConverter>{},
 	new QJsonTypeConverterStandardFactory<QJsonLocaleConverter>{},

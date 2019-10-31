@@ -263,7 +263,8 @@ template<typename T>
 void QJsonSerializerBase::registerPointerConverters()
 {
 	registerExtractor<QSharedPointer<T>, QJsonTypeExtractors::SmartPointerExtractor<QSharedPointer, T>>();
-	registerExtractor<QPointer<T>, QJsonTypeExtractors::SmartPointerExtractor<QPointer, T>>();
+	if constexpr (std::is_base_of_v<QObject, T>)
+		registerExtractor<QPointer<T>, QJsonTypeExtractors::SmartPointerExtractor<QPointer, T>>();
 }
 
 template<typename T>

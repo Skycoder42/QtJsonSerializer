@@ -45,7 +45,7 @@ public:
 	using Type = QPointer<TType>;
 
 	QByteArray baseType() const final {
-		return QByteArrayLiteral("pointer");
+		return QByteArrayLiteral("qpointer");
 	}
 
 	QList<int> subtypes() const final {
