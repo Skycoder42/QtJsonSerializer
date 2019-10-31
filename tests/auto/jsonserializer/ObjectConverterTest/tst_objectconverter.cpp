@@ -34,8 +34,6 @@ void ObjectConverterTest::initTest()
 	qRegisterMetaType<DynamicPolyObject*>();
 	qRegisterMetaType<DerivedTestObject*>();
 	qRegisterMetaType<BrokenObject*>();
-
-	QJsonSerializer::registerPointerConverters<TestObject>();
 }
 
 QJsonTypeConverter *ObjectConverterTest::converter()
@@ -65,16 +63,6 @@ void ObjectConverterTest::addMetaData()
 						  << QCborValue::Map
 						  << true
 						  << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
-	QTest::newRow("tracking") << qMetaTypeId<QPointer<TestObject>>()
-							  << static_cast<QCborTag>(QCborSerializer::NoTag)
-							  << QCborValue::Map
-							  << true
-							  << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
-	QTest::newRow("shared") << qMetaTypeId<QSharedPointer<TestObject>>()
-							<< static_cast<QCborTag>(QCborSerializer::NoTag)
-							<< QCborValue::Map
-							<< true
-							<< QJsonTypeConverter::DeserializationCapabilityResult::Positive;
 
 	QTest::newRow("generic") << qMetaTypeId<TestObject*>()
 							 << static_cast<QCborTag>(QCborSerializer::GenericObject)
@@ -140,54 +128,14 @@ void ObjectConverterTest::addCommonSerData()
 									{QStringLiteral("key"), 1},
 									{QStringLiteral("value"), 2}
 								}};
-	QTest::newRow("tracking") << QVariantHash{}
-							  << TestQ{{QMetaType::Int, 10, 1}, {QMetaType::Double, 0.1, 2}}
-							  << static_cast<QObject*>(nullptr)
-							  << qMetaTypeId<QPointer<TestObject>>()
-							  << QVariant::fromValue<QPointer<TestObject>>(new TestObject{10, 0.1, 11, this})
-							  << QCborValue{QCborMap{
-									 {QStringLiteral("key"), 1},
-									 {QStringLiteral("value"), 2}
-								 }}
-							  << QJsonValue{QJsonObject{
-										{QStringLiteral("key"), 1},
-										{QStringLiteral("value"), 2}
-									}};
-	QTest::newRow("shared") << QVariantHash{}
-							<< TestQ{{QMetaType::Int, 10, 1}, {QMetaType::Double, 0.1, 2}}
-							<< static_cast<QObject*>(nullptr)
-							<< qMetaTypeId<QSharedPointer<TestObject>>()
-							<< QVariant::fromValue(QSharedPointer<TestObject>::create(10, 0.1, 11))
-							<< QCborValue{QCborMap{
-								   {QStringLiteral("key"), 1},
-								   {QStringLiteral("value"), 2}
-							   }}
-							<< QJsonValue{QJsonObject{
-									{QStringLiteral("key"), 1},
-									{QStringLiteral("value"), 2}
-								}};
 
-	QTest::newRow("null.basic") << QVariantHash{}
-								<< TestQ{}
-								<< static_cast<QObject*>(nullptr)
-								<< qMetaTypeId<TestObject*>()
-								<< QVariant::fromValue<TestObject*>(nullptr)
-								<< QCborValue{QCborValue::Null}
-								<< QJsonValue{QJsonValue::Null};
-	QTest::newRow("null.tracking") << QVariantHash{}
-								   << TestQ{}
-								   << static_cast<QObject*>(nullptr)
-								   << qMetaTypeId<QPointer<TestObject>>()
-								   << QVariant::fromValue<QPointer<TestObject>>(nullptr)
-								   << QCborValue{QCborValue::Null}
-								   << QJsonValue{QJsonValue::Null};
-	QTest::newRow("null.shared") << QVariantHash{}
-								 << TestQ{}
-								 << static_cast<QObject*>(nullptr)
-								 << qMetaTypeId<QSharedPointer<TestObject>>()
-								 << QVariant::fromValue<QSharedPointer<TestObject>>(nullptr)
-								 << QCborValue{QCborValue::Null}
-								 << QJsonValue{QJsonValue::Null};
+	QTest::newRow("null") << QVariantHash{}
+						  << TestQ{}
+						  << static_cast<QObject*>(nullptr)
+						  << qMetaTypeId<TestObject*>()
+						  << QVariant::fromValue<TestObject*>(nullptr)
+						  << QCborValue{QCborValue::Null}
+						  << QJsonValue{QJsonValue::Null};
 
 	QTest::newRow("name.keep") << QVariantHash{{QStringLiteral("keepObjectName"), true}}
 							   << TestQ{{QMetaType::Int, 10, 1}, {QMetaType::Double, 0.1, 2}, {QMetaType::QString, QStringLiteral("TestObject"), 3}}

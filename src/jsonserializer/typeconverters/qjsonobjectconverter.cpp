@@ -1,16 +1,13 @@
 #include "qjsonobjectconverter_p.h"
 #include "qjsonserializerexception.h"
 #include "qcborserializer.h"
-#include "qjsonserializerbase_p.h"
 
 #include <array>
 
 bool QJsonObjectConverter::canConvert(int metaTypeId) const
 {
 	auto flags = QMetaType::typeFlags(metaTypeId);
-	return flags.testFlag(QMetaType::PointerToQObject) ||
-			flags.testFlag(QMetaType::SharedPointerToQObject) ||  // weak ptr cannot be constructed
-			flags.testFlag(QMetaType::TrackingPointerToQObject);
+	return flags.testFlag(QMetaType::PointerToQObject);
 }
 
 QList<QCborTag> QJsonObjectConverter::allowedCborTags(int metaTypeId) const
@@ -50,25 +47,13 @@ int QJsonObjectConverter::guessType(QCborTag tag, QCborValue::Type dataType) con
 
 QCborValue QJsonObjectConverter::serialize(int propertyType, const QVariant &value) const
 {
-	QSharedPointer<const QJsonTypeExtractor> extractor;
-	QObject *object = nullptr;
-	if (QMetaType::typeFlags(propertyType).testFlag(QMetaType::PointerToQObject))
-		object = value.value<QObject*>();
-	else {
-		extractor = helper()->extractor(propertyType);
-		if (!extractor) {
-			throw QJsonSerializationException(QByteArray("Failed to get extractor for type ") +
-											  QMetaType::typeName(propertyType) +
-											  QByteArray(". Make shure to register pair types via QJsonSerializer::registerPointerConverters"));
-		}
-		object = extractor->extract(value).value<QObject*>();
-	}
-
+	auto object = value.value<QObject*>();
 	if (!object)
 		return QCborValue::Null;
+	QCborMap cborMap;
 
-	//get the metaobject, based on polymorphism
-	const QMetaObject *meta = nullptr;
+	// get the metaobject, based on polymorphism
+	const QMetaObject *metaObject = nullptr;
 	auto poly = static_cast<QJsonSerializerBase::Polymorphing>(helper()->getProperty("polymorphing").toInt());
 	auto isPoly = false;
 	switch (poly) {
@@ -86,14 +71,14 @@ QCborValue QJsonObjectConverter::serialize(int propertyType, const QVariant &val
 		break;
 	}
 
-	QCborMap cborMap;
-
-	if(isPoly) {
-		meta = object->metaObject();
+	if (isPoly) {
+		metaObject = object->metaObject();
 		//first: pass the class name
-		cborMap[QStringLiteral("@class")] = QString::fromUtf8(meta->className());
+		cborMap[QStringLiteral("@class")] = QString::fromUtf8(metaObject->className());
 	} else
-		meta = getMetaObject(propertyType, extractor);
+		metaObject = QMetaType::metaObjectForType(propertyType);
+	if (!metaObject)
+		throw QJsonSerializationException(QByteArray("Unable to get metaobject for type ") + QMetaType::typeName(propertyType));
 
 	//go through all properties and try to serialize them
 	const auto keepObjectName = helper()->getProperty("keepObjectName").toBool();
@@ -101,8 +86,8 @@ QCborValue QJsonObjectConverter::serialize(int propertyType, const QVariant &val
 	auto i = QObject::staticMetaObject.indexOfProperty("objectName");
 	if (!keepObjectName)
 		i++;
-	for(; i < meta->propertyCount(); i++) {
-		auto property = meta->property(i);
+	for(; i < metaObject->propertyCount(); i++) {
+		auto property = metaObject->property(i);
 		if (ignoreStoredAttribute || property.isStored())
 			cborMap[QString::fromUtf8(property.name())] = helper()->serializeSubtype(property, property.read(object));
 	}
@@ -112,25 +97,15 @@ QCborValue QJsonObjectConverter::serialize(int propertyType, const QVariant &val
 
 QVariant QJsonObjectConverter::deserializeCbor(int propertyType, const QCborValue &value, QObject *parent) const
 {
-	QSharedPointer<const QJsonTypeExtractor> extractor;
-	if (!QMetaType::typeFlags(propertyType).testFlag(QMetaType::PointerToQObject)) {
-		extractor = helper()->extractor(propertyType);
-		if (!extractor) {
-			throw QJsonDeserializationException(QByteArray("Failed to get extractor for type ") +
-												QMetaType::typeName(propertyType) +
-												QByteArray(". Make shure to register pair types via QJsonSerializer::registerPointerConverters"));
-		}
-	}
-
 	if ((value.isTag() ? value.taggedValue() : value).isNull())
-		return toVariant(nullptr, extractor);
+		return QVariant::fromValue<QObject*>(nullptr);
 
 	QCborMap cborMap;
 	if (value.isTag()) {
 		if (value.tag() == static_cast<QCborTag>(QCborSerializer::GenericObject))
-			return toVariant(deserializeGenericObject(value.taggedValue().toArray(), parent), extractor);
+			return QVariant::fromValue(deserializeGenericObject(value.taggedValue().toArray(), parent));
 		else if (value.tag() == static_cast<QCborTag>(QCborSerializer::ConstructedObject))
-			return toVariant(deserializeConstructedObject(value.taggedValue(), parent), extractor);
+			return QVariant::fromValue(deserializeConstructedObject(value.taggedValue(), parent));
 		else
 			cborMap = value.taggedValue().toMap();
 	} else
@@ -138,7 +113,7 @@ QVariant QJsonObjectConverter::deserializeCbor(int propertyType, const QCborValu
 
 	auto poly = static_cast<QJsonSerializerBase::Polymorphing>(helper()->getProperty("polymorphing").toInt());
 
-	auto metaObject = getMetaObject(propertyType, extractor);
+	auto metaObject = QMetaType::metaObjectForType(propertyType);
 	if (!metaObject)
 		throw QJsonDeserializationException(QByteArray("Unable to get metaobject for type ") + QMetaType::typeName(propertyType));
 
@@ -172,28 +147,7 @@ QVariant QJsonObjectConverter::deserializeCbor(int propertyType, const QCborValu
 	}
 
 	deserializeProperties(metaObject, object, cborMap, isPoly);
-	return toVariant(object, extractor);
-}
-
-const QMetaObject *QJsonObjectConverter::getMetaObject(int typeId, const QSharedPointer<const QJsonTypeExtractor> &extractor) const
-{
-	auto flags = QMetaType::typeFlags(typeId);
-	if (flags.testFlag(QMetaType::PointerToQObject))
-		return QMetaType::metaObjectForType(typeId);
-	else if (extractor)
-		return QMetaType::metaObjectForType(extractor->subtypes()[0]);
-	else
-		return nullptr;
-}
-
-QVariant QJsonObjectConverter::toVariant(QObject *object, const QSharedPointer<const QJsonTypeExtractor> &extractor) const
-{
-	if (extractor) {
-		QVariant res;
-		extractor->emplace(res, QVariant::fromValue(object));
-		return res;
-	} else
-		return QVariant::fromValue(object);
+	return QVariant::fromValue(object);
 }
 
 bool QJsonObjectConverter::polyMetaObject(QObject *object) const
