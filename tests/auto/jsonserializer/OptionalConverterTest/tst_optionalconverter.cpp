@@ -32,7 +32,7 @@ private:
 void OptionalConverterTest::initTest()
 {
 	QJsonSerializer::registerOptionalConverters<int>();
-	QJsonSerializer_registerOptionalConverters_named(std::pair<int, bool>);
+	QJsonSerializer::registerOptionalConverters<std::pair<int, bool>>();
 	QJsonSerializer::registerOptionalConverters<OpaqueDummy>();
 
 	QMetaType::registerEqualsComparator<std::optional<int>>();
@@ -45,25 +45,26 @@ QJsonTypeConverter *OptionalConverterTest::converter()
 
 void OptionalConverterTest::addConverterData()
 {
-	QTest::newRow("optional") << static_cast<int>(QJsonTypeConverter::Standard)
-							  << QList<QJsonValue::Type>{
-									 QJsonValue::Null,
-									 QJsonValue::Bool,
-									 QJsonValue::Double,
-									 QJsonValue::String,
-									 QJsonValue::Array,
-									 QJsonValue::Object
-								 };
+	QTest::newRow("optional") << static_cast<int>(QJsonTypeConverter::Standard);
 }
 
 void OptionalConverterTest::addMetaData()
 {
 	QTest::newRow("basic") << qMetaTypeId<std::optional<int>>()
-						   << true;
+						   << static_cast<QCborTag>(QCborSerializer::NoTag)
+						   << QCborValue::Double
+						   << true
+						   << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("extended") << qMetaTypeId<std::optional<std::pair<int, bool>>>()
-							  << true;
+							  << static_cast<QCborTag>(QCborSerializer::NoTag)
+							  << QCborValue::Null
+							  << true
+							  << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("invalid") << qMetaTypeId<QList<int>>()
-							 << false;
+							 << static_cast<QCborTag>(QCborSerializer::NoTag)
+							 << QCborValue::Integer
+							 << false
+							 << QJsonTypeConverter::DeserializationCapabilityResult::Negative;
 }
 
 void OptionalConverterTest::addCommonSerData()
@@ -73,12 +74,14 @@ void OptionalConverterTest::addCommonSerData()
 						   << static_cast<QObject*>(nullptr)
 						   << qMetaTypeId<std::optional<int>>()
 						   << QVariant::fromValue(std::optional<int>{5})
+						   << QCborValue{1}
 						   << QJsonValue{1};
 	QTest::newRow("nullopt") << QVariantHash{}
 							 << TestQ{{QMetaType::Nullptr, QVariant::fromValue(nullptr), QJsonValue::Null}}
 							 << static_cast<QObject*>(nullptr)
 							 << qMetaTypeId<std::optional<int>>()
 							 << QVariant::fromValue<std::optional<int>>(std::nullopt)
+							 << QCborValue{QCborValue::Null}
 							 << QJsonValue{QJsonValue::Null};
 }
 
@@ -89,13 +92,8 @@ void OptionalConverterTest::addSerData()
 										   << static_cast<QObject*>(nullptr)
 										   << qMetaTypeId<std::optional<OpaqueDummy>>()
 										   << QVariant::fromValue(std::optional<OpaqueDummy>{OpaqueDummy{}})
+										   << QCborValue{}
 										   << QJsonValue{QJsonValue::Undefined};
-	QTest::newRow("invalid.input") << QVariantHash{}
-								   << TestQ{}
-								   << static_cast<QObject*>(nullptr)
-								   << qMetaTypeId<std::optional<int>>()
-								   << QVariant::fromValue(QStringLiteral("Hello World"))
-								   << QJsonValue{QJsonValue::Undefined};
 }
 
 QTEST_MAIN(OptionalConverterTest)

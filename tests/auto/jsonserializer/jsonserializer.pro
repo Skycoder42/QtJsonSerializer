@@ -17,7 +17,7 @@ CONVERTER_TESTS = \
 	MapConverterTest \
 	MultiMapConverterTest \
 	ObjectConverterTest \
-#	OptionalConverterTest \
+	OptionalConverterTest \
 	PairConverterTest \
 	SmartPointerConverterTest \
 #	TupleConverterTest \
