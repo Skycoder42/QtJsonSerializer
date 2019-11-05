@@ -14,8 +14,8 @@ HEADERS += \
 	$$PWD/qjsonpairconverter_p.h \
 	$$PWD/qjsonsmartpointerconverter_p.h \
 	$$PWD/qjsonstdoptionalconverter_p.h \
+	$$PWD/qjsonstdvariantconverter_p.h \
 	$$PWD/qjsonversionnumberconverter_p.h
-#	$$PWD/qjsonstdvariantconverter_p.h \
 #    $$PWD/qjsonstdtupleconverter_p.h \
 
 SOURCES += \
@@ -34,6 +34,6 @@ SOURCES += \
 	$$PWD/qjsonpairconverter.cpp \
 	$$PWD/qjsonsmartpointerconverter.cpp \
 	$$PWD/qjsonstdoptionalconverter.cpp \
+	$$PWD/qjsonstdvariantconverter.cpp \
 	$$PWD/qjsonversionnumberconverter.cpp
-#	$$PWD/qjsonstdvariantconverter.cpp \
 #    $$PWD/qjsonstdtupleconverter.cpp \

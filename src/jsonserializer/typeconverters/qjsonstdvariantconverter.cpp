@@ -1,37 +1,37 @@
 #include "qjsonstdvariantconverter_p.h"
 #include "qjsonserializerexception.h"
 
-const QRegularExpression QJsonStdVariantConverter::variantTypeRegex(QStringLiteral(R"__(^std::variant<(\s*.*?\s*(?:,\s*.*?\s*)*)>$)__"));
-
 bool QJsonStdVariantConverter::canConvert(int metaTypeId) const
 {
-	return variantTypeRegex.match(QString::fromUtf8(getCanonicalTypeName(metaTypeId))).hasMatch();
+	const auto extractor = helper()->extractor(metaTypeId);
+	return extractor && extractor->baseType() == "variant";
 }
 
-QList<QJsonValue::Type> QJsonStdVariantConverter::jsonTypes() const
+QList<QCborValue::Type> QJsonStdVariantConverter::allowedCborTypes(int metaTypeId, QCborTag tag) const
 {
-	// allow all values
-	return {
-		QJsonValue::Null,
-		QJsonValue::Bool,
-		QJsonValue::Double,
-		QJsonValue::String,
-		QJsonValue::Array,
-		QJsonValue::Object
-	};
-}
-
-QJsonValue QJsonStdVariantConverter::serialize(int propertyType, const QVariant &value, const QJsonTypeConverter::SerializationHelper *helper) const
-{
-	auto cValue = value;
-	if(!cValue.convert(QMetaType::QVariant)) {
-		throw QJsonSerializationException(QByteArray("Failed to convert type ") +
-										  QMetaType::typeName(propertyType) +
-										  QByteArray(" to a QVariant. Make shure to register variant types via QJsonSerializer::registerVariantConverters"));
+	Q_UNUSED(metaTypeId)
+	Q_UNUSED(tag)
+	QList<QCborValue::Type> types;
+	const auto metaEnum = QMetaEnum::fromType<QCborValue::Type>();
+	types.reserve(metaEnum.keyCount());
+	for (auto i = 0; i < metaEnum.keyCount(); ++i) {
+		if (const auto value = metaEnum.value(i); value != QCborValue::Invalid)
+			types.append(static_cast<QCborValue::Type>(value));
 	}
-	cValue = cValue.value<QVariant>();
+	return types;
+}
 
-	const auto metaTypes = getSubtypes(propertyType);
+QCborValue QJsonStdVariantConverter::serialize(int propertyType, const QVariant &value) const
+{
+	const auto extractor = helper()->extractor(propertyType);
+	if (!extractor) {
+		throw QJsonSerializationException(QByteArray("Failed to get extractor for type ") +
+										  QMetaType::typeName(propertyType) +
+										  QByteArray(". Make shure to register std::optional types via QJsonSerializer::registerVariantConverters"));
+	}
+
+	const auto metaTypes = extractor->subtypes();
+	const auto cValue = extractor->extract(value);
 	const auto mIndex = metaTypes.indexOf(cValue.userType());
 	if (mIndex == -1) {
 		throw QJsonSerializationException(QByteArray("Invalid value given for type ") +
@@ -40,35 +40,29 @@ QJsonValue QJsonStdVariantConverter::serialize(int propertyType, const QVariant 
 										  value.typeName() +
 										  QByteArray(", which is not a type of the given variant"));
 	}
-	return helper->serializeSubtype(metaTypes[mIndex], cValue, QByteArray{"<"} + QMetaType::typeName(metaTypes[mIndex]) + QByteArray{">"});
+	return helper()->serializeSubtype(metaTypes[mIndex], cValue, QByteArray{"<"} + QMetaType::typeName(metaTypes[mIndex]) + QByteArray{">"});
 }
 
-QVariant QJsonStdVariantConverter::deserialize(int propertyType, const QJsonValue &value, QObject *parent, const QJsonTypeConverter::SerializationHelper *helper) const
+QVariant QJsonStdVariantConverter::deserializeCbor(int propertyType, const QCborValue &value, QObject *parent) const
 {
+	const auto extractor = helper()->extractor(propertyType);
+	if (!extractor) {
+		throw QJsonDeserializationException(QByteArray("Failed to get extractor for type ") +
+											QMetaType::typeName(propertyType) +
+											QByteArray(". Make shure to register std::optional types via QJsonSerializer::registerVariantConverters"));
+	}
+
 	// try all types until one succeeds
-	for (auto metaType : getSubtypes(propertyType)) {
+	for (auto metaType : extractor->subtypes()) {
 		// ignore exceptions and try with the next type
 		try {
-			auto result = helper->deserializeSubtype(metaType, value, parent, QByteArray{"<"} + QMetaType::typeName(metaType) + QByteArray{">"});
-			return QVariant{QMetaType::QVariant, &result};
+			auto result = helper()->deserializeSubtype(metaType, value, parent, QByteArray{"<"} + QMetaType::typeName(metaType) + QByteArray{">"});
+			extractor->emplace(result, result);
+			return result;
 		} catch (QJsonDeserializationException &) {}
 	}
 
 	throw QJsonDeserializationException(QByteArray("Failed to deserialze value to ") +
 										QMetaType::typeName(propertyType) +
 										QByteArray(" because all possible sub-type converters rejected the passed value."));
-}
-
-QList<int> QJsonStdVariantConverter::getSubtypes(int metaType) const
-{
-	auto match = variantTypeRegex.match(QString::fromUtf8(getCanonicalTypeName(metaType)));
-	if(match.hasMatch()) {
-		QList<int> types;
-		const auto typeNames = match.captured(1).split(QLatin1Char(','));
-		types.reserve(typeNames.size());
-		for(const auto &name : typeNames)
-			types.append(QMetaType::type(name.toUtf8().trimmed()));
-		return types;
-	} else
-		return {};
 }

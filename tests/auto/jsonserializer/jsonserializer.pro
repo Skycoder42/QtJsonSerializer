@@ -21,7 +21,7 @@ CONVERTER_TESTS = \
 	PairConverterTest \
 	SmartPointerConverterTest \
 #	TupleConverterTest \
-#	VariantConverterTest \
+	VariantConverterTest \
 	VersionConverterTest
 
 for(test, CONVERTER_TESTS) {

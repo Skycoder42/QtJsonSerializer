@@ -206,7 +206,5 @@ jobs:
         run: |
           qmake CONFIG+=no_register_json_converters QT_PLATFORM=${{matrix.platform}}
           make qmake_all
-        working-directory: QtJsonSerializer
       - name: make module
         run: make
-        working-directory: QtJsonSerializer
