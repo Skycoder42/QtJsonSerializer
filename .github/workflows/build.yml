@@ -9,7 +9,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: ["5.13.2"]
+        version:
+          - 5.13.2
         platform: 
           - gcc_64
           - android_arm64_v8a
@@ -172,7 +173,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: 5.13.2
+        version:
+          - 5.13.2
         platform: 
           - gcc_64
           - msvc2017_64
