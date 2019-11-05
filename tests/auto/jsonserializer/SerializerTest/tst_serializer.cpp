@@ -410,6 +410,12 @@ void SerializerTest::testDeserialization_data()
 
 	addCommonData();
 
+	QTest::newRow("font.short") << QVariant::fromValue(QFont{QStringLiteral("MyScript Sans")})
+								<< QCborValue{static_cast<QCborTag>(QCborSerializer::Font), QStringLiteral("MyScript Sans")}
+								<< QJsonValue{QStringLiteral("MyScript Sans")}
+								<< true
+								<< QVariantHash{};
+
 	QTest::newRow("null.invalid.bool") << QVariant{false}
 									   << QCborValue{QCborValue::Null}
 									   << QJsonValue{QJsonValue::Null}
@@ -721,12 +727,11 @@ void SerializerTest::addCommonData()
 								<< QJsonValue{QStringLiteral("#ddaabbcc")}
 								<< true
 								<< QVariantHash{};
-	// TODO use converter
-//	QTest::newRow("font") << QVariant::fromValue(QFont{QStringLiteral("Liberation Sans")})
-//						  << QCborValue{static_cast<QCborTag>(QCborSerializer::Font), QStringLiteral("Liberation Sans")}
-//						  << QJsonValue{QStringLiteral("Liberation Sans")}
-//						  << true
-//						  << QVariantHash{};
+	QTest::newRow("font.full") << QVariant::fromValue(QFont{QStringLiteral("MyScript Sans")})
+							   << QCborValue{static_cast<QCborTag>(QCborSerializer::Font), QStringLiteral("MyScript Sans,12,-1,5,50,0,0,0,0,0")}
+							   << QJsonValue{QStringLiteral("MyScript Sans,12,-1,5,50,0,0,0,0,0")}
+							   << true
+							   << QVariantHash{};
 
 	// bytearrays
 	QTest::newRow("bytearray") << QVariant::fromValue(QByteArrayLiteral("test123"))
