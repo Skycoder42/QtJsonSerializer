@@ -131,25 +131,36 @@ jobs:
           version: ${{matrix.version}}
           platform: ${{matrix.platform}}
           install-args: --verbose
+      - run: qmake -query
       - run: mkdir install
       - name: qmake
-        run: qmake CONFIG+=install_ok QT_PLATFORM=${{matrix.platform}} && make qmake_all
+        run: |
+          qmake CONFIG+=install_ok QT_PLATFORM=${{matrix.platform}}
+          make qmake_all
         working-directory: QtJsonSerializer
       - name: make module
-        run: make && make INSTALL_ROOT="$PWD/../install" install
+        run: |
+          make
+          make INSTALL_ROOT="$PWD/../install" install
         working-directory: QtJsonSerializer
       - name: make tests
-        run: make all && make run-tests
+        run: |
+          make all
+          make run-tests
         if: matrix.test
         working-directory: QtJsonSerializer
         env:
           MAKEFLAGS: -j1
       - name: make examples
-        run: make sub-examples && cd examples && make INSTALL_ROOT="$PWD/../install" install
+        run: |
+          make sub-examples
+          cd examples && make INSTALL_ROOT="$PWD/../install" install
         if: matrix.examples
         working-directory: QtJsonSerializer
       - name: make doc
-        run: make doxygen && cd doc && make INSTALL_ROOT="$PWD/../install" install
+        run: |
+          make doxygen
+          cd doc && make INSTALL_ROOT="$PWD/../install" install
         if: matrix.doc
         working-directory: QtJsonSerializer
       - uses: actions/upload-artifact@v1
