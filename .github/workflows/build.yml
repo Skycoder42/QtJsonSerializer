@@ -136,7 +136,11 @@ jobs:
         shell: bash
         run: |
           mkdir install
-          echo "::set-output name=install::$PWD/install"
+          if [[ ${{matrix.os}} == *"windows"* ]]; then
+            echo "::set-output name=install::${PWD:2}/install"
+          else
+            echo "::set-output name=install::$PWD/install"
+          fi
       - name: qmake
         run: |
           qmake CONFIG+=install_ok QT_PLATFORM=${{matrix.platform}}
