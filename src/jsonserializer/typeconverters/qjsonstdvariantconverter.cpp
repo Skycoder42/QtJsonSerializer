@@ -27,7 +27,7 @@ QCborValue QJsonStdVariantConverter::serialize(int propertyType, const QVariant 
 	if (!extractor) {
 		throw QJsonSerializationException(QByteArray("Failed to get extractor for type ") +
 										  QMetaType::typeName(propertyType) +
-										  QByteArray(". Make shure to register std::optional types via QJsonSerializer::registerVariantConverters"));
+										  QByteArray(". Make shure to register std::variant types via QJsonSerializer::registerVariantConverters"));
 	}
 
 	const auto metaTypes = extractor->subtypes();
@@ -49,7 +49,7 @@ QVariant QJsonStdVariantConverter::deserializeCbor(int propertyType, const QCbor
 	if (!extractor) {
 		throw QJsonDeserializationException(QByteArray("Failed to get extractor for type ") +
 											QMetaType::typeName(propertyType) +
-											QByteArray(". Make shure to register std::optional types via QJsonSerializer::registerVariantConverters"));
+											QByteArray(". Make shure to register std::variant types via QJsonSerializer::registerVariantConverters"));
 	}
 
 	// try all types until one succeeds

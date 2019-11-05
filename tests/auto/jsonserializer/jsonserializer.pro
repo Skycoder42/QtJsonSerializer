@@ -20,7 +20,7 @@ CONVERTER_TESTS = \
 	OptionalConverterTest \
 	PairConverterTest \
 	SmartPointerConverterTest \
-#	TupleConverterTest \
+	TupleConverterTest \
 	VariantConverterTest \
 	VersionConverterTest
 

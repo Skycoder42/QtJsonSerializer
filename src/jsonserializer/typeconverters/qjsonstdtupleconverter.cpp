@@ -1,85 +1,61 @@
 #include "qjsonstdtupleconverter_p.h"
-
-#include <QtCore/QJsonArray>
-
 #include "qjsonserializerexception.h"
+#include "qcborserializer.h"
 
-const QRegularExpression QJsonStdTupleConverter::tupleTypeRegex(QStringLiteral(R"__(^std::tuple<(\s*.*?\s*(?:,\s*.*?\s*)*)>$)__"));
+#include <QtCore/QCborArray>
 
 bool QJsonStdTupleConverter::canConvert(int metaTypeId) const
 {
-	return tupleTypeRegex.match(QString::fromUtf8(getCanonicalTypeName(metaTypeId))).hasMatch();
+	const auto extractor = helper()->extractor(metaTypeId);
+	return extractor && extractor->baseType() == "tuple";
 }
 
-QList<QJsonValue::Type> QJsonStdTupleConverter::jsonTypes() const
+QList<QCborTag> QJsonStdTupleConverter::allowedCborTags(int metaTypeId) const
 {
-	return {QJsonValue::Array};
+	Q_UNUSED(metaTypeId)
+	return {static_cast<QCborTag>(QCborSerializer::Tuple)};
 }
 
-QJsonValue QJsonStdTupleConverter::serialize(int propertyType, const QVariant &value, const QJsonTypeConverter::SerializationHelper *helper) const
+QList<QCborValue::Type> QJsonStdTupleConverter::allowedCborTypes(int metaTypeId, QCborTag tag) const
 {
-	const auto types = getSubtypes(propertyType);
-	if(types.isEmpty())
-		throw QJsonSerializationException{QByteArray{"Failed to extract element types from "} + QMetaType::typeName(propertyType)};
+	Q_UNUSED(metaTypeId)
+	Q_UNUSED(tag)
+	return {QCborValue::Array};
+}
 
-	auto cValue = value;
-	if(!cValue.canConvert(QMetaType::QVariantList) || !cValue.convert(QMetaType::QVariantList)) {
-		throw QJsonSerializationException {
-			QByteArray{"Failed to convert type "} +
-			QMetaType::typeName(propertyType) +
-			QByteArray{" to a variant list. Make shure to register tuple types via QJsonSerializer::registerTupleConverters"}
-		};
+QCborValue QJsonStdTupleConverter::serialize(int propertyType, const QVariant &value) const
+{
+	const auto extractor = helper()->extractor(propertyType);
+	if (!extractor) {
+		throw QJsonSerializationException(QByteArray("Failed to get extractor for type ") +
+										  QMetaType::typeName(propertyType) +
+										  QByteArray(". Make shure to register std::tuple types via QJsonSerializer::registerTupleConverters"));
 	}
 
-	const auto vList = cValue.toList();
-	if(vList.size() != types.size()) {
-		throw QJsonSerializationException {
-			QByteArray{"Element count mismatch on value for type "} +
-			QMetaType::typeName(propertyType) +
-			QByteArray{". Detected "} + QByteArray::number(types.size()) + QByteArray{" types for the tuple, but the passed value has "} +
-			QByteArray::number(vList.size()) + QByteArray{" elements"}
-		};
-	}
-
-	QJsonArray array;
-	for(auto i = 0, max = vList.size(); i < max; ++i)
-		array.append(helper->serializeSubtype(types[i], vList[i], "<" + QByteArray::number(i) + ">"));
-	return array;
+	const auto metaTypes = extractor->subtypes();
+	QCborArray array;
+	for(auto i = 0, max = metaTypes.size(); i < max; ++i)
+		array.append(helper()->serializeSubtype(metaTypes[i], extractor->extract(value, i), "<" + QByteArray::number(i) + ">"));
+	return {static_cast<QCborTag>(QCborSerializer::Tuple), array};
 }
 
-QVariant QJsonStdTupleConverter::deserialize(int propertyType, const QJsonValue &value, QObject *parent, const QJsonTypeConverter::SerializationHelper *helper) const
+QVariant QJsonStdTupleConverter::deserializeCbor(int propertyType, const QCborValue &value, QObject *parent) const
 {
-	const auto types = getSubtypes(propertyType);
-	if(types.isEmpty())
-		throw QJsonSerializationException{QByteArray{"Failed to extract element types from "} + QMetaType::typeName(propertyType)};
-
-	const auto array = value.toArray();
-	if(array.size() != types.size()) {
-		throw QJsonDeserializationException {
-			QByteArray{"Element count mismatch on value for type "} +
-			QMetaType::typeName(propertyType) +
-			QByteArray{". Detected "} + QByteArray::number(types.size()) + QByteArray{" types for the tuple, but the json array has "} +
-			QByteArray::number(array.size()) + QByteArray{" elements"}
-		};
+	const auto extractor = helper()->extractor(propertyType);
+	if (!extractor) {
+		throw QJsonDeserializationException(QByteArray("Failed to get extractor for type ") +
+											QMetaType::typeName(propertyType) +
+											QByteArray(". Make shure to register std::tuple types via QJsonSerializer::registerTupleConverters"));
 	}
 
-	QVariantList list;
-	list.reserve(array.size());
-	for(auto i = 0, max = array.size(); i < max; ++i)
-		list.append(helper->deserializeSubtype(types[i], array[i], parent, "<" + QByteArray::number(i) + ">"));
-	return list;
-}
+	const auto metaTypes = extractor->subtypes();
+	const auto cArray = (value.isTag() ? value.taggedValue() : value).toArray();
+	if (cArray.size() != metaTypes.size())
+		throw QJsonDeserializationException{"Expected array with " + QByteArray::number(metaTypes.size()) +
+											" elements, but got " + QByteArray::number(cArray.size()) + " instead"};
 
-QList<int> QJsonStdTupleConverter::getSubtypes(int metaType) const
-{
-	auto match = tupleTypeRegex.match(QString::fromUtf8(getCanonicalTypeName(metaType)));
-	if(match.hasMatch()) {
-		QList<int> types;
-		const auto typeNames = match.captured(1).split(QLatin1Char(','));
-		types.reserve(typeNames.size());
-		for(const auto &name : typeNames)
-			types.append(QMetaType::type(name.toUtf8().trimmed()));
-		return types;
-	} else
-		return {};
+	QVariant tuple{propertyType, nullptr};
+	for(auto i = 0, max = metaTypes.size(); i < max; ++i)
+		extractor->emplace(tuple, helper()->deserializeSubtype(metaTypes[i], cArray[i], parent, "<" + QByteArray::number(i) + ">"), i);
+	return tuple;
 }

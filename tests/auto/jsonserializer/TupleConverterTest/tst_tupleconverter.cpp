@@ -32,8 +32,9 @@ private:
 
 void TupleConverterTest::initTest()
 {
-	QJsonSerializer_registerTupleConverters_named(int, bool, double);
-	QJsonSerializer_registerTupleConverters_named(QList<int>, QPair<bool, bool>, QMap<QString, double>);
+	QJsonSerializer::registerTupleConverters<int, bool, double>();
+	QJsonSerializer::registerTupleConverters<QList<int>, QPair<bool, bool>, QMap<QString, double>>();
+	QJsonSerializer::registerTupleConverters<OpaqueDummy>();
 
 	QMetaType::registerEqualsComparator<TestTpl1>();
 }
@@ -45,18 +46,31 @@ QJsonTypeConverter *TupleConverterTest::converter()
 
 void TupleConverterTest::addConverterData()
 {
-	QTest::newRow("tuple") << static_cast<int>(QJsonTypeConverter::Standard)
-						   << QList<QJsonValue::Type>{QJsonValue::Array};
+	QTest::newRow("tuple") << static_cast<int>(QJsonTypeConverter::Standard);
 }
 
 void TupleConverterTest::addMetaData()
 {
 	QTest::newRow("basic") << qMetaTypeId<std::tuple<int, bool, double>>()
-						   << true;
+						   << static_cast<QCborTag>(QCborSerializer::Tuple)
+						   << QCborValue::Array
+						   << true
+						   << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("extended") << qMetaTypeId<std::tuple<QList<int>, QPair<bool, bool>, QMap<QString, double>>>()
-							  << true;
-	QTest::newRow("invalid") << static_cast<int>(QMetaType::QVariantList)
-							 << false;
+							  << static_cast<QCborTag>(QCborSerializer::NoTag)
+							  << QCborValue::Array
+							  << true
+							  << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+	QTest::newRow("invalid") << static_cast<int>(QMetaType::QVariant)
+							 << static_cast<QCborTag>(QCborSerializer::NoTag)
+							 << QCborValue::Null
+							 << false
+							 << QJsonTypeConverter::DeserializationCapabilityResult::Negative;
+	QTest::newRow("wrongtag") << qMetaTypeId<std::tuple<int, bool, double>>()
+							  << static_cast<QCborTag>(QCborSerializer::Homogeneous)
+							  << QCborValue::Array
+							  << true
+							  << QJsonTypeConverter::DeserializationCapabilityResult::WrongTag;
 }
 
 void TupleConverterTest::addCommonSerData()
@@ -66,6 +80,7 @@ void TupleConverterTest::addCommonSerData()
 						   << static_cast<QObject*>(this)
 						   << qMetaTypeId<std::tuple<int, bool, double>>()
 						   << QVariant::fromValue(std::make_tuple(5, true, 5.5))
+						   << QCborValue{static_cast<QCborTag>(QCborSerializer::Tuple), QCborArray{1, 2, 3}}
 						   << QJsonValue{QJsonArray{1, 2, 3}};
 }
 
@@ -76,6 +91,7 @@ void TupleConverterTest::addSerData()
 								   << static_cast<QObject*>(nullptr)
 								   << qMetaTypeId<std::tuple<OpaqueDummy>>()
 								   << QVariant::fromValue(std::tuple<OpaqueDummy>{})
+								   << QCborValue{}
 								   << QJsonValue{QJsonValue::Undefined};
 }
 
@@ -86,6 +102,7 @@ void TupleConverterTest::addDeserData()
 							 << static_cast<QObject*>(nullptr)
 							 << qMetaTypeId<TestTpl1>()
 							 << QVariant{}
+							 << QCborValue{static_cast<QCborTag>(QCborSerializer::Tuple), QCborArray{1, true, 3.4, 4}}
 							 << QJsonValue{QJsonArray{1, true, 3.4, 4}};
 }
 
