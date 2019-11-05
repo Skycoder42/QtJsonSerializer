@@ -6,6 +6,8 @@
 #include <QtJsonSerializer/private/qjsonsmartpointerconverter_p.h>
 
 #include "testobject.h"
+using namespace QtJsonSerializer;
+using namespace QtJsonSerializer::TypeConverters;
 
 class SmartPointerConverterTest : public TypeConverterTestBase
 {

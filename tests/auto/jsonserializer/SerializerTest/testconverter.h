@@ -40,7 +40,7 @@ private:
 	void setEnumFlags(EnumFlags value);
 };
 
-class TestEnumConverter : public QJsonTypeConverter
+class TestEnumConverter : public QtJsonSerializer::QJsonTypeConverter
 {
 public:
 	using NormalEnum = EnumContainer::NormalEnum;
@@ -54,7 +54,7 @@ public:
 	QVariant deserializeCbor(int propertyType, const QCborValue &value, QObject *parent) const override;
 };
 
-class TestWrapperConverter : public QJsonTypeConverter
+class TestWrapperConverter : public QtJsonSerializer::QJsonTypeConverter
 {
 public:
 	TestWrapperConverter();

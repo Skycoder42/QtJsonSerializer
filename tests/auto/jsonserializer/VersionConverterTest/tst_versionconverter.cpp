@@ -4,6 +4,8 @@
 #include "typeconvertertestbase.h"
 
 #include <QtJsonSerializer/private/qjsonversionnumberconverter_p.h>
+using namespace QtJsonSerializer;
+using namespace QtJsonSerializer::TypeConverters;
 
 class VersionConverterTest : public TypeConverterTestBase
 {

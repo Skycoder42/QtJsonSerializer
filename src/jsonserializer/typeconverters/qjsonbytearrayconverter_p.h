@@ -4,6 +4,8 @@
 #include "qtjsonserializer_global.h"
 #include "qjsontypeconverter.h"
 
+namespace QtJsonSerializer::TypeConverters {
+
 class Q_JSONSERIALIZER_EXPORT QJsonBytearrayConverter : public QJsonTypeConverter
 {
 public:
@@ -15,5 +17,7 @@ public:
 	QVariant deserializeCbor(int propertyType, const QCborValue &value, QObject *parent) const override;
 	QVariant deserializeJson(int propertyType, const QCborValue &value, QObject *parent) const override;
 };
+
+}
 
 #endif // QJSONBYTEARRAYCONVERTER_P_H

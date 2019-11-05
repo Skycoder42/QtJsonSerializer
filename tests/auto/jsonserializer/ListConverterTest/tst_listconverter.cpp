@@ -4,6 +4,8 @@
 #include "typeconvertertestbase.h"
 
 #include <QtJsonSerializer/private/qjsonlistconverter_p.h>
+using namespace QtJsonSerializer;
+using namespace QtJsonSerializer::TypeConverters;
 
 class ListConverterTest : public TypeConverterTestBase
 {

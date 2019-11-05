@@ -6,6 +6,8 @@
 #include <QtJsonSerializer/private/qjsonstdoptionalconverter_p.h>
 
 #include <optional>
+using namespace QtJsonSerializer;
+using namespace QtJsonSerializer::TypeConverters;
 
 using ExtendedOptional = std::optional<std::pair<int, bool>>;
 

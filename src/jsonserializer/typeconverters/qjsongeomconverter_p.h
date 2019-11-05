@@ -10,6 +10,8 @@
 #include <QtCore/QLine>
 #include <QtCore/QRect>
 
+namespace QtJsonSerializer::TypeConverters {
+
 class Q_JSONSERIALIZER_EXPORT QJsonGeomConverter : public QJsonTypeConverter
 {
 public:
@@ -43,5 +45,7 @@ int QJsonGeomConverter::extract(const QCborValue &value) const;
 
 template <>
 qreal QJsonGeomConverter::extract(const QCborValue &value) const;
+
+}
 
 #endif // QJSONGEOMCONVERTER_P_H

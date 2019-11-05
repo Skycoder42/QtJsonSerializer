@@ -16,6 +16,8 @@
 #define QT_JSONSERIALIZER_EXCEPTION_OR
 #endif
 
+namespace QtJsonSerializer {
+
 class QJsonSerializationExceptionPrivate;
 //! Exception thrown by QJsonSerializer if something goes wrong
 class Q_JSONSERIALIZER_EXPORT QJsonSerializerException : public QT_JSONSERIALIZER_EXCEPTION_BASE
@@ -66,5 +68,7 @@ public:
 	void raise() const override;
 	QT_JSONSERIALIZER_EXCEPTION_BASE *clone() const override;
 };
+
+}
 
 #endif // QJSONSERIALIZEREXCEPTION_H

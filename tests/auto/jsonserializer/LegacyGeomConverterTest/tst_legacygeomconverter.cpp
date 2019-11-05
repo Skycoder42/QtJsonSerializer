@@ -4,6 +4,8 @@
 #include "typeconvertertestbase.h"
 
 #include <QtJsonSerializer/private/qjsonlegacygeomconverter_p.h>
+using namespace QtJsonSerializer;
+using namespace QtJsonSerializer::TypeConverters;
 
 class LegacyGeomConverterTest : public TypeConverterTestBase
 {

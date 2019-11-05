@@ -4,6 +4,8 @@
 #include "typeconvertertestbase.h"
 
 #include <QtJsonSerializer/private/qjsonmultimapconverter_p.h>
+using namespace QtJsonSerializer;
+using namespace QtJsonSerializer::TypeConverters;
 
 template<template <typename, typename> class TContainer>
 bool tCompare(const TContainer<QString, int> &lhs, const TContainer<QString, int> &rhs) {

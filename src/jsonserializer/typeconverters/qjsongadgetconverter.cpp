@@ -4,6 +4,8 @@
 
 #include <QtCore/QMetaProperty>
 #include <QtCore/QSet>
+using namespace QtJsonSerializer;
+using namespace QtJsonSerializer::TypeConverters;
 
 bool QJsonGadgetConverter::canConvert(int metaTypeId) const
 {

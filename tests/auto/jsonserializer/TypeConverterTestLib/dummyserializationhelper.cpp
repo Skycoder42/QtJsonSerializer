@@ -5,6 +5,7 @@
 
 #include <QtJsonSerializer/private/qjsonserializerbase_p.h>
 #include <QtJsonSerializer/private/qjsonexceptioncontext_p.h>
+using namespace QtJsonSerializer;
 
 DummySerializationHelper::DummySerializationHelper(QObject *parent) :
 	QObject{parent}

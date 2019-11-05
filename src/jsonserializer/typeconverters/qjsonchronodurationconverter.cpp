@@ -2,6 +2,8 @@
 #include "qcborserializer.h"
 
 #include <QtCore/QSet>
+using namespace QtJsonSerializer;
+using namespace QtJsonSerializer::TypeConverters;
 
 using namespace std::chrono;
 

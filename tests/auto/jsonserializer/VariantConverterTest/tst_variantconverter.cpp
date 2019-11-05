@@ -6,6 +6,8 @@
 #include <QtJsonSerializer/private/qjsonstdvariantconverter_p.h>
 
 #include <variant>
+using namespace QtJsonSerializer;
+using namespace QtJsonSerializer::TypeConverters;
 
 using TestVar1 = std::variant<int, bool, double>;
 using TestVar2 = std::variant<QList<int>, QPair<bool, bool>, QMap<QString, double>>;

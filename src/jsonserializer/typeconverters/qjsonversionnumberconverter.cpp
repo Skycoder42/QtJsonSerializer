@@ -3,6 +3,8 @@
 #include "qcborserializer.h"
 
 #include <QtCore/QVersionNumber>
+using namespace QtJsonSerializer;
+using namespace QtJsonSerializer::TypeConverters;
 
 bool QJsonVersionNumberConverter::canConvert(int metaTypeId) const
 {

@@ -5,6 +5,8 @@
 #include "testgadget.h"
 
 #include <QtJsonSerializer/private/qjsongadgetconverter_p.h>
+using namespace QtJsonSerializer;
+using namespace QtJsonSerializer::TypeConverters;
 
 class GadgetConverterTest : public TypeConverterTestBase
 {

@@ -28,6 +28,8 @@
 #include <QtCore/qhash.h>
 #include <QtCore/qmap.h>
 
+namespace QtJsonSerializer {
+
 class QJsonSerializerBasePrivate;
 //! A class to serializer and deserializer c++ classes to and from JSON
 class Q_JSONSERIALIZER_EXPORT QJsonSerializerBase : public QObject, protected QJsonTypeConverter::SerializationHelper
@@ -212,11 +214,6 @@ private:
 	static void registerInverseTypedefImpl(int typeId, const char *normalizedTypeName);
 };
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(QJsonSerializerBase::ValidationFlags)
-
-Q_DECLARE_ASSOCIATIVE_CONTAINER_METATYPE(QMultiMap)
-Q_DECLARE_ASSOCIATIVE_CONTAINER_METATYPE(QMultiHash)
-
 //! A macro the mark a class as polymorphic
 #define Q_JSON_POLYMORPHIC(x) \
 	static_assert(std::is_same<decltype(x), bool>::value, "x must be bool"); \
@@ -233,38 +230,38 @@ void QJsonSerializerBase::registerExtractor()
 template<typename T>
 void QJsonSerializerBase::registerListConverters()
 {
-	QSequentialWriter::registerWriter<QList, T>();
-	QSequentialWriter::registerWriter<QLinkedList, T>();
-	QSequentialWriter::registerWriter<QVector, T>();
-	QSequentialWriter::registerWriter<QStack, T>();
-	QSequentialWriter::registerWriter<QQueue, T>();
+	MetaWriters::QSequentialWriter::registerWriter<QList, T>();
+	MetaWriters::QSequentialWriter::registerWriter<QLinkedList, T>();
+	MetaWriters::QSequentialWriter::registerWriter<QVector, T>();
+	MetaWriters::QSequentialWriter::registerWriter<QStack, T>();
+	MetaWriters::QSequentialWriter::registerWriter<QQueue, T>();
 }
 
 template<typename T>
 void QJsonSerializerBase::registerSetConverters()
 {
-	QSequentialWriter::registerWriter<QSet, T>();
+	MetaWriters::QSequentialWriter::registerWriter<QSet, T>();
 }
 
 template<typename TKey, typename TValue, bool mapTypes, bool hashTypes>
 void QJsonSerializerBase::registerMapConverters()
 {
 	if constexpr (mapTypes) {
-		QAssociativeWriter::registerWriter<QMap, TKey, TValue>();
-		QAssociativeWriter::registerWriter<QMultiMap, TKey, TValue>();
+		MetaWriters::QAssociativeWriter::registerWriter<QMap, TKey, TValue>();
+		MetaWriters::QAssociativeWriter::registerWriter<QMultiMap, TKey, TValue>();
 	}
 	if constexpr (hashTypes) {
-		QAssociativeWriter::registerWriter<QHash, TKey, TValue>();
-		QAssociativeWriter::registerWriter<QMultiHash, TKey, TValue>();
+		MetaWriters::QAssociativeWriter::registerWriter<QHash, TKey, TValue>();
+		MetaWriters::QAssociativeWriter::registerWriter<QMultiHash, TKey, TValue>();
 	}
 }
 
 template<typename T>
 void QJsonSerializerBase::registerPointerConverters()
 {
-	registerExtractor<QSharedPointer<T>, QJsonTypeExtractors::SmartPointerExtractor<QSharedPointer, T>>();
+	registerExtractor<QSharedPointer<T>, TypeExtractors::SmartPointerExtractor<QSharedPointer, T>>();
 	if constexpr (std::is_base_of_v<QObject, T>)
-		registerExtractor<QPointer<T>, QJsonTypeExtractors::SmartPointerExtractor<QPointer, T>>();
+		registerExtractor<QPointer<T>, TypeExtractors::SmartPointerExtractor<QPointer, T>>();
 }
 
 template<typename T>
@@ -285,26 +282,26 @@ void QJsonSerializerBase::registerBasicConverters()
 template<typename T1, typename T2>
 void QJsonSerializerBase::registerPairConverters()
 {
-	registerExtractor<QPair<T1, T2>, QJsonTypeExtractors::PairExtractor<QPair, T1, T2>>();
-	registerExtractor<std::pair<T1, T2>, QJsonTypeExtractors::PairExtractor<std::pair, T1, T2>>();
+	registerExtractor<QPair<T1, T2>, TypeExtractors::PairExtractor<QPair, T1, T2>>();
+	registerExtractor<std::pair<T1, T2>, TypeExtractors::PairExtractor<std::pair, T1, T2>>();
 }
 
 template<typename... TArgs>
 void QJsonSerializerBase::registerTupleConverters()
 {
-	registerExtractor<std::tuple<TArgs...>, QJsonTypeExtractors::TupleExtractor<TArgs...>>();
+	registerExtractor<std::tuple<TArgs...>, TypeExtractors::TupleExtractor<TArgs...>>();
 }
 
 template<typename T>
 void QJsonSerializerBase::registerOptionalConverters()
 {
-	registerExtractor<std::optional<T>, QJsonTypeExtractors::OptionalExtractor<T>>();
+	registerExtractor<std::optional<T>, TypeExtractors::OptionalExtractor<T>>();
 }
 
 template<typename... TArgs>
 void QJsonSerializerBase::registerVariantConverters()
 {
-	registerExtractor<std::variant<TArgs...>, QJsonTypeExtractors::VariantExtractor<TArgs...>>();
+	registerExtractor<std::variant<TArgs...>, TypeExtractors::VariantExtractor<TArgs...>>();
 }
 
 template<typename TConverter, int Priority>
@@ -320,6 +317,13 @@ void QJsonSerializerBase::addJsonTypeConverter()
 	static_assert(std::is_base_of<QJsonTypeConverter, TConverter>::value, "T must implement QJsonTypeConverter");
 	addJsonTypeConverter(QSharedPointer<TConverter>::create());
 }
+
+}
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(QtJsonSerializer::QJsonSerializerBase::ValidationFlags)
+
+Q_DECLARE_ASSOCIATIVE_CONTAINER_METATYPE(QMultiMap)
+Q_DECLARE_ASSOCIATIVE_CONTAINER_METATYPE(QMultiHash)
 
 //! @file qjsonserializerbase.h The QJsonSerializerBase header file
 #endif // QJSONSERIALIZERBASE_H

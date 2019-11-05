@@ -4,6 +4,8 @@
 
 #include <QtCore/QByteArray>
 #include <QtCore/QRegularExpression>
+using namespace QtJsonSerializer;
+using namespace QtJsonSerializer::TypeConverters;
 
 bool QJsonBytearrayConverter::canConvert(int metaTypeId) const
 {

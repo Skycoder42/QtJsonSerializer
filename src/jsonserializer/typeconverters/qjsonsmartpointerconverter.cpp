@@ -1,5 +1,7 @@
 #include "qjsonsmartpointerconverter_p.h"
 #include "qjsonserializerexception.h"
+using namespace QtJsonSerializer;
+using namespace QtJsonSerializer::TypeConverters;
 
 bool QJsonSmartPointerConverter::canConvert(int metaTypeId) const
 {

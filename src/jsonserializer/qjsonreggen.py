@@ -45,7 +45,7 @@ def create_hook(file_name, class_name, *modes):
 
 		file.write("#define QT_JSON_SERIALIZER_NAMED(T) #T\n\n")
 
-		file.write("namespace _qjsonserializer_helpertypes::converter_hooks {\n\n")
+		file.write("namespace QtJsonSerializer::__private::converter_hooks {\n\n")
 
 		file.write("void register_{}_converters() {{\n".format(escaped(class_name)))
 		for mode_name in modes:
@@ -63,18 +63,20 @@ def create_super_hook(file_name, *class_names):
 	with open(file_name, "w") as file:
 		file.write('#include "qtjsonserializer_global.h"\n\n')
 
-		file.write("namespace _qjsonserializer_helpertypes::converter_hooks {\n\n")
+		file.write("namespace QtJsonSerializer::__private::converter_hooks {\n\n")
 		for class_name in class_names:
 			file.write("void register_{}_converters();\n".format(escaped(class_name)))
 		file.write("\n}\n\n")
 
-		file.write("void qtJsonSerializerRegisterTypes() {\n")
+		file.write("namespace QtJsonSerializer {\n\n")
+		file.write("void registerTypes() {\n")
 		file.write("\tstatic bool wasCalled = false;\n")
 		file.write("\tif(wasCalled)\n")
 		file.write("\t\treturn;\n")
 		file.write("\twasCalled = true;\n")
 		for class_name in class_names:
-			file.write("\t_qjsonserializer_helpertypes::converter_hooks::register_{}_converters();\n".format(escaped(class_name)))
+			file.write("\tQtJsonSerializer::__private::converter_hooks::register_{}_converters();\n".format(escaped(class_name)))
+		file.write("}\n\n")
 		file.write("}\n")
 
 

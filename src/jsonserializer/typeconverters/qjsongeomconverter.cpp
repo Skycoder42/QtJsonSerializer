@@ -1,6 +1,8 @@
 #include "qjsongeomconverter_p.h"
 #include "qjsonserializerexception.h"
 #include "qcborserializer.h"
+using namespace QtJsonSerializer;
+using namespace QtJsonSerializer::TypeConverters;
 
 bool QJsonGeomConverter::canConvert(int metaTypeId) const
 {

@@ -2,6 +2,8 @@
 #include "qjsonserializerexception.h"
 
 #include <optional>
+using namespace QtJsonSerializer;
+using namespace QtJsonSerializer::TypeConverters;
 
 // WORKAROUND for now, nullptr is used instead of nullopt, as nullopt_t cannot be registered as metatype
 

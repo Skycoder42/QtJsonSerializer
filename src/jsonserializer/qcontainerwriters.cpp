@@ -2,6 +2,8 @@
 #include "qcontainerwriters_p.h"
 
 #include <QtCore/QRegularExpression>
+using namespace QtJsonSerializer;
+using namespace QtJsonSerializer::MetaWriters;
 
 void QSequentialWriter::registerWriter(int metaTypeId, QSequentialWriterFactory *factory)
 {

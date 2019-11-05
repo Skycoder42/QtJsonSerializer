@@ -27,11 +27,16 @@
 #include "typeconverters/qjsonstdtupleconverter_p.h"
 #include "typeconverters/qjsonstdvariantconverter_p.h"
 #include "typeconverters/qjsonversionnumberconverter_p.h"
+using namespace QtJsonSerializer;
+using namespace QtJsonSerializer::TypeConverters;
 
 #ifndef NO_REGISTER_JSON_CONVERTERS
+namespace {
+void qtJsonSerializerRegisterTypes() {
+	QtJsonSerializer::registerTypes();
+}
+}
 Q_COREAPP_STARTUP_FUNCTION(qtJsonSerializerRegisterTypes);
-#else
-void qtJsonSerializerRegisterTypes();
 #endif
 
 QJsonSerializerBase::QJsonSerializerBase(QObject *parent) :

@@ -4,6 +4,8 @@
 #include "typeconvertertestbase.h"
 
 #include <QtJsonSerializer/private/qjsonstdtupleconverter_p.h>
+using namespace QtJsonSerializer;
+using namespace QtJsonSerializer::TypeConverters;
 
 using TestTpl1 = std::tuple<int, bool, double>;
 using TestTpl2 = std::tuple<QList<int>, QPair<bool, bool>, QMap<QString, double>>;

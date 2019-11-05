@@ -1,6 +1,7 @@
 #include <QCoreApplication>
 #include <QtJsonSerializer>
 #include <QDebug>
+using namespace QtJsonSerializer;
 
 #include "sampleobject.h"
 

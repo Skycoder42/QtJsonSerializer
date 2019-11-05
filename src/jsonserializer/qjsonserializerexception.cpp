@@ -1,6 +1,7 @@
 #include "qjsonserializerexception.h"
 #include "qjsonserializerexception_p.h"
 #include "qjsonexceptioncontext_p.h"
+using namespace QtJsonSerializer;
 
 QJsonSerializerException::QJsonSerializerException(const QByteArray &what) :
 	d{new QJsonSerializationExceptionPrivate{what}}

@@ -9,6 +9,8 @@
 
 #include <QtCore/private/qobject_p.h>
 
+namespace QtJsonSerializer {
+
 class Q_JSONSERIALIZER_EXPORT QJsonSerializerBasePrivate : public QObjectPrivate
 {
 	Q_DECLARE_PUBLIC(QJsonSerializerBase)
@@ -135,6 +137,8 @@ void QJsonSerializerBasePrivate::ConverterStore<TConverter>::insertSorted(const 
 	}
 	// not inserted -> add to end
 	store.append(converter);
+}
+
 }
 
 #endif // QJSONSERIALIZERBASE_P_H

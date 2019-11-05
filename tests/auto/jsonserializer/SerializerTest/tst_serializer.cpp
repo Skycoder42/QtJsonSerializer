@@ -7,6 +7,8 @@
 #include "testconverter.h"
 
 #include <QtJsonSerializer/private/qjsonserializerbase_p.h>
+using namespace QtJsonSerializer;
+using namespace QtJsonSerializer::MetaWriters;
 
 using TestTuple = std::tuple<int, QString, QList<int>>;
 using TestPair = std::pair<bool, int>;

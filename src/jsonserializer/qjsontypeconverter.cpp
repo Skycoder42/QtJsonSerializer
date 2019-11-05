@@ -1,5 +1,8 @@
 #include "qjsontypeconverter.h"
 #include "qjsonserializerbase_p.h"
+using namespace QtJsonSerializer;
+
+namespace QtJsonSerializer {
 
 class QJsonTypeConverterPrivate
 {
@@ -7,6 +10,8 @@ public:
 	int priority = QJsonTypeConverter::Standard;
 	const QJsonTypeConverter::SerializationHelper *helper = nullptr;
 };
+
+}
 
 
 

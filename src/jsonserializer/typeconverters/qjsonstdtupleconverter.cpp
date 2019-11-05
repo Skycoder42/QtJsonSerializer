@@ -3,6 +3,8 @@
 #include "qcborserializer.h"
 
 #include <QtCore/QCborArray>
+using namespace QtJsonSerializer;
+using namespace QtJsonSerializer::TypeConverters;
 
 bool QJsonStdTupleConverter::canConvert(int metaTypeId) const
 {

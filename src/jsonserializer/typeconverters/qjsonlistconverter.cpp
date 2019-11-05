@@ -4,6 +4,9 @@
 #include "qcontainerwriters.h"
 
 #include <QtCore/QJsonArray>
+using namespace QtJsonSerializer;
+using namespace QtJsonSerializer::TypeConverters;
+using namespace QtJsonSerializer::MetaWriters;
 
 bool QJsonListConverter::canConvert(int metaTypeId) const
 {

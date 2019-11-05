@@ -1,5 +1,6 @@
 #include "multitypeconvertertestbase.h"
 #include <QtTest>
+using namespace QtJsonSerializer;
 
 MultiTypeConverterTestBase::MultiTypeConverterTestBase(QObject *parent) :
 	TypeConverterTestBase{parent}

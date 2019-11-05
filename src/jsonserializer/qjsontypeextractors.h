@@ -10,7 +10,7 @@
 #include <QtCore/qbytearray.h>
 #include <QtCore/qpair.h>
 
-namespace QJsonTypeExtractors {
+namespace QtJsonSerializer::TypeExtractors {
 
 template <template <typename> class TSmartPointer, typename TType>
 class SmartPointerExtractor final : public QJsonTypeExtractor

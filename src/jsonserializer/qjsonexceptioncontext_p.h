@@ -7,6 +7,8 @@
 #include <QtCore/QMetaProperty>
 #include <QtCore/QThreadStorage>
 
+namespace QtJsonSerializer {
+
 class Q_JSONSERIALIZER_EXPORT QJsonExceptionContext
 {
 public:
@@ -19,5 +21,7 @@ public:
 private:
 	static QThreadStorage<QJsonSerializationException::PropertyTrace> contextStore;
 };
+
+}
 
 #endif // QJSONEXCEPTIONCONTEXT_P_H

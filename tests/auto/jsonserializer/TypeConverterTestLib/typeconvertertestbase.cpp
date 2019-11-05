@@ -7,6 +7,8 @@
 #include <QtJsonSerializer/private/qjsonserializer_p.h>
 #undef private
 
+using namespace QtJsonSerializer;
+
 #define SELF_COMPARE(type, actual, expected) \
 do {\
 	if (!compare(type, actual, expected, #actual, #expected, __FILE__, __LINE__))\

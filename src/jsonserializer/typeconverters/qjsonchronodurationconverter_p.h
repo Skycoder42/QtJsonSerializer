@@ -7,6 +7,8 @@
 
 #include <chrono>
 
+namespace QtJsonSerializer::TypeConverters {
+
 class Q_JSONSERIALIZER_EXPORT QJsonChronoDurationConverter : public QJsonTypeConverter
 {
 public:
@@ -47,5 +49,7 @@ private:
 		}, duration);
 	}
 };
+
+}
 
 #endif // QJSONCHRONODURATIONCONVERTER_P_H

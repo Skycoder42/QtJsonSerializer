@@ -3,6 +3,8 @@
 #include "qcborserializer.h"
 
 #include <cmath>
+using namespace QtJsonSerializer;
+using namespace QtJsonSerializer::TypeConverters;
 
 namespace {
 

@@ -3,6 +3,7 @@
 
 #include <QtCore/QCborStreamReader>
 #include <QtCore/QCborStreamWriter>
+using namespace QtJsonSerializer;
 
 QCborSerializer::QCborSerializer(QObject *parent) :
 	QJsonSerializerBase{*new QCborSerializerPrivate{}, parent}

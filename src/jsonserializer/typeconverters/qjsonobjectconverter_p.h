@@ -4,6 +4,8 @@
 #include "qtjsonserializer_global.h"
 #include "qjsontypeconverter.h"
 
+namespace QtJsonSerializer::TypeConverters {
+
 class Q_JSONSERIALIZER_EXPORT QJsonObjectConverter : public QJsonTypeConverter
 {
 public:
@@ -21,5 +23,7 @@ private:
 	QObject *deserializeConstructedObject(const QCborValue &value, QObject *parent) const;
 	void deserializeProperties(const QMetaObject *metaObject, QObject *object, const QCborMap &value, bool isPoly = false) const;
 };
+
+}
 
 #endif // QJSONOBJECTCONVERTER_P_H

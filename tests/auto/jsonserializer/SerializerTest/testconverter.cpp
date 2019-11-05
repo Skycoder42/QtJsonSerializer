@@ -1,5 +1,6 @@
 #include "testconverter.h"
 #include <QCborMap>
+using namespace QtJsonSerializer;
 
 bool EnumContainer::operator==(EnumContainer other) const
 {

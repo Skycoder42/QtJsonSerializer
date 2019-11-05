@@ -3,6 +3,8 @@
 #include "qcborserializer.h"
 
 #include <QtCore/QLocale>
+using namespace QtJsonSerializer;
+using namespace QtJsonSerializer::TypeConverters;
 
 bool QJsonLocaleConverter::canConvert(int metaTypeId) const
 {

@@ -6,6 +6,8 @@
 
 #include <QtCore/QMetaEnum>
 
+namespace QtJsonSerializer::TypeConverters {
+
 class Q_JSONSERIALIZER_EXPORT QJsonEnumConverter : public QJsonTypeConverter
 {
 public:
@@ -21,5 +23,7 @@ private:
 	bool testForEnum(int metaTypeId) const;
 	QMetaEnum getEnum(int metaTypeId, bool ser) const;
 };
+
+}
 
 #endif // QJSONENUMCONVERTER_H

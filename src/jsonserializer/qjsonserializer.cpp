@@ -2,6 +2,7 @@
 #include "qjsonserializer_p.h"
 
 #include <QtCore/QBuffer>
+using namespace QtJsonSerializer;
 
 QJsonSerializer::QJsonSerializer(QObject *parent) :
 	  QJsonSerializerBase{*new QJsonSerializerPrivate{}, parent}

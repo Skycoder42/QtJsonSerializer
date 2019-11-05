@@ -12,6 +12,8 @@
 #include <QtCore/qset.h>
 #include <QtCore/qlinkedlist.h>
 
+namespace QtJsonSerializer::MetaWriters {
+
 class QSequentialWriterFactory;
 class Q_JSONSERIALIZER_EXPORT QSequentialWriter
 {
@@ -258,6 +260,8 @@ void QAssociativeWriter::registerWriter()
 {
 	registerWriter(qMetaTypeId<TContainer<TKey, TValue>>(),
 				   new QAssociativeWriterFactoryImpl<TContainer, TKey, TValue>{});
+}
+
 }
 
 #endif // QCONTAINERWRITERS_H

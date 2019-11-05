@@ -6,6 +6,8 @@
 #include <QtJsonSerializer/private/qjsonenumconverter_p.h>
 
 #include "testclass.h"
+using namespace QtJsonSerializer;
+using namespace QtJsonSerializer::TypeConverters;
 
 class EnumConverterTest : public TypeConverterTestBase
 {

@@ -13,6 +13,8 @@
 #include <QtCore/qvariant.h>
 #include <QtCore/qsharedpointer.h>
 
+namespace QtJsonSerializer {
+
 class Q_JSONSERIALIZER_EXPORT QJsonTypeExtractor
 {
 	Q_DISABLE_COPY(QJsonTypeExtractor)
@@ -142,6 +144,8 @@ QSharedPointer<QJsonTypeConverter> QJsonTypeConverterStandardFactory<TConverter,
 	if (OverwritePriority != QJsonTypeConverter::Priority::Standard)
 		converter->setPriority(OverwritePriority);
 	return converter;
+}
+
 }
 
 #endif // QJSONTYPECONVERTER_H

@@ -11,7 +11,7 @@ public:
 	explicit MultiTypeConverterTestBase(QObject *parent = nullptr);
 
 protected:
-	QJsonTypeConverter *converter() final;
+	QtJsonSerializer::QJsonTypeConverter *converter() final;
 	void testConverterIsRegistered_data() override;
 	void testConverterMeta_data() override;
 	void testMetaTypeDetection_data() override;
@@ -21,6 +21,6 @@ protected:
 	virtual void addConverterInstances() = 0;
 };
 
-Q_DECLARE_METATYPE(QJsonTypeConverter*)
+Q_DECLARE_METATYPE(QtJsonSerializer::QJsonTypeConverter*)
 
 #endif // MULTITYPECONVERTERTESTBASE_H

@@ -5,6 +5,8 @@
 #include "testobject.h"
 
 #include <QtJsonSerializer/private/qjsonobjectconverter_p.h>
+using namespace QtJsonSerializer;
+using namespace QtJsonSerializer::TypeConverters;
 
 class ObjectConverterTest : public TypeConverterTestBase
 {

@@ -3,6 +3,8 @@
 
 #include "qcontainerwriters.h"
 
+namespace QtJsonSerializer::MetaWriters {
+
 class QContainerWritersPrivate
 {
 public:
@@ -61,5 +63,7 @@ public:
 		return QSharedPointer<QAssociativeWriterImpl<QHash, QString, QVariant>>::create(reinterpret_cast<QVariantHash*>(data));
 	}
 };
+
+}
 
 #endif // QCONTAINERWRITERS_P_H

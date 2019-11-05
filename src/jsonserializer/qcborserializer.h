@@ -4,6 +4,8 @@
 #include "QtJsonSerializer/qtjsonserializer_global.h"
 #include "QtJsonSerializer/qjsonserializerbase.h"
 
+namespace QtJsonSerializer {
+
 class QCborSerializerPrivate;
 class Q_JSONSERIALIZER_EXPORT QCborSerializer : public QJsonSerializerBase
 {
@@ -70,7 +72,7 @@ public:
 
 	//! Serializers a QObject, Q_GADGET or a list of one of those to cbor
 	template <typename T>
-	typename _qjsonserializer_helpertypes::json_type<T>::cborType serialize(const T &data) const;
+	typename QtJsonSerializer::__private::json_type<T>::cborType serialize(const T &data) const;
 	//! Serializers a QObject, Q_GADGET or a list of one of those to a device
 	template <typename T>
 	void serializeTo(QIODevice *device, const T &data) const;
@@ -87,7 +89,7 @@ public:
 
 	//! Deserializes cbor to the given QObject type, Q_GADGET type or a list of one of those types
 	template <typename T>
-	T deserialize(const typename _qjsonserializer_helpertypes::json_type<T>::cborType &json, QObject *parent = nullptr) const;
+	T deserialize(const typename QtJsonSerializer::__private::json_type<T>::cborType &json, QObject *parent = nullptr) const;
 	//! Deserializes data from a device to the given QObject type, Q_GADGET type or a list of one of those types
 	template <typename T>
 	T deserializeFrom(QIODevice *device, QObject *parent = nullptr) const;
@@ -122,45 +124,47 @@ QCborTag QCborSerializer::typeTag() const
 }
 
 template<typename T>
-typename _qjsonserializer_helpertypes::json_type<T>::cborType QCborSerializer::serialize(const T &data) const
+typename QtJsonSerializer::__private::json_type<T>::cborType QCborSerializer::serialize(const T &data) const
 {
-	static_assert(_qjsonserializer_helpertypes::is_serializable<T>::value, "T cannot be serialized");
-	return _qjsonserializer_helpertypes::json_type<T>::convert(serialize(_qjsonserializer_helpertypes::variant_helper<T>::toVariant(data)));
+	static_assert(__private::is_serializable<T>::value, "T cannot be serialized");
+	return __private::json_type<T>::convert(serialize(__private::variant_helper<T>::toVariant(data)));
 }
 
 template<typename T>
 void QCborSerializer::serializeTo(QIODevice *device, const T &data) const
 {
-	static_assert(_qjsonserializer_helpertypes::is_serializable<T>::value, "T cannot be serialized");
-	serializeTo(device, _qjsonserializer_helpertypes::variant_helper<T>::toVariant(data));
+	static_assert(__private::is_serializable<T>::value, "T cannot be serialized");
+	serializeTo(device, __private::variant_helper<T>::toVariant(data));
 }
 
 template<typename T>
 QByteArray QCborSerializer::serializeTo(const T &data) const
 {
-	static_assert(_qjsonserializer_helpertypes::is_serializable<T>::value, "T cannot be serialized");
-	return serializeTo(_qjsonserializer_helpertypes::variant_helper<T>::toVariant(data));
+	static_assert(__private::is_serializable<T>::value, "T cannot be serialized");
+	return serializeTo(__private::variant_helper<T>::toVariant(data));
 }
 
 template<typename T>
-T QCborSerializer::deserialize(const typename _qjsonserializer_helpertypes::json_type<T>::cborType &json, QObject *parent) const
+T QCborSerializer::deserialize(const typename __private::json_type<T>::cborType &json, QObject *parent) const
 {
-	static_assert(_qjsonserializer_helpertypes::is_serializable<T>::value, "T cannot be deserialized");
-	return _qjsonserializer_helpertypes::variant_helper<T>::fromVariant(deserialize(json, qMetaTypeId<T>(), parent));
+	static_assert(__private::is_serializable<T>::value, "T cannot be deserialized");
+	return __private::variant_helper<T>::fromVariant(deserialize(json, qMetaTypeId<T>(), parent));
 }
 
 template<typename T>
 T QCborSerializer::deserializeFrom(QIODevice *device, QObject *parent) const
 {
-	static_assert(_qjsonserializer_helpertypes::is_serializable<T>::value, "T cannot be deserialized");
-	return _qjsonserializer_helpertypes::variant_helper<T>::fromVariant(deserializeFrom(device, qMetaTypeId<T>(), parent));
+	static_assert(__private::is_serializable<T>::value, "T cannot be deserialized");
+	return __private::variant_helper<T>::fromVariant(deserializeFrom(device, qMetaTypeId<T>(), parent));
 }
 
 template<typename T>
 T QCborSerializer::deserializeFrom(const QByteArray &data, QObject *parent) const
 {
-	static_assert(_qjsonserializer_helpertypes::is_serializable<T>::value, "T cannot be deserialized");
-	return _qjsonserializer_helpertypes::variant_helper<T>::fromVariant(deserializeFrom(data, qMetaTypeId<T>(), parent));
+	static_assert(__private::is_serializable<T>::value, "T cannot be deserialized");
+	return __private::variant_helper<T>::fromVariant(deserializeFrom(data, qMetaTypeId<T>(), parent));
+}
+
 }
 
 #endif // QCBORSERIALIZER_H

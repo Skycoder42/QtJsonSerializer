@@ -17,7 +17,7 @@
 #include <type_traits>
 #include <tuple>
 
-namespace _qjsonserializer_helpertypes {
+namespace QtJsonSerializer::__private {
 
 template <class T, class Enable = void>
 struct gadget_helper

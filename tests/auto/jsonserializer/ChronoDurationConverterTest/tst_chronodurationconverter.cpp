@@ -8,6 +8,8 @@
 #include <chrono>
 using namespace std::chrono;
 using namespace std::chrono_literals;
+using namespace QtJsonSerializer;
+using namespace QtJsonSerializer::TypeConverters;
 
 Q_DECLARE_METATYPE(std::chrono::nanoseconds)
 Q_DECLARE_METATYPE(std::chrono::microseconds)

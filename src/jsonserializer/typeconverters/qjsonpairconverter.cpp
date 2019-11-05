@@ -3,6 +3,8 @@
 #include <QCborSerializer>
 
 #include <QtCore/QCborArray>
+using namespace QtJsonSerializer;
+using namespace QtJsonSerializer::TypeConverters;
 
 bool QJsonPairConverter::canConvert(int metaTypeId) const
 {

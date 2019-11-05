@@ -2,6 +2,8 @@
 #include "qjsonserializerexception.h"
 
 #include <QtCore/QCborMap>
+using namespace QtJsonSerializer;
+using namespace QtJsonSerializer::TypeConverters;
 
 QJsonLegacyGeomConverter::QJsonLegacyGeomConverter()
 {
