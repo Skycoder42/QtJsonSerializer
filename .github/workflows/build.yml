@@ -131,6 +131,7 @@ jobs:
           version: ${{matrix.version}}
           platform: ${{matrix.platform}}
           install-args: --verbose
+      - run: qmake -query
       - run: mkdir install
       - name: qmake
         run: |
