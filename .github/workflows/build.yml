@@ -4,8 +4,6 @@ on: [push, check_run]
 
 jobs:
   build:
-    env:
-      QDEP_CACHE_DIR: $HOME/.qdep-cache
     strategy:
       fail-fast: false
       matrix:
