@@ -131,7 +131,12 @@ jobs:
           version: ${{matrix.version}}
           platform: ${{matrix.platform}}
           install-args: --verbose
-      - run: mkdir install
+      - name: create install dir
+        id: create_install
+        shell: bash
+        run: |
+          mkdir install
+          echo "::set-output name=install::$PWD/install"
       - name: qmake
         run: |
           qmake CONFIG+=install_ok QT_PLATFORM=${{matrix.platform}}
@@ -139,7 +144,7 @@ jobs:
       - name: make module
         run: |
           make
-          make INSTALL_ROOT="$PWD/install" install
+          make INSTALL_ROOT="${{steps.create_install.outputs.install}}" install
       - name: make tests
         run: |
           make all
@@ -150,12 +155,12 @@ jobs:
       - name: make examples
         run: |
           make sub-examples
-          cd examples && make INSTALL_ROOT="$PWD/install" install
+          cd examples && make INSTALL_ROOT="${{steps.create_install.outputs.install}}" install
         if: matrix.examples
       - name: make doc
         run: |
           make doxygen
-          cd doc && make INSTALL_ROOT="$PWD/install" install
+          cd doc && make INSTALL_ROOT="${{steps.create_install.outputs.install}}" install
         if: matrix.doc
       - uses: actions/upload-artifact@v1
         with:
