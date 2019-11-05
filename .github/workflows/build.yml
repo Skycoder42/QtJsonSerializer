@@ -127,20 +127,11 @@ jobs:
           #toolset: 14.16
           uwp: ${{contains(matrix.platform, 'winrt')}}
       - uses: Skycoder42/action-setup-qt@master
+        id: setup_qt
         with:
           version: ${{matrix.version}}
           platform: ${{matrix.platform}}
           install-args: --verbose
-      - name: create install dir
-        id: create_install
-        shell: bash
-        run: |
-          mkdir install
-          if [[ ${{matrix.os}} == *"windows"* ]]; then
-            echo "::set-output name=install::${PWD:2}/install"
-          else
-            echo "::set-output name=install::$PWD/install"
-          fi
       - name: qmake
         run: |
           qmake CONFIG+=install_ok QT_PLATFORM=${{matrix.platform}}
@@ -148,7 +139,7 @@ jobs:
       - name: make module
         run: |
           make
-          make INSTALL_ROOT="${{steps.create_install.outputs.install}}" install
+          make INSTALL_ROOT="${{steps.setup_qt.outputs.installdir}}" install
       - name: make tests
         run: |
           make all
@@ -159,12 +150,12 @@ jobs:
       - name: make examples
         run: |
           make sub-examples
-          cd examples && make INSTALL_ROOT="${{steps.create_install.outputs.install}}" install
+          cd examples && make INSTALL_ROOT="${{steps.setup_qt.outputs.installdir}}" install
         if: matrix.examples
       - name: make doc
         run: |
           make doxygen
-          cd doc && make INSTALL_ROOT="${{steps.create_install.outputs.install}}" install
+          cd doc && make INSTALL_ROOT="${{steps.setup_qt.outputs.installdir}}" install
         if: matrix.doc
       - uses: actions/upload-artifact@v1
         with:
