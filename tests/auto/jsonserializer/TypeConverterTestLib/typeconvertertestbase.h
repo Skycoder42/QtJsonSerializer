@@ -3,7 +3,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QJsonValue>
-#include <QtJsonSerializer/QJsonTypeConverter>
+#include <QtJsonSerializer/TypeConverter>
 
 #include "dummyserializationhelper.h"
 #include "opaquedummy.h"
