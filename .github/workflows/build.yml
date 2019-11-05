@@ -1,0 +1,215 @@
+name: Build, test and upload the module
+
+on: [push, check_run]
+
+jobs:
+  build:
+    env:
+      QDEP_CACHE_DIR: $HOME/.qdep-cache
+    strategy:
+      fail-fast: false
+      matrix:
+        version: 5.13.2
+        platform: 
+          - gcc_64
+          - android_arm64_v8a
+          - android_x86_64
+          - android_armv7
+          - android_x86
+          - wasm_32
+          - msvc2017_64
+          - msvc2017
+          - winrt_x64_msvc2017
+          - winrt_x86_msvc2017
+          - winrt_armv7_msvc2017
+          - mingw73_64
+          - mingw73_32
+          - clang_64
+          - ios
+
+        include: 
+          - platform: gcc_64
+            os: ubuntu-latest
+            test: true
+            examples: true
+            doc: true
+          - platform: android_arm64_v8a
+            os: ubuntu-latest
+            test: false
+            examples: false
+            doc: false
+          - platform: android_x86_64
+            os: ubuntu-latest
+            test: false
+            examples: false
+            doc: false
+          - platform: android_armv7
+            os: ubuntu-latest
+            test: false
+            examples: false
+            doc: false
+          - platform: android_x86
+            os: ubuntu-latest
+            test: false
+            examples: false
+            doc: false
+          - platform: wasm_32
+            os: ubuntu-latest
+            test: false
+            examples: false
+            doc: false
+          - platform: msvc2017_64
+            os: windows-latest
+            vcarch: x64
+            test: true
+            examples: false
+            doc: false
+          - platform: msvc2017
+            os: windows-latest
+            vcarch: x64_x86
+            test: true
+            examples: false
+            doc: false
+          - platform: winrt_x64_msvc2017
+            os: windows-latest
+            vcarch: x64
+            test: false
+            examples: false
+            doc: false
+          - platform: winrt_x86_msvc2017
+            os: windows-latest
+            vcarch: x64_x86
+            test: false
+            examples: false
+            doc: false
+          - platform: winrt_armv7_msvc2017
+            os: windows-latest
+            vcarch: x64_arm
+            test: false
+            examples: false
+            doc: false
+          - platform: mingw73_64
+            os: windows-latest
+            test: true
+            examples: false
+            doc: false
+          - platform: mingw73_32
+            os: windows-latest
+            test: true
+            examples: false
+            doc: false
+          - platform: clang_64
+            os: macos-latest
+            test: true
+            examples: false
+            doc: false
+          - platform: ios
+            os: macos-latest
+            test: false
+            examples: false
+            doc: false
+
+    runs-on: ${{matrix.os}}
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          submodules: recursive
+      - uses: actions/setup-python@v1
+      - uses: mymindstorm/setup-emsdk@v1
+        if: matrix.platform == 'wasm_32'
+        with:
+          version: sdk-1.38.27-64bit
+      - uses: ilammy/msvc-dev-cmd@v1
+        if: contains(matrix.platform, 'msvc')
+        with:
+          arch: ${{matrix.vcarch}}
+          #toolset: 14.16
+          uwp: ${{contains(matrix.platform, 'winrt')}}
+      - uses: Skycoder42/action-setup-qt@master
+        with:
+          version: ${{matrix.version}}
+          platform: ${{matrix.platform}}
+          install-args: --verbose
+      - run: mkdir install
+      - name: qmake
+        run: |
+          qmake CONFIG+=install_ok QT_PLATFORM=${{matrix.platform}}
+          make qmake_all
+        working-directory: QtJsonSerializer
+      - name: make module
+        run: |
+          make
+          make INSTALL_ROOT="$PWD/../install" install
+        working-directory: QtJsonSerializer
+      - name: make tests
+        run: |
+          make all
+          make run-tests
+        if: matrix.test
+        working-directory: QtJsonSerializer
+        env:
+          MAKEFLAGS: -j1
+      - name: make examples
+        run: |
+          make sub-examples
+          cd examples && make INSTALL_ROOT="$PWD/../install" install
+        if: matrix.examples
+        working-directory: QtJsonSerializer
+      - name: make doc
+        run: |
+          make doxygen
+          cd doc && make INSTALL_ROOT="$PWD/../install" install
+        if: matrix.doc
+        working-directory: QtJsonSerializer
+      - uses: actions/upload-artifact@v1
+        with:
+          name: qtjsonserializer-${{matrix.platform}}-${{matrix.version}}
+          path: install
+          
+  build-no-converters:
+    env:
+      QDEP_CACHE_DIR: $HOME/.qdep-cache
+    strategy:
+      fail-fast: false
+      matrix:
+        version: 5.13.2
+        platform: 
+          - gcc_64
+          - msvc2017_64
+          - mingw73_64
+          - clang_64
+
+        include: 
+          - platform: gcc_64
+            os: ubuntu-latest
+          - platform: msvc2017_64
+            os: windows-latest
+          - platform: mingw73_64
+            os: windows-latest
+          - platform: clang_64
+            os: macos-latest
+
+    runs-on: ${{matrix.os}}
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          submodules: recursive
+      - uses: actions/setup-python@v1
+      - uses: ilammy/msvc-dev-cmd@v1
+        if: contains(matrix.platform, 'msvc')
+        with:
+          arch: x64
+          #toolset: 14.16
+      - uses: Skycoder42/action-setup-qt@master
+        with:
+          version: ${{matrix.version}}
+          platform: ${{matrix.platform}}
+          install-args: --verbose
+      - name: qmake
+        run: |
+          qmake CONFIG+=no_register_json_converters QT_PLATFORM=${{matrix.platform}}
+          make qmake_all
+        working-directory: QtJsonSerializer
+      - name: make module
+        run: make
+        working-directory: QtJsonSerializer
