@@ -3,7 +3,7 @@
 
 #include "typeconvertertestbase.h"
 
-#include <QtJsonSerializer/private/qjsonstdoptionalconverter_p.h>
+#include <QtJsonSerializer/private/stdoptionalconverter_p.h>
 
 #include <optional>
 using namespace QtJsonSerializer;
@@ -21,52 +21,52 @@ class OptionalConverterTest : public TypeConverterTestBase
 
 protected:
 	void initTest() override;
-	QJsonTypeConverter *converter() override;
+	TypeConverter *converter() override;
 	void addConverterData() override;
 	void addMetaData() override;
 	void addCommonSerData() override;
 	void addSerData() override;
 
 private:
-	QJsonStdOptionalConverter _converter;
+	StdOptionalConverter _converter;
 };
 
 void OptionalConverterTest::initTest()
 {
-	QJsonSerializer::registerOptionalConverters<int>();
-	QJsonSerializer::registerOptionalConverters<std::pair<int, bool>>();
-	QJsonSerializer::registerOptionalConverters<OpaqueDummy>();
+	JsonSerializer::registerOptionalConverters<int>();
+	JsonSerializer::registerOptionalConverters<std::pair<int, bool>>();
+	JsonSerializer::registerOptionalConverters<OpaqueDummy>();
 
 	QMetaType::registerEqualsComparator<std::optional<int>>();
 }
 
-QJsonTypeConverter *OptionalConverterTest::converter()
+TypeConverter *OptionalConverterTest::converter()
 {
 	return &_converter;
 }
 
 void OptionalConverterTest::addConverterData()
 {
-	QTest::newRow("optional") << static_cast<int>(QJsonTypeConverter::Standard);
+	QTest::newRow("optional") << static_cast<int>(TypeConverter::Standard);
 }
 
 void OptionalConverterTest::addMetaData()
 {
 	QTest::newRow("basic") << qMetaTypeId<std::optional<int>>()
-						   << static_cast<QCborTag>(QCborSerializer::NoTag)
+						   << static_cast<QCborTag>(CborSerializer::NoTag)
 						   << QCborValue::Double
 						   << true
-						   << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+						   << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("extended") << qMetaTypeId<std::optional<std::pair<int, bool>>>()
-							  << static_cast<QCborTag>(QCborSerializer::NoTag)
+							  << static_cast<QCborTag>(CborSerializer::NoTag)
 							  << QCborValue::Null
 							  << true
-							  << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+							  << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("invalid") << qMetaTypeId<QList<int>>()
-							 << static_cast<QCborTag>(QCborSerializer::NoTag)
+							 << static_cast<QCborTag>(CborSerializer::NoTag)
 							 << QCborValue::Integer
 							 << false
-							 << QJsonTypeConverter::DeserializationCapabilityResult::Negative;
+							 << TypeConverter::DeserializationCapabilityResult::Negative;
 }
 
 void OptionalConverterTest::addCommonSerData()

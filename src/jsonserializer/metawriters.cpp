@@ -1,0 +1,239 @@
+#include "metawriters.h"
+#include "metawriters_p.h"
+
+#include <QtCore/QRegularExpression>
+using namespace QtJsonSerializer;
+using namespace QtJsonSerializer::MetaWriters;
+
+void SequentialWriter::registerWriter(int metaTypeId, SequentialWriterFactory *factory)
+{
+	Q_ASSERT(factory);
+	QWriteLocker _{&MetaWritersPrivate::sequenceLock};
+	MetaWritersPrivate::sequenceFactories.insert(metaTypeId, factory);
+	MetaWritersPrivate::sequenceInfoCache.remove(metaTypeId);
+}
+
+bool SequentialWriter::canWrite(int metaTypeId)
+{
+	QReadLocker _{&MetaWritersPrivate::sequenceLock};
+	return MetaWritersPrivate::sequenceFactories.contains(metaTypeId);
+}
+
+QSharedPointer<SequentialWriter> SequentialWriter::getWriter(QVariant &data)
+{
+	QReadLocker _{&MetaWritersPrivate::sequenceLock};
+	const auto factory = MetaWritersPrivate::sequenceFactories.value(data.userType());
+	if (factory)
+		return factory->create(data.data());
+	else
+		return {};
+}
+
+SequentialWriter::SequenceInfo SequentialWriter::getInfo(int metaTypeId)
+{
+	QReadLocker rLocker{&MetaWritersPrivate::sequenceLock};
+	auto it = MetaWritersPrivate::sequenceInfoCache.find(metaTypeId);
+	if (it != MetaWritersPrivate::sequenceInfoCache.end())
+		return *it;
+	else {
+		rLocker.unlock();
+		QWriteLocker wLocker{&MetaWritersPrivate::sequenceLock};
+		const auto factory = MetaWritersPrivate::sequenceFactories.value(metaTypeId);
+		if (factory)
+			it = MetaWritersPrivate::sequenceInfoCache.insert(metaTypeId, factory->create(nullptr)->info());
+		else
+			it = MetaWritersPrivate::sequenceInfoCache.insert(metaTypeId, MetaWritersPrivate::tryParseSequenceInfo(metaTypeId));
+		return *it;
+	}
+}
+
+SequentialWriter::~SequentialWriter() = default;
+
+SequentialWriter::SequentialWriter() = default;
+
+
+
+SequentialWriterFactory::SequentialWriterFactory() = default;
+
+SequentialWriterFactory::~SequentialWriterFactory() = default;
+
+
+
+void AssociativeWriter::registerWriter(int metaTypeId, AssociativeWriterFactory *factory)
+{
+	Q_ASSERT(factory);
+	QWriteLocker _{&MetaWritersPrivate::associationLock};
+	MetaWritersPrivate::associationFactories.insert(metaTypeId, factory);
+	MetaWritersPrivate::associationInfoCache.remove(metaTypeId);
+}
+
+bool AssociativeWriter::canWrite(int metaTypeId)
+{
+	QReadLocker _{&MetaWritersPrivate::associationLock};
+	return MetaWritersPrivate::associationFactories.contains(metaTypeId);
+}
+
+QSharedPointer<AssociativeWriter> AssociativeWriter::getWriter(QVariant &data)
+{
+	QReadLocker _{&MetaWritersPrivate::associationLock};
+	const auto factory = MetaWritersPrivate::associationFactories.value(data.userType());
+	if (factory)
+		return factory->create(data.data());
+	else
+		return {};
+}
+
+AssociativeWriter::AssociationInfo AssociativeWriter::getInfo(int metaTypeId)
+{
+	QReadLocker rLocker{&MetaWritersPrivate::associationLock};
+	auto it = MetaWritersPrivate::associationInfoCache.find(metaTypeId);
+	if (it != MetaWritersPrivate::associationInfoCache.end())
+		return *it;
+	else {
+		rLocker.unlock();
+		QWriteLocker wLocker{&MetaWritersPrivate::associationLock};
+		const auto factory = MetaWritersPrivate::associationFactories.value(metaTypeId);
+		if (factory)
+			it = MetaWritersPrivate::associationInfoCache.insert(metaTypeId, factory->create(nullptr)->info());
+		else
+			it = MetaWritersPrivate::associationInfoCache.insert(metaTypeId, MetaWritersPrivate::tryParseAssociationInfo(metaTypeId));
+		return *it;
+	}
+}
+
+AssociativeWriter::~AssociativeWriter() = default;
+
+AssociativeWriter::AssociativeWriter() = default;
+
+
+
+AssociativeWriterFactory::AssociativeWriterFactory() = default;
+
+AssociativeWriterFactory::~AssociativeWriterFactory() = default;
+
+
+
+SequentialWriterImpl<QList, QVariant>::SequentialWriterImpl(QVariantList *data)
+	: _data{data}
+{}
+
+SequentialWriter::SequenceInfo SequentialWriterImpl<QList, QVariant>::info() const
+{
+	return {QMetaType::UnknownType, false};
+}
+
+void SequentialWriterImpl<QList, QVariant>::reserve(int size)
+{
+	_data->reserve(size);
+}
+
+void SequentialWriterImpl<QList, QVariant>::add(const QVariant &value)
+{
+	_data->append(value);
+}
+
+
+
+AssociativeWriterImpl<QMap, QString, QVariant>::AssociativeWriterImpl(QVariantMap *data)
+	: _data{data}
+{}
+
+AssociativeWriter::AssociationInfo AssociativeWriterImpl<QMap, QString, QVariant>::info() const
+{
+	return {QMetaType::QString, QMetaType::UnknownType};
+}
+
+void AssociativeWriterImpl<QMap, QString, QVariant>::add(const QVariant &key, const QVariant &value)
+{
+	_data->insert(key.toString(), value);
+}
+
+AssociativeWriterImpl<QHash, QString, QVariant>::AssociativeWriterImpl(QVariantHash *data)
+	: _data{data}
+{}
+
+AssociativeWriter::AssociationInfo AssociativeWriterImpl<QHash, QString, QVariant>::info() const
+{
+	return {QMetaType::QString, QMetaType::UnknownType};
+}
+
+void AssociativeWriterImpl<QHash, QString, QVariant>::add(const QVariant &key, const QVariant &value)
+{
+	_data->insert(key.toString(), value);
+}
+
+// ------------- private implementation -------------
+
+QReadWriteLock MetaWritersPrivate::sequenceLock;
+QHash<int, SequentialWriterFactory*> MetaWritersPrivate::sequenceFactories {
+	{QMetaType::QStringList, new SequentialWriterFactoryQStringList{}},
+	{QMetaType::QByteArrayList, new SequentialWriterFactoryQByteArrayList{}},
+	{QMetaType::QVariantList, new SequentialWriterFactoryQVariantList{}}
+};
+QHash<int, SequentialWriter::SequenceInfo> MetaWritersPrivate::sequenceInfoCache;
+
+QReadWriteLock MetaWritersPrivate::associationLock;
+QHash<int, AssociativeWriterFactory*> MetaWritersPrivate::associationFactories {
+	{QMetaType::QVariantMap, new AssociativeWriterFactoryQVariantMap{}},
+	{QMetaType::QVariantHash, new AssociativeWriterFactoryQVariantHash{}}
+};
+QHash<int, AssociativeWriter::AssociationInfo> MetaWritersPrivate::associationInfoCache;
+
+SequentialWriter::SequenceInfo MetaWritersPrivate::tryParseSequenceInfo(int metaTypeId)
+{
+	if (metaTypeId == QMetaType::QStringList)
+		return {QMetaType::QString, false};
+	else if (metaTypeId == QMetaType::QByteArrayList)
+		return {QMetaType::QByteArray, false};
+	else if (metaTypeId == QMetaType::QVariantList)
+		return {QMetaType::UnknownType, false};
+	else {
+		static const QRegularExpression listTypeRegex{
+			QStringLiteral(R"__(^((?![0-9_])(?:\w|::)*\w)\s*<\s*(.*?)\s*>$)__"),
+			QRegularExpression::UseUnicodePropertiesOption
+		};
+		auto match = listTypeRegex.match(QString::fromUtf8(QMetaType::typeName(metaTypeId)));
+		if (match.hasMatch()) {
+			return {
+				QMetaType::type(match.captured(2).toUtf8().trimmed()),
+				match.captured(1) == QStringLiteral("QSet")
+			};
+		}
+	}
+
+	return {QMetaType::UnknownType, false};
+}
+
+AssociativeWriter::AssociationInfo MetaWritersPrivate::tryParseAssociationInfo(int metaTypeId)
+{
+	if (metaTypeId == QMetaType::QVariantMap ||
+		metaTypeId == QMetaType::QVariantHash)
+		return {QMetaType::QString, QMetaType::UnknownType};
+	else {
+		static const QRegularExpression mapTypeRegex{
+			QStringLiteral(R"__(^(?![0-9_])(?:\w|::)*\w\s*<\s*(.*?)\s*>$)__"),
+			QRegularExpression::UseUnicodePropertiesOption
+		};
+		auto match = mapTypeRegex.match(QString::fromUtf8(QMetaType::typeName(metaTypeId)));
+		if (match.hasMatch()) {
+			// parse match, using <> and , rules
+			const auto matchStr = match.captured(1);
+			auto bCount = 0;
+			for (auto i = 0; i < matchStr.size(); ++i) {
+				const auto &c = matchStr[i];
+				if (c == QLatin1Char('<'))
+					++bCount;
+				else if (c == QLatin1Char('>'))
+					--bCount;
+				else if (bCount == 0 && c == QLatin1Char(',')) {
+					return {
+						QMetaType::type(matchStr.mid(0, i).trimmed().toUtf8()),
+						QMetaType::type(matchStr.mid(i + 1).trimmed().toUtf8())
+					};
+				}
+			}
+		}
+	}
+
+	return {QMetaType::UnknownType, QMetaType::UnknownType};
+}

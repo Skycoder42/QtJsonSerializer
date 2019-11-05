@@ -3,7 +3,7 @@
 
 #include "typeconvertertestbase.h"
 
-#include <QtJsonSerializer/private/qjsonmapconverter_p.h>
+#include <QtJsonSerializer/private/mapconverter_p.h>
 using namespace QtJsonSerializer;
 using namespace QtJsonSerializer::TypeConverters;
 
@@ -13,22 +13,22 @@ class MapConverterTest : public TypeConverterTestBase
 
 protected:
 	void initTest() override;
-	QJsonTypeConverter *converter() override;
+	TypeConverter *converter() override;
 	void addConverterData() override;
 	void addMetaData() override;
 	void addCommonSerData() override;
 	void addDeserData() override;
 
 private:
-	QJsonMapConverter _converter;
+	MapConverter _converter;
 };
 
 void MapConverterTest::initTest()
 {
-	QJsonSerializerBase::registerMapConverters<int, double>();
-	QJsonSerializerBase::registerMapConverters<QPair<int, int>, double>();
-	QJsonSerializerBase::registerMapConverters<QString, QList<int>>();
-	QJsonSerializerBase::registerMapConverters<QPair<int, int>, QPair<int, bool>>();
+	SerializerBase::registerMapConverters<int, double>();
+	SerializerBase::registerMapConverters<QPair<int, int>, double>();
+	SerializerBase::registerMapConverters<QString, QList<int>>();
+	SerializerBase::registerMapConverters<QPair<int, int>, QPair<int, bool>>();
 
 	QMetaType::registerEqualsComparator<QMap<QString, int>>();
 	QMetaType::registerEqualsComparator<QHash<QString, bool>>();
@@ -37,70 +37,70 @@ void MapConverterTest::initTest()
 	QMetaType::registerEqualsComparator<QMap<QPair<int, int>, double>>();
 }
 
-QJsonTypeConverter *MapConverterTest::converter()
+TypeConverter *MapConverterTest::converter()
 {
 	return &_converter;
 }
 
 void MapConverterTest::addConverterData()
 {
-	QTest::newRow("map") << static_cast<int>(QJsonTypeConverter::Standard);
+	QTest::newRow("map") << static_cast<int>(TypeConverter::Standard);
 }
 
 void MapConverterTest::addMetaData()
 {
 	QTest::newRow("int") << qMetaTypeId<QMap<QString, int>>()
-						 << static_cast<QCborTag>(QCborSerializer::NoTag)
+						 << static_cast<QCborTag>(CborSerializer::NoTag)
 						 << QCborValue::Map
 						 << true
-						 << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+						 << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("string") << qMetaTypeId<QMap<QString, QString>>()
-							<< static_cast<QCborTag>(QCborSerializer::ExplicitMap)
+							<< static_cast<QCborTag>(CborSerializer::ExplicitMap)
 							<< QCborValue::Map
 							<< true
-							<< QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+							<< TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("key") << qMetaTypeId<QMap<int, double>>()
-						 << static_cast<QCborTag>(QCborSerializer::ExplicitMap)
+						 << static_cast<QCborTag>(CborSerializer::ExplicitMap)
 						 << QCborValue::Map
 						 << true
-						 << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+						 << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("variant") << static_cast<int>(QMetaType::QVariantMap)
-							 << static_cast<QCborTag>(QCborSerializer::NoTag)
+							 << static_cast<QCborTag>(CborSerializer::NoTag)
 							 << QCborValue::Map
 							 << true
-							 << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+							 << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("list") << qMetaTypeId<QMap<QString, QList<int>>>()
-						  << static_cast<QCborTag>(QCborSerializer::NoTag)
+						  << static_cast<QCborTag>(CborSerializer::NoTag)
 						  << QCborValue::Map
 						  << true
-						  << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+						  << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("complex") << qMetaTypeId<QMap<QPair<int, int>, QPair<int, bool>>>()
-							 << static_cast<QCborTag>(QCborSerializer::NoTag)
+							 << static_cast<QCborTag>(CborSerializer::NoTag)
 							 << QCborValue::Map
 							 << true
-							 << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+							 << TypeConverter::DeserializationCapabilityResult::Positive;
 
 	QTest::newRow("hash") << qMetaTypeId<QHash<QString, int>>()
-						  << static_cast<QCborTag>(QCborSerializer::NoTag)
+						  << static_cast<QCborTag>(CborSerializer::NoTag)
 						  << QCborValue::Map
 						  << true
-						  << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+						  << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("hash.key") << qMetaTypeId<QHash<int, double>>()
-							  << static_cast<QCborTag>(QCborSerializer::NoTag)
+							  << static_cast<QCborTag>(CborSerializer::NoTag)
 							  << QCborValue::Map
 							  << true
-							  << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+							  << TypeConverter::DeserializationCapabilityResult::Positive;
 
 	QTest::newRow("invalid.pair") << qMetaTypeId<QPair<QString, int>>()
-								  << static_cast<QCborTag>(QCborSerializer::NoTag)
+								  << static_cast<QCborTag>(CborSerializer::NoTag)
 								  << QCborValue::Map
 								  << false
-								  << QJsonTypeConverter::DeserializationCapabilityResult::Negative;
+								  << TypeConverter::DeserializationCapabilityResult::Negative;
 	QTest::newRow("invalid.tag") << qMetaTypeId<QMap<QString, int>>()
-								 << static_cast<QCborTag>(QCborSerializer::GenericObject)
+								 << static_cast<QCborTag>(CborSerializer::GenericObject)
 								 << QCborValue::Map
 								 << true
-								 << QJsonTypeConverter::DeserializationCapabilityResult::WrongTag;
+								 << TypeConverter::DeserializationCapabilityResult::WrongTag;
 }
 
 void MapConverterTest::addCommonSerData()

@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
 	//to actually work polymorphic, we must register:
 	qRegisterMetaType<SuperSampleObject*>();
 
-	QJsonSerializer serializer;
+	JsonSerializer serializer;
 
 	qDebug() << "Serializing SampleGadget:";
 	SampleGadget gadget;

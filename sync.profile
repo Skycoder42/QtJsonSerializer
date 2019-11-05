@@ -2,4 +2,4 @@
 	"QtJsonSerializer" => "$basedir/src/jsonserializer",
 );
 
-$publicclassregexp = "^(?!_qjsonserializer_helpertypes::).+";
+$publicclassregexp = "^QtJsonSerializer::(?!__private::|MetaWriters::|TypeExtractors::).+";

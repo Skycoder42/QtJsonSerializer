@@ -3,7 +3,7 @@
 
 #include "typeconvertertestbase.h"
 
-#include <QtJsonSerializer/private/qjsonlistconverter_p.h>
+#include <QtJsonSerializer/private/listconverter_p.h>
 using namespace QtJsonSerializer;
 using namespace QtJsonSerializer::TypeConverters;
 
@@ -13,20 +13,20 @@ class ListConverterTest : public TypeConverterTestBase
 
 protected:
 	void initTest() override;
-	QJsonTypeConverter *converter() override;
+	TypeConverter *converter() override;
 	void addConverterData() override;
 	void addMetaData() override;
 	void addCommonSerData() override;
 	void addDeserData() override;
 
 private:
-	QJsonListConverter _converter;
+	ListConverter _converter;
 };
 
 void ListConverterTest::initTest()
 {
-	QJsonSerializerBase::registerListConverters<QList<bool>>();
-	QJsonSerializerBase::registerListConverters<QPair<int, bool>>();
+	SerializerBase::registerListConverters<QList<bool>>();
+	SerializerBase::registerListConverters<QPair<int, bool>>();
 
 	QMetaType::registerEqualsComparator<QList<int>>();
 	QMetaType::registerEqualsComparator<QLinkedList<int>>();
@@ -36,89 +36,89 @@ void ListConverterTest::initTest()
 	QMetaType::registerEqualsComparator<QSet<int>>();
 }
 
-QJsonTypeConverter *ListConverterTest::converter()
+TypeConverter *ListConverterTest::converter()
 {
 	return &_converter;
 }
 
 void ListConverterTest::addConverterData()
 {
-	QTest::newRow("list") << static_cast<int>(QJsonTypeConverter::Standard);
+	QTest::newRow("list") << static_cast<int>(TypeConverter::Standard);
 }
 
 void ListConverterTest::addMetaData()
 {
 	QTest::newRow("int") << qMetaTypeId<QList<int>>()
-						 << static_cast<QCborTag>(QCborSerializer::Homogeneous)
+						 << static_cast<QCborTag>(CborSerializer::Homogeneous)
 						 << QCborValue::Array
 						 << true
-						 << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+						 << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("string") << static_cast<int>(QMetaType::QStringList)
-							<< static_cast<QCborTag>(QCborSerializer::Homogeneous)
+							<< static_cast<QCborTag>(CborSerializer::Homogeneous)
 							<< QCborValue::Array
 							<< true
-							<< QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+							<< TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("bytearray") << static_cast<int>(QMetaType::QByteArrayList)
-							   << static_cast<QCborTag>(QCborSerializer::Homogeneous)
+							   << static_cast<QCborTag>(CborSerializer::Homogeneous)
 							   << QCborValue::Array
 							   << true
-							   << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+							   << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("variant") << static_cast<int>(QMetaType::QVariantList)
-							 << static_cast<QCborTag>(QCborSerializer::Homogeneous)
+							 << static_cast<QCborTag>(CborSerializer::Homogeneous)
 							 << QCborValue::Array
 							 << true
-							 << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+							 << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("list") << qMetaTypeId<QList<QList<bool>>>()
-						  << static_cast<QCborTag>(QCborSerializer::Homogeneous)
+						  << static_cast<QCborTag>(CborSerializer::Homogeneous)
 						  << QCborValue::Array
 						  << true
-						  << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+						  << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("pair") << qMetaTypeId<QList<QPair<int, bool>>>()
-						  << static_cast<QCborTag>(QCborSerializer::Homogeneous)
+						  << static_cast<QCborTag>(CborSerializer::Homogeneous)
 						  << QCborValue::Array
 						  << true
-						  << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+						  << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("untagged") << qMetaTypeId<QList<int>>()
-							  << static_cast<QCborTag>(QCborSerializer::NoTag)
+							  << static_cast<QCborTag>(CborSerializer::NoTag)
 							  << QCborValue::Array
 							  << true
-							  << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+							  << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("invalid") << static_cast<int>(QMetaType::UnknownType)
-							 << static_cast<QCborTag>(QCborSerializer::Homogeneous)
+							 << static_cast<QCborTag>(CborSerializer::Homogeneous)
 							 << QCborValue::Array
 							 << false
-							 << QJsonTypeConverter::DeserializationCapabilityResult::Negative;
+							 << TypeConverter::DeserializationCapabilityResult::Negative;
 
 	QTest::newRow("linkedList") << qMetaTypeId<QLinkedList<int>>()
-								<< static_cast<QCborTag>(QCborSerializer::Homogeneous)
+								<< static_cast<QCborTag>(CborSerializer::Homogeneous)
 								<< QCborValue::Array
 								<< true
-								<< QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+								<< TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("vector") << qMetaTypeId<QVector<int>>()
-							<< static_cast<QCborTag>(QCborSerializer::Homogeneous)
+							<< static_cast<QCborTag>(CborSerializer::Homogeneous)
 							<< QCborValue::Array
 							<< true
-							<< QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+							<< TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("stack") << qMetaTypeId<QStack<int>>()
-						   << static_cast<QCborTag>(QCborSerializer::Homogeneous)
+						   << static_cast<QCborTag>(CborSerializer::Homogeneous)
 						   << QCborValue::Array
 						   << true
-						   << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+						   << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("queue") << qMetaTypeId<QQueue<int>>()
-						   << static_cast<QCborTag>(QCborSerializer::Homogeneous)
+						   << static_cast<QCborTag>(CborSerializer::Homogeneous)
 						   << QCborValue::Array
 						   << true
-						   << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+						   << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("set.set") << qMetaTypeId<QSet<int>>()
-							 << static_cast<QCborTag>(QCborSerializer::Set)
+							 << static_cast<QCborTag>(CborSerializer::Set)
 							 << QCborValue::Array
 							 << true
-							 << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+							 << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("set.homogeneous") << qMetaTypeId<QSet<int>>()
-									 << static_cast<QCborTag>(QCborSerializer::Homogeneous)
+									 << static_cast<QCborTag>(CborSerializer::Homogeneous)
 									 << QCborValue::Array
 									 << true
-									 << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+									 << TypeConverter::DeserializationCapabilityResult::Positive;
 }
 
 void ListConverterTest::addCommonSerData()
@@ -213,7 +213,7 @@ void ListConverterTest::addCommonSerData()
 							 << static_cast<QObject*>(this)
 							 << qMetaTypeId<QSet<int>>()
 							 << QVariant::fromValue(s)
-							 << QCborValue{static_cast<QCborTag>(QCborSerializer::Set), QCborArray{2, 4, 6}}
+							 << QCborValue{static_cast<QCborTag>(CborSerializer::Set), QCborArray{2, 4, 6}}
 							 << QJsonValue{QJsonArray{2, 4, 6}};
 	}
 }
@@ -225,7 +225,7 @@ void ListConverterTest::addDeserData()
 									  << static_cast<QObject*>(this)
 									  << qMetaTypeId<QList<int>>()
 									  << QVariant::fromValue(QList<int>{1, 3, 5})
-									  << QCborValue{static_cast<QCborTag>(QCborSerializer::Homogeneous), QCborArray{2, 4, 6}}
+									  << QCborValue{static_cast<QCborTag>(CborSerializer::Homogeneous), QCborArray{2, 4, 6}}
 									  << QJsonValue{QJsonArray{2, 4, 6}};
 	QSet<int> s{1, 3, 5};
 	TestQ q;
@@ -237,7 +237,7 @@ void ListConverterTest::addDeserData()
 									<< static_cast<QObject*>(this)
 									<< qMetaTypeId<QSet<int>>()
 									<< QVariant::fromValue(s)
-									<< QCborValue{static_cast<QCborTag>(QCborSerializer::Homogeneous), QCborArray{2, 4, 6}}
+									<< QCborValue{static_cast<QCborTag>(CborSerializer::Homogeneous), QCborArray{2, 4, 6}}
 									<< QJsonValue{QJsonArray{2, 4, 6}};
 	QTest::newRow("unwritable") << QVariantHash{}
 								<< TestQ{}

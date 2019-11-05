@@ -3,7 +3,7 @@
 
 #include "typeconvertertestbase.h"
 
-#include <QtJsonSerializer/private/qjsonpairconverter_p.h>
+#include <QtJsonSerializer/private/pairconverter_p.h>
 using namespace QtJsonSerializer;
 using namespace QtJsonSerializer::TypeConverters;
 
@@ -13,7 +13,7 @@ class PairConverterTest : public TypeConverterTestBase
 
 protected:
 	void initTest() override;
-	QJsonTypeConverter *converter() override;
+	TypeConverter *converter() override;
 	void addConverterData() override;
 	void addMetaData() override;
 	void addCommonSerData() override;
@@ -21,17 +21,17 @@ protected:
 	void addDeserData() override;
 
 private:
-	QJsonPairConverter _converter;
+	PairConverter _converter;
 };
 
 void PairConverterTest::initTest()
 {
-	QJsonSerializer::registerPairConverters<QString, int>();
-	QJsonSerializer::registerPairConverters<int, int>();
-	QJsonSerializer::registerPairConverters<bool, int>();
-	QJsonSerializer::registerPairConverters<QList<int>, QList<int>>();
-	QJsonSerializer::registerPairConverters<QPair<int, int>, QPair<bool, bool>>();
-	QJsonSerializer::registerPairConverters<QMap<int, int>, QList<int>>();
+	JsonSerializer::registerPairConverters<QString, int>();
+	JsonSerializer::registerPairConverters<int, int>();
+	JsonSerializer::registerPairConverters<bool, int>();
+	JsonSerializer::registerPairConverters<QList<int>, QList<int>>();
+	JsonSerializer::registerPairConverters<QPair<int, int>, QPair<bool, bool>>();
+	JsonSerializer::registerPairConverters<QMap<int, int>, QList<int>>();
 
 	QMetaType::registerEqualsComparator<QPair<bool, int>>();
 	QMetaType::registerEqualsComparator<std::pair<bool, int>>();
@@ -40,63 +40,63 @@ void PairConverterTest::initTest()
 	QMetaType::registerEqualsComparator<QList<int>>();
 }
 
-QJsonTypeConverter *PairConverterTest::converter()
+TypeConverter *PairConverterTest::converter()
 {
 	return &_converter;
 }
 
 void PairConverterTest::addConverterData()
 {
-	QTest::newRow("pair") << static_cast<int>(QJsonTypeConverter::Standard);
+	QTest::newRow("pair") << static_cast<int>(TypeConverter::Standard);
 }
 
 void PairConverterTest::addMetaData()
 {
 	QTest::newRow("qt.tagged") << qMetaTypeId<QPair<QString, int>>()
-							   << static_cast<QCborTag>(QCborSerializer::Pair)
+							   << static_cast<QCborTag>(CborSerializer::Pair)
 							   << QCborValue::Array
 							   << true
-							   << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+							   << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("qt.untagged") << qMetaTypeId<QPair<int, int>>()
-								 << static_cast<QCborTag>(QCborSerializer::NoTag)
+								 << static_cast<QCborTag>(CborSerializer::NoTag)
 								 << QCborValue::Array
 								 << true
-								 << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+								 << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("qt.list") << qMetaTypeId<QPair<QList<int>, QList<int>>>()
-							 << static_cast<QCborTag>(QCborSerializer::Pair)
+							 << static_cast<QCborTag>(CborSerializer::Pair)
 							 << QCborValue::Array
 							 << true
-							 << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+							 << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("qt.pair") << qMetaTypeId<QPair<QPair<int, int>, QPair<bool, bool>>>()
-							 << static_cast<QCborTag>(QCborSerializer::Pair)
+							 << static_cast<QCborTag>(CborSerializer::Pair)
 							 << QCborValue::Array
 							 << true
-							 << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+							 << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("qt.map") << qMetaTypeId<QPair<QMap<int, int>, QList<int>>>()
-							<< static_cast<QCborTag>(QCborSerializer::Pair)
+							<< static_cast<QCborTag>(CborSerializer::Pair)
 							<< QCborValue::Array
 							<< true
-							<< QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+							<< TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("std.tagged") << qMetaTypeId<std::pair<QString, int>>()
-								<< static_cast<QCborTag>(QCborSerializer::Pair)
+								<< static_cast<QCborTag>(CborSerializer::Pair)
 								<< QCborValue::Array
 								<< true
-								<< QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+								<< TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("std.untagged") << qMetaTypeId<std::pair<int, int>>()
-								  << static_cast<QCborTag>(QCborSerializer::NoTag)
+								  << static_cast<QCborTag>(CborSerializer::NoTag)
 								  << QCborValue::Array
 								  << true
-								  << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+								  << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("invalid.type") << static_cast<int>(QMetaType::QVariantList)
-								  << static_cast<QCborTag>(QCborSerializer::NoTag)
+								  << static_cast<QCborTag>(CborSerializer::NoTag)
 								  << QCborValue::Array
 								  << false
-								  << QJsonTypeConverter::DeserializationCapabilityResult::Negative;
+								  << TypeConverter::DeserializationCapabilityResult::Negative;
 	QTest::newRow("invalid.tag") << qMetaTypeId<std::pair<int, int>>()
-								 << static_cast<QCborTag>(QCborSerializer::Homogeneous)
+								 << static_cast<QCborTag>(CborSerializer::Homogeneous)
 								 << QCborValue::Array
 								 << true
-								 << QJsonTypeConverter::DeserializationCapabilityResult::WrongTag;
+								 << TypeConverter::DeserializationCapabilityResult::WrongTag;
 }
 
 void PairConverterTest::addCommonSerData()
@@ -106,7 +106,7 @@ void PairConverterTest::addCommonSerData()
 							  << static_cast<QObject*>(this)
 							  << qMetaTypeId<QPair<bool, int>>()
 							  << QVariant::fromValue(QPair<bool, int>{true, 42})
-							  << QCborValue{static_cast<QCborTag>(QCborSerializer::Pair), QCborArray{42, true}}
+							  << QCborValue{static_cast<QCborTag>(CborSerializer::Pair), QCborArray{42, true}}
 							  << QJsonValue{QJsonArray{42, true}};
 	QTest::newRow("qt.advanced") << QVariantHash{}
 								 << TestQ{
@@ -116,14 +116,14 @@ void PairConverterTest::addCommonSerData()
 								 << static_cast<QObject*>(this)
 								 << qMetaTypeId<QPair<QMap<int, int>, QList<int>>>()
 								 << QVariant::fromValue(QPair<QMap<int, int>, QList<int>>{{{3, 7}}, {1, 2, 3}})
-								 << QCborValue{static_cast<QCborTag>(QCborSerializer::Pair), QCborArray{1, 2}}
+								 << QCborValue{static_cast<QCborTag>(CborSerializer::Pair), QCborArray{1, 2}}
 								 << QJsonValue{QJsonArray{1, 2}};
 	QTest::newRow("std") << QVariantHash{}
 						 << TestQ{{QMetaType::Bool, true, 42}, {QMetaType::Int, 42, true}}
 						 << static_cast<QObject*>(this)
 						 << qMetaTypeId<std::pair<bool, int>>()
 						 << QVariant::fromValue(std::pair<bool, int>{true, 42})
-						 << QCborValue{static_cast<QCborTag>(QCborSerializer::Pair), QCborArray{42, true}}
+						 << QCborValue{static_cast<QCborTag>(CborSerializer::Pair), QCborArray{42, true}}
 						 << QJsonValue{QJsonArray{42, true}};
 }
 
@@ -153,7 +153,7 @@ void PairConverterTest::addDeserData()
 							 << static_cast<QObject*>(nullptr)
 							 << qMetaTypeId<QPair<bool, int>>()
 							 << QVariant{}
-							 << QCborValue{static_cast<QCborTag>(QCborSerializer::Pair), QCborArray{true, 2, 3}}
+							 << QCborValue{static_cast<QCborTag>(CborSerializer::Pair), QCborArray{true, 2, 3}}
 							 << QJsonValue{QJsonArray{true, 2, 3}};
 }
 

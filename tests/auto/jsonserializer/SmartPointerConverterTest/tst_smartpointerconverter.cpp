@@ -3,7 +3,7 @@
 
 #include "typeconvertertestbase.h"
 
-#include <QtJsonSerializer/private/qjsonsmartpointerconverter_p.h>
+#include <QtJsonSerializer/private/smartpointerconverter_p.h>
 
 #include "testobject.h"
 using namespace QtJsonSerializer;
@@ -15,7 +15,7 @@ class SmartPointerConverterTest : public TypeConverterTestBase
 
 protected:
 	void initTest() override;
-	QJsonTypeConverter *converter() override;
+	TypeConverter *converter() override;
 	void addConverterData() override;
 	void addMetaData() override;
 	void addSerData() override;
@@ -23,7 +23,7 @@ protected:
 	bool compare(int type, QVariant &actual, QVariant &expected, const char *aName, const char *eName, const char *file, int line) override;
 
 private:
-	QJsonSmartPointerConverter _converter;
+	SmartPointerConverter _converter;
 };
 
 void SmartPointerConverterTest::initTest()
@@ -31,43 +31,43 @@ void SmartPointerConverterTest::initTest()
 	qRegisterMetaType<TestClass*>();
 	qRegisterMetaType<QSharedPointer<TestClass>>();
 
-	QJsonSerializerBase::registerPointerConverters<TestClass>();
-	QJsonSerializerBase::registerPointerConverters<TestObject>();
+	SerializerBase::registerPointerConverters<TestClass>();
+	SerializerBase::registerPointerConverters<TestObject>();
 }
 
-QJsonTypeConverter *SmartPointerConverterTest::converter()
+TypeConverter *SmartPointerConverterTest::converter()
 {
 	return &_converter;
 }
 
 void SmartPointerConverterTest::addConverterData()
 {
-	QTest::newRow("smart") << static_cast<int>(QJsonTypeConverter::Standard);
+	QTest::newRow("smart") << static_cast<int>(TypeConverter::Standard);
 }
 
 void SmartPointerConverterTest::addMetaData()
 {
 	QTest::newRow("class.shared") << qMetaTypeId<QSharedPointer<TestClass>>()
-								  << static_cast<QCborTag>(QCborSerializer::NoTag)
+								  << static_cast<QCborTag>(CborSerializer::NoTag)
 								  << QCborValue::Map
 								  << true
-								  << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+								  << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("object.shared") << qMetaTypeId<QSharedPointer<TestObject>>()
-								   << static_cast<QCborTag>(QCborSerializer::NoTag)
+								   << static_cast<QCborTag>(CborSerializer::NoTag)
 								   << QCborValue::Map
 								   << true
-								   << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+								   << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("object.ptr") << qMetaTypeId<QPointer<TestObject>>()
-								<< static_cast<QCborTag>(QCborSerializer::NoTag)
+								<< static_cast<QCborTag>(CborSerializer::NoTag)
 								<< QCborValue::Map
 								<< true
-								<< QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+								<< TypeConverter::DeserializationCapabilityResult::Positive;
 
 	QTest::newRow("invalid.raw") << qMetaTypeId<TestClass*>()
-								 << static_cast<QCborTag>(QCborSerializer::NoTag)
+								 << static_cast<QCborTag>(CborSerializer::NoTag)
 								 << QCborValue::Map
 								 << false
-								 << QJsonTypeConverter::DeserializationCapabilityResult::Negative;
+								 << TypeConverter::DeserializationCapabilityResult::Negative;
 }
 
 void SmartPointerConverterTest::addSerData()

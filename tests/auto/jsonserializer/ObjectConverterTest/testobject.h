@@ -2,7 +2,7 @@
 #define TESTOBJECT_H
 
 #include <QObject>
-#include <QtJsonSerializer/QJsonSerializer>
+#include <QtJsonSerializer/SerializerBase>
 
 class TestObject : public QObject
 {

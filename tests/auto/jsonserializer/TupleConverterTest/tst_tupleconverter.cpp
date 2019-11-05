@@ -3,7 +3,7 @@
 
 #include "typeconvertertestbase.h"
 
-#include <QtJsonSerializer/private/qjsonstdtupleconverter_p.h>
+#include <QtJsonSerializer/private/stdtupleconverter_p.h>
 using namespace QtJsonSerializer;
 using namespace QtJsonSerializer::TypeConverters;
 
@@ -21,7 +21,7 @@ class TupleConverterTest : public TypeConverterTestBase
 
 protected:
 	void initTest() override;
-	QJsonTypeConverter *converter() override;
+	TypeConverter *converter() override;
 	void addConverterData() override;
 	void addMetaData() override;
 	void addCommonSerData() override;
@@ -29,50 +29,50 @@ protected:
 	void addDeserData() override;
 
 private:
-	QJsonStdTupleConverter _converter;
+	StdTupleConverter _converter;
 };
 
 void TupleConverterTest::initTest()
 {
-	QJsonSerializer::registerTupleConverters<int, bool, double>();
-	QJsonSerializer::registerTupleConverters<QList<int>, QPair<bool, bool>, QMap<QString, double>>();
-	QJsonSerializer::registerTupleConverters<OpaqueDummy>();
+	JsonSerializer::registerTupleConverters<int, bool, double>();
+	JsonSerializer::registerTupleConverters<QList<int>, QPair<bool, bool>, QMap<QString, double>>();
+	JsonSerializer::registerTupleConverters<OpaqueDummy>();
 
 	QMetaType::registerEqualsComparator<TestTpl1>();
 }
 
-QJsonTypeConverter *TupleConverterTest::converter()
+TypeConverter *TupleConverterTest::converter()
 {
 	return &_converter;
 }
 
 void TupleConverterTest::addConverterData()
 {
-	QTest::newRow("tuple") << static_cast<int>(QJsonTypeConverter::Standard);
+	QTest::newRow("tuple") << static_cast<int>(TypeConverter::Standard);
 }
 
 void TupleConverterTest::addMetaData()
 {
 	QTest::newRow("basic") << qMetaTypeId<std::tuple<int, bool, double>>()
-						   << static_cast<QCborTag>(QCborSerializer::Tuple)
+						   << static_cast<QCborTag>(CborSerializer::Tuple)
 						   << QCborValue::Array
 						   << true
-						   << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+						   << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("extended") << qMetaTypeId<std::tuple<QList<int>, QPair<bool, bool>, QMap<QString, double>>>()
-							  << static_cast<QCborTag>(QCborSerializer::NoTag)
+							  << static_cast<QCborTag>(CborSerializer::NoTag)
 							  << QCborValue::Array
 							  << true
-							  << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+							  << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("invalid") << static_cast<int>(QMetaType::QVariant)
-							 << static_cast<QCborTag>(QCborSerializer::NoTag)
+							 << static_cast<QCborTag>(CborSerializer::NoTag)
 							 << QCborValue::Null
 							 << false
-							 << QJsonTypeConverter::DeserializationCapabilityResult::Negative;
+							 << TypeConverter::DeserializationCapabilityResult::Negative;
 	QTest::newRow("wrongtag") << qMetaTypeId<std::tuple<int, bool, double>>()
-							  << static_cast<QCborTag>(QCborSerializer::Homogeneous)
+							  << static_cast<QCborTag>(CborSerializer::Homogeneous)
 							  << QCborValue::Array
 							  << true
-							  << QJsonTypeConverter::DeserializationCapabilityResult::WrongTag;
+							  << TypeConverter::DeserializationCapabilityResult::WrongTag;
 }
 
 void TupleConverterTest::addCommonSerData()
@@ -82,7 +82,7 @@ void TupleConverterTest::addCommonSerData()
 						   << static_cast<QObject*>(this)
 						   << qMetaTypeId<std::tuple<int, bool, double>>()
 						   << QVariant::fromValue(std::make_tuple(5, true, 5.5))
-						   << QCborValue{static_cast<QCborTag>(QCborSerializer::Tuple), QCborArray{1, 2, 3}}
+						   << QCborValue{static_cast<QCborTag>(CborSerializer::Tuple), QCborArray{1, 2, 3}}
 						   << QJsonValue{QJsonArray{1, 2, 3}};
 }
 
@@ -104,7 +104,7 @@ void TupleConverterTest::addDeserData()
 							 << static_cast<QObject*>(nullptr)
 							 << qMetaTypeId<TestTpl1>()
 							 << QVariant{}
-							 << QCborValue{static_cast<QCborTag>(QCborSerializer::Tuple), QCborArray{1, true, 3.4, 4}}
+							 << QCborValue{static_cast<QCborTag>(CborSerializer::Tuple), QCborArray{1, true, 3.4, 4}}
 							 << QJsonValue{QJsonArray{1, true, 3.4, 4}};
 }
 

@@ -3,7 +3,7 @@
 
 #include "typeconvertertestbase.h"
 
-#include <QtJsonSerializer/private/qjsonstdvariantconverter_p.h>
+#include <QtJsonSerializer/private/stdvariantconverter_p.h>
 
 #include <variant>
 using namespace QtJsonSerializer;
@@ -23,7 +23,7 @@ class VariantConverterTest : public TypeConverterTestBase
 
 protected:
 	void initTest() override;
-	QJsonTypeConverter *converter() override;
+	TypeConverter *converter() override;
 	void addConverterData() override;
 	void addMetaData() override;
 	void addCommonSerData() override;
@@ -31,47 +31,47 @@ protected:
 	void addDeserData() override;
 
 private:
-	QJsonStdVariantConverter _converter;
+	StdVariantConverter _converter;
 };
 
 
 
 void VariantConverterTest::initTest()
 {
-	QJsonSerializer::registerVariantConverters<int, bool, double>();
-	QJsonSerializer::registerVariantConverters<QList<int>, QPair<bool, bool>, QMap<QString, double>>();
-	QJsonSerializer::registerVariantConverters<OpaqueDummy>();
+	JsonSerializer::registerVariantConverters<int, bool, double>();
+	JsonSerializer::registerVariantConverters<QList<int>, QPair<bool, bool>, QMap<QString, double>>();
+	JsonSerializer::registerVariantConverters<OpaqueDummy>();
 
 	QMetaType::registerEqualsComparator<TestVar1>();
 }
 
-QJsonTypeConverter *VariantConverterTest::converter()
+TypeConverter *VariantConverterTest::converter()
 {
 	return &_converter;
 }
 
 void VariantConverterTest::addConverterData()
 {
-	QTest::newRow("variant") << static_cast<int>(QJsonTypeConverter::Standard);
+	QTest::newRow("variant") << static_cast<int>(TypeConverter::Standard);
 }
 
 void VariantConverterTest::addMetaData()
 {
 	QTest::newRow("basic") << qMetaTypeId<std::variant<int, bool, double>>()
-						   << static_cast<QCborTag>(QCborSerializer::NoTag)
+						   << static_cast<QCborTag>(CborSerializer::NoTag)
 						   << QCborValue::Double
 						   << true
-						   << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+						   << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("extended") << qMetaTypeId<std::variant<QList<int>, QPair<bool, bool>, QMap<QString, double>>>()
-							  << static_cast<QCborTag>(QCborSerializer::NoTag)
+							  << static_cast<QCborTag>(CborSerializer::NoTag)
 							  << QCborValue::Array
 							  << true
-							  << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+							  << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("invalid") << static_cast<int>(QMetaType::QVariant)
-							 << static_cast<QCborTag>(QCborSerializer::NoTag)
+							 << static_cast<QCborTag>(CborSerializer::NoTag)
 							 << QCborValue::Null
 							 << false
-							 << QJsonTypeConverter::DeserializationCapabilityResult::Negative;
+							 << TypeConverter::DeserializationCapabilityResult::Negative;
 }
 
 void VariantConverterTest::addCommonSerData()

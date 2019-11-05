@@ -3,7 +3,7 @@
 
 #include "typeconvertertestbase.h"
 
-#include <QtJsonSerializer/private/qjsoncborconverter_p.h>
+#include <QtJsonSerializer/private/cborconverter_p.h>
 using namespace QtJsonSerializer;
 using namespace QtJsonSerializer::TypeConverters;
 
@@ -12,112 +12,112 @@ class CborConverterTest : public TypeConverterTestBase
 	Q_OBJECT
 
 protected:
-	QJsonTypeConverter *converter() override;
+	TypeConverter *converter() override;
 	void addConverterData() override;
 	void addMetaData() override;
 	void addCommonSerData() override;
 
 private:
-	QJsonCborConverter _converter;
+	CborConverter _converter;
 };
 
-QJsonTypeConverter *CborConverterTest::converter()
+TypeConverter *CborConverterTest::converter()
 {
 	return &_converter;
 }
 
 void CborConverterTest::addConverterData()
 {
-	QTest::newRow("cbor") << static_cast<int>(QJsonTypeConverter::Standard);
+	QTest::newRow("cbor") << static_cast<int>(TypeConverter::Standard);
 }
 
 void CborConverterTest::addMetaData()
 {
 	QTest::newRow("cbor.value") << static_cast<int>(QMetaType::QCborValue)
-								<< static_cast<QCborTag>(QCborSerializer::NoTag)
+								<< static_cast<QCborTag>(CborSerializer::NoTag)
 								<< QCborValue::Double
 								<< true
-								<< QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+								<< TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("cbor.map") << static_cast<int>(QMetaType::QCborMap)
-							  << static_cast<QCborTag>(QCborSerializer::NoTag)
+							  << static_cast<QCborTag>(CborSerializer::NoTag)
 							  << QCborValue::Map
 							  << true
-							  << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+							  << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("cbor.map.invalid") << static_cast<int>(QMetaType::QCborMap)
-									  << static_cast<QCborTag>(QCborSerializer::NoTag)
+									  << static_cast<QCborTag>(CborSerializer::NoTag)
 									  << QCborValue::Array
 									  << true
-									  << QJsonTypeConverter::DeserializationCapabilityResult::Negative;
+									  << TypeConverter::DeserializationCapabilityResult::Negative;
 	QTest::newRow("cbor.array") << static_cast<int>(QMetaType::QCborArray)
-								<< static_cast<QCborTag>(QCborSerializer::NoTag)
+								<< static_cast<QCborTag>(CborSerializer::NoTag)
 								<< QCborValue::Array
 								<< true
-								<< QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+								<< TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("cbor.array.invalid") << static_cast<int>(QMetaType::QCborArray)
-										<< static_cast<QCborTag>(QCborSerializer::NoTag)
+										<< static_cast<QCborTag>(CborSerializer::NoTag)
 										<< QCborValue::Double
 										<< true
-										<< QJsonTypeConverter::DeserializationCapabilityResult::Negative;
+										<< TypeConverter::DeserializationCapabilityResult::Negative;
 	QTest::newRow("cbor.simple") << static_cast<int>(QMetaType::QCborSimpleType)
-								 << static_cast<QCborTag>(QCborSerializer::NoTag)
+								 << static_cast<QCborTag>(CborSerializer::NoTag)
 								 << QCborValue::False
 								 << true
-								 << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+								 << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("cbor.simple.invalid") << static_cast<int>(QMetaType::QCborSimpleType)
-										 << static_cast<QCborTag>(QCborSerializer::NoTag)
+										 << static_cast<QCborTag>(CborSerializer::NoTag)
 										 << QCborValue::String
 										 << true
-										 << QJsonTypeConverter::DeserializationCapabilityResult::Negative;
+										 << TypeConverter::DeserializationCapabilityResult::Negative;
 	QTest::newRow("json.value") << static_cast<int>(QMetaType::QJsonValue)
-								<< static_cast<QCborTag>(QCborSerializer::NoTag)
+								<< static_cast<QCborTag>(CborSerializer::NoTag)
 								<< QCborValue::Double
 								<< true
-								<< QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+								<< TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("json.value.invalid") << static_cast<int>(QMetaType::QJsonValue)
-										<< static_cast<QCborTag>(QCborSerializer::NoTag)
+										<< static_cast<QCborTag>(CborSerializer::NoTag)
 										<< QCborValue::Integer
 										<< true
-										<< QJsonTypeConverter::DeserializationCapabilityResult::Negative;
+										<< TypeConverter::DeserializationCapabilityResult::Negative;
 	QTest::newRow("json.obj") << static_cast<int>(QMetaType::QJsonObject)
-							  << static_cast<QCborTag>(QCborSerializer::NoTag)
+							  << static_cast<QCborTag>(CborSerializer::NoTag)
 							  << QCborValue::Map
 							  << true
-							  << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+							  << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("json.obj.invalid") << static_cast<int>(QMetaType::QJsonObject)
-									  << static_cast<QCborTag>(QCborSerializer::NoTag)
+									  << static_cast<QCborTag>(CborSerializer::NoTag)
 									  << QCborValue::Array
 									  << true
-									  << QJsonTypeConverter::DeserializationCapabilityResult::Negative;
+									  << TypeConverter::DeserializationCapabilityResult::Negative;
 	QTest::newRow("json.array") << static_cast<int>(QMetaType::QJsonArray)
-								<< static_cast<QCborTag>(QCborSerializer::NoTag)
+								<< static_cast<QCborTag>(CborSerializer::NoTag)
 								<< QCborValue::Array
 								<< true
-								<< QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+								<< TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("json.array.invalid") << static_cast<int>(QMetaType::QJsonArray)
-										<< static_cast<QCborTag>(QCborSerializer::NoTag)
+										<< static_cast<QCborTag>(CborSerializer::NoTag)
 										<< QCborValue::Double
 										<< true
-										<< QJsonTypeConverter::DeserializationCapabilityResult::Negative;
+										<< TypeConverter::DeserializationCapabilityResult::Negative;
 	QTest::newRow("json.doc.obj") << static_cast<int>(QMetaType::QJsonDocument)
-								  << static_cast<QCborTag>(QCborSerializer::NoTag)
+								  << static_cast<QCborTag>(CborSerializer::NoTag)
 								  << QCborValue::Map
 								  << true
-								  << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+								  << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("json.doc.array") << static_cast<int>(QMetaType::QJsonDocument)
-									<< static_cast<QCborTag>(QCborSerializer::NoTag)
+									<< static_cast<QCborTag>(CborSerializer::NoTag)
 									<< QCborValue::Array
 									<< true
-									<< QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+									<< TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("json.doc.null") << static_cast<int>(QMetaType::QJsonDocument)
-								   << static_cast<QCborTag>(QCborSerializer::NoTag)
+								   << static_cast<QCborTag>(CborSerializer::NoTag)
 								   << QCborValue::Null
 								   << true
-								   << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+								   << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("json.doc.invalid") << static_cast<int>(QMetaType::QJsonDocument)
-									  << static_cast<QCborTag>(QCborSerializer::NoTag)
+									  << static_cast<QCborTag>(CborSerializer::NoTag)
 									  << QCborValue::String
 									  << true
-									  << QJsonTypeConverter::DeserializationCapabilityResult::Negative;
+									  << TypeConverter::DeserializationCapabilityResult::Negative;
 }
 
 void CborConverterTest::addCommonSerData()

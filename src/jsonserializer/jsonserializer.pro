@@ -3,30 +3,30 @@ TARGET = QtJsonSerializer
 QT = core core-private
 
 HEADERS += \
-	qcborserializer.h \
-	qcborserializer_p.h \
-	qcontainerwriters.h \
-	qcontainerwriters_p.h \
-	qjsonserializer.h \
-	qjsonserializer_p.h \
-	qjsonserializerbase.h \
-	qjsonserializerbase_p.h \
-	qjsonserializerexception.h \
-	qjsontypeextractors.h \
+	cborserializer.h \
+	cborserializer_p.h \
+	exception.h \
+	exception_p.h \
+	exceptioncontext_p.h \
+	jsonserializer.h \
+	jsonserializer_p.h \
+	metawriters.h \
+	metawriters_p.h \
 	qtjsonserializer_global.h \
-	qjsonserializer_helpertypes.h \
-	qjsontypeconverter.h \
-	qjsonexceptioncontext_p.h \
-	qjsonserializerexception_p.h
+	qtjsonserializer_helpertypes.h \
+	serializerbase.h \
+	serializerbase_p.h \
+	typeconverter.h \
+	typeextractors.h
 
 SOURCES += \
-	qcborserializer.cpp \
-	qcontainerwriters.cpp \
-	qjsonserializer.cpp \
-	qjsonserializerbase.cpp \
-	qjsonserializerexception.cpp \
-	qjsontypeconverter.cpp \
-	qjsonexceptioncontext.cpp
+	cborserializer.cpp \
+	exception.cpp \
+	exceptioncontext.cpp \
+	jsonserializer.cpp \
+	metawriters.cpp \
+	serializerbase.cpp \
+	typeconverter.cpp
 
 include(typeconverters/typeconverters.pri)
 

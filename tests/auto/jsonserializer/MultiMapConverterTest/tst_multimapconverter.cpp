@@ -3,7 +3,7 @@
 
 #include "typeconvertertestbase.h"
 
-#include <QtJsonSerializer/private/qjsonmultimapconverter_p.h>
+#include <QtJsonSerializer/private/multimapconverter_p.h>
 using namespace QtJsonSerializer;
 using namespace QtJsonSerializer::TypeConverters;
 
@@ -41,7 +41,7 @@ class MultiMapConverterTest : public TypeConverterTestBase
 protected:
 	void initTest() override;
 	bool compare(int type, QVariant &actual, QVariant &expected, const char *aName, const char *eName, const char *file, int line) override;
-	QJsonTypeConverter *converter() override;
+	TypeConverter *converter() override;
 	void addConverterData() override;
 	void addMetaData() override;
 	void addCommonSerData() override;
@@ -49,14 +49,14 @@ protected:
 	void addDeserData() override;
 
 private:
-	QJsonMultiMapConverter _converter;
+	MultiMapConverter _converter;
 };
 
 void MultiMapConverterTest::initTest()
 {
-	QJsonSerializerBase::registerMapConverters<int, int>();
-	QJsonSerializerBase::registerMapConverters<QString, QList<bool>>();
-	QJsonSerializerBase::registerMapConverters<int, QPair<int, bool>>();
+	SerializerBase::registerMapConverters<int, int>();
+	SerializerBase::registerMapConverters<QString, QList<bool>>();
+	SerializerBase::registerMapConverters<int, QPair<int, bool>>();
 
 	QMetaType::registerEqualsComparator<QMultiMap<QString, int>>();
 	QMetaType::registerEqualsComparator<QMultiHash<QString, int>>();
@@ -67,86 +67,86 @@ bool MultiMapConverterTest::compare(int type, QVariant &actual, QVariant &expect
 	return TypeConverterTestBase::compare(type, actual, expected, aName, eName, file, line);
 }
 
-QJsonTypeConverter *MultiMapConverterTest::converter()
+TypeConverter *MultiMapConverterTest::converter()
 {
 	return &_converter;
 }
 
 void MultiMapConverterTest::addConverterData()
 {
-	QTest::newRow("multimap") << static_cast<int>(QJsonTypeConverter::Standard);
+	QTest::newRow("multimap") << static_cast<int>(TypeConverter::Standard);
 }
 
 void MultiMapConverterTest::addMetaData()
 {
 	QTest::newRow("int") << qMetaTypeId<QMultiMap<QString, int>>()
-						 << static_cast<QCborTag>(QCborSerializer::NoTag)
+						 << static_cast<QCborTag>(CborSerializer::NoTag)
 						 << QCborValue::Map
 						 << true
-						 << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+						 << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("string") << qMetaTypeId<QMultiMap<QString, QString>>()
-							<< static_cast<QCborTag>(QCborSerializer::MultiMap)
+							<< static_cast<QCborTag>(CborSerializer::MultiMap)
 							<< QCborValue::Map
 							<< true
-							<< QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+							<< TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("object") << qMetaTypeId<QMultiMap<QString, QObject*>>()
-							<< static_cast<QCborTag>(QCborSerializer::ExplicitMap)
+							<< static_cast<QCborTag>(CborSerializer::ExplicitMap)
 							<< QCborValue::Map
 							<< true
-							<< QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+							<< TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("list") << qMetaTypeId<QMultiMap<QString, QList<bool>>>()
-						  << static_cast<QCborTag>(QCborSerializer::NoTag)
+						  << static_cast<QCborTag>(CborSerializer::NoTag)
 						  << QCborValue::Array
 						  << true
-						  << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+						  << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("pair") << qMetaTypeId<QMultiMap<int, QPair<int, bool>>>()
-						  << static_cast<QCborTag>(QCborSerializer::MultiMap)
+						  << static_cast<QCborTag>(CborSerializer::MultiMap)
 						  << QCborValue::Array
 						  << true
-						  << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+						  << TypeConverter::DeserializationCapabilityResult::Positive;
 
 	QTest::newRow("hash") << qMetaTypeId<QMultiHash<QString, int>>()
-						  << static_cast<QCborTag>(QCborSerializer::ExplicitMap)
+						  << static_cast<QCborTag>(CborSerializer::ExplicitMap)
 						  << QCborValue::Array
 						  << true
-						  << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+						  << TypeConverter::DeserializationCapabilityResult::Positive;
 
 	QTest::newRow("invalid.pair") << qMetaTypeId<QPair<QString, int>>()
-								  << static_cast<QCborTag>(QCborSerializer::NoTag)
+								  << static_cast<QCborTag>(CborSerializer::NoTag)
 								  << QCborValue::Map
 								  << false
-								  << QJsonTypeConverter::DeserializationCapabilityResult::Negative;
+								  << TypeConverter::DeserializationCapabilityResult::Negative;
 	QTest::newRow("invalid.tag") << qMetaTypeId<QMultiMap<int, int>>()
-								 << static_cast<QCborTag>(QCborSerializer::ConstructedObject)
+								 << static_cast<QCborTag>(CborSerializer::ConstructedObject)
 								 << QCborValue::Map
 								 << true
-								 << QJsonTypeConverter::DeserializationCapabilityResult::WrongTag;
+								 << TypeConverter::DeserializationCapabilityResult::WrongTag;
 }
 
 void MultiMapConverterTest::addCommonSerData()
 {
-	QTest::newRow("empty.map") << QVariantHash{{QStringLiteral("multiMapMode"), QVariant::fromValue(QJsonSerializer::MultiMapMode::Map)}}
+	QTest::newRow("empty.map") << QVariantHash{{QStringLiteral("multiMapMode"), QVariant::fromValue(JsonSerializer::MultiMapMode::Map)}}
 							   << TestQ{}
 							   << static_cast<QObject*>(nullptr)
 							   << qMetaTypeId<QMultiMap<QString, int>>()
 							   << QVariant::fromValue(QMultiMap<QString, int>{})
-							   << QCborValue{static_cast<QCborTag>(QCborSerializer::MultiMap), QCborMap{}}
+							   << QCborValue{static_cast<QCborTag>(CborSerializer::MultiMap), QCborMap{}}
 							   << QJsonValue{QJsonObject{}};
-	QTest::newRow("empty.arr") << QVariantHash{{QStringLiteral("multiMapMode"), QVariant::fromValue(QJsonSerializer::MultiMapMode::List)}}
+	QTest::newRow("empty.arr") << QVariantHash{{QStringLiteral("multiMapMode"), QVariant::fromValue(JsonSerializer::MultiMapMode::List)}}
 							   << TestQ{}
 							   << static_cast<QObject*>(nullptr)
 							   << qMetaTypeId<QMultiMap<QString, int>>()
 							   << QVariant::fromValue(QMultiMap<QString, int>{})
-							   << QCborValue{static_cast<QCborTag>(QCborSerializer::MultiMap), QCborArray{}}
+							   << QCborValue{static_cast<QCborTag>(CborSerializer::MultiMap), QCborArray{}}
 							   << QJsonValue{QJsonArray{}};
-	QTest::newRow("empty.dense") << QVariantHash{{QStringLiteral("multiMapMode"), QVariant::fromValue(QJsonSerializer::MultiMapMode::DenseMap)}}
+	QTest::newRow("empty.dense") << QVariantHash{{QStringLiteral("multiMapMode"), QVariant::fromValue(JsonSerializer::MultiMapMode::DenseMap)}}
 								 << TestQ{}
 								 << static_cast<QObject*>(nullptr)
 								 << qMetaTypeId<QMultiMap<QString, int>>()
 								 << QVariant::fromValue(QMultiMap<QString, int>{})
-								 << QCborValue{static_cast<QCborTag>(QCborSerializer::MultiMap), QCborMap{}}
+								 << QCborValue{static_cast<QCborTag>(CborSerializer::MultiMap), QCborMap{}}
 								 << QJsonValue{QJsonObject{}};
-	QTest::newRow("filled.map.arr") << QVariantHash{{QStringLiteral("multiMapMode"), QVariant::fromValue(QJsonSerializer::MultiMapMode::List)}}
+	QTest::newRow("filled.map.arr") << QVariantHash{{QStringLiteral("multiMapMode"), QVariant::fromValue(JsonSerializer::MultiMapMode::List)}}
 									<< TestQ{
 										   {QMetaType::QString, QStringLiteral("a"), QStringLiteral("A")},
 										   {QMetaType::QString, QStringLiteral("a"), QStringLiteral("A")},
@@ -162,7 +162,7 @@ void MultiMapConverterTest::addCommonSerData()
 										   {QStringLiteral("a"), 1},
 										   {QStringLiteral("b"), 5}
 									   })
-									<< QCborValue{static_cast<QCborTag>(QCborSerializer::MultiMap), QCborArray{
+									<< QCborValue{static_cast<QCborTag>(CborSerializer::MultiMap), QCborArray{
 											QCborArray{QStringLiteral("A"), 2},
 											QCborArray{QStringLiteral("A"), 4},
 											QCborArray{QStringLiteral("B"), 6}
@@ -172,7 +172,7 @@ void MultiMapConverterTest::addCommonSerData()
 											QJsonArray{QStringLiteral("A"), 4},
 											QJsonArray{QStringLiteral("B"), 6}
 										}};
-	QTest::newRow("filled.hash") << QVariantHash{{QStringLiteral("multiMapMode"), QVariant::fromValue(QJsonSerializer::MultiMapMode::Map)}}
+	QTest::newRow("filled.hash") << QVariantHash{{QStringLiteral("multiMapMode"), QVariant::fromValue(JsonSerializer::MultiMapMode::Map)}}
 								 << TestQ{
 										{QMetaType::QString, QStringLiteral("a"), QStringLiteral("A")},
 										{QMetaType::Int, 1, 2}
@@ -182,7 +182,7 @@ void MultiMapConverterTest::addCommonSerData()
 								 << QVariant::fromValue(QMultiHash<QString, int>{
 										{QStringLiteral("a"), 1}
 									})
-								 << QCborValue{static_cast<QCborTag>(QCborSerializer::MultiMap), QCborMap{
+								 << QCborValue{static_cast<QCborTag>(CborSerializer::MultiMap), QCborMap{
 										{QStringLiteral("A"), QCborArray{2}}
 									}}
 								 << QJsonValue{QJsonObject{
@@ -192,7 +192,7 @@ void MultiMapConverterTest::addCommonSerData()
 
 void MultiMapConverterTest::addSerData()
 {
-	QTest::newRow("filled.map.map") << QVariantHash{{QStringLiteral("multiMapMode"), QVariant::fromValue(QJsonSerializer::MultiMapMode::Map)}}
+	QTest::newRow("filled.map.map") << QVariantHash{{QStringLiteral("multiMapMode"), QVariant::fromValue(JsonSerializer::MultiMapMode::Map)}}
 									<< TestQ{
 										   {QMetaType::QString, QStringLiteral("a"), QStringLiteral("A")},
 										   {QMetaType::QString, QStringLiteral("a"), QStringLiteral("A")},
@@ -208,7 +208,7 @@ void MultiMapConverterTest::addSerData()
 										   {QStringLiteral("a"), 1},
 										   {QStringLiteral("b"), 5}
 									   })
-									<< QCborValue{static_cast<QCborTag>(QCborSerializer::MultiMap), QCborMap{
+									<< QCborValue{static_cast<QCborTag>(CborSerializer::MultiMap), QCborMap{
 																										{QStringLiteral("A"), QCborArray{2, 4}},
 																										{QStringLiteral("B"), QCborArray{6}}
 																									}}
@@ -216,7 +216,7 @@ void MultiMapConverterTest::addSerData()
 										   {QStringLiteral("A"), QJsonArray{2, 4}},
 										   {QStringLiteral("B"), QJsonArray{6}}
 									   }};
-	QTest::newRow("filled.map.dense") << QVariantHash{{QStringLiteral("multiMapMode"), QVariant::fromValue(QJsonSerializer::MultiMapMode::DenseMap)}}
+	QTest::newRow("filled.map.dense") << QVariantHash{{QStringLiteral("multiMapMode"), QVariant::fromValue(JsonSerializer::MultiMapMode::DenseMap)}}
 									  << TestQ{
 											 {QMetaType::QString, QStringLiteral("a"), QStringLiteral("A")},
 											 {QMetaType::QString, QStringLiteral("a"), QStringLiteral("A")},
@@ -232,7 +232,7 @@ void MultiMapConverterTest::addSerData()
 											 {QStringLiteral("a"), 1},
 											 {QStringLiteral("b"), 5}
 										 })
-									  << QCborValue{static_cast<QCborTag>(QCborSerializer::MultiMap), QCborMap{
+									  << QCborValue{static_cast<QCborTag>(CborSerializer::MultiMap), QCborMap{
 																										  {QStringLiteral("A"), QCborArray{2, 4}},
 																										  {QStringLiteral("B"), 6}
 																									  }}
@@ -244,7 +244,7 @@ void MultiMapConverterTest::addSerData()
 
 void MultiMapConverterTest::addDeserData()
 {
-	QTest::newRow("filled.map.map") << QVariantHash{{QStringLiteral("multiMapMode"), QVariant::fromValue(QJsonSerializer::MultiMapMode::Map)}}
+	QTest::newRow("filled.map.map") << QVariantHash{{QStringLiteral("multiMapMode"), QVariant::fromValue(JsonSerializer::MultiMapMode::Map)}}
 									<< TestQ{
 										   {QMetaType::QString, QStringLiteral("a"), QStringLiteral("A")},
 										   {QMetaType::QString, QStringLiteral("b"), QStringLiteral("B")},
@@ -259,7 +259,7 @@ void MultiMapConverterTest::addDeserData()
 										   {QStringLiteral("a"), 1},
 										   {QStringLiteral("b"), 5}
 									   })
-									<< QCborValue{static_cast<QCborTag>(QCborSerializer::MultiMap), QCborMap{
+									<< QCborValue{static_cast<QCborTag>(CborSerializer::MultiMap), QCborMap{
 																										{QStringLiteral("A"), QCborArray{2, 4}},
 																										{QStringLiteral("B"), QCborArray{6}}
 																									}}
@@ -267,7 +267,7 @@ void MultiMapConverterTest::addDeserData()
 										   {QStringLiteral("A"), QJsonArray{2, 4}},
 										   {QStringLiteral("B"), QJsonArray{6}}
 									   }};
-	QTest::newRow("filled.map.dense") << QVariantHash{{QStringLiteral("multiMapMode"), QVariant::fromValue(QJsonSerializer::MultiMapMode::DenseMap)}}
+	QTest::newRow("filled.map.dense") << QVariantHash{{QStringLiteral("multiMapMode"), QVariant::fromValue(JsonSerializer::MultiMapMode::DenseMap)}}
 									  << TestQ{
 											 {QMetaType::QString, QStringLiteral("a"), QStringLiteral("A")},
 											 {QMetaType::QString, QStringLiteral("b"), QStringLiteral("B")},
@@ -282,7 +282,7 @@ void MultiMapConverterTest::addDeserData()
 											 {QStringLiteral("a"), 1},
 											 {QStringLiteral("b"), 5}
 										 })
-									  << QCborValue{static_cast<QCborTag>(QCborSerializer::MultiMap), QCborMap{
+									  << QCborValue{static_cast<QCborTag>(CborSerializer::MultiMap), QCborMap{
 																										  {QStringLiteral("A"), QCborArray{2, 4}},
 																										  {QStringLiteral("B"), 6}
 																									  }}
@@ -290,7 +290,7 @@ void MultiMapConverterTest::addDeserData()
 											 {QStringLiteral("A"), QJsonArray{2, 4}},
 											 {QStringLiteral("B"), 6}
 										 }};
-	QTest::newRow("unmatchable.array") << QVariantHash{{QStringLiteral("multiMapMode"), QVariant::fromValue(QJsonSerializer::MultiMapMode::List)}}
+	QTest::newRow("unmatchable.array") << QVariantHash{{QStringLiteral("multiMapMode"), QVariant::fromValue(JsonSerializer::MultiMapMode::List)}}
 									   << TestQ{}
 									   << static_cast<QObject*>(nullptr)
 									   << qMetaTypeId<QMultiMap<QString, int>>()
@@ -301,14 +301,14 @@ void MultiMapConverterTest::addDeserData()
 									   << QJsonValue{QJsonArray{
 											  QJsonArray{QStringLiteral("a"), 4, false}
 										  }};
-	QTest::newRow("unmatchable.int") << QVariantHash{{QStringLiteral("multiMapMode"), QVariant::fromValue(QJsonSerializer::MultiMapMode::List)}}
+	QTest::newRow("unmatchable.int") << QVariantHash{{QStringLiteral("multiMapMode"), QVariant::fromValue(JsonSerializer::MultiMapMode::List)}}
 									 << TestQ{}
 									 << static_cast<QObject*>(nullptr)
 									 << qMetaTypeId<QMultiMap<QString, int>>()
 									 << QVariant{}
 									 << QCborValue{QCborArray{5}}
 									 << QJsonValue{QJsonArray{5}};
-	QTest::newRow("unwritable") << QVariantHash{{QStringLiteral("multiMapMode"), QVariant::fromValue(QJsonSerializer::MultiMapMode::Map)}}
+	QTest::newRow("unwritable") << QVariantHash{{QStringLiteral("multiMapMode"), QVariant::fromValue(JsonSerializer::MultiMapMode::Map)}}
 								<< TestQ{}
 								<< static_cast<QObject*>(nullptr)
 								<< qMetaTypeId<QMultiMap<QString, OpaqueDummy>>()

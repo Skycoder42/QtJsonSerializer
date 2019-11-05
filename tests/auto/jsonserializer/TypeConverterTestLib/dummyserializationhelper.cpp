@@ -1,10 +1,10 @@
 #include "dummyserializationhelper.h"
 #include <QtTest>
-#include <QJsonSerializerException>
-#include <QCborSerializer>
+#include <QtJsonSerializer/Exception>
+#include <QtJsonSerializer/CborSerializer>
 
-#include <QtJsonSerializer/private/qjsonserializerbase_p.h>
-#include <QtJsonSerializer/private/qjsonexceptioncontext_p.h>
+#include <QtJsonSerializer/private/serializerbase_p.h>
+#include <QtJsonSerializer/private/exceptioncontext_p.h>
 using namespace QtJsonSerializer;
 
 DummySerializationHelper::DummySerializationHelper(QObject *parent) :
@@ -25,13 +25,13 @@ QCborTag DummySerializationHelper::typeTag(int metaTypeId) const
 {
 	Q_UNUSED(metaTypeId)
 	return properties.value(QStringLiteral("typeTag"),
-							QVariant::fromValue(static_cast<QCborTag>(QCborSerializer::NoTag)))
+							QVariant::fromValue(static_cast<QCborTag>(CborSerializer::NoTag)))
 			.value<QCborTag>();
 }
 
-QSharedPointer<const QJsonTypeExtractor> DummySerializationHelper::extractor(int metaTypeId) const
+QSharedPointer<const TypeExtractor> DummySerializationHelper::extractor(int metaTypeId) const
 {
-	return QJsonSerializerBasePrivate::extractors.get(metaTypeId);
+	return SerializerBasePrivate::extractors.get(metaTypeId);
 }
 
 QCborValue DummySerializationHelper::serializeSubtype(const QMetaProperty &property, const QVariant &value) const
@@ -41,9 +41,9 @@ QCborValue DummySerializationHelper::serializeSubtype(const QMetaProperty &prope
 
 QCborValue DummySerializationHelper::serializeSubtype(int propertyType, const QVariant &value, const QByteArray &traceHint) const
 {
-	QJsonExceptionContext ctx{propertyType, traceHint};
+	ExceptionContext ctx{propertyType, traceHint};
 	if (serData.isEmpty())
-		throw QJsonSerializationException{"No more data to serialize was expected"};
+		throw SerializationException{"No more data to serialize was expected"};
 
 	for (auto i = 0; i < serData.size(); ++i) {
 		if (serData[i].typeId != propertyType)
@@ -58,10 +58,10 @@ QCborValue DummySerializationHelper::serializeSubtype(int propertyType, const QV
 		if (ok)
 			return data.cbor;
 		else
-			throw QJsonSerializationException{"Data comparison failed"};
+			throw SerializationException{"Data comparison failed"};
 	}
 
-	throw QJsonSerializationException{QByteArrayLiteral("Unable to find data of type ") + QMetaType::typeName(propertyType) + QByteArrayLiteral(" in serData")};
+	throw SerializationException{QByteArrayLiteral("Unable to find data of type ") + QMetaType::typeName(propertyType) + QByteArrayLiteral(" in serData")};
 }
 
 QVariant DummySerializationHelper::deserializeSubtype(const QMetaProperty &property, const QCborValue &value, QObject *parent) const
@@ -71,9 +71,9 @@ QVariant DummySerializationHelper::deserializeSubtype(const QMetaProperty &prope
 
 QVariant DummySerializationHelper::deserializeSubtype(int propertyType, const QCborValue &value, QObject *parent, const QByteArray &traceHint) const
 {
-	QJsonExceptionContext ctx{propertyType, traceHint};
+	ExceptionContext ctx{propertyType, traceHint};
 	if (deserData.isEmpty())
-		throw QJsonDeserializationException{"No more data to deserialize was expected"};
+		throw DeserializationException{"No more data to deserialize was expected"};
 
 	for(auto i = 0; i < deserData.size(); i++) {
 		if (deserData[i].typeId != propertyType)
@@ -90,8 +90,8 @@ QVariant DummySerializationHelper::deserializeSubtype(int propertyType, const QC
 		if (ok)
 			return data.variant;
 		else
-			throw QJsonDeserializationException{"Data comparison failed"};
+			throw DeserializationException{"Data comparison failed"};
 	}
 
-	throw QJsonDeserializationException{QByteArrayLiteral("Unable to find data of type ") + QMetaType::typeName(propertyType) + QByteArrayLiteral(" in deserData")};
+	throw DeserializationException{QByteArrayLiteral("Unable to find data of type ") + QMetaType::typeName(propertyType) + QByteArrayLiteral(" in deserData")};
 }

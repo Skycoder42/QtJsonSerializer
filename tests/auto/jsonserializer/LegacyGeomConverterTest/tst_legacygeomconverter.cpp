@@ -3,7 +3,7 @@
 
 #include "typeconvertertestbase.h"
 
-#include <QtJsonSerializer/private/qjsonlegacygeomconverter_p.h>
+#include <QtJsonSerializer/private/legacygeomconverter_p.h>
 using namespace QtJsonSerializer;
 using namespace QtJsonSerializer::TypeConverters;
 
@@ -12,97 +12,97 @@ class LegacyGeomConverterTest : public TypeConverterTestBase
 	Q_OBJECT
 
 protected:
-	QJsonTypeConverter *converter() override;
+	TypeConverter *converter() override;
 	void addConverterData() override;
 	void addMetaData() override;
 	void addSerData() override;
 	void addDeserData() override;
 
 private:
-	QJsonLegacyGeomConverter _converter;
+	LegacyGeomConverter _converter;
 };
 
-QJsonTypeConverter *LegacyGeomConverterTest::converter()
+TypeConverter *LegacyGeomConverterTest::converter()
 {
 	return &_converter;
 }
 
 void LegacyGeomConverterTest::addConverterData()
 {
-	QTest::newRow("geom") << static_cast<int>(QJsonTypeConverter::VeryLow);
+	QTest::newRow("geom") << static_cast<int>(TypeConverter::VeryLow);
 }
 
 void LegacyGeomConverterTest::addMetaData()
 {
 	QTest::newRow("size") << static_cast<int>(QMetaType::QSize)
-						  << static_cast<QCborTag>(QCborSerializer::NoTag)
+						  << static_cast<QCborTag>(CborSerializer::NoTag)
 						  << QCborValue::Map
 						  << true
-						  << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+						  << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("sizef") << static_cast<int>(QMetaType::QSizeF)
-						   << static_cast<QCborTag>(QCborSerializer::NoTag)
+						   << static_cast<QCborTag>(CborSerializer::NoTag)
 						   << QCborValue::Map
 						   << true
-						   << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+						   << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("size.invalid") << static_cast<int>(QMetaType::QSize)
-								  << static_cast<QCborTag>(QCborSerializer::NoTag)
+								  << static_cast<QCborTag>(CborSerializer::NoTag)
 								  << QCborValue::Array
 								  << true
-								  << QJsonTypeConverter::DeserializationCapabilityResult::Negative;
+								  << TypeConverter::DeserializationCapabilityResult::Negative;
 
 	QTest::newRow("point") << static_cast<int>(QMetaType::QPoint)
-						   << static_cast<QCborTag>(QCborSerializer::NoTag)
+						   << static_cast<QCborTag>(CborSerializer::NoTag)
 						   << QCborValue::Map
 						   << true
-						   << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+						   << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("pointf") << static_cast<int>(QMetaType::QPointF)
-							<< static_cast<QCborTag>(QCborSerializer::NoTag)
+							<< static_cast<QCborTag>(CborSerializer::NoTag)
 							<< QCborValue::Map
 							<< true
-							<< QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+							<< TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("point.invalid") << static_cast<int>(QMetaType::QPoint)
-								   << static_cast<QCborTag>(QCborSerializer::NoTag)
+								   << static_cast<QCborTag>(CborSerializer::NoTag)
 								   << QCborValue::Array
 								   << true
-								   << QJsonTypeConverter::DeserializationCapabilityResult::Negative;
+								   << TypeConverter::DeserializationCapabilityResult::Negative;
 
 	QTest::newRow("line") << static_cast<int>(QMetaType::QLine)
-						  << static_cast<QCborTag>(QCborSerializer::NoTag)
+						  << static_cast<QCborTag>(CborSerializer::NoTag)
 						  << QCborValue::Map
 						  << true
-						  << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+						  << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("linef") << static_cast<int>(QMetaType::QLine)
-						   << static_cast<QCborTag>(QCborSerializer::NoTag)
+						   << static_cast<QCborTag>(CborSerializer::NoTag)
 						   << QCborValue::Map
 						   << true
-						   << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+						   << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("line.invalid") << static_cast<int>(QMetaType::QLine)
-								  << static_cast<QCborTag>(QCborSerializer::NoTag)
+								  << static_cast<QCborTag>(CborSerializer::NoTag)
 								  << QCborValue::Array
 								  << true
-								  << QJsonTypeConverter::DeserializationCapabilityResult::Negative;
+								  << TypeConverter::DeserializationCapabilityResult::Negative;
 
 	QTest::newRow("rect") << static_cast<int>(QMetaType::QRect)
-						  << static_cast<QCborTag>(QCborSerializer::NoTag)
+						  << static_cast<QCborTag>(CborSerializer::NoTag)
 						  << QCborValue::Map
 						  << true
-						  << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+						  << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("rectf") << static_cast<int>(QMetaType::QRectF)
-						   << static_cast<QCborTag>(QCborSerializer::NoTag)
+						   << static_cast<QCborTag>(CborSerializer::NoTag)
 						   << QCborValue::Map
 						   << true
-						   << QJsonTypeConverter::DeserializationCapabilityResult::Positive;
+						   << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("rect.invalid") << static_cast<int>(QMetaType::QRect)
-								  << static_cast<QCborTag>(QCborSerializer::NoTag)
+								  << static_cast<QCborTag>(CborSerializer::NoTag)
 								  << QCborValue::Array
 								  << true
-								  << QJsonTypeConverter::DeserializationCapabilityResult::Negative;
+								  << TypeConverter::DeserializationCapabilityResult::Negative;
 
 	QTest::newRow("invalid.type") << static_cast<int>(QMetaType::QMatrix)
-								  << static_cast<QCborTag>(QCborSerializer::NoTag)
+								  << static_cast<QCborTag>(CborSerializer::NoTag)
 								  << QCborValue::Array
 								  << false
-								  << QJsonTypeConverter::DeserializationCapabilityResult::Negative;
+								  << TypeConverter::DeserializationCapabilityResult::Negative;
 }
 
 void LegacyGeomConverterTest::addSerData()

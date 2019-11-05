@@ -21,7 +21,7 @@ public:
 protected:
 	DummySerializationHelper * const helper;
 
-	virtual QtJsonSerializer::QJsonTypeConverter *converter() = 0;
+	virtual QtJsonSerializer::TypeConverter *converter() = 0;
 
 	virtual void initTest();
 	virtual void cleanupTest();
@@ -58,6 +58,6 @@ private Q_SLOTS:
 
 Q_DECLARE_METATYPE(QCborValue::Type)
 Q_DECLARE_METATYPE(QJsonValue::Type)
-Q_DECLARE_METATYPE(QtJsonSerializer::QJsonTypeConverter::DeserializationCapabilityResult)
+Q_DECLARE_METATYPE(QtJsonSerializer::TypeConverter::DeserializationCapabilityResult)
 
 #endif // TYPECONVERTERTESTLIB_H
