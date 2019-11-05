@@ -158,7 +158,7 @@ jobs:
       - uses: actions/upload-artifact@v1
         with:
           name: qtjsonserializer-${{matrix.platform}}-${{matrix.version}}
-          path: install
+          path: install_link
 
   build-no-converters:
     env:
