@@ -29,114 +29,40 @@ jobs:
         include:
           - platform: gcc_64
             os: ubuntu-latest
-            cachebase: /opt/hostedtoolcache
-            test: true
-            examples: true
-            doc: true
-            testflags: "-j1"
           - platform: android_arm64_v8a
             os: ubuntu-latest
-            cachebase: /opt/hostedtoolcache
-            test: false
-            examples: false
-            doc: false
-            testflags: "-j1"
           - platform: android_x86_64
             os: ubuntu-latest
-            cachebase: /opt/hostedtoolcache
-            test: false
-            examples: false
-            doc: false
-            testflags: "-j1"
           - platform: android_armv7
             os: ubuntu-latest
-            cachebase: /opt/hostedtoolcache
-            test: false
-            examples: false
-            doc: false
-            testflags: "-j1"
           - platform: android_x86
             os: ubuntu-latest
-            cachebase: /opt/hostedtoolcache
-            test: false
-            examples: false
-            doc: false
-            testflags: "-j1"
           - platform: wasm_32
             os: ubuntu-latest
-            cachebase: /opt/hostedtoolcache
-            test: false
-            examples: false
-            doc: false
-            testflags: "-j1"
+            emsdk: sdk-1.38.27-64bit
           - platform: msvc2017_64
             os: windows-latest
-            cachebase: C:/hostedtoolcache/windows
             vcarch: x64
-            test: true
-            examples: false
-            doc: false
-            testflags: ""
           - platform: msvc2017
             os: windows-latest
-            cachebase: C:/hostedtoolcache/windows
             vcarch: x64_x86
-            test: true
-            examples: false
-            doc: false
-            testflags: ""
           - platform: winrt_x64_msvc2017
             os: windows-latest
-            cachebase: C:/hostedtoolcache/windows
             vcarch: x64
-            test: false
-            examples: false
-            doc: false
-            testflags: ""
           - platform: winrt_x86_msvc2017
             os: windows-latest
-            cachebase: C:/hostedtoolcache/windows
             vcarch: x64_x86
-            test: false
-            examples: false
-            doc: false
-            testflags: ""
           - platform: winrt_armv7_msvc2017
             os: windows-latest
-            cachebase: C:/hostedtoolcache/windows
             vcarch: x64_arm
-            test: false
-            examples: false
-            doc: false
-            testflags: ""
           - platform: mingw73_64
             os: windows-latest
-            cachebase: C:/hostedtoolcache/windows
-            test: true
-            examples: false
-            doc: false
-            testflags: "-j1"
           - platform: mingw73_32
             os: windows-latest
-            cachebase: C:/hostedtoolcache/windows
-            test: true
-            examples: false
-            doc: false
-            testflags: "-j1"
           - platform: clang_64
             os: macos-latest
-            cachebase: /Users/runner/hostedtoolcache
-            test: true
-            examples: false
-            doc: false
-            testflags: "-j1"
           - platform: ios
             os: macos-latest
-            cachebase: /Users/runner/hostedtoolcache
-            test: false
-            examples: false
-            doc: false
-            testflags: "-j1"
 
     runs-on: ${{matrix.os}}
     steps:
@@ -147,25 +73,19 @@ jobs:
       - uses: mymindstorm/setup-emsdk@v1
         if: matrix.platform == 'wasm_32'
         with:
-          version: sdk-1.38.27-64bit
+          version: $${{matrix.emsdk}}
       - uses: ilammy/msvc-dev-cmd@v1
         if: contains(matrix.platform, 'msvc')
         with:
           arch: ${{matrix.vcarch}}
           #toolset: 14.16
           uwp: ${{contains(matrix.platform, 'winrt')}}
-#      - uses: actions/cache@v1
-#        id: cache
-#        with:
-#          path: ${{matrix.cachebase}}/qt/${{matrix.version}}/${{matrix.platform}}
-#          key: qt-${{matrix.version}}-${{matrix.platform}}
       - uses: Skycoder42/action-setup-qt@master
         id: setup_qt
         with:
           version: ${{matrix.version}}
           platform: ${{matrix.platform}}
           install-args: --verbose
-          cached: ${{matrix.cachebase}}/qt/${{matrix.version}}/${{matrix.platform}}
       - name: qmake
         run: |
           qmake CONFIG+=install_ok QT_PLATFORM=${{matrix.platform}}
@@ -175,20 +95,20 @@ jobs:
           make
           make INSTALL_ROOT="${{steps.setup_qt.outputs.installdir}}" install
       - name: make tests
+        if: steps.setup_qt.outputs.tests
         run: |
           make all
-          make ${{matrix.testflags}} run-tests
-        if: matrix.test
+          make ${{steps.setup_qt.outputs.testflags}} run-tests
       - name: make examples
+        if: matrix.platform == 'gcc_64'
         run: |
           make sub-examples
           cd examples && make INSTALL_ROOT="${{steps.setup_qt.outputs.installdir}}" install
-        if: matrix.examples
       - name: make doc
+        if: matrix.platform == 'gcc_64'
         run: |
           make doxygen
           cd doc && make INSTALL_ROOT="${{steps.setup_qt.outputs.installdir}}" install
-        if: matrix.doc
       - uses: actions/upload-artifact@v1
         with:
           name: qtjsonserializer-${{matrix.platform}}-${{matrix.version}}
@@ -211,16 +131,13 @@ jobs:
         include:
           - platform: gcc_64
             os: ubuntu-latest
-            cachebase: /opt/hostedtoolcache
           - platform: msvc2017_64
             os: windows-latest
-            cachebase: C:/hostedtoolcache/windows
+            vcarch: x64
           - platform: mingw73_64
             os: windows-latest
-            cachebase: C:/hostedtoolcache/windows
           - platform: clang_64
             os: macos-latest
-            cachebase: /Users/runner/hostedtoolcache
 
     runs-on: ${{matrix.os}}
     steps:
@@ -231,22 +148,26 @@ jobs:
       - uses: ilammy/msvc-dev-cmd@v1
         if: contains(matrix.platform, 'msvc')
         with:
-          arch: x64
+          arch: ${{matrix.vcarch}}
           #toolset: 14.16
       - uses: actions/cache@v1
         id: cache
         with:
-          path: ${{matrix.cachebase}}/qt/${{matrix.version}}/${{matrix.platform}}
-          key: qt-${{matrix.version}}-${{matrix.platform}}
+          path: qt-cache
+          key: qt-${{matrix.version}}-${{matrix.platform}}-test
       - uses: Skycoder42/action-setup-qt@master
         with:
           version: ${{matrix.version}}
           platform: ${{matrix.platform}}
           install-args: --verbose
-      - run: qmake -query
+          cachedir: qt-cache
       - name: qmake
         run: |
           qmake CONFIG+=no_register_json_converters QT_PLATFORM=${{matrix.platform}}
           make qmake_all
       - name: make module
         run: make
+      - name: prepare qt for caching
+        if: steps.cache.outputs.cache-hit != 'true'
+        shell: python
+        run: -c 'import shutil; shutil.copytree("${{steps.setup_qt.outputs.qtdir}}", "qt-cache", symlinks=True)'
