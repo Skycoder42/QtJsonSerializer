@@ -412,7 +412,9 @@ void SerializerTest::testDeserialization_data()
 
 	addCommonData();
 
-	QTest::newRow("font.short") << QVariant::fromValue(QFont{QStringLiteral("MyScript Sans")})
+	QVariant fontVariant{QStringLiteral("MyScript Sans")};
+	QVERIFY(fontVariant.convert(QMetaType::QFont));
+	QTest::newRow("font.short") << fontVariant
 								<< QCborValue{static_cast<QCborTag>(CborSerializer::Font), QStringLiteral("MyScript Sans")}
 								<< QJsonValue{QStringLiteral("MyScript Sans")}
 								<< true
@@ -730,13 +732,8 @@ void SerializerTest::addCommonData()
 								<< true
 								<< QVariantHash{};
 	QTest::newRow("font.full") << QVariant::fromValue(QFont{QStringLiteral("MyScript Sans")})
-#ifdef Q_OS_MACOS
-							   << QCborValue{static_cast<QCborTag>(CborSerializer::Font), QStringLiteral("MyScript Sans,13,-1,5,50,0,0,0,0,0")}
-							   << QJsonValue{QStringLiteral("MyScript Sans,13,-1,5,50,0,0,0,0,0")}
-#else
 							   << QCborValue{static_cast<QCborTag>(CborSerializer::Font), QStringLiteral("MyScript Sans,12,-1,5,50,0,0,0,0,0")}
 							   << QJsonValue{QStringLiteral("MyScript Sans,12,-1,5,50,0,0,0,0,0")}
-#endif
 							   << true
 							   << QVariantHash{};
 
