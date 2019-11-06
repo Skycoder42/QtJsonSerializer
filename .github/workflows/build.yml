@@ -154,11 +154,11 @@ jobs:
           arch: ${{matrix.vcarch}}
           #toolset: 14.16
           uwp: ${{contains(matrix.platform, 'winrt')}}
-      - uses: actions/cache@v1
-        id: cache
-        with:
-          path: ${{matrix.cachebase}}/qt/${{matrix.version}}/${{matrix.platform}}
-          key: qt-${{matrix.version}}-${{matrix.platform}}
+#      - uses: actions/cache@v1
+#        id: cache
+#        with:
+#          path: ${{matrix.cachebase}}/qt/${{matrix.version}}/${{matrix.platform}}
+#          key: qt-${{matrix.version}}-${{matrix.platform}}
       - uses: Skycoder42/action-setup-qt@master
         id: setup_qt
         with:
@@ -243,6 +243,7 @@ jobs:
           version: ${{matrix.version}}
           platform: ${{matrix.platform}}
           install-args: --verbose
+      - run: qmake -query
       - name: qmake
         run: |
           qmake CONFIG+=no_register_json_converters QT_PLATFORM=${{matrix.platform}}
