@@ -10,7 +10,7 @@ Q_LOGGING_CATEGORY(QtJsonSerializer::MetaWriters::logAsocWriter, "qt.jsonseriali
 
 void SequentialWriter::registerWriter(int metaTypeId, SequentialWriterFactory *factory)
 {
-	Q_ASSERT(factory);
+	Q_ASSERT_X(factory, Q_FUNC_INFO, "factory must not be null!");
 	QWriteLocker _{&MetaWritersPrivate::sequenceLock};
 	MetaWritersPrivate::sequenceFactories.insert(metaTypeId, factory);
 	MetaWritersPrivate::sequenceInfoCache.remove(metaTypeId);
@@ -31,7 +31,7 @@ QSharedPointer<SequentialWriter> SequentialWriter::getWriter(QVariant &data)
 		qCDebug(logSeqWriter) << "Found factory for data of type" << data.userType();
 		return factory->create(data.data());
 	} else {
-		qCDebug(logSeqWriter) << "Unable to find factory for data of type" << data.userType();
+		qCWarning(logSeqWriter) << "Unable to find factory for data of type" << data.userType();
 		return {};
 	}
 }
@@ -74,7 +74,7 @@ SequentialWriterFactory::~SequentialWriterFactory() = default;
 
 void AssociativeWriter::registerWriter(int metaTypeId, AssociativeWriterFactory *factory)
 {
-	Q_ASSERT(factory);
+	Q_ASSERT_X(factory, Q_FUNC_INFO, "factory must not be null!");
 	QWriteLocker _{&MetaWritersPrivate::associationLock};
 	MetaWritersPrivate::associationFactories.insert(metaTypeId, factory);
 	MetaWritersPrivate::associationInfoCache.remove(metaTypeId);
@@ -95,7 +95,7 @@ QSharedPointer<AssociativeWriter> AssociativeWriter::getWriter(QVariant &data)
 		qCDebug(logAsocWriter) << "Found factory for data of type" << data.userType();
 		return factory->create(data.data());
 	} else {
-		qCDebug(logAsocWriter) << "Unable to find factory for data of type" << data.userType();
+		qCWarning(logAsocWriter) << "Unable to find factory for data of type" << data.userType();
 		return {};
 	}
 }

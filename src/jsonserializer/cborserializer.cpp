@@ -5,7 +5,7 @@
 #include <QtCore/QCborStreamWriter>
 using namespace QtJsonSerializer;
 
-Q_LOGGING_CATEGORY(QtJsonSerializer::logCbor, "qt.jsonserializer.cborserializer")
+Q_LOGGING_CATEGORY(QtJsonSerializer::logCbor, "qt.jsonserializer.serializer.cbor")
 
 CborSerializer::CborSerializer(QObject *parent) :
 	SerializerBase{*new CborSerializerPrivate{}, parent}

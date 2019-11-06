@@ -6,6 +6,7 @@
 
 #include <QtCore/QReadWriteLock>
 #include <QtCore/QHash>
+#include <QtCore/QLoggingCategory>
 
 #include <QtCore/private/qobject_p.h>
 
@@ -81,6 +82,9 @@ public:
 	QVariant deserializeCborValue(int propertyType, const QCborValue &value) const;
 	QVariant deserializeJsonValue(int propertyType, const QCborValue &value) const;
 };
+
+Q_DECLARE_LOGGING_CATEGORY(logSerializer)
+Q_DECLARE_LOGGING_CATEGORY(logSerializerExtractor)
 
 template<typename TConverter>
 SerializerBasePrivate::ThreadSafeStore<TConverter>::ThreadSafeStore(std::initializer_list<std::pair<int, QSharedPointer<TConverter>>> initData)
