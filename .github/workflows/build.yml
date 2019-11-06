@@ -219,6 +219,11 @@ jobs:
         with:
           arch: x64
           #toolset: 14.16
+      - uses: actions/cache@v1
+        id: cache
+        with:
+          path: ${{matrix.cachebase}}/qt/${{matrix.version}}/${{matrix.platform}}
+          key: qt-${{matrix.version}}-${{matrix.platform}}
       - uses: Skycoder42/action-setup-qt@master
         with:
           version: ${{matrix.version}}

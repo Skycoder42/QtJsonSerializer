@@ -27,7 +27,7 @@ void Exception::raise() const
 	throw *this;
 }
 
-QT_JSONSERIALIZER_EXCEPTION_BASE *Exception::clone() const
+ExceptionBase *Exception::clone() const
 {
 	auto exc = new Exception(QByteArray());
 	exc->d = d;
@@ -43,7 +43,7 @@ void SerializationException::raise() const
 	throw *this;
 }
 
-QT_JSONSERIALIZER_EXCEPTION_BASE *SerializationException::clone() const
+ExceptionBase *SerializationException::clone() const
 {
 	auto exc = new SerializationException(QByteArray());
 	exc->d = d;
@@ -59,7 +59,7 @@ void DeserializationException::raise() const
 	throw *this;
 }
 
-QT_JSONSERIALIZER_EXCEPTION_BASE *DeserializationException::clone() const
+ExceptionBase *DeserializationException::clone() const
 {
 	auto exc = new DeserializationException(QByteArray());
 	exc->d = d;

@@ -6,6 +6,7 @@
 
 #include <QtCore/QMetaProperty>
 #include <QtCore/QThreadStorage>
+#include <QtCore/QLoggingCategory>
 
 namespace QtJsonSerializer {
 
@@ -21,6 +22,8 @@ public:
 private:
 	static QThreadStorage<SerializationException::PropertyTrace> contextStore;
 };
+
+Q_DECLARE_LOGGING_CATEGORY(logExceptCtx)
 
 }
 

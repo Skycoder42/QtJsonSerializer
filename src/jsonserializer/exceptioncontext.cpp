@@ -3,6 +3,8 @@
 #include <QtCore/qdebug.h>
 using namespace QtJsonSerializer;
 
+Q_LOGGING_CATEGORY(QtJsonSerializer::logExceptCtx, "qt.jsonserializer.private.exceptioncontext")
+
 QThreadStorage<SerializationException::PropertyTrace> ExceptionContext::contextStore;
 
 ExceptionContext::ExceptionContext(const QMetaProperty &property)
@@ -26,8 +28,8 @@ ExceptionContext::ExceptionContext(int propertyType, const QByteArray &hint)
 ExceptionContext::~ExceptionContext()
 {
 	auto &context = contextStore.localData();
-	if(context.isEmpty())
-		qWarning() << "Corrupted context store";
+	if (context.isEmpty())
+		qCWarning(logExceptCtx) << "Corrupted context store";
 	else
 		context.pop();
 }

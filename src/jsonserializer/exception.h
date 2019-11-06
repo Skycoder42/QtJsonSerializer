@@ -8,19 +8,21 @@
 
 #if !defined(QT_NO_EXCEPTIONS) && QT_CONFIG(future)
 #include <QtCore/qexception.h>
-#define QT_JSONSERIALIZER_EXCEPTION_BASE QException
-#define QT_JSONSERIALIZER_EXCEPTION_OR override
+namespace QtJsonSerializer {
+using ExceptionBase = QException;
+}
 #else
 #include <exception>
-#define QT_JSONSERIALIZER_EXCEPTION_BASE std::exception
-#define QT_JSONSERIALIZER_EXCEPTION_OR
+namespace QtJsonSerializer {
+using ExceptionBase = std::exception;
+}
 #endif
 
 namespace QtJsonSerializer {
 
 class ExceptionPrivate;
 //! Exception thrown by QJsonSerializer if something goes wrong
-class Q_JSONSERIALIZER_EXPORT Exception : public QT_JSONSERIALIZER_EXCEPTION_BASE
+class Q_JSONSERIALIZER_EXPORT Exception : public ExceptionBase
 {
 public:
 	//! The type of a stack of a property trace (name, type)
@@ -38,9 +40,9 @@ public:
 	PropertyTrace propertyTrace() const;
 
 	//! @inherit{QException::raise}
-	virtual void raise() const QT_JSONSERIALIZER_EXCEPTION_OR;
+	virtual void raise() const;
 	//! @inherit{QException::clone}
-	virtual QT_JSONSERIALIZER_EXCEPTION_BASE *clone() const QT_JSONSERIALIZER_EXCEPTION_OR;
+	virtual ExceptionBase *clone() const;
 
 protected:
 	//! @private
@@ -55,7 +57,7 @@ public:
 	SerializationException(const QByteArray &what);
 
 	void raise() const override;
-	QT_JSONSERIALIZER_EXCEPTION_BASE *clone() const override;
+	ExceptionBase *clone() const override;
 };
 
 //! Exception thrown by QJsonSerializer if something goes wrong while deserializing
@@ -66,7 +68,7 @@ public:
 	DeserializationException(const QByteArray &what);
 
 	void raise() const override;
-	QT_JSONSERIALIZER_EXCEPTION_BASE *clone() const override;
+	ExceptionBase *clone() const override;
 };
 
 }

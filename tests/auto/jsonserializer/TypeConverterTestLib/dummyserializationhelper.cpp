@@ -1,6 +1,6 @@
 #include "dummyserializationhelper.h"
 #include <QtTest>
-#include <QtJsonSerializer/Exception>
+#include <QtJsonSerializer/exception.h>
 #include <QtJsonSerializer/CborSerializer>
 
 #include <QtJsonSerializer/private/serializerbase_p.h>

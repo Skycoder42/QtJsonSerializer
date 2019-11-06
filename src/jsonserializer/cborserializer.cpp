@@ -5,6 +5,8 @@
 #include <QtCore/QCborStreamWriter>
 using namespace QtJsonSerializer;
 
+Q_LOGGING_CATEGORY(QtJsonSerializer::logCbor, "qt.jsonserializer.cborserializer")
+
 CborSerializer::CborSerializer(QObject *parent) :
 	SerializerBase{*new CborSerializerPrivate{}, parent}
 {
@@ -30,7 +32,13 @@ QCborTag CborSerializer::typeTag(int metaTypeId) const
 {
 	Q_D(const CborSerializer);
 	QReadLocker lock{&d->typeTagsLock};
-	return d->typeTags.value(metaTypeId, TypeConverter::NoTag);
+	const auto tag = d->typeTags.value(metaTypeId, TypeConverter::NoTag);
+	if (tag != TypeConverter::NoTag) {
+		qCDebug(logCbor) << "Found Type-Tag for metaTypeId" << metaTypeId
+						 << "as" << tag;
+	} else
+		qCDebug(logCbor) << "No Type-Tag found for metaTypeId" << metaTypeId;
+	return tag;
 }
 
 QCborValue CborSerializer::serialize(const QVariant &data) const
@@ -91,5 +99,8 @@ QList<int> CborSerializer::typesForTag(QCborTag tag) const
 {
 	Q_D(const CborSerializer);
 	QReadLocker lock{&d->typeTagsLock};
-	return d->typeTags.keys(tag);
+	const auto keys = d->typeTags.keys(tag);
+	qCDebug(logCbor) << "Found metaTypeIds for tag" << tag
+					 << "as" << keys;
+	return keys;
 }
