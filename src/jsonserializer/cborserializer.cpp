@@ -22,10 +22,14 @@ void CborSerializer::setTypeTag(int metaTypeId, QCborTag tag)
 	Q_D(CborSerializer);
 	Q_ASSERT_X(metaTypeId != QMetaType::UnknownType, Q_FUNC_INFO, "You cannot assign a tag to QMetaType::UnknownType");
 	QWriteLocker lock{&d->typeTagsLock};
-	if (tag == TypeConverter::NoTag)
+	if (tag == TypeConverter::NoTag) {
 		d->typeTags.remove(metaTypeId);
-	else
+		qCDebug(logCbor) << "Added Type-Tag for metaTypeId" << metaTypeId
+						 << "as" << tag;
+	} else {
 		d->typeTags.insert(metaTypeId, tag);
+		qCDebug(logCbor) << "Removed Type-Tag for metaTypeId" << metaTypeId;
+	}
 }
 
 QCborTag CborSerializer::typeTag(int metaTypeId) const

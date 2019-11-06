@@ -33,42 +33,42 @@ jobs:
             test: true
             examples: true
             doc: true
-            testflags: "-j 1"
+            testflags: "-j1"
           - platform: android_arm64_v8a
             os: ubuntu-latest
             cachebase: /opt/hostedtoolcache
             test: false
             examples: false
             doc: false
-            testflags: "-j 1"
+            testflags: "-j1"
           - platform: android_x86_64
             os: ubuntu-latest
             cachebase: /opt/hostedtoolcache
             test: false
             examples: false
             doc: false
-            testflags: "-j 1"
+            testflags: "-j1"
           - platform: android_armv7
             os: ubuntu-latest
             cachebase: /opt/hostedtoolcache
             test: false
             examples: false
             doc: false
-            testflags: "-j 1"
+            testflags: "-j1"
           - platform: android_x86
             os: ubuntu-latest
             cachebase: /opt/hostedtoolcache
             test: false
             examples: false
             doc: false
-            testflags: "-j 1"
+            testflags: "-j1"
           - platform: wasm_32
             os: ubuntu-latest
             cachebase: /opt/hostedtoolcache
             test: false
             examples: false
             doc: false
-            testflags: "-j 1"
+            testflags: "-j1"
           - platform: msvc2017_64
             os: windows-latest
             cachebase: C:/hostedtoolcache/windows
@@ -76,7 +76,7 @@ jobs:
             test: true
             examples: false
             doc: false
-            testflags: "/J 1"
+            testflags: ""
           - platform: msvc2017
             os: windows-latest
             cachebase: C:/hostedtoolcache/windows
@@ -84,7 +84,7 @@ jobs:
             test: true
             examples: false
             doc: false
-            testflags: "/J 1"
+            testflags: ""
           - platform: winrt_x64_msvc2017
             os: windows-latest
             cachebase: C:/hostedtoolcache/windows
@@ -92,7 +92,7 @@ jobs:
             test: false
             examples: false
             doc: false
-            testflags: "/J 1"
+            testflags: ""
           - platform: winrt_x86_msvc2017
             os: windows-latest
             cachebase: C:/hostedtoolcache/windows
@@ -100,7 +100,7 @@ jobs:
             test: false
             examples: false
             doc: false
-            testflags: "/J 1"
+            testflags: ""
           - platform: winrt_armv7_msvc2017
             os: windows-latest
             cachebase: C:/hostedtoolcache/windows
@@ -108,35 +108,35 @@ jobs:
             test: false
             examples: false
             doc: false
-            testflags: "/J 1"
+            testflags: ""
           - platform: mingw73_64
             os: windows-latest
             cachebase: C:/hostedtoolcache/windows
             test: true
             examples: false
             doc: false
-            testflags: "-j 1"
+            testflags: "-j1"
           - platform: mingw73_32
             os: windows-latest
             cachebase: C:/hostedtoolcache/windows
             test: true
             examples: false
             doc: false
-            testflags: "-j 1"
+            testflags: "-j1"
           - platform: clang_64
             os: macos-latest
             cachebase: /Users/runner/hostedtoolcache
             test: true
             examples: false
             doc: false
-            testflags: "-j 1"
+            testflags: "-j1"
           - platform: ios
             os: macos-latest
             cachebase: /Users/runner/hostedtoolcache
             test: false
             examples: false
             doc: false
-            testflags: "-j 1"
+            testflags: "-j1"
 
     runs-on: ${{matrix.os}}
     steps:

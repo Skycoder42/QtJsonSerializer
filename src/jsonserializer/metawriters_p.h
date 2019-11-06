@@ -3,6 +3,8 @@
 
 #include "metawriters.h"
 
+#include <QtCore/QLoggingCategory>
+
 namespace QtJsonSerializer::MetaWriters {
 
 class MetaWritersPrivate
@@ -19,6 +21,9 @@ public:
 	static SequentialWriter::SequenceInfo tryParseSequenceInfo(int metaTypeId);
 	static AssociativeWriter::AssociationInfo tryParseAssociationInfo(int metaTypeId);
 };
+
+Q_DECLARE_LOGGING_CATEGORY(logSeqWriter)
+Q_DECLARE_LOGGING_CATEGORY(logAsocWriter)
 
 
 
