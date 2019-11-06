@@ -95,7 +95,7 @@ jobs:
           make
           make INSTALL_ROOT="${{steps.setup_qt.outputs.installdir}}" install
       - name: make tests
-        if: steps.setup_qt.outputs.tests
+        if: steps.setup_qt.outputs.tests == 'true'
         run: |
           make all
           make ${{steps.setup_qt.outputs.testflags}} run-tests
@@ -156,6 +156,7 @@ jobs:
           path: qt-cache
           key: qt-${{matrix.version}}-${{matrix.platform}}-test
       - uses: Skycoder42/action-setup-qt@master
+        id: setup_qt
         with:
           version: ${{matrix.version}}
           platform: ${{matrix.platform}}
@@ -170,4 +171,4 @@ jobs:
       - name: prepare qt for caching
         if: steps.cache.outputs.cache-hit != 'true'
         shell: python
-        run: -c 'import shutil; shutil.copytree("${{steps.setup_qt.outputs.qtdir}}", "qt-cache", symlinks=True)'
+        run: import shutil; shutil.copytree("${{steps.setup_qt.outputs.qtdir}}", "qt-cache", symlinks=True)
