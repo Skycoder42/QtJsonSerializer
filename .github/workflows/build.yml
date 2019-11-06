@@ -29,81 +29,96 @@ jobs:
         include:
           - platform: gcc_64
             os: ubuntu-latest
+            cachebase: /opt/hostedtoolcache
             test: true
             examples: true
             doc: true
           - platform: android_arm64_v8a
             os: ubuntu-latest
+            cachebase: /opt/hostedtoolcache
             test: false
             examples: false
             doc: false
           - platform: android_x86_64
             os: ubuntu-latest
+            cachebase: /opt/hostedtoolcache
             test: false
             examples: false
             doc: false
           - platform: android_armv7
             os: ubuntu-latest
+            cachebase: /opt/hostedtoolcache
             test: false
             examples: false
             doc: false
           - platform: android_x86
             os: ubuntu-latest
+            cachebase: /opt/hostedtoolcache
             test: false
             examples: false
             doc: false
           - platform: wasm_32
             os: ubuntu-latest
+            cachebase: /opt/hostedtoolcache
             test: false
             examples: false
             doc: false
           - platform: msvc2017_64
             os: windows-latest
+            cachebase: C:/hostedtoolcache/windows
             vcarch: x64
             test: true
             examples: false
             doc: false
           - platform: msvc2017
             os: windows-latest
+            cachebase: C:/hostedtoolcache/windows
             vcarch: x64_x86
             test: true
             examples: false
             doc: false
           - platform: winrt_x64_msvc2017
             os: windows-latest
+            cachebase: C:/hostedtoolcache/windows
             vcarch: x64
             test: false
             examples: false
             doc: false
           - platform: winrt_x86_msvc2017
             os: windows-latest
+            cachebase: C:/hostedtoolcache/windows
             vcarch: x64_x86
             test: false
             examples: false
             doc: false
           - platform: winrt_armv7_msvc2017
             os: windows-latest
+            cachebase: C:/hostedtoolcache/windows
             vcarch: x64_arm
             test: false
             examples: false
             doc: false
           - platform: mingw73_64
             os: windows-latest
+            cachebase: C:/hostedtoolcache/windows
             test: true
             examples: false
             doc: false
           - platform: mingw73_32
             os: windows-latest
+            cachebase: C:/hostedtoolcache/windows
             test: true
             examples: false
             doc: false
           - platform: clang_64
             os: macos-latest
+            cachebase: /Users/runner/hostedtoolcache
             test: true
             examples: false
             doc: false
           - platform: ios
             os: macos-latest
+            cachebase: /Users/runner/hostedtoolcache
             test: false
             examples: false
             doc: false
@@ -124,6 +139,11 @@ jobs:
           arch: ${{matrix.vcarch}}
           #toolset: 14.16
           uwp: ${{contains(matrix.platform, 'winrt')}}
+      - uses: actions/cache@v1
+        id: cache
+        with:
+          path: ${{matrix.cachebase}}/qt/${{matrix.version}}/${{matrix.platform}}
+          key: qt-${{matrix.version}}-${{matrix.platform}}
       - uses: Skycoder42/action-setup-qt@master
         id: setup_qt
         with:
@@ -177,12 +197,16 @@ jobs:
         include:
           - platform: gcc_64
             os: ubuntu-latest
+            cachebase: /opt/hostedtoolcache
           - platform: msvc2017_64
             os: windows-latest
+            cachebase: C:/hostedtoolcache/windows
           - platform: mingw73_64
             os: windows-latest
+            cachebase: C:/hostedtoolcache/windows
           - platform: clang_64
             os: macos-latest
+            cachebase: /Users/runner/hostedtoolcache
 
     runs-on: ${{matrix.os}}
     steps:
