@@ -33,36 +33,42 @@ jobs:
             test: true
             examples: true
             doc: true
+            testflags: "-j 1"
           - platform: android_arm64_v8a
             os: ubuntu-latest
             cachebase: /opt/hostedtoolcache
             test: false
             examples: false
             doc: false
+            testflags: "-j 1"
           - platform: android_x86_64
             os: ubuntu-latest
             cachebase: /opt/hostedtoolcache
             test: false
             examples: false
             doc: false
+            testflags: "-j 1"
           - platform: android_armv7
             os: ubuntu-latest
             cachebase: /opt/hostedtoolcache
             test: false
             examples: false
             doc: false
+            testflags: "-j 1"
           - platform: android_x86
             os: ubuntu-latest
             cachebase: /opt/hostedtoolcache
             test: false
             examples: false
             doc: false
+            testflags: "-j 1"
           - platform: wasm_32
             os: ubuntu-latest
             cachebase: /opt/hostedtoolcache
             test: false
             examples: false
             doc: false
+            testflags: "-j 1"
           - platform: msvc2017_64
             os: windows-latest
             cachebase: C:/hostedtoolcache/windows
@@ -70,6 +76,7 @@ jobs:
             test: true
             examples: false
             doc: false
+            testflags: "/J 1"
           - platform: msvc2017
             os: windows-latest
             cachebase: C:/hostedtoolcache/windows
@@ -77,6 +84,7 @@ jobs:
             test: true
             examples: false
             doc: false
+            testflags: "/J 1"
           - platform: winrt_x64_msvc2017
             os: windows-latest
             cachebase: C:/hostedtoolcache/windows
@@ -84,6 +92,7 @@ jobs:
             test: false
             examples: false
             doc: false
+            testflags: "/J 1"
           - platform: winrt_x86_msvc2017
             os: windows-latest
             cachebase: C:/hostedtoolcache/windows
@@ -91,6 +100,7 @@ jobs:
             test: false
             examples: false
             doc: false
+            testflags: "/J 1"
           - platform: winrt_armv7_msvc2017
             os: windows-latest
             cachebase: C:/hostedtoolcache/windows
@@ -98,30 +108,35 @@ jobs:
             test: false
             examples: false
             doc: false
+            testflags: "/J 1"
           - platform: mingw73_64
             os: windows-latest
             cachebase: C:/hostedtoolcache/windows
             test: true
             examples: false
             doc: false
+            testflags: "-j 1"
           - platform: mingw73_32
             os: windows-latest
             cachebase: C:/hostedtoolcache/windows
             test: true
             examples: false
             doc: false
+            testflags: "-j 1"
           - platform: clang_64
             os: macos-latest
             cachebase: /Users/runner/hostedtoolcache
             test: true
             examples: false
             doc: false
+            testflags: "-j 1"
           - platform: ios
             os: macos-latest
             cachebase: /Users/runner/hostedtoolcache
             test: false
             examples: false
             doc: false
+            testflags: "-j 1"
 
     runs-on: ${{matrix.os}}
     steps:
@@ -150,6 +165,7 @@ jobs:
           version: ${{matrix.version}}
           platform: ${{matrix.platform}}
           install-args: --verbose
+          cached: ${{matrix.cachebase}}/qt/${{matrix.version}}/${{matrix.platform}}
       - name: qmake
         run: |
           qmake CONFIG+=install_ok QT_PLATFORM=${{matrix.platform}}
@@ -161,10 +177,8 @@ jobs:
       - name: make tests
         run: |
           make all
-          make run-tests
+          make ${{matrix.testflags}} run-tests
         if: matrix.test
-        env:
-          MAKEFLAGS: -j1
       - name: make examples
         run: |
           make sub-examples

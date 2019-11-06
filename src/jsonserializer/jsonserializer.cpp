@@ -15,6 +15,8 @@ QJsonValue JsonSerializer::serialize(const QVariant &data) const
 
 void JsonSerializer::serializeTo(QIODevice *device, const QVariant &data, QJsonDocument::JsonFormat format) const
 {
+	if (!device->isOpen() || !device->isWritable())
+		throw SerializationException{"QIODevice must be open and writable!"};
 	QJsonDocument doc;
 	const auto jData = serialize(data);
 	if (jData.isArray())
@@ -22,14 +24,15 @@ void JsonSerializer::serializeTo(QIODevice *device, const QVariant &data, QJsonD
 	else if (jData.isObject())
 		doc = QJsonDocument{jData.toObject()};
 	else
-		throw SerializationException("Only objects or arrays can be written to a device!");
+		throw SerializationException{"Only objects or arrays can be written to a device!"};
 	device->write(doc.toJson(format));
 }
 
 QByteArray JsonSerializer::serializeTo(const QVariant &data, QJsonDocument::JsonFormat format) const
 {
 	QBuffer buffer;
-	buffer.open(QIODevice::WriteOnly);
+	if (!buffer.open(QIODevice::WriteOnly))
+		throw SerializationException{"Failed to write to bytearray buffer with error: " + buffer.errorString().toUtf8()};
 	serializeTo(&buffer, data, format);
 	buffer.close();
 	return buffer.data();
@@ -42,20 +45,27 @@ QVariant JsonSerializer::deserialize(const QJsonValue &json, int metaTypeId, QOb
 
 QVariant JsonSerializer::deserializeFrom(QIODevice *device, int metaTypeId, QObject *parent) const
 {
+	if (!device->isOpen() || !device->isReadable())
+		throw DeserializationException{"QIODevice must be open and readable!"};
 	QJsonParseError error;
 	auto doc = QJsonDocument::fromJson(device->readAll(), &error);
 	if (error.error != QJsonParseError::NoError)
 		throw DeserializationException{"Failed to read file as JSON with error: " + error.errorString().toUtf8()};
 	if (doc.isArray())
 		return deserialize(doc.array(), metaTypeId, parent);
-	else
+	else if (doc.isObject())
 		return deserialize(doc.object(), metaTypeId, parent);
+	else if (doc.isNull())
+		return deserialize(QJsonValue::Null, metaTypeId, parent);
+	else
+		return QVariant{};
 }
 
 QVariant JsonSerializer::deserializeFrom(const QByteArray &data, int metaTypeId, QObject *parent) const
 {
 	QBuffer buffer(const_cast<QByteArray*>(&data));
-	buffer.open(QIODevice::ReadOnly);
+	if (!buffer.open(QIODevice::ReadOnly))
+		throw DeserializationException{"Failed to read from bytearray buffer with error: " + buffer.errorString().toUtf8()};
 	auto res = deserializeFrom(&buffer, metaTypeId, parent);
 	buffer.close();
 	return res;

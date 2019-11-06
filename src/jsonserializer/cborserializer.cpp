@@ -48,6 +48,8 @@ QCborValue CborSerializer::serialize(const QVariant &data) const
 
 void CborSerializer::serializeTo(QIODevice *device, const QVariant &data, QCborValue::EncodingOptions options) const
 {
+	if (!device->isOpen() || !device->isWritable())
+		throw SerializationException{"QIODevice must be open and writable!"};
 	QCborStreamWriter writer{device};
 	serializeVariant(data.userType(), data).toCbor(writer, options);
 }
@@ -64,6 +66,8 @@ QVariant CborSerializer::deserialize(const QCborValue &json, int metaTypeId, QOb
 
 QVariant CborSerializer::deserializeFrom(QIODevice *device, int metaTypeId, QObject *parent) const
 {
+	if (!device->isOpen() || !device->isReadable())
+		throw DeserializationException{"QIODevice must be open and readable!"};
 	QCborStreamReader reader{device};
 	const auto cbor = QCborValue::fromCbor(reader);
 	if (const auto error = reader.lastError(); error.c != QCborError::NoError)
