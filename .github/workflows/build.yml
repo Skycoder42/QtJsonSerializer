@@ -80,12 +80,18 @@ jobs:
           arch: ${{matrix.vcarch}}
           #toolset: 14.16
           uwp: ${{contains(matrix.platform, 'winrt')}}
+      - uses: actions/cache@v1
+        id: cache
+        with:
+          path: qt-cache
+          key: qt-${{matrix.version}}-${{matrix.platform}}-test
       - uses: Skycoder42/action-setup-qt@master
         id: setup_qt
         with:
           version: ${{matrix.version}}
           platform: ${{matrix.platform}}
           install-args: --verbose
+          cachedir: qt-cache
       - name: qmake
         run: |
           qmake CONFIG+=install_ok QT_PLATFORM=${{matrix.platform}}
@@ -121,10 +127,12 @@ jobs:
           asset_name: qtjsonserializer-${{matrix.platform}}-${{matrix.version}}
           tag: ${{github.ref}}
           overwrite: true
+      - name: prepare qt for caching
+        if: steps.cache.outputs.cache-hit != 'true'
+        shell: python
+        run: import shutil; shutil.copytree(r"${{steps.setup_qt.outputs.qtdir}}", "qt-cache", symlinks=True)
 
   build-no-converters:
-    env:
-      QDEP_CACHE_DIR: $HOME/.qdep-cache
     strategy:
       fail-fast: false
       matrix:
@@ -170,7 +178,6 @@ jobs:
           platform: ${{matrix.platform}}
           install-args: --verbose
           cachedir: qt-cache
-      - run: ls -lsa "${{steps.setup_qt.outputs.qtdir}}/plugins/platforms/"
       - name: qmake
         run: |
           qmake CONFIG+=no_register_json_converters QT_PLATFORM=${{matrix.platform}}
