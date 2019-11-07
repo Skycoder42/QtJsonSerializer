@@ -16,7 +16,6 @@
 #include <QtCore/qmetaobject.h>
 #include <QtCore/qcborvalue.h>
 #include <QtCore/qvariant.h>
-#include <QtCore/qdebug.h>
 #include <QtCore/qsharedpointer.h>
 #include <QtCore/qpointer.h>
 #include <QtCore/qlist.h>

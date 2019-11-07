@@ -6,6 +6,8 @@
 using namespace QtJsonSerializer;
 using namespace QtJsonSerializer::TypeConverters;
 
+Q_LOGGING_CATEGORY(QtJsonSerializer::TypeConverters::logVersionConverter, "qt.jsonserializer.converter.versionnumber")
+
 bool VersionNumberConverter::canConvert(int metaTypeId) const
 {
 	return metaTypeId == qMetaTypeId<QVersionNumber>();
@@ -74,7 +76,7 @@ QVariant VersionNumberConverter::deserializeCbor(int propertyType, const QCborVa
 			if (version.isNull())
 				throw DeserializationException("Invalid version number, no segments found");
 			if (suffixIndex < strValue.size())
-				qWarning() << "Parsed QVersionNumber with suffix - suffixes are discarded!";
+				qCWarning(logVersionConverter) << "Parsed QVersionNumber with suffix - suffixes are discarded!";
 			return QVariant::fromValue(version);
 		} else
 			return QVariant::fromValue(QVersionNumber{});

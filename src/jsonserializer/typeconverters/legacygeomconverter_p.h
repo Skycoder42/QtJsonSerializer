@@ -17,6 +17,7 @@ class Q_JSONSERIALIZER_EXPORT LegacyGeomConverter : public TypeConverter
 public:
 	LegacyGeomConverter();
 
+	QT_JSONSERIALIZER_TYPECONVERTER_NAME(LegacyGeomConverter)
 	bool canConvert(int metaTypeId) const override;
 	QList<QCborValue::Type> allowedCborTypes(int metaTypeId, QCborTag tag) const override;
 	QCborValue serialize(int propertyType, const QVariant &value) const override;

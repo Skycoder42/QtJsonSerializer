@@ -1,6 +1,4 @@
 #include "exceptioncontext_p.h"
-
-#include <QtCore/qdebug.h>
 using namespace QtJsonSerializer;
 
 Q_LOGGING_CATEGORY(QtJsonSerializer::logExceptCtx, "qt.jsonserializer.private.exceptioncontext")

@@ -48,6 +48,7 @@ public:
 
 	TestEnumConverter();
 
+	QT_JSONSERIALIZER_TYPECONVERTER_NAME(TestEnumConverter)
 	bool canConvert(int metaTypeId) const override;
 	QList<QCborValue::Type> allowedCborTypes(int metaTypeId, QCborTag tag) const override;
 	QCborValue serialize(int propertyType, const QVariant &value) const override;
@@ -59,6 +60,7 @@ class TestWrapperConverter : public QtJsonSerializer::TypeConverter
 public:
 	TestWrapperConverter();
 
+	QT_JSONSERIALIZER_TYPECONVERTER_NAME(TestWrapperConverter)
 	bool canConvert(int metaTypeId) const override;
 	QList<QCborValue::Type> allowedCborTypes(int metaTypeId, QCborTag tag) const override;
 	QCborValue serialize(int propertyType, const QVariant &value) const override;

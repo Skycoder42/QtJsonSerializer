@@ -6,6 +6,8 @@
 using namespace QtJsonSerializer;
 using namespace QtJsonSerializer::TypeConverters;
 
+Q_LOGGING_CATEGORY(QtJsonSerializer::TypeConverters::logObjConverter, "qt.jsonserializer.converter.object")
+
 bool ObjectConverter::canConvert(int metaTypeId) const
 {
 	auto flags = QMetaType::typeFlags(metaTypeId);
@@ -171,7 +173,7 @@ bool ObjectConverter::polyMetaObject(QObject *object) const
 		else if (info.value() == QByteArray("false"))
 			return false;// use the class
 		else
-			qWarning() << "Invalid value for polymorphic classinfo on object type" << meta->className() << "ignored";
+			qCWarning(logObjConverter) << "Invalid value for polymorphic classinfo on object type" << meta->className() << "ignored";
 	}
 
 	//default: the class

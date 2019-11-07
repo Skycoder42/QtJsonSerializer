@@ -4,11 +4,14 @@
 #include "qtjsonserializer_global.h"
 #include "typeconverter.h"
 
+#include <QtCore/QLoggingCategory>
+
 namespace QtJsonSerializer::TypeConverters {
 
 class Q_JSONSERIALIZER_EXPORT ObjectConverter : public TypeConverter
 {
 public:
+	QT_JSONSERIALIZER_TYPECONVERTER_NAME(ObjectConverter)
 	bool canConvert(int metaTypeId) const override;
 	QList<QCborTag> allowedCborTags(int metaTypeId) const override;
 	QList<QCborValue::Type> allowedCborTypes(int metaTypeId, QCborTag tag) const override;
@@ -23,6 +26,8 @@ private:
 	QObject *deserializeConstructedObject(const QCborValue &value, QObject *parent) const;
 	void deserializeProperties(const QMetaObject *metaObject, QObject *object, const QCborMap &value, bool isPoly = false) const;
 };
+
+Q_DECLARE_LOGGING_CATEGORY(logObjConverter)
 
 }
 

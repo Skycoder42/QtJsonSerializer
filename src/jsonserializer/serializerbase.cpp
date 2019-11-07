@@ -12,7 +12,6 @@
 
 #include "typeconverters/bytearrayconverter_p.h"
 #include "typeconverters/cborconverter_p.h"
-#include "typeconverters/stdchronodurationconverter_p.h"
 #include "typeconverters/enumconverter_p.h"
 #include "typeconverters/gadgetconverter_p.h"
 #include "typeconverters/geomconverter_p.h"
@@ -24,6 +23,7 @@
 #include "typeconverters/objectconverter_p.h"
 #include "typeconverters/pairconverter_p.h"
 #include "typeconverters/smartpointerconverter_p.h"
+#include "typeconverters/stdchronodurationconverter_p.h"
 #include "typeconverters/stdoptionalconverter_p.h"
 #include "typeconverters/stdtupleconverter_p.h"
 #include "typeconverters/stdvariantconverter_p.h"
@@ -42,6 +42,24 @@ Q_COREAPP_STARTUP_FUNCTION(qtJsonSerializerRegisterTypes);
 
 Q_LOGGING_CATEGORY(QtJsonSerializer::logSerializer, "qt.jsonserializer.serializer")
 Q_LOGGING_CATEGORY(QtJsonSerializer::logSerializerExtractor, "qt.jsonserializer.serializer.extractor")
+
+namespace {
+
+class LogTag {
+public:
+	inline LogTag(QCborTag tag) : tag{tag} {}
+	inline operator QCborTag() const { return tag; }
+private:
+	QCborTag tag;
+};
+
+QDebug operator<<(QDebug debug, LogTag tag) {
+	if (tag != TypeConverter::NoTag)
+		debug << ", CBOR-Tag" << static_cast<QCborTag>(tag);
+	return debug;
+}
+
+}
 
 SerializerBase::SerializerBase(QObject *parent) :
 	SerializerBase{*new SerializerBasePrivate{}, parent}
@@ -115,6 +133,7 @@ void SerializerBase::addJsonTypeConverterFactory(TypeConverterFactory *factory)
 {
 	QWriteLocker _{&SerializerBasePrivate::typeConverterFactoryLock};
 	SerializerBasePrivate::typeConverterFactories.append(factory);
+	qCDebug(logSerializer) << "Added new global converter factory:" << factory;
 }
 
 void SerializerBase::addJsonTypeConverter(const QSharedPointer<TypeConverter> &converter)
@@ -125,6 +144,7 @@ void SerializerBase::addJsonTypeConverter(const QSharedPointer<TypeConverter> &c
 	d->typeConverters.insertSorted(converter);
 	d->serCache.clear();
 	d->deserCache.clear();
+	qCDebug(logSerializer) << "Added new local converter:" << converter->name();
 }
 
 void SerializerBase::setAllowDefaultNull(bool allowDefaultNull)
@@ -363,10 +383,10 @@ QVariant SerializerBase::deserializeVariant(int propertyType, const QCborValue &
 			return QVariant{propertyType, nullptr};
 		else {
 			throw DeserializationException(QByteArray("Failed to convert deserialized variant of type ") +
-												(vType ? vType : "<unknown>") +
-												QByteArray(" to property type ") +
-												QMetaType::typeName(propertyType) +
-												QByteArray(". Make shure to register converters with the QJsonSerializer::register* methods"));
+										   (vType ? vType : "<unknown>") +
+										   QByteArray(" to property type ") +
+										   QMetaType::typeName(propertyType) +
+										   QByteArray(". Make shure to register converters with the QJsonSerializer::register* methods"));
 		}
 	} else
 		return variant;
@@ -378,22 +398,22 @@ SerializerBasePrivate::ThreadSafeStore<TypeExtractor> SerializerBasePrivate::ext
 QReadWriteLock SerializerBasePrivate::typeConverterFactoryLock;
 QList<TypeConverterFactory*> SerializerBasePrivate::typeConverterFactories {
 	new TypeConverterStandardFactory<BytearrayConverter>{},
-	new TypeConverterStandardFactory<ListConverter>{},
-	new TypeConverterStandardFactory<ObjectConverter>{},
-	new TypeConverterStandardFactory<GadgetConverter>{},
+	new TypeConverterStandardFactory<CborConverter>{},
 	new TypeConverterStandardFactory<EnumConverter>{},
+	new TypeConverterStandardFactory<GadgetConverter>{},
+	new TypeConverterStandardFactory<GeomConverter>{},
+	new TypeConverterStandardFactory<ListConverter>{},
+	new TypeConverterStandardFactory<LocaleConverter>{},
 	new TypeConverterStandardFactory<MapConverter>{},
-	new TypeConverterStandardFactory<SmartPointerConverter>{},
+	new TypeConverterStandardFactory<MultiMapConverter>{},
+	new TypeConverterStandardFactory<ObjectConverter>{},
 	new TypeConverterStandardFactory<PairConverter>{},
+	new TypeConverterStandardFactory<SmartPointerConverter>{},
+	new TypeConverterStandardFactory<StdChronoDurationConverter>{},
 	new TypeConverterStandardFactory<StdOptionalConverter>{},
 	new TypeConverterStandardFactory<StdTupleConverter>{},
 	new TypeConverterStandardFactory<StdVariantConverter>{},
 	new TypeConverterStandardFactory<VersionNumberConverter>{},
-	new TypeConverterStandardFactory<LocaleConverter>{},
-	new TypeConverterStandardFactory<CborConverter>{},
-	new TypeConverterStandardFactory<GeomConverter>{},
-	new TypeConverterStandardFactory<MultiMapConverter>{},
-	new TypeConverterStandardFactory<StdChronoDurationConverter>{},
 
 	new TypeConverterStandardFactory<LegacyGeomConverter>{}
 };
@@ -404,13 +424,18 @@ QSharedPointer<TypeConverter> SerializerBasePrivate::findSerConverter(int proper
 	updateConverterStore();
 
 	// second: check if already cached
-	if (auto converter = serCache.get(propertyType); converter)
+	if (auto converter = serCache.get(propertyType); converter) {
+		qCDebug(logSerializer) << "Found cached serialization converter" << converter->name()
+							   << "for type:" <<  QMetaType::typeName(propertyType);
 		return converter;
+	}
 
 	// third: check if the list of explicit converters has a matching one
 	QReadLocker cLocker{&typeConverters.lock};
 	for (const auto &converter : qAsConst(typeConverters.store)) {
 		if (converter && converter->canConvert(propertyType)) {
+			qCDebug(logSerializer) << "Found and cached serialization converter" << converter->name()
+								   << "for type:" <<  QMetaType::typeName(propertyType);
 			// add converter to cache and return it
 			serCache.add(propertyType, converter);
 			return converter;
@@ -418,6 +443,8 @@ QSharedPointer<TypeConverter> SerializerBasePrivate::findSerConverter(int proper
 	}
 
 	// fourth: no converter found: return default converter
+	qCDebug(logSerializer) << "Unable to find serialization converte for type:" <<  QMetaType::typeName(propertyType)
+						   << "- falling back to default QVariant to CBOR conversion";
 	return nullptr;
 }
 
@@ -442,8 +469,13 @@ QSharedPointer<TypeConverter> SerializerBasePrivate::findDeserConverter(int &pro
 
 	// third: check if already cached
 	if (auto converter = deserCache.get(propertyType);
-		converter && converter->canDeserialize(propertyType, tag, type) > 0)
+		converter && converter->canDeserialize(propertyType, tag, type) > 0) {
+		qCDebug(logSerializer) << "Found cached deserialization converter" << converter->name()
+							   << "for type" <<  QMetaType::typeName(propertyType)
+							   << LogTag{tag}
+							   << "and CBOR-type" << type;
 		return converter;
+	}
 
 	// fourth: check if the list of explicit converters has a matching one
 	QReadLocker cLocker{&typeConverters.lock};
@@ -468,6 +500,10 @@ QSharedPointer<TypeConverter> SerializerBasePrivate::findDeserConverter(int &pro
 
 			// add converter to cache (only happens for positive cases)
 			deserCache.add(propertyType, converter);
+			qCDebug(logSerializer) << "Found and cached deserialization converter" << converter->name()
+								   << "for type" <<  QMetaType::typeName(propertyType)
+								   << LogTag{tag}
+								   << "and CBOR-type" << type;
 			return converter;
 		}
 	}
@@ -482,6 +518,10 @@ QSharedPointer<TypeConverter> SerializerBasePrivate::findDeserConverter(int &pro
 			// add converter to list and cache
 			propertyType = newType;
 			deserCache.add(propertyType, converter);
+			qCDebug(logSerializer) << "Found and cached deserialization converter" << converter->name()
+								   << "by guessing the data with CBOR-tag" << tag
+								   << "and CBOR-type" << type
+								   << "is of type" << QMetaType::typeName(propertyType);
 			return converter;
 		}
 	}
@@ -489,13 +529,17 @@ QSharedPointer<TypeConverter> SerializerBasePrivate::findDeserConverter(int &pro
 	// sixth: if a wrong tag mark was set, throw an expection
 	if (throwWrongTag) {
 		throw DeserializationException{QByteArray{"Found converter able to handle data of type "} +
-											QMetaType::typeName(propertyType) +
-											", but the given CBOR tag " +
-											QByteArray::number(static_cast<quint64>(tag)) +
-											" is not convertible to that type."};
+									   QMetaType::typeName(propertyType) +
+									   ", but the given CBOR tag " +
+									   QByteArray::number(static_cast<quint64>(tag)) +
+									   " is not convertible to that type."};
 	}
 
 	// seventh: no converter found: return default converter
+	qCDebug(logSerializer) << "Unable to find deserialization converte for type" <<  QMetaType::typeName(propertyType)
+						   << LogTag{tag}
+						   << "and CBOR-type" << type
+						   << "- falling back to default CBOR to QVariant conversion";
 	return nullptr;
 }
 
@@ -512,6 +556,7 @@ void SerializerBasePrivate::updateConverterStore() const
 				typeConverters.insertSorted(converter, cLocker);
 				serCache.clear();
 				deserCache.clear();
+				qCDebug(logSerializer) << "Found and added new global converter:" << converter->name();
 			}
 		}
 		typeConverters.factoryOffset.storeRelease(typeConverterFactories.size());
@@ -637,8 +682,8 @@ QVariant SerializerBasePrivate::deserializeCborValue(int propertyType, const QCb
 
 		if (doThrow) {
 			throw DeserializationException(QByteArray("Failed to deserialze CBOR-value to type ") +
-												QMetaType::typeName(propertyType) +
-												QByteArray(" because the given CBOR-value failed strict validation"));
+										   QMetaType::typeName(propertyType) +
+										   QByteArray(" because the given CBOR-value failed strict validation"));
 		}
 	}
 
@@ -705,8 +750,8 @@ QVariant SerializerBasePrivate::deserializeJsonValue(int propertyType, const QCb
 
 		if (doThrow) {
 			throw DeserializationException(QByteArray("Failed to deserialze JSON-value to type ") +
-												QMetaType::typeName(propertyType) +
-												QByteArray("because the given JSON-value failed strict validation"));
+										   QMetaType::typeName(propertyType) +
+										   QByteArray("because the given JSON-value failed strict validation"));
 		}
 	}
 

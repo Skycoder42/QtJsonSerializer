@@ -84,6 +84,8 @@ public:
 	//! Destructor
 	virtual ~TypeConverter();
 
+	virtual QByteArray name() const = 0;
+
 	//! Returns the priority of this converter
 	int priority() const;
 	//! Sets the priority of this converter
@@ -112,6 +114,11 @@ private:
 
 	void mapTypesToJson(QList<QCborValue::Type> &typeList) const;
 };
+
+#define QT_JSONSERIALIZER_TYPECONVERTER_NAME(className) inline QByteArray name() const override { \
+	static_assert(std::is_same_v<className, std::decay_t<decltype(*this)>>); \
+	return QByteArrayLiteral(#className); \
+}
 
 //! A factory interface to create instances of QJsonTypeConverters
 class Q_JSONSERIALIZER_EXPORT TypeConverterFactory

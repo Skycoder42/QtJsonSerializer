@@ -9,6 +9,7 @@ namespace QtJsonSerializer::TypeConverters {
 class Q_JSONSERIALIZER_EXPORT PairConverter : public TypeConverter
 {
 public:
+	QT_JSONSERIALIZER_TYPECONVERTER_NAME(PairConverter)
 	bool canConvert(int metaTypeId) const override;
 	QList<QCborTag> allowedCborTags(int metaTypeId) const override;
 	QList<QCborValue::Type> allowedCborTypes(int metaTypeId, QCborTag tag) const override;

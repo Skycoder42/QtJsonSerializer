@@ -12,6 +12,7 @@ class Q_JSONSERIALIZER_EXPORT EnumConverter : public TypeConverter
 {
 public:
 	EnumConverter();
+	QT_JSONSERIALIZER_TYPECONVERTER_NAME(EnumConverter)
 	bool canConvert(int metaTypeId) const override;
 	QList<QCborTag> allowedCborTags(int metaTypeId) const override;
 	QList<QCborValue::Type> allowedCborTypes(int metaTypeId, QCborTag tag) const override;
