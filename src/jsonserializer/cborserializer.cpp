@@ -24,11 +24,11 @@ void CborSerializer::setTypeTag(int metaTypeId, QCborTag tag)
 	QWriteLocker lock{&d->typeTagsLock};
 	if (tag == TypeConverter::NoTag) {
 		d->typeTags.remove(metaTypeId);
-		qCDebug(logCbor) << "Added Type-Tag for metaTypeId" << metaTypeId
+		qCDebug(logCbor) << "Added Type-Tag for" << QMetaType::typeName(metaTypeId)
 						 << "as" << tag;
 	} else {
 		d->typeTags.insert(metaTypeId, tag);
-		qCDebug(logCbor) << "Removed Type-Tag for metaTypeId" << metaTypeId;
+		qCDebug(logCbor) << "Removed Type-Tag for metaTypeId" << QMetaType::typeName(metaTypeId);
 	}
 }
 
@@ -38,10 +38,10 @@ QCborTag CborSerializer::typeTag(int metaTypeId) const
 	QReadLocker lock{&d->typeTagsLock};
 	const auto tag = d->typeTags.value(metaTypeId, TypeConverter::NoTag);
 	if (tag != TypeConverter::NoTag) {
-		qCDebug(logCbor) << "Found Type-Tag for metaTypeId" << metaTypeId
+		qCDebug(logCbor) << "Found Type-Tag for metaTypeId" << QMetaType::typeName(metaTypeId)
 						 << "as" << tag;
 	} else
-		qCDebug(logCbor) << "No Type-Tag found for metaTypeId" << metaTypeId;
+		qCDebug(logCbor) << "No Type-Tag found for metaTypeId" << QMetaType::typeName(metaTypeId);
 	return tag;
 }
 

@@ -8,6 +8,7 @@
 
 #include <QtCore/QDateTime>
 #include <QtCore/QCoreApplication>
+#include <QtCore/QScopeGuard>
 
 #include "typeconverters/bytearrayconverter_p.h"
 #include "typeconverters/cborconverter_p.h"
@@ -53,7 +54,7 @@ SerializerBase::SerializerBase(SerializerBasePrivate &dd, QObject *parent) :
 void SerializerBase::registerExtractor(int metaTypeId, const QSharedPointer<TypeExtractor> &extractor)
 {
 	SerializerBasePrivate::extractors.add(metaTypeId, extractor);
-	qCDebug(logSerializerExtractor) << "Added extractor for type" << metaTypeId;
+	qCDebug(logSerializerExtractor) << "Added extractor for type:" << QMetaType::typeName(metaTypeId);
 }
 
 bool SerializerBase::allowDefaultNull() const
@@ -225,9 +226,9 @@ QSharedPointer<const TypeExtractor> SerializerBase::extractor(int metaTypeId) co
 {
 	const auto extractor = SerializerBasePrivate::extractors.get(metaTypeId);
 	if (extractor)
-		qCDebug(logSerializerExtractor) << "Found extractor for type" << metaTypeId;
+		qCDebug(logSerializerExtractor) << "Found extractor for type:" << QMetaType::typeName(metaTypeId);
 	else
-		qCDebug(logSerializerExtractor) << "Unable to find extractor for type" << metaTypeId;
+		qCDebug(logSerializerExtractor) << "Unable to find extractor for type:" << QMetaType::typeName(metaTypeId);
 	return extractor;
 }
 
@@ -235,14 +236,20 @@ QCborValue SerializerBase::serializeSubtype(const QMetaProperty &property, const
 {
 	Q_D(const SerializerBase);
 	ExceptionContext ctx(property);
+	auto logGuard = qScopeGuard([](){
+		qCDebug(logSerializer) << QByteArray{">"}.repeated(ExceptionContext::currentDepth()).constData()
+							   << "done";
+	});
 	if (property.isEnumType()) {
 		const auto enumId = d->getEnumId(property.enumerator(), true);
-		qCDebug(logSerializer) << "Serializing subtype property" << property.name()
-							   << "of type" << enumId;
+		qCDebug(logSerializer) << QByteArray{">"}.repeated(ExceptionContext::currentDepth()).constData()
+							   << "Serializing subtype property" << property.name()
+							   << "of enum type" << QMetaType::typeName(enumId);
 		return serializeVariant(enumId, value);
 	} else {
-		qCDebug(logSerializer) << "Serializing subtype property" << property.name()
-							   << "of type" << property.userType();
+		qCDebug(logSerializer) << QByteArray{">"}.repeated(ExceptionContext::currentDepth()).constData()
+							   << "Serializing subtype property" << property.name()
+							   << "of type" << QMetaType::typeName(property.userType());
 		return serializeVariant(property.userType(), value);
 	}
 }
@@ -250,8 +257,13 @@ QCborValue SerializerBase::serializeSubtype(const QMetaProperty &property, const
 QCborValue SerializerBase::serializeSubtype(int propertyType, const QVariant &value, const QByteArray &traceHint) const
 {
 	ExceptionContext ctx(propertyType, traceHint);
-	qCDebug(logSerializer) << "Serializing subtype property" << traceHint
-						   << "of type" << propertyType;
+	auto logGuard = qScopeGuard([](){
+		qCDebug(logSerializer) << QByteArray{">"}.repeated(ExceptionContext::currentDepth()).constData()
+							   << "done";
+	});
+	qCDebug(logSerializer) << QByteArray{">"}.repeated(ExceptionContext::currentDepth()).constData()
+						   << "Serializing subtype property" << traceHint
+						   << "of type" << QMetaType::typeName(propertyType);
 	return serializeVariant(propertyType, value);
 }
 
@@ -259,14 +271,20 @@ QVariant SerializerBase::deserializeSubtype(const QMetaProperty &property, const
 {
 	Q_D(const SerializerBase);
 	ExceptionContext ctx(property);
+	auto logGuard = qScopeGuard([](){
+		qCDebug(logSerializer) << QByteArray{">"}.repeated(ExceptionContext::currentDepth()).constData()
+							   << "done";
+	});
 	if (property.isEnumType()) {
 		const auto enumId = d->getEnumId(property.enumerator(), false);
-		qCDebug(logSerializer) << "Deserializing subtype property" << property.name()
-							   << "of type" << enumId;
+		qCDebug(logSerializer) << QByteArray{">"}.repeated(ExceptionContext::currentDepth()).constData()
+							   << "Deserializing subtype property" << property.name()
+							   << "of enum type" << QMetaType::typeName(enumId);
 		return deserializeVariant(enumId, value, parent, true);
 	} else {
-		qCDebug(logSerializer) << "Deserializing subtype property" << property.name()
-							   << "of type" << property.userType();
+		qCDebug(logSerializer) << QByteArray{">"}.repeated(ExceptionContext::currentDepth()).constData()
+							   << "Deserializing subtype property" << property.name()
+							   << "of type" << QMetaType::typeName(property.userType());
 		return deserializeVariant(property.userType(), value, parent);
 	}
 }
@@ -274,8 +292,13 @@ QVariant SerializerBase::deserializeSubtype(const QMetaProperty &property, const
 QVariant SerializerBase::deserializeSubtype(int propertyType, const QCborValue &value, QObject *parent, const QByteArray &traceHint) const
 {
 	ExceptionContext ctx(propertyType, traceHint);
-	qCDebug(logSerializer) << "Deserializing subtype property" << traceHint
-						   << "of type" << propertyType;
+	auto logGuard = qScopeGuard([](){
+		qCDebug(logSerializer) << QByteArray{">"}.repeated(ExceptionContext::currentDepth()).constData()
+							   << "done";
+	});
+	qCDebug(logSerializer) << QByteArray{">"}.repeated(ExceptionContext::currentDepth()).constData()
+						   << "Deserializing subtype property" << traceHint
+						   << "of type" << QMetaType::typeName(propertyType);
 	return deserializeVariant(propertyType, value, parent);
 }
 

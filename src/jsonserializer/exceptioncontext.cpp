@@ -38,3 +38,8 @@ SerializationException::PropertyTrace ExceptionContext::currentContext()
 {
 	return contextStore.localData();
 }
+
+int ExceptionContext::currentDepth()
+{
+	return contextStore.localData().size();
+}

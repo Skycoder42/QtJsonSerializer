@@ -18,6 +18,7 @@ public:
 	~ExceptionContext();
 
 	static SerializationException::PropertyTrace currentContext();
+	static int currentDepth();
 
 private:
 	static QThreadStorage<SerializationException::PropertyTrace> contextStore;

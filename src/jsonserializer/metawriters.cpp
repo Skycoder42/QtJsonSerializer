@@ -14,7 +14,7 @@ void SequentialWriter::registerWriter(int metaTypeId, SequentialWriterFactory *f
 	QWriteLocker _{&MetaWritersPrivate::sequenceLock};
 	MetaWritersPrivate::sequenceFactories.insert(metaTypeId, factory);
 	MetaWritersPrivate::sequenceInfoCache.remove(metaTypeId);
-	qCDebug(logSeqWriter) << "Added factory for type" << metaTypeId;
+	qCDebug(logSeqWriter) << "Added factory for type:" << QMetaType::typeName(metaTypeId);
 }
 
 bool SequentialWriter::canWrite(int metaTypeId)
@@ -28,10 +28,10 @@ QSharedPointer<SequentialWriter> SequentialWriter::getWriter(QVariant &data)
 	QReadLocker _{&MetaWritersPrivate::sequenceLock};
 	const auto factory = MetaWritersPrivate::sequenceFactories.value(data.userType());
 	if (factory) {
-		qCDebug(logSeqWriter) << "Found factory for data of type" << data.userType();
+		qCDebug(logSeqWriter) << "Found factory for data of type:" << QMetaType::typeName(data.userType());
 		return factory->create(data.data());
 	} else {
-		qCWarning(logSeqWriter) << "Unable to find factory for data of type" << data.userType();
+		qCWarning(logSeqWriter) << "Unable to find factory for data of type:" << QMetaType::typeName(data.userType());
 		return {};
 	}
 }
@@ -41,7 +41,7 @@ SequentialWriter::SequenceInfo SequentialWriter::getInfo(int metaTypeId)
 	QReadLocker rLocker{&MetaWritersPrivate::sequenceLock};
 	auto it = MetaWritersPrivate::sequenceInfoCache.find(metaTypeId);
 	if (it != MetaWritersPrivate::sequenceInfoCache.end()) {
-		qCDebug(logSeqWriter) << "Found SequenceInfo for type" << metaTypeId
+		qCDebug(logSeqWriter) << "Found SequenceInfo for type" << QMetaType::typeName(metaTypeId)
 							  << "in cache";
 		return *it;
 	} else {
@@ -49,11 +49,11 @@ SequentialWriter::SequenceInfo SequentialWriter::getInfo(int metaTypeId)
 		QWriteLocker wLocker{&MetaWritersPrivate::sequenceLock};
 		const auto factory = MetaWritersPrivate::sequenceFactories.value(metaTypeId);
 		if (factory) {
-			qCDebug(logSeqWriter) << "Found factory to generate SequenceInfo for type" << metaTypeId;
+			qCDebug(logSeqWriter) << "Found factory to generate SequenceInfo for type:" << QMetaType::typeName(metaTypeId);
 			it = MetaWritersPrivate::sequenceInfoCache.insert(metaTypeId, factory->create(nullptr)->info());
 		} else {
-			qCWarning(logSeqWriter) << "Unable to find SequenceInfo for type" << metaTypeId
-									<< "- trying to guess by parsing the types name:" << QMetaType::typeName(metaTypeId);
+			qCWarning(logSeqWriter) << "Unable to find SequenceInfo for type" << QMetaType::typeName(metaTypeId)
+									<< "- trying to guess by parsing the types name";
 			it = MetaWritersPrivate::sequenceInfoCache.insert(metaTypeId, MetaWritersPrivate::tryParseSequenceInfo(metaTypeId));
 		}
 		return *it;
@@ -78,7 +78,7 @@ void AssociativeWriter::registerWriter(int metaTypeId, AssociativeWriterFactory 
 	QWriteLocker _{&MetaWritersPrivate::associationLock};
 	MetaWritersPrivate::associationFactories.insert(metaTypeId, factory);
 	MetaWritersPrivate::associationInfoCache.remove(metaTypeId);
-	qCDebug(logAsocWriter) << "Added factory for type" << metaTypeId;
+	qCDebug(logAsocWriter) << "Added factory for type:" << QMetaType::typeName(metaTypeId);
 }
 
 bool AssociativeWriter::canWrite(int metaTypeId)
@@ -92,10 +92,10 @@ QSharedPointer<AssociativeWriter> AssociativeWriter::getWriter(QVariant &data)
 	QReadLocker _{&MetaWritersPrivate::associationLock};
 	const auto factory = MetaWritersPrivate::associationFactories.value(data.userType());
 	if (factory) {
-		qCDebug(logAsocWriter) << "Found factory for data of type" << data.userType();
+		qCDebug(logAsocWriter) << "Found factory for data of type:" << QMetaType::typeName(data.userType());
 		return factory->create(data.data());
 	} else {
-		qCWarning(logAsocWriter) << "Unable to find factory for data of type" << data.userType();
+		qCWarning(logAsocWriter) << "Unable to find factory for data of type:" << QMetaType::typeName(data.userType());
 		return {};
 	}
 }
@@ -105,7 +105,7 @@ AssociativeWriter::AssociationInfo AssociativeWriter::getInfo(int metaTypeId)
 	QReadLocker rLocker{&MetaWritersPrivate::associationLock};
 	auto it = MetaWritersPrivate::associationInfoCache.find(metaTypeId);
 	if (it != MetaWritersPrivate::associationInfoCache.end()) {
-		qCDebug(logAsocWriter) << "Found SequenceInfo for type" << metaTypeId
+		qCDebug(logAsocWriter) << "Found SequenceInfo for type" << QMetaType::typeName(metaTypeId)
 							   << "in cache";
 		return *it;
 	} else {
@@ -113,11 +113,11 @@ AssociativeWriter::AssociationInfo AssociativeWriter::getInfo(int metaTypeId)
 		QWriteLocker wLocker{&MetaWritersPrivate::associationLock};
 		const auto factory = MetaWritersPrivate::associationFactories.value(metaTypeId);
 		if (factory) {
-			qCDebug(logAsocWriter) << "Found factory to generate SequenceInfo for type" << metaTypeId;
+			qCDebug(logAsocWriter) << "Found factory to generate SequenceInfo for type:" << QMetaType::typeName(metaTypeId);
 			it = MetaWritersPrivate::associationInfoCache.insert(metaTypeId, factory->create(nullptr)->info());
 		} else {
-			qCWarning(logAsocWriter) << "Unable to find SequenceInfo for type" << metaTypeId
-									 << "- trying to guess by parsing the types name:" << QMetaType::typeName(metaTypeId);
+			qCWarning(logAsocWriter) << "Unable to find SequenceInfo for type" << QMetaType::typeName(metaTypeId)
+									 << "- trying to guess by parsing the types name";
 			it = MetaWritersPrivate::associationInfoCache.insert(metaTypeId, MetaWritersPrivate::tryParseAssociationInfo(metaTypeId));
 		}
 		return *it;
