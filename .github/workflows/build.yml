@@ -92,6 +92,19 @@ jobs:
           platform: ${{matrix.platform}}
           install-args: --verbose
           cachedir: qt-cache
+      - run: |
+          mkdir ltest
+          cd ltest
+          echo '#include <QtCore/QtCore>' > main.cpp
+          echo 'int main(int argc, char**argv) {' >> main.cpp
+          echo 'QCoreApplication a{argc, argv};' >> main.cpp
+          echo 'qDebug() << QCoreApplication::libraryPaths();' >> main.cpp
+          echo 'return 0;' >> main.cpp
+          echo '}' >> main.cpp
+          qmake -project
+          qmake
+          make
+          ./ltest || ./ltest.exe
       - name: qmake
         run: |
           qmake CONFIG+=install_ok QT_PLATFORM=${{matrix.platform}}
