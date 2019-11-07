@@ -64,20 +64,27 @@ void BitarrayConverterTest::addMetaData()
 
 void BitarrayConverterTest::addCommonSerData()
 {
-	QTest::newRow("basic.aligned") << QVariantHash{}
-								   << TestQ{}
-								   << static_cast<QObject*>(nullptr)
-								   << static_cast<int>(QMetaType::QBitArray)
-								   << QVariant{generateAlternating(24)}
-								   << QCborValue{static_cast<QCborTag>(CborSerializer::BitArray), QByteArray("\x00UUU", 4)}
-								   << QJsonValue{QStringLiteral("AFVVVQ")};
-	QTest::newRow("basic.unaligned") << QVariantHash{}
-									 << TestQ{}
-									 << static_cast<QObject*>(nullptr)
-									 << static_cast<int>(QMetaType::QBitArray)
-									 << QVariant{generateAlternating(28, 4)}
-									 << QCborValue{static_cast<QCborTag>(CborSerializer::BitArray), QByteArray("\x04\x11\x11\x11\x01", 5)}
-									 << QJsonValue{QStringLiteral("BBEREQE")};
+	QTest::newRow("aligned") << QVariantHash{}
+							 << TestQ{}
+							 << static_cast<QObject*>(nullptr)
+							 << static_cast<int>(QMetaType::QBitArray)
+							 << QVariant{generateAlternating(24)}
+							 << QCborValue{static_cast<QCborTag>(CborSerializer::BitArray), QByteArray("\x00UUU", 4)}
+							 << QJsonValue{QStringLiteral("AFVVVQ")};
+	QTest::newRow("unaligned") << QVariantHash{}
+							   << TestQ{}
+							   << static_cast<QObject*>(nullptr)
+							   << static_cast<int>(QMetaType::QBitArray)
+							   << QVariant{generateAlternating(28, 4)}
+							   << QCborValue{static_cast<QCborTag>(CborSerializer::BitArray), QByteArray("\x04\x11\x11\x11\x01", 5)}
+							   << QJsonValue{QStringLiteral("BBEREQE")};
+	QTest::newRow("empty") << QVariantHash{}
+						   << TestQ{}
+						   << static_cast<QObject*>(nullptr)
+						   << static_cast<int>(QMetaType::QBitArray)
+						   << QVariant{QBitArray{}}
+						   << QCborValue{static_cast<QCborTag>(CborSerializer::BitArray), QByteArray{}}
+						   << QJsonValue{QStringLiteral("")};
 }
 
 QBitArray BitarrayConverterTest::generateAlternating(int len, int width) const

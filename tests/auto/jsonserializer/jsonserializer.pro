@@ -9,6 +9,7 @@ CONVERTER_TESTS = \
 	BytearrayConverterTest \
 	CborConverterTest \
 	ChronoDurationConverterTest \
+	DateTimeConverterTest \
 	EnumConverterTest \
 	GadgetConverterTest \
 	GeomConverterTest \

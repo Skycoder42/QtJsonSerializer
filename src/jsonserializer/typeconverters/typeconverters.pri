@@ -2,6 +2,7 @@ HEADERS += \
 	$$PWD/bitarrayconverter_p.h \
 	$$PWD/bytearrayconverter_p.h \
 	$$PWD/cborconverter_p.h \
+	$$PWD/datetimeconverter_p.h \
 	$$PWD/enumconverter_p.h \
 	$$PWD/gadgetconverter_p.h \
 	$$PWD/geomconverter_p.h \
@@ -23,6 +24,7 @@ SOURCES += \
 	$$PWD/bitarrayconverter.cpp \
 	$$PWD/bytearrayconverter.cpp \
 	$$PWD/cborconverter.cpp \
+	$$PWD/datetimeconverter.cpp \
 	$$PWD/enumconverter.cpp \
 	$$PWD/gadgetconverter.cpp \
 	$$PWD/geomconverter.cpp \

@@ -13,6 +13,7 @@
 #include "typeconverters/bitarrayconverter_p.h"
 #include "typeconverters/bytearrayconverter_p.h"
 #include "typeconverters/cborconverter_p.h"
+#include "typeconverters/datetimeconverter_p.h"
 #include "typeconverters/enumconverter_p.h"
 #include "typeconverters/gadgetconverter_p.h"
 #include "typeconverters/geomconverter_p.h"
@@ -98,6 +99,12 @@ bool SerializerBase::versionAsString() const
 {
 	Q_D(const SerializerBase);
 	return d->versionAsString;
+}
+
+bool SerializerBase::dateAsTimeStamp() const
+{
+	Q_D(const SerializerBase);
+	return d->dateAsTimeStamp;
 }
 
 bool SerializerBase::useBcp47Locale() const
@@ -186,6 +193,16 @@ void SerializerBase::setVersionAsString(bool versionAsString)
 
 	d->versionAsString = versionAsString;
 	emit versionAsStringChanged(d->versionAsString, {});
+}
+
+void SerializerBase::setDateAsTimeStamp(bool dateAsTimeStamp)
+{
+	Q_D(SerializerBase);
+	if(d->dateAsTimeStamp == dateAsTimeStamp)
+		return;
+
+	d->dateAsTimeStamp = dateAsTimeStamp;
+	emit dateAsTimeStampChanged(d->dateAsTimeStamp, {});
 }
 
 void SerializerBase::setUseBcp47Locale(bool useBcp47Locale)
@@ -401,6 +418,7 @@ QList<TypeConverterFactory*> SerializerBasePrivate::typeConverterFactories {
 	new TypeConverterStandardFactory<BitArrayConverter>{},
 	new TypeConverterStandardFactory<BytearrayConverter>{},
 	new TypeConverterStandardFactory<CborConverter>{},
+	new TypeConverterStandardFactory<DateTimeConverter>{},
 	new TypeConverterStandardFactory<EnumConverter>{},
 	new TypeConverterStandardFactory<GadgetConverter>{},
 	new TypeConverterStandardFactory<GeomConverter>{},

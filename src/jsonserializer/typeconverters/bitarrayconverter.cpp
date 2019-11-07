@@ -35,13 +35,17 @@ QCborValue BitArrayConverter::serialize(int propertyType, const QVariant &value)
 {
 	Q_UNUSED(propertyType)
 	const auto bitArray = value.value<QBitArray>();
-	const auto byteLen = bitArray.size() % 8 == 0 ?
-							 bitArray.size() / 8 :
-							 (bitArray.size() / 8) + 1;
-	QByteArray cData(byteLen + 1, 0);
-	cData[0] = static_cast<char>(bitArray.size() % 8);
-	memcpy(cData.data() + 1, bitArray.bits(), static_cast<size_t>(byteLen));
-	return {static_cast<QCborTag>(CborSerializer::BitArray), cData};
+	if (bitArray.isEmpty())
+		return {static_cast<QCborTag>(CborSerializer::BitArray), QByteArray{}};
+	else {
+		const auto byteLen = bitArray.size() % 8 == 0 ?
+													  bitArray.size() / 8 :
+													  (bitArray.size() / 8) + 1;
+		QByteArray cData(byteLen + 1, 0);
+		cData[0] = static_cast<char>(bitArray.size() % 8);
+		memcpy(cData.data() + 1, bitArray.bits(), static_cast<size_t>(byteLen));
+		return {static_cast<QCborTag>(CborSerializer::BitArray), cData};
+	}
 }
 
 QVariant BitArrayConverter::deserializeCbor(int propertyType, const QCborValue &value, QObject *parent) const
@@ -50,12 +54,16 @@ QVariant BitArrayConverter::deserializeCbor(int propertyType, const QCborValue &
 	Q_UNUSED(parent)
 
 	const auto cData = (value.isTag() ? value.taggedValue() : value).toByteArray();
-	const auto byteLen = cData.size() - 1;
-	const auto sSize = static_cast<int>(cData[0]);
-	if (sSize == 0)
-		return QBitArray::fromBits(cData.data() + 1, byteLen * 8);
-	else
-		return QBitArray::fromBits(cData.data() + 1, (byteLen - 1) * 8 + sSize);
+	if (cData.isEmpty())
+		return QBitArray{};
+	else {
+		const auto byteLen = cData.size() - 1;
+		const auto sSize = static_cast<int>(cData[0]);
+		if (sSize == 0)
+			return QBitArray::fromBits(cData.data() + 1, byteLen * 8);
+		else
+			return QBitArray::fromBits(cData.data() + 1, (byteLen - 1) * 8 + sSize);
+	}
 }
 
 QVariant BitArrayConverter::deserializeJson(int propertyType, const QCborValue &value, QObject *parent) const

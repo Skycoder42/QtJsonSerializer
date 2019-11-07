@@ -35,6 +35,8 @@ public:
 		VersionNumber = 10007,
 		Tuple = 10008,
 		BitArray = 10009,
+		Date = 10010,
+		Time = 10011,
 
 		LocaleISO = 10100,
 		LocaleBCP47 = 10101,

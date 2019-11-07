@@ -60,6 +60,7 @@ public:
 	bool keepObjectName = false;
 	bool enumAsString = false;
 	bool versionAsString = false;
+	bool dateAsTimeStamp = false;
 	bool useBcp47Locale = true;
 	ValidationFlags validationFlags = ValidationFlag::StandardValidation;
 	Polymorphing polymorphing = Polymorphing::Enabled;
