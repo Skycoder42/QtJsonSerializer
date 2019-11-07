@@ -115,16 +115,31 @@ jobs:
         run: |
           make doxygen
           cd doc && make INSTALL_ROOT="${{steps.setup_qt.outputs.installdir}}" install
-      - uses: actions/upload-artifact@v1
-        with:
-          name: qtjsonserializer-${{matrix.platform}}-${{matrix.version}}
-          path: install_link
-      - uses: Skycoder42/action-upload-release@master
+      - name: upload module to releases
+        uses: Skycoder42/action-upload-release@master
         if: startsWith(github.ref, 'refs/tags/')
         with:
           repo_token: ${{secrets.GITHUB_TOKEN}}
           directory: install_link
           asset_name: qtjsonserializer-${{matrix.platform}}-${{matrix.version}}
+          tag: ${{github.ref}}
+          overwrite: true
+      - name: upload examples to releases
+        uses: Skycoder42/action-upload-release@master
+        if: matrix.platform == 'gcc_64' && startsWith(github.ref, 'refs/tags/')
+        with:
+          repo_token: ${{secrets.GITHUB_TOKEN}}
+          directory: ${{steps.setup_qt.outputs.installdir}}/opt/hostedtoolcache/qt/Examples
+          asset_name: qtjsonserializer-examples-${{matrix.version}}
+          tag: ${{github.ref}}
+          overwrite: true
+      - name: upload doc to releases
+        uses: Skycoder42/action-upload-release@master
+        if: matrix.platform == 'gcc_64' && startsWith(github.ref, 'refs/tags/')
+        with:
+          repo_token: ${{secrets.GITHUB_TOKEN}}
+          directory: ${{steps.setup_qt.outputs.installdir}}/opt/hostedtoolcache/qt/Docs
+          asset_name: qtjsonserializer-doc-${{matrix.version}}
           tag: ${{github.ref}}
           overwrite: true
       - name: prepare qt for caching
