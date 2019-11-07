@@ -84,7 +84,7 @@ jobs:
         id: cache
         with:
           path: qt-cache
-          key: qt-${{matrix.version}}-${{matrix.platform}}-test
+          key: qt-${{matrix.version}}-${{matrix.platform}}-jsonserializer
       - uses: Skycoder42/action-setup-qt@master
         id: setup_qt
         with:
@@ -170,7 +170,7 @@ jobs:
         id: cache
         with:
           path: qt-cache
-          key: qt-${{matrix.version}}-${{matrix.platform}}-test
+          key: qt-${{matrix.version}}-${{matrix.platform}}-jsonserializer
       - uses: Skycoder42/action-setup-qt@master
         id: setup_qt
         with:
