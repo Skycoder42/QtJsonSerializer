@@ -24,9 +24,13 @@ JSON_TYPES = \
 	QDateTime \
 	QUrl \
 	QUuid \
+	QCborValue \
+	QCborMap \
+	QCborArray \
 	QJsonValue \
 	QJsonObject \
 	QJsonArray \
+	QMimeType \
 	QVersionNumber \
 	QLocale \
 	QRegularExpression \
@@ -34,12 +38,20 @@ JSON_TYPES = \
 	QPoint \
 	QLine \
 	QRect \
+	QSizeF \
+	QPointF \
+	QLineF \
+	QRectF \
 	QByteArray
 
 QSize.modes = list
 QPoint.modes = list
 QLine.modes = list
 QRect.modes = list
+QSizeF.modes = list
+QPointF.modes = list
+QLineF.modes = list
+QRectF.modes = list
 QByteArray.modes = map set
 
 isEmpty(QT_JSONSERIALIZER_REGGEN_DIR): QT_JSONSERIALIZER_REGGEN_DIR = $$OUT_PWD/.reggen
