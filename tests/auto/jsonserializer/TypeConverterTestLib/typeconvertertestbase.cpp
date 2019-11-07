@@ -57,7 +57,7 @@ void TypeConverterTestBase::testConverterIsRegistered()
 		if(typeid(*cOwn).hash_code() == typeid(*cReg).hash_code())
 			return;
 	}
-	QFAIL(QByteArrayLiteral("TypeConverter \"") + typeid(*cOwn).name() + QByteArrayLiteral("\" is not registerd within QJsonSerializer"));
+	QFAIL(QByteArrayLiteral("TypeConverter \"") + cOwn->name() + QByteArrayLiteral("\" is not registerd within QJsonSerializer"));
 }
 
 void TypeConverterTestBase::testConverterMeta_data()

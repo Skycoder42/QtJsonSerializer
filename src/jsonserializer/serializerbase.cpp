@@ -10,6 +10,7 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QScopeGuard>
 
+#include "typeconverters/bitarrayconverter_p.h"
 #include "typeconverters/bytearrayconverter_p.h"
 #include "typeconverters/cborconverter_p.h"
 #include "typeconverters/enumconverter_p.h"
@@ -397,6 +398,7 @@ QVariant SerializerBase::deserializeVariant(int propertyType, const QCborValue &
 SerializerBasePrivate::ThreadSafeStore<TypeExtractor> SerializerBasePrivate::extractors;
 QReadWriteLock SerializerBasePrivate::typeConverterFactoryLock;
 QList<TypeConverterFactory*> SerializerBasePrivate::typeConverterFactories {
+	new TypeConverterStandardFactory<BitArrayConverter>{},
 	new TypeConverterStandardFactory<BytearrayConverter>{},
 	new TypeConverterStandardFactory<CborConverter>{},
 	new TypeConverterStandardFactory<EnumConverter>{},

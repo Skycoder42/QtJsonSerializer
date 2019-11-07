@@ -1,4 +1,5 @@
 HEADERS += \
+	$$PWD/bitarrayconverter_p.h \
 	$$PWD/bytearrayconverter_p.h \
 	$$PWD/cborconverter_p.h \
 	$$PWD/enumconverter_p.h \
@@ -19,6 +20,7 @@ HEADERS += \
 	$$PWD/versionnumberconverter_p.h
 
 SOURCES += \
+	$$PWD/bitarrayconverter.cpp \
 	$$PWD/bytearrayconverter.cpp \
 	$$PWD/cborconverter.cpp \
 	$$PWD/enumconverter.cpp \

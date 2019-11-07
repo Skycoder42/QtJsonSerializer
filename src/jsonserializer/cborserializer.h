@@ -34,6 +34,7 @@ public:
 		MultiMap = 10006,
 		VersionNumber = 10007,
 		Tuple = 10008,
+		BitArray = 10009,
 
 		LocaleISO = 10100,
 		LocaleBCP47 = 10101,
