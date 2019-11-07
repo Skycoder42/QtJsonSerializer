@@ -169,9 +169,9 @@ void DateTimeConverterTest::addCommonSerData()
 									 << TestQ{}
 									 << static_cast<QObject*>(nullptr)
 									 << static_cast<int>(QMetaType::QDateTime)
-									 << QVariant{QDateTime{{2019, 1, 3}, {13, 42, 15}}}
-									 << QCborValue{QCborKnownTags::UnixTime_t, 1546519335ll}
-									 << QJsonValue{1546519335ll};
+									 << QVariant{QDateTime{{2019, 1, 3}, {13, 42, 15}, Qt::UTC}}
+									 << QCborValue{QCborKnownTags::UnixTime_t, 1546522935ll}
+									 << QJsonValue{1546522935ll};
 
 	QTest::newRow("date.datestr") << QVariantHash{}
 								  << TestQ{}
