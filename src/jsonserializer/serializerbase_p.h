@@ -79,9 +79,9 @@ public:
 	void updateConverterStore() const;
 
 	int getEnumId(QMetaEnum metaEnum, bool ser) const;
-	QCborValue serializeValue(int propertyType, const QVariant &value) const;
-	QVariant deserializeCborValue(int propertyType, const QCborValue &value) const;
-	QVariant deserializeJsonValue(int propertyType, const QCborValue &value) const;
+	virtual QCborValue serializeValue(int propertyType, const QVariant &value) const;
+	virtual QVariant deserializeCborValue(int propertyType, const QCborValue &value) const;
+	virtual QVariant deserializeJsonValue(int propertyType, const QCborValue &value) const;
 };
 
 Q_DECLARE_LOGGING_CATEGORY(logSerializer)

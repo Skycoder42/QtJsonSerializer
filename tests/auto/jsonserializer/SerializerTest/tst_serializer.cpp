@@ -572,6 +572,74 @@ void SerializerTest::testDeserialization_data()
 								  << QJsonValue{42}
 								  << false
 								  << QVariantHash{};
+
+	QTest::newRow("specialint.PositiveBignum.u8") << QVariant::fromValue<quint8>(0x42)
+												  << QCborValue{QCborKnownTags::PositiveBignum, QByteArray("\x42", 1)}
+												  << QJsonValue{QJsonValue::Undefined}
+												  << true
+												  << QVariantHash{{QStringLiteral("handleSpecialIntegers"), true}};
+	QTest::newRow("specialint.PositiveBignum.u16") << QVariant::fromValue<quint16>(0x1342)
+												   << QCborValue{QCborKnownTags::PositiveBignum, QByteArray("\x13\x42", 2)}
+												   << QJsonValue{QJsonValue::Undefined}
+												   << true
+												   << QVariantHash{{QStringLiteral("handleSpecialIntegers"), true}};
+	QTest::newRow("specialint.PositiveBignum.u32") << QVariant::fromValue<quint32>(0x03134207)
+												   << QCborValue{QCborKnownTags::PositiveBignum, QByteArray("\x03\x13\x42\x07", 4)}
+												   << QJsonValue{QJsonValue::Undefined}
+												   << true
+												   << QVariantHash{{QStringLiteral("handleSpecialIntegers"), true}};
+	QTest::newRow("specialint.PositiveBignum.u64") << QVariant::fromValue<quint64>(0x0313420703134207)
+												   << QCborValue{QCborKnownTags::PositiveBignum, QByteArray("\x03\x13\x42\x07\x03\x13\x42\x07", 8)}
+												   << QJsonValue{QJsonValue::Undefined}
+												   << true
+												   << QVariantHash{{QStringLiteral("handleSpecialIntegers"), true}};
+	QTest::newRow("specialint.PositiveBignum.u24") << QVariant::fromValue<quint32>(0x00771342)
+												   << QCborValue{QCborKnownTags::PositiveBignum, QByteArray("\x77\x13\x42", 3)}
+												   << QJsonValue{QJsonValue::Undefined}
+												   << true
+												   << QVariantHash{{QStringLiteral("handleSpecialIntegers"), true}};
+	QTest::newRow("specialint.PositiveBignum.u48") << QVariant::fromValue<quint64>(0x0000112203134207)
+												   << QCborValue{QCborKnownTags::PositiveBignum, QByteArray("\x11\x22\x03\x13\x42\x07", 6)}
+												   << QJsonValue{QJsonValue::Undefined}
+												   << true
+												   << QVariantHash{{QStringLiteral("handleSpecialIntegers"), true}};
+	QTest::newRow("specialint.PositiveBignum.oversized") << QVariant::fromValue<quint64>(0)
+														 << QCborValue{QCborKnownTags::PositiveBignum, QByteArray("\x01\x02\x03\x04\x05\x06\x07\x08\x09", 9)}
+														 << QJsonValue{QJsonValue::Undefined}
+														 << false
+														 << QVariantHash{{QStringLiteral("handleSpecialIntegers"), true}};
+
+	QTest::newRow("specialint.NegativeBignum.i8") << QVariant::fromValue<qint8>(-80)
+												  << QCborValue{QCborKnownTags::PositiveBignum, QByteArray("\x4F", 1)}
+												  << QJsonValue{QJsonValue::Undefined}
+												  << true
+												  << QVariantHash{{QStringLiteral("handleSpecialIntegers"), true}};
+	return;
+	QTest::newRow("specialint.NegativeBignum.i16") << QVariant::fromValue<quint16>(0x1342)
+												   << QCborValue{QCborKnownTags::PositiveBignum, QByteArray("\x13\x42", 2)}
+												   << QJsonValue{QJsonValue::Undefined}
+												   << true
+												   << QVariantHash{{QStringLiteral("handleSpecialIntegers"), true}};
+	QTest::newRow("specialint.NegativeBignum.i32") << QVariant::fromValue<quint32>(0x03134207)
+												   << QCborValue{QCborKnownTags::PositiveBignum, QByteArray("\x03\x13\x42\x07", 4)}
+												   << QJsonValue{QJsonValue::Undefined}
+												   << true
+												   << QVariantHash{{QStringLiteral("handleSpecialIntegers"), true}};
+	QTest::newRow("specialint.NegativeBignum.i64") << QVariant::fromValue<quint64>(0x0313420703134207)
+												   << QCborValue{QCborKnownTags::PositiveBignum, QByteArray("\x03\x13\x42\x07\x03\x13\x42\x07", 8)}
+												   << QJsonValue{QJsonValue::Undefined}
+												   << true
+												   << QVariantHash{{QStringLiteral("handleSpecialIntegers"), true}};
+	QTest::newRow("specialint.NegativeBignum.i24") << QVariant::fromValue<quint32>(0x00771342)
+												   << QCborValue{QCborKnownTags::PositiveBignum, QByteArray("\x77\x13\x42", 3)}
+												   << QJsonValue{QJsonValue::Undefined}
+												   << true
+												   << QVariantHash{{QStringLiteral("handleSpecialIntegers"), true}};
+	QTest::newRow("specialint.NegativeBignum.i48") << QVariant::fromValue<quint64>(0x0000112203134207)
+												   << QCborValue{QCborKnownTags::PositiveBignum, QByteArray("\x11\x22\x03\x13\x42\x07", 6)}
+												   << QJsonValue{QJsonValue::Undefined}
+												   << true
+												   << QVariantHash{{QStringLiteral("handleSpecialIntegers"), true}};
 }
 
 void SerializerTest::testDeserialization()
