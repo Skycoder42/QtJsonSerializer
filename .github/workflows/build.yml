@@ -72,6 +72,7 @@ jobs:
       - uses: actions/setup-python@v1
       - name: actions/cache emsdk
         uses: actions/cache@v1
+        if: matrix.platform == 'wasm_32'
         with:
           path: emsdk-cache
           key: ${{runner.os}}-emsdk-${{matrix.emsdk}}
@@ -90,15 +91,15 @@ jobs:
         uses: actions/cache@v1
         id: cache
         with:
-          path: qt-cache
-          key: qt-${{matrix.version}}-${{matrix.platform}}-jsonserializer
+          path: qt-${{matrix.version}}-${{matrix.platform}}
+          key: qt-${{matrix.version}}-${{matrix.platform}}
       - uses: Skycoder42/action-setup-qt@master
         id: setup_qt
         with:
           version: ${{matrix.version}}
           platform: ${{matrix.platform}}
           install-args: --verbose
-          cachedir: qt-cache
+          cachedir: qt-${{matrix.version}}-${{matrix.platform}}
       - name: qmake
         run: |
           qmake CONFIG+=install_ok QT_PLATFORM=${{matrix.platform}}
@@ -149,17 +150,6 @@ jobs:
           asset_name: qtjsonserializer-doc-${{matrix.version}}
           tag: ${{github.ref}}
           overwrite: true
-      - name: prepare qt for caching
-        if: steps.cache.outputs.cache-hit != 'true'
-        continue-on-error: true
-        shell: python
-        run: |
-          import shutil
-          shutil.rmtree("qt-cache", ignore_errors=True)
-          try:
-            shutil.move(r"${{steps.setup_qt.outputs.qtdir}}", "qt-cache")
-          except:
-            shutil.rmtree("qt-cache", ignore_errors=True)
 
   build-no-converters:
     strategy:
@@ -198,15 +188,15 @@ jobs:
       - uses: actions/cache@v1
         id: cache
         with:
-          path: qt-cache
-          key: qt-${{matrix.version}}-${{matrix.platform}}-jsonserializer
+          path: qt-${{matrix.version}}-${{matrix.platform}}
+          key: qt-${{matrix.version}}-${{matrix.platform}}
       - uses: Skycoder42/action-setup-qt@master
         id: setup_qt
         with:
           version: ${{matrix.version}}
           platform: ${{matrix.platform}}
           install-args: --verbose
-          cachedir: qt-cache
+          cachedir: qt-${{matrix.version}}-${{matrix.platform}}
       - name: qmake
         run: |
           qmake CONFIG+=no_register_json_converters QT_PLATFORM=${{matrix.platform}}
