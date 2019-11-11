@@ -9,11 +9,13 @@
 #if !defined(QT_NO_EXCEPTIONS) && QT_CONFIG(future)
 #include <QtCore/qexception.h>
 namespace QtJsonSerializer {
+//! The exception base class to use for this module
 using ExceptionBase = QException;
 }
 #else
 #include <exception>
 namespace QtJsonSerializer {
+//! The exception base class to use for this module
 using ExceptionBase = std::exception;
 }
 #endif
@@ -49,7 +51,7 @@ protected:
 	QSharedPointer<ExceptionPrivate> d;
 };
 
-//! Exception thrown by QJsonSerializer if something goes wrong while serializing
+//! Exception thrown by the serializers if something goes wrong while serializing
 class Q_JSONSERIALIZER_EXPORT SerializationException : public Exception
 {
 public:
@@ -60,7 +62,7 @@ public:
 	ExceptionBase *clone() const override;
 };
 
-//! Exception thrown by QJsonSerializer if something goes wrong while deserializing
+//! Exception thrown by the serializers if something goes wrong while deserializing
 class Q_JSONSERIALIZER_EXPORT DeserializationException : public Exception
 {
 public:

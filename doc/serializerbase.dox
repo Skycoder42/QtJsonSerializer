@@ -139,7 +139,7 @@ Both formats are accepted for deserialization
 /*!
 @property QtJsonSerializer::SerializerBase::validationFlags
 
-@default{`SerializerBase::StandardValidation`}
+@default{`SerializerBase::ValidationFlag::StandardValidation`}
 
 Applies to deserialization only.<br/>
 By specifying those flags, you can set which additional attributes the serializer should check when deserializing.
@@ -158,7 +158,7 @@ using defaults values etc.
 /*!
 @property QtJsonSerializer::SerializerBase::polymorphing
 
-@default{`SerializerBase::Enabled`}
+@default{`SerializerBase::Polymorphing::Enabled`}
 
 @attention Only applicable for QObject deriving classes
 

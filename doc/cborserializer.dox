@@ -1,772 +1,172 @@
 /*!
-@class QJsonSerializer
+@class QtJsonSerializer::CborSerializer
 
-This class is the modules core component. It performs the de/serialization. Normally, you will
-only use the public members of this class. However, in some cases, you may have to add custom
-code to properly serialize special classes. In order to modify the general serialization
-behavior, have a look at the properties.
+This class is one of the modules core component. It performs the de/serialization of C++
+classes from and to CBOR.
 
-@section supported Supported types
+@section cbor_supported Supported types
 The serializer supports a bunch of types by default, but there are limitations. Check the main
-page @ref qtjsonserializer_readme_label_4 "Usage Hints" for details about what is possible and what is not.
+page @ref qtjsonserializer_readme_label_4 "Usage Hints" for details about what is possible and
+what is not.
 
-@section extending Extending the serializer
-To extend the serializers functionality, create a custom implementation of the QJsonTypeConverter class.
-Check it's documentation for more details and an example on how to. Once you've created a custom converter
-class, you can add it to a serializer instance by using QJsonSerializer::addJsonTypeConverter.
+@section cbor_extending Extending the serializer
+To extend the serializers functionality, create a custom implementation of the
+TypeConverter class. Check it's documentation for more details and an example on how to. Once
+you've created a custom converter class, you can add it to a serializer instance by using
+SerializerBase::addJsonTypeConverter.
+
+@sa SerializerBase, JsonSerializer
 */
 
 /*!
-@property QJsonSerializer::allowDefaultNull
+@property QtJsonSerializer::CborSerializer::handleSpecialNumbers
 
 @default{`false`}
 
 Applies to deserialization only.<br/>
-If set to `false`, a `null` json value can only be converted to a QObject (`nullptr`)! For value
-types (including Q_GADGETs!), the conversion will fail instead. This is a strict mode, since for
-value types, there is no null value.<br/>
-If set to `true`, `null` is allowed for all types. If it's not a QObject, a default
-constructed value will be used.
+The following table shows which tags are understood by the serializer and how they are
+deserialized. The 'Checked' column indicates, if the data is tested to fit into the type before
+deserialzing. If that's not the case, data can be lost without notice.
 
-@note If you are deserializing json from external sources, it's possible they don't follow this
-approach, and in order to get a working deserialization, you will have to enable this property.
+ Tag											| Types											| Checked
+------------------------------------------------|-----------------------------------------------|---------
+ QCborKnownTags::PositiveBignum					| q[u]int8 - q[u]int64 (depends on data size)	| yes
+ QCborKnownTags::NegativeBignum					| qint8 - qint64 (depends on data size)			| yes
+ QCborKnownTags::Decimal						| qreal											| no
+ QCborKnownTags::Bigfloat						| qreal											| no
+ CborSerializer::ExtendedTags::RationaleNumber	| qreal											| no
 
-@accessors{
-	@readAc{allowDefaultNull()}
-	@writeAc{setAllowDefaultNull()}
-	@notifyAc{allowDefaultNullChanged()}
-}
-*/
-
-/*!
-@property QJsonSerializer::keepObjectName
-
-@default{`false`}
-
-Applies to serialization only.<br/>
-By default, the QObject::objectName property will not be serialized for QObjects! If you need to
-keep this information, set the property to `true`
-
-@note If the `objectName` is contained in json, a deserialization will use that value, independent
-of this property.
+@warning Please note that those types have been explicitly created to allow encoding of
+data that does not fit the standard integer or floating point types. The deserialization of
+this class however will fail for data that does fit into such a type. If you truely need to
+handle these types with their full capacity, create a custom converter instead of using this
+property. It is only provided for convenience.
 
 @accessors{
-	@readAc{keepObjectName()}
-	@writeAc{setKeepObjectName()}
-	@notifyAc{keepObjectNameChanged()}
+	@readAc{handleSpecialNumbers()}
+	@writeAc{setHandleSpecialNumbers()}
+	@notifyAc{handleSpecialNumbersChanged()}
 }
 */
 
 /*!
-@property QJsonSerializer::enumAsString
-
-@default{`false`}
-
-Applies to serialization only.<br/>
-By default, enums and flags are serialized as an integer, representing their value. If you want
-to serialize them as a string, the "name" of each value, enable this propterty.
-
-@note For deserialization, both int and string are always correctly deserialized.
-
-@accessors{
-	@readAc{enumAsString()}
-	@writeAc{setEnumAsString()}
-	@notifyAc{enumAsStringChanged()}
-}
-*/
-
-/*!
-@property QJsonSerializer::validateBase64
-
-@default{`true`}
-
-Applies to deserialization only.<br/>
-If active, the date is checked first to verify it is actually a base64 encoded string. If thats not the case
-an exception will be thrown. When disabled, invalid characters are silently discarded, so no error is reported
-
-@accessors{
-	@readAc{validateBase64()}
-	@writeAc{setValidateBase64()}
-	@notifyAc{validateBase64Changed()}
-}
-*/
-
-/*!
-@property QJsonSerializer::useBcp47Locale
-
-@default{`true`}
-
-Applies to serialization only.<br/>
-The property can be used to change how QLocale is serialized. If active, a bcp47 local string is created (See QLocale::bcp47Name()).
-That string is able to encode all information contained in the locale, but is not as wide spread as the "simple name format". That one
-is used if set to false (See QLocale::name())
-
-Both formats are accepted for deserialization
-
-@accessors{
-	@readAc{useBcp47Locale()}
-	@writeAc{setUseBcp47Locale()}
-	@notifyAc{useBcp47LocaleChanged()}
-}
-
-@sa QLocale::bcp47Name, QLocale::name
-*/
-
-/*!
-@property QJsonSerializer::validationFlags
-
-@default{`QJsonSerialzer::StandardValidation`}
-
-Applies to deserialization only.<br/>
-By specifying those flags, you can set which additional attributes the serializer should check when deserializing.
-In those stricter modes, the serializer will fail with an exception if the conditions are not met instead of simply
-using defaults values etc.
-
-@accessors{
-	@readAc{validationFlags()}
-	@writeAc{setValidationFlags()}
-	@notifyAc{validationFlagsChanged()}
-}
-
-@sa QJsonSerializer::ValidationFlag
-*/
-
-/*!
-@property QJsonSerializer::polymorphing
-
-@default{`QJsonSerialzer::Enabled`}
-
-@attention Only applicable for QObject deriving classes
-
-Depending on the set mode QObject deriving classes are de/serialized differently. Polymorphing in this
-context can be easily described with a simple example:
-
-@code{.cpp}
-class Foo : public QObject {
-//...
-	Q_PROPERTY(int foo MEMBER foo)
-//...
-};
-
-class Bar : public Foo {
-//...
-	Q_PROPERTY(int bar MEMBER bar)
-	Q_CLASSINFO("polymorphic", "true")
-//...
-};
-@endcode
-
-Assuming you are de/serializing `Foo*`, but it actually is a `Bar*` object, for example: `serialize<Foo*>(new Bar());`
-
-For Serialization:<br/>
-With polymorphing `QJsonSerialzer::Disabled`, any additional information about a type is ignored. `Bar` is serialized as `Foo`, and
-the json would only contain the `foo` property. With it beeing `QJsonSerialzer::Enabled`, by default no polymorphic information
-is stored. However, if the type "declares" polymorphism (as in this example Bar does) it is stored. So here `Bar` is actually serialized
-as `Bar`. In order to make deserialization possible, an additional json value, @@class is created containing the actual class name, `Bar`.
-The json contains this property, the `foo` and the `bar` property. If polymorphism is `QJsonSerialzer::Forced`, any type is treated like `Bar`
-in the previous case, even if no polymorphism is specified. For all types, even simple QObjects, the @@class is added and the actual typed serialized.
-
-For Deserialization:<br/>
-With polymorphing `QJsonSerialzer::Disabled`, the @@class json property is ignored, and a value always deserialized as the given
-property type. So even if `@@class` is set to `Bar`, only a `Foo` object is created, and the `bar` property ignored. By using
-`QJsonSerialzer::Enabled`, if the json does contain the @@class property, the serializer creates an instance of the class named by
-this property. Here, a `Bar` object is created, with both the `foo` and the `bar` property correctly read. When set to `QJsonSerialzer::Forced`,
-every json object to be deserialized as QObject must have the @@class property, or otherwise an exception is thrown.
-
-<b>Declare objects polymorphic:</b><br/>
-There are to ways to make objects polymorphic. The first is static and uses `Q_CLASSINFO`. Simply add the macro to the class
-that should be polymorphic as `Q_CLASSINFO("polymorphic", "true")`. You can also set it to false, to disable polymorphism in
-case the class you inherit has this already set to true.
-
-The second way is to use a dynamic property. The property overrides the classinfo, but has to be set on an actual instance of
-the object to be serialized. Set the property by calling `setProperty("__qt_json_serializer_polymorphic", true);`. Just like with class info, you can set it
-to false to disable it.
-
-@note This is only required for serialization. When deserializing, Polymorphism is determined by the @@class property. If it
-is present, the data is treated polymorphic.
-
-@accessors{
-	@readAc{polymorphing()}
-	@writeAc{setPolymorphing()}
-	@notifyAc{polymorphingChanged()}
-}
-*/
-
-/*!
-@property QJsonSerializer::multiMapMode
-
-@default{`QJsonSerialzer::MultiMapMode::Map`}
-
-Applies to serialization only.<br/>
-Selects how QMultiMap and QMultiHash are serialized. There are two options. Assuimg you have the
-following multi map:
-
-@code{.cpp}
-QMultiMap<QString, int> map;
-map.insert("a", 1);
-map.insert("a", 2);
-map.insert("b", 3);
-@endcode
-
-When in map mode, the following json is generated:
-@code{.json}
-{
-	"a": [1, 2],
-	"b": [3]
-}
-@endcode
-
-When in list mode, the following is generated instead:
-@code{.json}
-[
-	["a", 1],
-	["a", 2],
-	["b", 3],
-]
-@endcode
-
-For deserialization, both formats are always supported.
-
-@accessors{
-	@readAc{multiMapMode()}
-	@writeAc{setMultiMapMode()}
-	@notifyAc{multiMapModeChanged()}
-}
-
-@sa QJsonSerializer::MultiMapMode
-*/
-
-/*!
-@fn QJsonSerializer::registerInverseTypedef
-
-@tparam T The type to register the original name for
-@param typeName The name to be registered
-
-Use this method in case you are working with a typedef that was registered as the primary
-type it Qt using #Q_DECLARE_METATYPE. This can be neccessary for some container types. Simple example:
-
-@code{.cpp}
-using MyMap = QMap<QString, int>;
-Q_DECLARE_METATYPE(MyMap);
-
-// ...
-
-QJsonSerializer::registerInverseTypedef<MyMap>("QMap<QString, int>");
-@endcode
-
-@sa QJsonTypeConverter::getCanonicalTypeName
-*/
-
-/*!
-@fn QJsonSerializer::registerListContainerConverters
-
-@tparam TContainer The container type to register the converters for
-@tparam TClass The contained type to register converters for
-@tparam TAppendRet The return type of the append method
-
-@param appendMethod A member method of TContainer to be called to append an element to it
-@param reserveMethod A member method of TContainer to reserve memory for faster appending. Can
-be `nullptr` if the container has no such method.
-
-@note Only use this method if you have a custom container. When working with standard Qt
-containers, use QJsonSerializer::registerListConverters instead!
-
-Performs the registration of converters for `TContainer<T> <--> QVariantList`. This conversion
-is a requirement for the serializer, if you want to be able to serialize lists of a type. The
-function calls the following methods for the given type:
-
-- `QMetaType::registerConverter<TContainer<T>, QVariantList>()`
-- `QMetaType::registerConverter<QVariantList, TContainer<T>>()`
-
-with a generic conversion using QVariant. By default, methods with the signatures
-`&TContainer<TClass>::append` and `&TContainer<TClass>::reserve` are passed as parameters to this
-method to prepare a list for beeing created and actually append items. You can pass custom
-methods if they are named differently on your TContainer. Also, it is allowed to pass `nullptr`
-as second parameter.
-
-@sa QJsonSerializer::registerListConverters, QJsonSerializer::registerSetConverters
-*/
-
-/*!
-@fn QJsonSerializer::registerMapContainerConverters
-
-@tparam TContainer The container type to register the converters for
-@tparam TClass The contained type to register converters for
-@tparam TInsertRet The return type of the insert method
-
-@param insertMethod A member method of TContainer to be called to insert an element to it
-@param asMultiMap Specify if the given map-container is a multi-map or normal map container.
-
-@note Only use this method if you have a custom container. When working with standard Qt
-containers, use QJsonSerializer::registerMapConverters instead!
-
-Performs the registration of converters for `TContainer<QString, TClass> <--> QVariantMap`. This
-conversion is a requirement for the serializer, if you want to be able to serialize lists of a
-type. The function calls the following methods for the given type:
-
-- `QMetaType::registerConverter<TContainer<QString, TClass>, QVariantMap>()`
-- `QMetaType::registerConverter<QVariantMap, TContainer<QString, TClass>>()`
-
-with a generic conversion using QVariant. By default, methods with the signatures
-`&TContainer<QString, TClass>::insert` are passed as parameters to this method to prepare a map
-for inserting items. You can pass a custom method if it isnamed differently on your TContainer.
-
-@sa QJsonSerializer::registerMapConverters
-*/
-
-/*!
-@fn QJsonSerializer::registerListConverters
-
-@tparam T The type to register converters for
-
-Performs the registration of converters for list-like Qt containers. This conversion is a
-requirement for the serializer, if you want to be able to serialize lists of a type. The function
-calls the following methods for the given type:
-
-- `QJsonSerializer::registerListContainerConverters<QList, T>()`
-- `QJsonSerializer::registerListContainerConverters<QLinkedList, T>()`
-- `QJsonSerializer::registerListContainerConverters<QVector, T>()`
-- `QJsonSerializer::registerListContainerConverters<QStack, T>()`
-- `QJsonSerializer::registerListContainerConverters<QQueue, T>()`
-
-with a generic conversion using QVariant.
-
-@sa QJsonSerializer::registerBasicConverters, QJsonSerializer::registerSetConverters,
-QJsonSerializer::registerMapConverters, QJsonSerializer::registerPointerConverters,
-QJsonSerializer::registerPairConverters, QJsonSerializer::registerTupleConverter,
-QJsonSerializer::registerOptionalConverters, QJsonSerializer::registerVariantConverters,
-qtJsonSerializerRegisterTypes()
-*/
-
-/*!
-@fn QJsonSerializer::registerSetConverters
-
-@tparam T The type to register converters for
-
-Performs the registration of converters for set-like Qt containers. This conversion is a
-requirement for the serializer, if you want to be able to serialize sets of a type. The function
-calls the following methods for the given type:
-- `QJsonSerializer::registerListContainerConverters<QSet, T>()`
-
-with a generic conversion using QVariant.
-
-@sa QJsonSerializer::registerBasicConverters, QJsonSerializer::registerListConverters,
-QJsonSerializer::registerMapConverters, QJsonSerializer::registerPointerConverters,
-QJsonSerializer::registerPairConverters, QJsonSerializer::registerTupleConverter,
-QJsonSerializer::registerOptionalConverters, QJsonSerializer::registerVariantConverters,
-qtJsonSerializerRegisterTypes()
-*/
-
-/*!
-@fn QJsonSerializer::registerMapConverters
-
-@tparam T The type to register converters for
-@tparam mapTypes Statically enables registration for QMap based containers
-@tparam hashTypes Statically enables registration for QHash based containers
-
-Performs the registration of converters for map-like Qt containers. This conversion is a
-requirement for the serializer, if you want to be able to serialize maps of a type. The function
-calls the following methods for the given type:
-
-- If `mapTypes` is true (the default):
-	- `QJsonSerializer::registerMapContainerConverters<QMap, T>()`
-	- `QJsonSerializer::registerMapContainerConverters<QMultiMap, T>()`
-- If `hashTypes` is true (the default):
-	- `QJsonSerializer::registerMapContainerConverters<QHash, T>()`
-	- `QJsonSerializer::registerMapContainerConverters<QMultiHash, T>()`
-
-with a generic conversion using QVariant.
-
-@sa QJsonSerializer::registerBasicConverters, QJsonSerializer::registerListConverters,
-QJsonSerializer::registerSetConverters, QJsonSerializer::registerPointerConverters,
-QJsonSerializer::registerPairConverters, QJsonSerializer::registerTupleConverter,
-QJsonSerializer::registerOptionalConverters, QJsonSerializer::registerVariantConverters,
-qtJsonSerializerRegisterTypes()
-*/
-
-/*!
-@fn QJsonSerializer::registerPointerConverters
-
-@tparam T The type to register converters for
-
-Performs the registration of converters for `QSharedPointer<T> <--> QSharedPointer<QObject>` and
-`QPointer<T> <--> QPointer<QObject>`. This conversion is a requirement for the serializer, if you
-want to be able to serialize QSharedPointers or QPointers of a type. The function calls the following
-methods for the given type:
-
-- `QMetaType::registerConverter<QSharedPointer<QObject>, QSharedPointer<T>>()`
-- `QMetaType::registerConverter<QSharedPointer<T>, QSharedPointer<QObject>>()`
-- `QMetaType::registerConverter<QPointer<QObject>, QPointer<T>>()`
-- `QMetaType::registerConverter<QPointer<T>, QPointer<QObject>>()`
-
-@sa QJsonSerializer::registerBasicConverters, QJsonSerializer::registerListConverters,
-QJsonSerializer::registerSetConverters, QJsonSerializer::registerMapConverters,
-QJsonSerializer::registerPairConverters, QJsonSerializer::registerTupleConverter,
-QJsonSerializer::registerOptionalConverters, QJsonSerializer::registerVariantConverters,
-qtJsonSerializerRegisterTypes()
-*/
-
-/*!
-@fn QJsonSerializer::registerBasicConverters
-
-@tparam T The type to register converters for
-
-A shortcut for all the container registrations QJsonSerializer provides. For any class that
-does **not** inherit QObject, the method internally calls:
-
-- `QJsonSerializer::registerListConverters<T>()`
-- `QJsonSerializer::registerSetConverters<T>()`
-- `QJsonSerializer::registerMapConverters<T>()`
-
-For a T that extends QObject, it instead calls the following. Please not that you have to
-register such a type *without* the pointer-star, e.g.
-QJsonSerializer::registerBasicConverters<QFile>:
-
-- `QJsonSerializer::registerPointerConverters<T>()`
-- `QJsonSerializer::registerBasicConverters<T*>()`
-- `QJsonSerializer::registerBasicConverters<QSharedPointer<T>>()`
-- `QJsonSerializer::registerBasicConverters<QPointer<T>>()`
-
-@sa QJsonSerializer::registerListConverters, QJsonSerializer::registerSetConverters,
-QJsonSerializer::registerMapConverters, QJsonSerializer::registerPointerConverters,
-QJsonSerializer::registerPairConverters, QJsonSerializer::registerTupleConverter,
-QJsonSerializer::registerOptionalConverters, QJsonSerializer::registerVariantConverters,
-qtJsonSerializerRegisterTypes()
-*/
-
-/*!
-@fn QJsonSerializer::registerPairConverters
-
-@tparam T1 The first type to register converters for
-@tparam T2 The second type to register converters for
-@param originalTypeName If given, automatically registers an inverse typedef for the given std::pair
-
-Performs the registration of converters for `QPair<T1, T2> <--> QPair<QVariant, QVariant>`
-and `std::pair<T1, T2> <--> QPair<QVariant, QVariant>`.
-This conversion is a requirement for the serializer, if you want to be able to serialize
-pairs with the given two types. The function calls the following methods for the given type:
-
-- `QMetaType::registerConverter<QPair<T1, T2>, QPair<QVariant, QVariant>>()`
-- `QMetaType::registerConverter<QPair<QVariant, QVariant>, QPair<T1, T2>>()`
-- `QMetaType::registerConverter<std::pair<T1, T2>, QPair<QVariant, QVariant>>()`
-- `QMetaType::registerConverter<QPair<QVariant, QVariant>, std::pair<T1, T2>>()`
-
-If originalTypeName is set, this method also calls
-`QJsonSerializer::registerInverseTypedef<std::pair<T1, T2>>(originalTypeName);`.
-
-@attention Only this very specific combination in this specific order is registered. If you change
-one type to another, or swap the two types, you need to call this method again with this different pair.
-
-@sa QJsonSerializer::registerBasicConverters, QJsonSerializer::registerListConverters,
-QJsonSerializer::registerSetConverters, QJsonSerializer::registerMapConverters,
-QJsonSerializer::registerPointerConverters, QJsonSerializer::registerTupleConverter,
-QJsonSerializer::registerOptionalConverters, QJsonSerializer::registerVariantConverters
-*/
-
-/*!
-@fn QJsonSerializer::registerTupleConverters
-
-@tparam TArgs The types that make up the tuple to register converters for
-@param originalTypeName If given, automatically registers an inverse typedef for the given std::tuple
-
-Performs the registration of converters for `std::tuple<TArgs...> <--> QVariantList`.
-This conversion is a requirement for the serializer, if you want to be able to serialize
-tuples with the given types. The function calls the following methods for the given type:
-
-- `QMetaType::registerConverter<std::tuple<TArgs...>, QVariantList>()`
-- `QMetaType::registerConverter<QVariantList, std::tuple<TArgs...>>()`
-
-If originalTypeName is set, this method also calls
-`QJsonSerializer::registerInverseTypedef<std::tuple<TArgs...>>(originalTypeName);`.
-
-@attention Only this very specific combination in this specific order is registered. If you change
-one type to another, or swap the types, you need to call this method again with this different type set.
-
-@sa QJsonSerializer::registerBasicConverters, QJsonSerializer::registerListConverters,
-QJsonSerializer::registerSetConverters, QJsonSerializer::registerMapConverters,
-QJsonSerializer::registerPointerConverters, QJsonSerializer::registerPairConverters,
-QJsonSerializer::registerOptionalConverters, QJsonSerializer::registerVariantConverters
-*/
-
-/*!
-@fn QJsonSerializer::registerOptionalConverters
-
-@tparam T The type that the std::optional wraps
-@param originalTypeName If given, automatically registers an inverse typedef for the given std::optional
-
-Performs the registration of converters for `std::optional<T> <--> QVariant`.
-This conversion is a requirement for the serializer, if you want to be able to serialize
-optionals with the given type. The function calls the following methods for the given type:
-
-- `QMetaType::registerConverter<std::optional<T>, QVariant>()`
-- `QMetaType::registerConverter<QVariant, std::optional<T>>()`
-
-If originalTypeName is set, this method also calls
-`QJsonSerializer::registerInverseTypedef<std::optional<T>>(originalTypeName);`.
-
-@sa QJsonSerializer::registerBasicConverters, QJsonSerializer::registerListConverters,
-QJsonSerializer::registerSetConverters, QJsonSerializer::registerMapConverters,
-QJsonSerializer::registerPointerConverters, QJsonSerializer::registerPairConverters,
-QJsonSerializer::registerTupleConverters, QJsonSerializer::registerVariantConverters
-*/
-
-/*!
-@fn QJsonSerializer::registerVariantConverters
-
-@tparam TArgs The types that make up the variant to register converters for
-@param originalTypeName If given, automatically registers an inverse typedef for the given std::variant
-
-Performs the registration of converters for `std::variant<TArgs...> <--> QVariant`.
-This conversion is a requirement for the serializer, if you want to be able to serialize
-variants with the given types. The function calls the following methods for the given type:
-
-- `QMetaType::registerConverter<std::variant<TArgs...>, QVariant>()`
-- `QMetaType::registerConverter<QVariant, std::variant<TArgs...>>()`
-
-If originalTypeName is set, this method also calls
-`QJsonSerializer::registerInverseTypedef<std::variant<TArgs...>>(originalTypeName);`.
-
-@attention Only this very specific combination in this specific order is registered. If you change
-one type to another, you need to call this method again with this different type set.
-
-@sa QJsonSerializer::registerBasicConverters, QJsonSerializer::registerListConverters,
-QJsonSerializer::registerSetConverters, QJsonSerializer::registerMapConverters,
-QJsonSerializer::registerPointerConverters, QJsonSerializer::registerPairConverters,
-QJsonSerializer::registerTupleConverters, QJsonSerializer::registerOptionalConverters
-*/
-
-/*!
-@fn QJsonSerializer::serialize(const QVariant &) const
+@fn QtJsonSerializer::CborSerializer::serialize(const QVariant &) const
 
 @param data The data to be serialized
 @returns The serialized value
-@throws QJsonSerializationException Thrown if the serialization fails
+@throws SerializationException Thrown if the serialization fails
 
-@sa QJsonSerializer::deserialize, QJsonSerializer::serializeTo
+@sa CborSerializer::deserialize, CborSerializer::serializeTo
 */
 
 /*!
-@fn QJsonSerializer::serialize(const T &) const
-
-@tparam T The type of the data to be serialized
-@copydetails QJsonSerializer::serialize(const QVariant &) const
-*/
-
-/*!
-@fn QJsonSerializer::serializeTo(QIODevice *, const QVariant &) const
+@fn QtJsonSerializer::CborSerializer::serializeTo(QIODevice *, const QVariant &, QCborValue::EncodingOptions) const
 
 @param device The device to write the json to
 @param data The data to be serialized
-@throws QJsonSerializationException Thrown if the serialization fails
+@param options The encoding options for the generated cbor
+@throws SerializationException Thrown if the serialization fails
 
-@sa QJsonSerializer::deserializeFrom, QJsonSerializer::serialize
+@sa CborSerializer::deserializeFrom, CborSerializer::serialize
 */
 
 /*!
-@fn QJsonSerializer::serializeTo(QIODevice *, const QVariant &, QJsonDocument::JsonFormat) const
-
-@param format The formatting for the generated json (compact or intended)
-@copydetails QJsonSerializer::serializeTo(QIODevice *, const QVariant &) const
-*/
-
-/*!
-@fn QJsonSerializer::serializeTo(const QVariant &) const
+@fn QtJsonSerializer::CborSerializer::serializeTo(const QVariant &, QCborValue::EncodingOptions) const
 
 @param data The data to be serialized
+@param options The encoding options for the generated cbor
 @returns The serialized data as byte array
-@throws QJsonSerializationException Thrown if the serialization fails
+@throws SerializationException Thrown if the serialization fails
 
-@sa QJsonSerializer::deserializeFrom, QJsonSerializer::serialize
+@sa CborSerializer::deserializeFrom, CborSerializer::serialize
 */
 
 /*!
-@fn QJsonSerializer::serializeTo(const QVariant &, QJsonDocument::JsonFormat) const
-
-@param format The formatting for the generated json (compact or intended)
-@copydetails QJsonSerializer::serializeTo(const QVariant &) const
-*/
-
-/*!
-@fn QJsonSerializer::serializeTo(QIODevice *, const T &, QJsonDocument::JsonFormat) const
-
+@fn QtJsonSerializer::CborSerializer::serialize(const T &) const
 @tparam T The type of the data to be serialized
-@copydetails QJsonSerializer::serializeTo(QIODevice *, const QVariant &, QJsonDocument::JsonFormat) const
+@copydetails CborSerializer::serialize(const QVariant &) const
 */
 
 /*!
-@fn QJsonSerializer::serializeTo(const T &, QJsonDocument::JsonFormat) const
-
+@fn QtJsonSerializer::CborSerializer::serializeTo(QIODevice *, const T &, QCborValue::EncodingOptions) const
 @tparam T The type of the data to be serialized
-@copydetails QJsonSerializer::serializeTo(const QVariant &, QJsonDocument::JsonFormat) const
+@copydetails CborSerializer::serializeTo(QIODevice *, const QVariant &, QCborValue::EncodingOptions) const
 */
 
 /*!
-@fn QJsonSerializer::deserialize(const QJsonValue &, int, QObject*) const
+@fn QtJsonSerializer::CborSerializer::serializeTo(const T &, QCborValue::EncodingOptions) const
+@tparam T The type of the data to be serialized
+@copydetails CborSerializer::serializeTo(const QVariant &, QCborValue::EncodingOptions) const
+*/
 
-@param json The data to be deserialized
+/*!
+@fn QtJsonSerializer::CborSerializer::deserialize(const QCborValue &, int, QObject*) const
+
+@param cbor The data to be deserialized
 @param metaTypeId The target type of the deserialization
 @param parent The parent object of the result. Only used if the returend value is a QObject*
 @returns The deserialized value, wrapped in QVariant
-@throws QJsonDeserializationException Thrown if the deserialization fails
+@throws DeserializationException Thrown if the deserialization fails
 
-@sa QJsonSerializer::serialize, QJsonSerializer::deserializeFrom
+@sa CborSerializer::serialize, CborSerializer::deserializeFrom
 */
 
 /*!
-@fn QJsonSerializer::deserialize(const typename _qjsonserializer_helpertypes::json_type<T>::type &, QObject*) const
-
-@tparam T The type of the data to be deserialized
-@param json The data to be deserialized
-@param parent The parent object of the result. Only used if the returend value is a QObject*
-@returns The deserialized value
-@throws QJsonDeserializationException Thrown if the deserialization fails
-
-@sa QJsonSerializer::serialize, QJsonSerializer::deserializeFrom
-*/
-
-/*!
-@fn QJsonSerializer::deserializeFrom(QIODevice *, int, QObject*) const
+@fn QtJsonSerializer::CborSerializer::deserializeFrom(QIODevice *, int, QObject*) const
 
 @param device The device to read the json to be deserialized from
 @param metaTypeId The target type of the deserialization
 @param parent The parent object of the result. Only used if the returend value is a QObject*
 @returns The deserialized value, wrapped in QVariant
-@throws QJsonDeserializationException Thrown if the deserialization fails
+@throws DeserializationException Thrown if the deserialization fails
 
-@sa QJsonSerializer::serializeTo, QJsonSerializer::deserialize
+@sa CborSerializer::serializeTo, CborSerializer::deserialize
 */
 
 /*!
-@fn QJsonSerializer::deserializeFrom(QIODevice *, QObject*) const
-
-@tparam T The type of the data to be deserialized
-@param device The device to read the json to be deserialized from
-@param parent The parent object of the result. Only used if the returend value is a QObject*
-@returns The deserialized value
-@throws QJsonDeserializationException Thrown if the deserialization fails
-
-@sa QJsonSerializer::serializeTo, QJsonSerializer::deserialize
-*/
-
-/*!
-@fn QJsonSerializer::deserializeFrom(const QByteArray &, int, QObject*) const
+@fn QtJsonSerializer::CborSerializer::deserializeFrom(const QByteArray &, int, QObject*) const
 
 @param data The data to read the json to be deserialized from
 @param metaTypeId The target type of the deserialization
 @param parent The parent object of the result. Only used if the returend value is a QObject*
 @returns The deserialized value, wrapped in QVariant
-@throws QJsonDeserializationException Thrown if the deserialization fails
+@throws DeserializationException Thrown if the deserialization fails
 
-@sa QJsonSerializer::serializeTo, QJsonSerializer::deserialize
+@sa CborSerializer::serializeTo, CborSerializer::deserialize
 */
 
 /*!
-@fn QJsonSerializer::deserializeFrom(const QByteArray &, QObject*) const
+@fn QtJsonSerializer::CborSerializer::deserialize(const QCborValue &, QObject*) const
+
+@tparam T The type of the data to be deserialized
+@param cbor The data to be deserialized
+@param parent The parent object of the result. Only used if the returend value is a QObject*
+@returns The deserialized value
+@throws DeserializationException Thrown if the deserialization fails
+
+@sa CborSerializer::serialize, CborSerializer::deserializeFrom
+*/
+
+/*!
+@fn QtJsonSerializer::CborSerializer::deserializeFrom(QIODevice *, QObject*) const
+
+@tparam T The type of the data to be deserialized
+@param device The device to read the json to be deserialized from
+@param parent The parent object of the result. Only used if the returend value is a QObject*
+@returns The deserialized value
+@throws DeserializationException Thrown if the deserialization fails
+
+@sa CborSerializer::serializeTo, CborSerializer::deserialize
+*/
+
+/*!
+@fn QtJsonSerializer::CborSerializer::deserializeFrom(const QByteArray &, QObject*) const
 
 @tparam T The type of the data to be deserialized
 @param data The data to read the json to be deserialized from
 @param parent The parent object of the result. Only used if the returend value is a QObject*
 @returns The deserialized value
-@throws QJsonDeserializationException Thrown if the deserialization fails
+@throws DeserializationException Thrown if the deserialization fails
 
-@sa QJsonSerializer::serializeTo, QJsonSerializer::deserialize
-*/
-
-/*!
-@fn QJsonSerializer::addJsonTypeConverterFactory()
-
-@tparam T The converter-class to add
-@tparam Priority The priority all the created converters should have
-
-Creates an instance of a QJsonTypeConverterStandardFactory for the given converter type and
-registeres it.
-
-@sa QJsonTypeConverter, QJsonSerializer::addJsonTypeConverter
-*/
-
-/*!
-@fn QJsonSerializer::addJsonTypeConverterFactory(const QSharedPointer<QJsonTypeConverterFactory> &)
-
-@param factory The factory to add
-
-Adds a custom converter factory class that can provide a certain converter for all serializer
-instances globally.
-
-@sa QJsonTypeConverter, QJsonSerializer::addJsonTypeConverterFactory
-*/
-
-/*!
-@fn QJsonSerializer::addJsonTypeConverter()
-
-@tparam T The converter-class to add
-
-Adds a custom converter class to add additional serialization capabilities. Check
-the QJsonTypeConverter documentation for details.
-
-@sa QJsonTypeConverter, QJsonSerializer::addJsonTypeConverterFactory
-*/
-
-/*!
-@fn QJsonSerializer::addJsonTypeConverter(QSharedPointer<QJsonTypeConverter>)
-
-@param converter The converter to add
-
-Adds a custom converter class to add additional serialization capabilities. Check
-the QJsonTypeConverter documentation for details.
-
-@sa QJsonTypeConverter, QJsonSerializer::addJsonTypeConverterFactory
-*/
-
-
-
-/*!
-@fn qtJsonSerializerRegisterTypes()
-
-This method is called automatically by the library when loaded, to register converters for all
-types supported by default. When build the library as a static library, you have to call it
-yourself instead.
-
-The types and converters that are registerd with this method are:
-
-The following types are already registered by default:
-
- Type				| List-Converters	| Map-Converters	| Set-Converters
---------------------|-------------------|-------------------|----------------
- bool				| yes				| yes				| yes
- int				| yes				| yes				| yes
- unsigned int		| yes				| yes				| yes
- double				| yes				| yes				| yes
- QChar				| yes				| yes				| yes
- QString			| yes				| yes				| yes
- long long			| yes				| yes				| yes
- short				| yes				| yes				| yes
- char				| yes				| yes				| yes
- unsigned long		| yes				| yes				| yes
- unsigned long long	| yes				| yes				| yes
- unsigned short		| yes				| yes				| yes
- signed char		| yes				| yes				| yes
- unsigned char		| yes				| yes				| yes
- float				| yes				| yes				| yes
- QDate				| yes				| yes				| yes
- QTime				| yes				| yes				| yes
- QUrl				| yes				| yes				| yes
- QDateTime			| yes				| yes				| yes
- QJsonValue			| yes				| yes				| yes
- QJsonObject		| yes				| yes				| yes
- QJsonArray			| yes				| yes				| yes
- QVersionNumber		| yes				| yes				| yes
- QLocale			| yes				| yes				| yes
- QRegularExpression	| yes				| yes				| yes
- QObject *			| yes				| yes				| yes
- QSize				| yes				| no				| no
- QPoint				| yes				| no				| no
- QLine				| yes				| no				| no
- QRect				| yes				| no				| no
- QByteArray			| no				| yes				| yes
-
-@sa QJsonSerializer::registerListConverters, QJsonSerializer::registerSetConverters,
-QJsonSerializer::registerMapConverters, QJsonSerializer::registerBasicConverters,
-QJsonSerializer::registerPointerConverters, QJsonSerializer::registerPointerListConverters,
-QJsonSerializer::registerPairConverters, QJsonSerializer::registerTupleConverters,
-QJsonSerializer::registerOptionalConverters, QJsonSerializer::registerVariantConverters
+@sa CborSerializer::serializeTo, CborSerializer::deserialize
 */

@@ -1,0 +1,376 @@
+/*!
+@class QtJsonSerializer::TypeConverter
+
+If you have a custom class, that cannot be serialized with the converters the library has built
+in, you will need to create a custom type converter in order to handle your type. Implement
+this interface for your custom type, and add it to a serializer instance by calling
+SerializerBase::addJsonTypeConverter.
+
+@attention Most types are already covered by the converters internally used by the library. To
+find out if you custom type is already supported by what the library provides, either try it
+out out or check your class against the list found in the
+@ref qtjsonserializer_readme_label_4 "Usage Hints". You don't need a custom converter for most
+types.
+
+@section example Example
+To understand how it works, here is a small example for a custom type converter. First, the
+definition of the custom class.
+
+@note A class like this could be easily defined as Q_GADGET, and thus would not need a custom
+converter. It is only done without the gadget to demonstrate how a converter could look like.
+
+@subsection setup Setup
+@code{.cpp}
+class Foo
+{
+public:
+	Foo(int salt, QObject *object);
+
+	// destructor, other methods, etc...
+
+private:
+	int salt;
+	QObject *object;
+};
+
+Q_DECLARE_METATYPE(Foo) // important
+@endcode
+
+This class is neither a gadget nor an object, and thus be default not serializable. For this
+example, we want to get the following json out of the serializer for this type:
+
+@code{.json}
+{
+	"salt": <number>
+	"object": <whatever QObject* serializes to>
+}
+@endcode
+
+In case of a CBOR serialization, it should be equivalent, but tagged with our custom CBOR tag:
+@code{.cpp}
+static const QCborTag FooTag = static_cast<QCborTag>(4711);
+@endcode
+
+@subsection class The Converter class
+To do this, we implement our custom type converter:
+
+@code{.cpp}
+class FooConverter : public QtJsonSerializer::TypeConverter
+{
+public:
+	// required methods
+	bool canConvert(int metaTypeId) const override;
+	QList<QCborValue::Type> allowedCborTypes(int metaTypeId, QCborTag tag) const override;
+	QCborValue serialize(int propertyType, const QVariant &value) const override;
+	QVariant deserializeCbor(int propertyType, const QCborValue &value, QObject *parent) const override;
+
+	// optional methods
+	QList<QCborTag> allowedCborTags(int metaTypeId) const override;
+	int guessType(QCborTag tag, QCborValue::Type dataType) const override;
+	QVariant deserializeJson(int propertyType, const QCborValue &value, QObject *parent) const override;
+};
+@endcode
+
+There are 4 required methods to be implemented. In addition to that, there is also the
+TypeConverter::priority. It is not relevant for this example, but might be for your special
+case. For certain use cases, some of the three optional methods may also be required
+
+@subsubsection class_canConvert The `canConvert` method
+This method is called be the serializer to determine whether your converter can handle a
+specific type or not. In our case, all that needs to be done is to check if the passed type is
+our Foo type:
+
+@code{.cpp}
+bool FooConverter::canConvert(int metaTypeId) const
+{
+	return metaTypeId == qMetaTypeId<Foo>();
+}
+@endcode
+
+@subsubsection class_cborTypes The `allowedCborTypes` method
+This method is called be the serializer to determine which cbor or types your converter can
+deserialize. For the example, we serialize to a json object (or cbor map), and thus can only
+deserialize objects/maps as well.
+
+@code{.cpp}
+QList<QCborValue::Type> FooConverter::allowedCborTypes(int metaTypeId, QCborTag tag) const
+{
+	Q_UNUSED(metaTypeId);  // not used because we only support one type
+	Q_UNUSED(tag);  // not used, as the type is the same for all tags (FooTag and no tag at all)
+	return {QCborValue::Map};
+}
+@endcode
+
+As you can see, we only need to provide the CBOR type. The json type is autmatically derived
+from the CBOR type, according to the CBOR specification.
+
+@subsubsection class_serialize The `serialize` method
+This method contains the actual code to convert our c++ Foo object into a CBOR value. As CBOR
+can be converter to JSON automatically, and to ensure compability between the CBOR and JSON
+representation of data, only a conversion to CBOR is needed. The data is the converter to JSON
+if needed, using the standard CBOR rules.
+
+The implementation is easy for the interger type `salt`, as CBOR has numbers. But for the
+object, we want the serializer to do the work for as. To do this, we make use of the
+SerializationHelper that is available via the helper() method.
+
+@code{.cpp}
+QCborValue FooConverter::serialize(int propertyType, const QVariant &value) const
+{
+	auto foo = value.value<Foo>();  // convert the QVariant parameter to our Foo type
+	QCborMap fooCbor;  // create the cbor
+	fooCbor["salt"] = foo.salt;
+	fooCbor["object"] = helper()->serializeSubtype(QMetaType::QObjectStar, QVariant::fromValue(foo.object), "object");
+	return {FooTag, fooCbor};  // return data with tag. The tag is dropped for JSON
+}
+@endcode
+
+We pass 3 arguments to the SerializationHelper::serializeSubtype method. The first one is the
+type of what we want to get serialized. In this case, a pointer to QObject. The second is the
+actual value, converted to QVariant. The third parameter is a hint in case of an exception.
+It basically means: If something goes wrong it was somewhere in the "object" field of the Foo
+class.
+
+@note If you need to do error handling, i.e. fail in case of an error, do so by throwing a
+SerializationException
+
+@subsubsection class_deserialize_cbor The `deserializeCbor` method
+This method contains the actual code to convert a CBOR object into our c++ Foo object. Again,
+since JSON and CBOR are compatible, JSON data is simply converted to CBOR and then handled by
+this method. However, some types need special handline, which is why the deserializeJson()
+is provided as well. See @ref class_deserialize_json for more details
+
+This is easy for the interger type `salt`, as cbor has numbers. But for the object, we
+want the serializer to do the work for as. To do this, we make use of the SerializationHelper
+that is available via the helper() method.
+
+@code{.cpp}
+QVariant FooConverter::deserializeCbor(int propertyType, const QCborValue &value, QObject *parent) const
+{
+	Q_UNUSED(parent); // not used because we own the object
+	// Get the map from the value. Make sure to account for tagged values
+	auto cMap = (value.isTag() ? value.taggedValue() : value).toMap();
+
+	// check if salt is what you expect it to be
+	if (!cMap["salt"].isInteger())
+		throw DeserializationException("No cbor valued named salt with number type");
+
+	auto object = helper()->deserializeSubtype(QMetaType::QObjectStar, cMap["object"], nullptr, "object");
+	Foo foo(jsonFoo["salt"].toInteger(), object);
+	return QVariant::fromValue(foo);
+}
+@endcode
+
+We pass 4 arguments to the SerializationHelper::serializeSubtype method. The first one is the
+type of what we want to get deserialized. In this case, a pointer to QObject. The second is the
+actual cbor value. The third argument is parent for the QObject. In our case, the Foo class
+owns the object, and thus the object should not have a parent, and we pass nullptr. The fourth
+parameter is a hint in case of an exception. It basically means: If something goes wrong it was
+somewhere in the "object" field of the Foo class.
+
+@note If you need to do error handling, i.e. fail in case of an error, do so by throwing a
+DeserializationException
+
+@subsubsection class_cborTags The `allowedCborTags` method
+In some cases, you want your CBOR data to be tagged. The @ref class_serialize section already
+shows how to tag data. For deserialization however, you may want to verify your data to make
+sure only data with a correct tag can be deserialized. Thats what the allowedCborTags method
+is for. For JSON deserialization, this method is ignored.
+
+@code{.cpp}
+QList<QCborTag> FooConverter::allowedCborTags(int metaTypeId) const
+{
+	Q_UNUSED(metaTypeId);  // not used because we only support one type
+	return {NoTag, FooTag};  // only allow CBOR data with the FooTag tag or no tag at all
+}
+@endcode
+
+@note Not having a tag is always allowed by default, even if your list does not contain the
+NoTag. To force failures in such cases, set the
+SerializerBase::ValidationFlag::StrictBasicTypes flag via SerializerBase::validationFlags.
+
+@subsubsection class_guessType The `guessType` method
+If your converter supports certain tags, you might be able to guess the C++ type from the tag.
+This can be very useful, when deserializing data without knowing the C++ type to deserialize
+it to. Since JSON has no tags, this method is ignored for json deserialization.
+
+@code{.cpp}
+int FooConverter::guessType(QCborTag tag, QCborValue::Type dataType) const
+{
+	// make shure both tag and type match
+	if (tag == FooTag && dataType == QCborValue::Map)
+		return qMetaTypeId<Foo>();  // return Foo as guessed type
+	else
+		return QMetaType::UnknownType;  // no guess for all other cases
+}
+@endcode
+
+@subsubsection class_deserialize_json The `deserializeJson` method
+In some rare cases, important information is lost when converting from cbor to JSON. For
+example, if you use a QByteArray, it is converted to a base64url encoded string when converted
+to JSON. To deserialize such a value, extra information is needed, as the CBOR parser does not
+know the read data is a bytearray and not just a string.
+
+You can use the deserializeJson() to handle such special cases:
+
+@code{.cpp}
+QVariant FooConverter::deserializeJson(int propertyType, const QCborValue &value, QObject *parent) const
+{
+	if (value.isString())
+		// convert to bytearray
+	else
+		return deserializeCbor(propertyType, value, parent);
+}
+@endcode
+
+@sa QJsonSerializer::addJsonTypeConverter
+*/
+
+/*!
+@fn QtJsonSerializer::TypeConverter::priority
+
+@returns The priority of the converter
+
+The priority is important for cases where multiple converters can handle the same type. The converter with the highest
+priority wins. The default value is 0, and so are all converters internally used by the library. The property can be set
+either by your implementation (i.e. in the constructor), or dynamically before adding the converter to a serializer.
+
+@sa QJsonTypeConverter::Priority, QJsonTypeConverter::setPriority
+*/
+
+/*!
+@fn QtJsonSerializer::TypeConverter::setPriority
+
+@param priority The priority of the converter
+
+The priority is important for cases where multiple converters can handle the same type. The converter with the highest
+priority wins. The default value is 0, and so are all converters internally used by the library. The property can be set
+either by your implementation (i.e. in the constructor), or dynamically before adding the converter to a serializer.
+
+@sa QJsonTypeConverter::Priority, QJsonTypeConverter::priority
+*/
+
+/*!
+@fn QtJsonSerializer::TypeConverter::helper
+
+@returns The helper instance
+
+The helper returned by this method is always valid, except from the constructor. It can be
+used to de/serialize subtypes and obtain other information useful for a converter from the
+serializer that is using the converter.
+
+@sa TypeConverter::setHelper, TypeConverter::SerializationHelper
+*/
+
+/*!
+@fn QtJsonSerializer::TypeConverter::canConvert
+
+@param metaTypeId The id of the type to be converted
+@returns true, if this converter can convert the given type, false otherwise
+
+If you return true for this method, it is expected your implementation can successfully
+de/serialize any _valid_ instance for the given type. If you can't, serialization will fail,
+and no other converter get's a chance to try
+
+@sa @ref example Example, TypeConverter::allowedCborTypes
+*/
+
+/*!
+@fn QtJsonSerializer::TypeConverter::allowedCborTags
+
+@param metaTypeId The id of the type to get tags for
+@returns A list of tags that are allowed for the given type
+
+If your converter uses tags, use this method to return relevant tags. If the list does not
+contain NoTag, deserialization will fail if the data has either no tag (only for strict
+deserialization) or a tag not in this list. Adding NoTag to the list makes sure data without
+a tag is always allowed even for the strict mode.
+
+@sa @ref example Example, TypeConverter::canConvert, TypeConverter::allowedCborTypes,
+TypeConverter::guessType
+*/
+
+/*!
+@fn QtJsonSerializer::TypeConverter::allowedCborTypes
+
+@param metaTypeId The id of the type to get types for
+@param tag The CBOR tag of the data to get types for
+@returns A list of all supported cbor types for deserialization
+
+The list should contain all types that are allowed for this specific type/tag combination. Your
+implementation must be able to deserialize any combination of the returned types and the given
+metaTypeId/tag. You can ignore the tag if you don't care about tags and the type if your
+converter only supports one type.
+
+For JSON deserialization, the types are converter to JSON according to the table from
+QCborValue::toJsonValue
+
+
+@sa @ref example Example, TypeConverter::canConvert, TypeConverter::allowedCborTags,
+TypeConverter::guessType, QCborValue::toJsonValue
+*/
+
+/*!
+@fn QtJsonSerializer::TypeConverter::guessType
+
+@param tag The CBOR tag of the data to get the C++ type for
+@param dataType The CBOR data type of the data to get the C++ type for
+@returns A valid type id or QMetaType::UnknownType
+
+If your converter supports tags, and you deserialize data without providing the C++ type to
+deserialize it to, this method is used to guess the C++ type from the tag and the data type.
+
+If you support a combination of a tag and data type, and it matches a unique C++ type your
+converter supports, return the metaTypeId of that type. Otherwise return QMetaType::UnknownType
+to indicate your converter does not understand the data.
+
+@sa @ref example Example, TypeConverter::canConvert, TypeConverter::allowedCborTags,
+TypeConverter::allowedCborTypes
+*/
+
+/*!
+@fn QtJsonSerializer::TypeConverter::serialize
+
+@param propertyType The type of the data to serialize
+@param value The value to serialize, wrapped as QVariant
+@returns A CBOR value with the serialized data of value
+@throws SerializationException In case something goes wrong, invalid data, etc.
+
+This method contains your actual converter code to transform a C++ data type to the CBOR
+representation. Use the helper() and given inputs to perform that conversion.
+
+@sa @ref example Example, TypeConverter::deserialize, SerializationHelper
+*/
+
+/*!
+@fn QtJsonSerializer::TypeConverter::deserializeCbor
+
+@param propertyType The type of the data to deserialize
+@param value The value to deserialize, as cbor value
+@param parent A parent object, in case you create a QObject class you can pass it as parent
+@returns The deserialized data, wrapped as QVariant
+@throws DeserializationException In case something goes wrong, invalid data, etc.
+
+This method contains your actual converter code to transform CBOR (or JSON) data to a C++ data
+type to the. Use the helper() and given inputs to perform that conversion.
+
+@sa @ref example Example, TypeConverter::serialize, SerializationHelper
+*/
+
+/*!
+@fn QtJsonSerializer::TypeConverter::deserializeJson
+@copydetails TypeConverter::deserializeCbor
+*/
+
+
+
+/*!
+@class QtJsonSerializer::TypeConverter::SerializationHelper
+
+@warning Do not implement this class yourself. It is created internally, and only passed to your custom converter implementations
+
+For the de/serializeSubtype methods, always prefer the overload with the QMetaProperty parameter, in case you have one. If not,
+it is recommended to pass a "naming" string as last parameter, to help identifying errors.
+
+@sa TypeConverter, TypeConverter::serialize, TypeConverter::deserialize
+*/

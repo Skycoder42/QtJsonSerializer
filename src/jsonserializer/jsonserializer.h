@@ -36,19 +36,19 @@ public:
 	//! Serializers a QVariant value to a QJsonValue
 	QJsonValue serialize(const QVariant &data) const;
 	//! Serializers a QVariant value to a device
-	void serializeTo(QIODevice *device, const QVariant &data, QJsonDocument::JsonFormat format = QJsonDocument::Indented) const;
+	void serializeTo(QIODevice *device, const QVariant &data, QJsonDocument::JsonFormat format = QJsonDocument::Compact) const;
 	//! Serializers a QVariant value to a byte array
-	QByteArray serializeTo(const QVariant &data, QJsonDocument::JsonFormat format = QJsonDocument::Indented) const;
+	QByteArray serializeTo(const QVariant &data, QJsonDocument::JsonFormat format = QJsonDocument::Compact) const;
 
 	//! Serializers a generic c++ type to json
 	template <typename T>
 	typename QtJsonSerializer::__private::json_type<T>::type serialize(const T &data) const;
-	//! Serializers a QObject, Q_GADGET or a list of one of those to a device
+	//! Serializers a generic c++ type to a device
 	template <typename T>
-	void serializeTo(QIODevice *device, const T &data, QJsonDocument::JsonFormat format = QJsonDocument::Indented) const;
-	//! Serializers a QQObject, Q_GADGET or a list of one of those to a byte array
+	void serializeTo(QIODevice *device, const T &data, QJsonDocument::JsonFormat format = QJsonDocument::Compact) const;
+	//! Serializers a generic c++ type to a byte array
 	template <typename T>
-	QByteArray serializeTo(const T &data, QJsonDocument::JsonFormat format = QJsonDocument::Indented) const;
+	QByteArray serializeTo(const T &data, QJsonDocument::JsonFormat format = QJsonDocument::Compact) const;
 
 	//! Deserializes a QJsonValue to a QVariant value, based on the given type id
 	QVariant deserialize(const QJsonValue &json, int metaTypeId, QObject *parent = nullptr) const;
@@ -57,13 +57,13 @@ public:
 	//! Deserializes data from a device to a QVariant value, based on the given type id
 	QVariant deserializeFrom(const QByteArray &data, int metaTypeId, QObject *parent = nullptr) const;
 
-	//! Deserializes a json to the given QObject type, Q_GADGET type or a list of one of those types
+	//! Deserializes a json to the given c++ type
 	template <typename T>
 	T deserialize(const typename QtJsonSerializer::__private::json_type<T>::type &json, QObject *parent = nullptr) const;
-	//! Deserializes data from a device to the given QObject type, Q_GADGET type or a list of one of those types
+	//! Deserializes data from a device to the given c++ type
 	template <typename T>
 	T deserializeFrom(QIODevice *device, QObject *parent = nullptr) const;
-	//! Deserializes data from a byte array to the given QObject type, Q_GADGET type or a list of one of those types
+	//! Deserializes data from a byte array to the given c++ type
 	template <typename T>
 	T deserializeFrom(const QByteArray &data, QObject *parent = nullptr) const;
 

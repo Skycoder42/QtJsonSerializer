@@ -772,7 +772,7 @@ void SerializerTest::testDeviceSerialization()
 	};
 	const auto cRes = QCborValue{cMap}.toCbor();
 	const auto jMap = QCborValue{cMap}.toJsonValue().toObject();
-	const auto jRes = QJsonDocument{jMap}.toJson(QJsonDocument::Indented);
+	const auto jRes = QJsonDocument{jMap}.toJson(QJsonDocument::Compact);
 
 	// to/from bytearray
 	QCOMPARE(cborSerializer->serializeTo(data), cRes);

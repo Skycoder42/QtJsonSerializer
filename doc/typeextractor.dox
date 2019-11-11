@@ -1,0 +1,159 @@
+/*!
+@class QtJsonSerializer::TypeExtractor
+
+@note This class is only relevant if you plan on creating your own TypeConverter
+
+This interface is used by custom TypeConverter classes to get data from a generic container in
+a non-generic fashion. For example, an extractor for `QPair<T1, T2>` allows the converters to
+access the `first` and `second` elements of the pair as QVariant, without having to know the
+actual types of T1 and T2.
+
+When creating extractors, they are typlically generic themselves, as a generic extractor is
+registered to provide the non generic API. The following code is a basic sample for a QPair
+converter. Further details about the methods can be found here.
+
+@code{.cpp}
+
+template <typename T1, typename T2>
+class QPairExtractor final : public QtJsonSerializer::TypeExtractor
+{
+public:
+	using Type = QPair<T1, T2>;
+
+	QByteArray baseType() const final {
+		return QByteArrayLiteral("QPair");
+	}
+
+	QList<int> subtypes() const final {
+		return {qMetaTypeId<T1>(), qMetaTypeId<T2>()};
+	}
+
+	QVariant extract(const QVariant &value, int index) const final {
+		const auto vPair = value.value<Type>();
+		switch (index) {
+		case 0:
+			return QVariant::fromValue(vPair.first);
+		case 1:
+			return QVariant::fromValue(vPair.second);
+		default:
+			return {};
+		}
+	}
+
+	void emplace(QVariant &target, const QVariant &value, int index) const final {
+		Q_ASSERT(target.userType() == qMetaTypeId<Type>());
+		const auto vPair = reinterpret_cast<Type*>(target.data());
+		switch (index) {
+		case 0:
+			vPair->first = value.value<T1>();
+			break;
+		case 1:
+			vPair->second = value.value<T2>();
+			break;
+		default:
+			break;
+		}
+	}
+};
+@endcode
+
+@sa TypeConverter, TypeConverter::SerializationHelper,
+TypeConverter::SerializationHelper::extractor, SerializerBase::registerExtractor
+*/
+
+/*!
+@fn QtJsonSerializer::TypeExtractor::baseType
+
+@returns The base type identifier
+
+The base type should be a simple string representing the generic type this extractor provides.
+It must be the same for any generic instance created, independent of the generic type, i.e. a
+`QPair<T1, T2>` extractor could for example return `QPair` or `pair` etc.
+
+When creating a converter that uses this extractor, you can easily check if your converter
+supports a certain type by checking this base type:
+
+@code{.cpp}
+bool MyConverter::canConvert(int metaTypeId) const {
+	const auto extractor = helper()->extractor(metaTypeId);
+	return extractor && extractor->baseType() == "QPair";
+}
+@endcode
+
+@sa TypeConverter::canConvert
+*/
+
+/*!
+@fn QtJsonSerializer::TypeExtractor::subtypes
+
+@returns The ordered list of subtypes
+
+This list must contain the type ids of all elements contained in the container, in the same
+order as they are accessed by extract() and emplace(). For example, for a `QPair<T1, T2>`, the
+type ids would be `qMetaTypeId<T1>()` and `qMetaTypeId<T2>()`.
+
+You can use these in your custom converter to pass a type id to the
+TypeConverter::SerializationHelper::serializeSubtype and
+TypeConverter::SerializationHelper::serializeSubtype methods when handling elements of the
+contained data.
+*/
+
+/*!
+@fn QtJsonSerializer::TypeExtractor::extract
+
+@param value The data to extract subdata from
+@param index An optional index, if the value holds more than one subvalue
+@returns The subvalue extract from value
+
+Use this method in your custom converters TypeConverter::serialize to get data out of a generic
+container. If a value is supported by the extractor, you can get the subvalues via this method.
+For simple containers (such as std::optional), you can ignore the index, as there is only one
+value. For more complex types, such as `QPair<T1, T2>`, use the index to access the elements.
+
+The type of each value returned by a certain index will match the type at the same index from
+subtypes(). The subtypes list will also tell you, how many elements there are in the generic
+type.
+
+To, for example, access the value of `second` of a `QPair<T1, T2>` and then serialize it, the
+following code can be used
+
+@code{.cpp}
+const auto extractor = helper()->extractor(metaTypeId);
+const auto tIds = extractor->subtypes();
+const auto subData = extractor->extract(data, 1);
+const auto serData = helper()->serializeSubtype(tIds[1], subData);
+@endcode
+
+@sa TypeConverter::serialize, TypeExtractor::subtypes
+*/
+
+/*!
+@fn QtJsonSerializer::TypeExtractor::emplace
+
+@param target The data to emplace the subdata into
+@param value The subvalue to emplace into the target
+@param index An optional index, if the value holds more than one subvalue
+
+Use this method in your custom converters TypeConverter::deserialize to get data into a
+generic container. If a value is supported by the extractor, you can set the subvalues via this
+method. For simple containers (such as std::optional), you can ignore the index, as there is
+only one value. For more complex types, such as `QPair<T1, T2>`, use the index to access the
+elements.
+
+The type of each value expected by a certain index will match the type at the same index from
+subtypes(). The subtypes list will also tell you, how many elements there are in the generic
+type.
+
+To, for example, emplace the value of `first` of a `QPair<T1, T2>` after deserialize it, the
+following code can be used
+
+@code{.cpp}
+QVariant pairData{propertyType, nullptr};
+const auto extractor = helper()->extractor(metaTypeId);
+const auto tIds = extractor->subtypes();
+const auto deserData = helper()->deserializeSubtype(tIds[0], data);
+extractor->emplace(pairData, deserData, 0);
+@endcode
+
+@sa TypeConverter::deserialize, TypeExtractor::subtypes
+*/
