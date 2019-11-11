@@ -94,7 +94,7 @@ jobs:
           path: qt-${{matrix.version}}-${{matrix.platform}}
           key: qt-${{matrix.version}}-${{matrix.platform}}
       - uses: Skycoder42/action-setup-qt@master
-        id: setup_qt
+        id: qt
         with:
           version: ${{matrix.version}}
           platform: ${{matrix.platform}}
@@ -103,26 +103,26 @@ jobs:
       - name: qmake
         run: |
           qmake CONFIG+=install_ok QT_PLATFORM=${{matrix.platform}}
-          make qmake_all
+          ${{steps.qt.outputs.make}} qmake_all
       - name: make module
         run: |
-          make
-          make INSTALL_ROOT="${{steps.setup_qt.outputs.installdir}}" install
+          ${{steps.qt.outputs.make}}
+          ${{steps.qt.outputs.make}} INSTALL_ROOT="${{steps.qt.outputs.installdir}}" install
       - name: make tests
-        if: steps.setup_qt.outputs.tests == 'true'
+        if: steps.qt.outputs.tests == 'true'
         run: |
-          make all
-          make ${{steps.setup_qt.outputs.testflags}} run-tests
+          ${{steps.qt.outputs.make}} all
+          ${{steps.qt.outputs.make}} ${{steps.qt.outputs.testflags}} run-tests
       - name: make examples
         if: matrix.platform == 'gcc_64'
         run: |
-          make sub-examples
-          cd examples && make INSTALL_ROOT="${{steps.setup_qt.outputs.installdir}}" install
+          ${{steps.qt.outputs.make}} sub-examples
+          cd examples && ${{steps.qt.outputs.make}} INSTALL_ROOT="${{steps.qt.outputs.installdir}}" install
       - name: make doc
         if: matrix.platform == 'gcc_64'
         run: |
-          make doxygen
-          cd doc && make INSTALL_ROOT="${{steps.setup_qt.outputs.installdir}}" install
+          ${{steps.qt.outputs.make}} doxygen
+          cd doc && ${{steps.qt.outputs.make}} INSTALL_ROOT="${{steps.qt.outputs.installdir}}" install
       - name: upload module to releases
         uses: Skycoder42/action-upload-release@master
         if: startsWith(github.ref, 'refs/tags/')
@@ -137,7 +137,7 @@ jobs:
         if: matrix.platform == 'gcc_64' && startsWith(github.ref, 'refs/tags/')
         with:
           repo_token: ${{secrets.GITHUB_TOKEN}}
-          directory: ${{steps.setup_qt.outputs.installdir}}/opt/hostedtoolcache/qt/Examples
+          directory: ${{steps.qt.outputs.installdir}}/opt/hostedtoolcache/qt/Examples
           asset_name: qtjsonserializer-examples-${{matrix.version}}
           tag: ${{github.ref}}
           overwrite: true
@@ -146,7 +146,7 @@ jobs:
         if: matrix.platform == 'gcc_64' && startsWith(github.ref, 'refs/tags/')
         with:
           repo_token: ${{secrets.GITHUB_TOKEN}}
-          directory: ${{steps.setup_qt.outputs.installdir}}/opt/hostedtoolcache/qt/Docs
+          directory: ${{steps.qt.outputs.installdir}}/opt/hostedtoolcache/qt/Docs
           asset_name: qtjsonserializer-doc-${{matrix.version}}
           tag: ${{github.ref}}
           overwrite: true
@@ -191,7 +191,7 @@ jobs:
           path: qt-${{matrix.version}}-${{matrix.platform}}
           key: qt-${{matrix.version}}-${{matrix.platform}}
       - uses: Skycoder42/action-setup-qt@master
-        id: setup_qt
+        id: qt
         with:
           version: ${{matrix.version}}
           platform: ${{matrix.platform}}
@@ -200,6 +200,6 @@ jobs:
       - name: qmake
         run: |
           qmake CONFIG+=no_register_json_converters QT_PLATFORM=${{matrix.platform}}
-          make qmake_all
+          ${{steps.qt.outputs.make}} qmake_all
       - name: make module
-        run: make
+        run: ${{steps.qt.outputs.make}}
