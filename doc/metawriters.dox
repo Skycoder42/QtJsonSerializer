@@ -1,0 +1,92 @@
+/*!
+@namespace QtJsonSerializer::MetaWriters
+
+@brief Contains the writer classes required to support serialization of generic containers
+
+Qt already provides read access to such containers via the QSequentialIterable and
+QAssociativeIterable classes. However, they do support creating or writing to such containers.
+
+Therefore, until [QTBUG-79170](https://bugreports.qt.io/browse/QTBUG-79170) was fixed, the
+writer classes are needed to perform this task.
+
+As long as you only work with Qt containers, you will never use these classes. However, if
+you plan on using custom or std containers, you must register them via the writers.
+*/
+
+/*!
+@class QtJsonSerializer::MetaWriters::SequentialWriter
+
+The sequential writer is used to provide write access to such containers. They must first be
+registered via `Q_DECLARE_SEQUENTIAL_CONTAINER_METATYPE` and then via
+SequentialWriter::registerWriter. For most containers, you can simply use the generic variant
+of this method. If you have containers that are not supported by the generic variant, extend
+the writer instead and use the non-generic variant of the method.
+
+@sa MetaWriters::SequentialWriterFactory, MetaWriters::AssociativeWriter
+*/
+
+/*!
+@fn QtJsonSerializer::MetaWriters::SequentialWriter::registerWriter()
+
+@tparam TContainer The container class to register the writer for
+@tparam TClass The value held by the container to register the writer for
+
+This methods assumes a type of the format `TContainer<TClass>` exists. Furthermore, the
+container must provide the following methods:
+
+- `TReturn reserve(int)`
+- `TReturn append(TClass)`
+
+@sa SequentialWriter::getWriter
+*/
+
+/*!
+@fn QtJsonSerializer::MetaWriters::SequentialWriter::registerWriter(int, SequentialWriterFactory*)
+
+@param metaTypeId The type to register the writer for
+@param factory A factory to create writer instances for the given type
+
+Use this method if the generic one does not work for you. You have to implement the
+SequentialWriter and provide a SequentialWriterFactory that generates it.
+
+@sa SequentialWriter::getWriter, SequentialWriterFactory
+*/
+
+/*!
+@class QtJsonSerializer::MetaWriters::AssociativeWriter
+
+The associative writer is used to provide write access to such containers. They must first be
+registered via `Q_DECLARE_ASSOCIATIVE_CONTAINER_METATYPE` and then via
+AssociativeWriter::registerWriter. For most containers, you can simply use the generic variant
+of this method. If you have containers that are not supported by the generic variant, extend
+the writer instead and use the non-generic variant of the method.
+
+@sa MetaWriters::AssociativeWriterFactory, MetaWriters::SequentialWriter
+*/
+
+/*!
+@fn QtJsonSerializer::MetaWriters::AssociativeWriter::registerWriter()
+
+@tparam TContainer The container class to register the writer for
+@tparam TKey The type of keys used to access elements of the container
+@tparam TValue The type of elements held by the container
+
+This methods assumes a type of the format `TContainer<TKey, TValue>` exists. Furthermore, the
+container must provide the following method:
+
+- `TReturn insert(TKey, TValue)`
+
+@sa AssociativeWriter::getWriter
+*/
+
+/*!
+@fn QtJsonSerializer::MetaWriters::AssociativeWriter::registerWriter(int, AssociativeWriterFactory*)
+
+@param metaTypeId The type to register the writer for
+@param factory A factory to create writer instances for the given type
+
+Use this method if the generic one does not work for you. You have to implement the
+AssociativeWriter and provide a AssociativeWriterFactory that generates it.
+
+@sa AssociativeWriter::getWriter, AssociativeWriterFactory
+*/

@@ -15,32 +15,46 @@
 namespace QtJsonSerializer::MetaWriters {
 
 class SequentialWriterFactory;
+//! The writer class for sequential containers
 class Q_JSONSERIALIZER_EXPORT SequentialWriter
 {
 	Q_DISABLE_COPY(SequentialWriter)
 
 public:
+	//! Information about a sequential container
 	struct SequenceInfo {
+		//! The containers data type
 		int type = QMetaType::UnknownType;
+		//! Specifies if the container is a finite set
 		bool isSet = false;
 	};
 
+	//! Registers a container factory for the given container and value classes
 	template <template<typename> class TContainer, typename TClass>
 	static void registerWriter();
+	//! @copybrief SequentialWriter::registerWriter()
 	static void registerWriter(int metaTypeId, SequentialWriterFactory *factory);
+	//! Checks if a writer exists for the given type
 	static bool canWrite(int metaTypeId);
+	//! Returns a writer instance for the given data, or nullptr if none found
 	static QSharedPointer<SequentialWriter> getWriter(QVariant &data);
+	//! Returns the information details of the given type
 	static SequenceInfo getInfo(int metaTypeId);
 
 	virtual ~SequentialWriter();
+	//! Return the information for the wrapped container
 	virtual SequenceInfo info() const = 0;
+	//! Reserves space for size elements in the container
 	virtual void reserve(int size) = 0;
+	//! Adds an element to the "end" of the container
 	virtual void add(const QVariant &value) = 0;
 
 protected:
+	//! @private
 	SequentialWriter();
 };
 
+//! A factory to create sequential writer instances from variant data
 class Q_JSONSERIALIZER_EXPORT SequentialWriterFactory
 {
 	Q_DISABLE_COPY(SequentialWriterFactory)
@@ -48,37 +62,51 @@ class Q_JSONSERIALIZER_EXPORT SequentialWriterFactory
 public:
 	SequentialWriterFactory();
 	virtual ~SequentialWriterFactory();
+	//! Factory method to create the instance. data can be null for read-only writers
 	virtual QSharedPointer<SequentialWriter> create(void *data) const = 0;
 };
 
 
 
 class AssociativeWriterFactory;
+//! The writer class for associative containers
 class Q_JSONSERIALIZER_EXPORT AssociativeWriter
 {
 	Q_DISABLE_COPY(AssociativeWriter)
 
 public:
+	//! Information about a associative container
 	struct AssociationInfo {
+		//! The type of the associations keys
 		int keyType = QMetaType::UnknownType;
+		//! The type of the associations values
 		int valueType = QMetaType::UnknownType;
 	};
 
+	//! Registers a container factory for the given container, key and value classes
 	template <template<typename, typename> class TContainer, typename TKey, typename TValue>
 	static void registerWriter();
+	//! @copybrief AssociativeWriter::registerWriter()
 	static void registerWriter(int metaTypeId, AssociativeWriterFactory *factory);
+	//! Checks if a writer exists for the given type
 	static bool canWrite(int metaTypeId);
+	//! Returns a writer instance for the given data, or nullptr if none found
 	static QSharedPointer<AssociativeWriter> getWriter(QVariant &data);
+	//! Returns the information details of the given type
 	static AssociationInfo getInfo(int metaTypeId);
 
 	virtual ~AssociativeWriter();
+	//! Return the information for the wrapped container
 	virtual AssociationInfo info() const = 0;
+	//! Inserts the given value for the given key into the container
 	virtual void add(const QVariant &key, const QVariant &value) = 0;
 
 protected:
+	//! @private
 	AssociativeWriter();
 };
 
+//! A factory to create associative writer instances from variant data
 class Q_JSONSERIALIZER_EXPORT AssociativeWriterFactory
 {
 	Q_DISABLE_COPY(AssociativeWriterFactory)
@@ -86,6 +114,7 @@ class Q_JSONSERIALIZER_EXPORT AssociativeWriterFactory
 public:
 	AssociativeWriterFactory();
 	virtual ~AssociativeWriterFactory();
+	//! Factory method to create the instance. data can be null for read-only writers
 	virtual QSharedPointer<AssociativeWriter> create(void *data) const = 0;
 };
 
