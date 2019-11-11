@@ -21,7 +21,7 @@ public:
 
 	mutable QReadWriteLock typeTagsLock {};
 	QHash<int, QCborTag> typeTags {};
-	bool handleSpecialIntegers = false;
+	bool handleSpecialNumbers = false;
 
 	QVariant deserializeCborValue(int propertyType, const QCborValue &value) const override;
 

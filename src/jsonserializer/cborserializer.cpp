@@ -20,10 +20,10 @@ CborSerializer::CborSerializer(QObject *parent) :
 	};
 }
 
-bool CborSerializer::handleSpecialIntegers() const
+bool CborSerializer::handleSpecialNumbers() const
 {
 	Q_D(const CborSerializer);
-	return d->handleSpecialIntegers;
+	return d->handleSpecialNumbers;
 }
 
 void CborSerializer::setTypeTag(int metaTypeId, QCborTag tag)
@@ -107,14 +107,14 @@ QVariant CborSerializer::deserializeGeneric(const std::variant<QCborValue, QJson
 	return deserialize(std::get<QCborValue>(value), metaTypeId, parent);
 }
 
-void CborSerializer::setHandleSpecialIntegers(bool handleSpecialIntegers)
+void CborSerializer::setHandleSpecialNumbers(bool handleSpecialNumbers)
 {
 	Q_D(CborSerializer);
-	if(d->handleSpecialIntegers == handleSpecialIntegers)
+	if(d->handleSpecialNumbers == handleSpecialNumbers)
 		return;
 
-	d->handleSpecialIntegers = handleSpecialIntegers;
-	emit handleSpecialIntegersChanged(d->handleSpecialIntegers, {});
+	d->handleSpecialNumbers = handleSpecialNumbers;
+	emit handleSpecialNumbersChanged(d->handleSpecialNumbers, {});
 }
 
 bool CborSerializer::jsonMode() const
@@ -142,19 +142,22 @@ bool testOverflow(const QByteArray &data) {
 		   (data[0] & 0x80) != 0;
 }
 
-template <typename TInt>
+template <typename TInt, bool Invert = false>
 TInt extract(QByteArray data) {
 	static_assert (std::is_integral_v<TInt>, "TInt must be an integer type");
 	if (data.size() < static_cast<int>(sizeof(TInt)))
 		data.prepend(QByteArray(static_cast<int>(sizeof(TInt)) - data.size(), 0));
-	return qFromBigEndian<TInt>(data.data());
+	if constexpr (Invert)
+		return ~qFromBigEndian<TInt>(data.data());
+	else
+		return qFromBigEndian<TInt>(data.data());
 }
 
 }
 
 QVariant CborSerializerPrivate::deserializeCborValue(int propertyType, const QCborValue &value) const
 {
-	if (handleSpecialIntegers) {
+	if (handleSpecialNumbers) {
 		switch (value.tag()) {
 		case static_cast<QCborTag>(QCborKnownTags::PositiveBignum):
 			return deserializePositiveBignum(value.taggedValue().toByteArray());
@@ -201,13 +204,13 @@ QVariant CborSerializerPrivate::deserializeNegativeBignum(const QByteArray &data
 									   " bytes (- the first bit)"};
 	}
 	if (dSize <= sizeof (qint8) && !testOverflow<qint8>(data))
-		return QVariant::fromValue<qint8>(~extract<qint8>(data));
+		return QVariant::fromValue<qint8>(extract<qint8, true>(data));
 	else if (dSize <= sizeof (qint16) && !testOverflow<qint16>(data))
-		return ~extract<qint16>(data);
+		return extract<qint16, true>(data);
 	else if (dSize <= sizeof (qint32) && !testOverflow<qint32>(data))
-		return ~extract<qint32>(data);
+		return extract<qint32, true>(data);
 	else
-		return QVariant::fromValue(~extract<qint64>(data));
+		return QVariant::fromValue(extract<qint64, true>(data));
 }
 
 qreal CborSerializerPrivate::deserializeDecimal(const QCborArray &data) const

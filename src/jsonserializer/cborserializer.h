@@ -11,7 +11,7 @@ class Q_JSONSERIALIZER_EXPORT CborSerializer : public SerializerBase
 {
 	Q_OBJECT
 
-	Q_PROPERTY(bool handleSpecialIntegers READ handleSpecialIntegers WRITE setHandleSpecialIntegers NOTIFY handleSpecialIntegersChanged)
+	Q_PROPERTY(bool handleSpecialNumbers READ handleSpecialNumbers WRITE setHandleSpecialNumbers NOTIFY handleSpecialNumbersChanged)
 
 public:
 	enum ExtendedTags : std::underlying_type_t<QCborTag> {
@@ -61,8 +61,8 @@ public:
 
 	explicit CborSerializer(QObject *parent = nullptr);
 
-	//! @readAcFn{CborSerializer::handleSpecialIntegers}
-	bool handleSpecialIntegers() const;
+	//! @readAcFn{CborSerializer::handleSpecialNumbers}
+	bool handleSpecialNumbers() const;
 
 	void setTypeTag(int metaTypeId, QCborTag tag = static_cast<QCborTag>(NoTag));
 	template <typename T>
@@ -109,12 +109,12 @@ public:
 	QVariant deserializeGeneric(const std::variant<QCborValue, QJsonValue> &value, int metaTypeId, QObject *parent) const override;
 
 public Q_SLOTS:
-	//! @writeAcFn{CborSerializer::handleSpecialIntegers}
-	void setHandleSpecialIntegers(bool handleSpecialIntegers);
+	//! @writeAcFn{CborSerializer::handleSpecialNumbers}
+	void setHandleSpecialNumbers(bool handleSpecialNumbers);
 
 Q_SIGNALS:
-	//! @notifyAcFn{CborSerializer::handleSpecialIntegers}
-	void handleSpecialIntegersChanged(bool handleSpecialIntegers, QPrivateSignal);
+	//! @notifyAcFn{CborSerializer::handleSpecialNumbers}
+	void handleSpecialNumbersChanged(bool handleSpecialNumbers, QPrivateSignal);
 
 protected:
 	// protected implementation -> internal use for the type converters

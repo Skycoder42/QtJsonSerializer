@@ -70,17 +70,24 @@ jobs:
         with:
           submodules: recursive
       - uses: actions/setup-python@v1
-      - uses: mymindstorm/setup-emsdk@v1
+      - name: actions/cache emsdk
+        uses: actions/cache@v1
+        with:
+          path: emsdk-cache
+          key: ${{runner.os}}-emsdk-${{matrix.emsdk}}
+      - uses: mymindstorm/setup-emsdk@v3
         if: matrix.platform == 'wasm_32'
         with:
           version: ${{matrix.emsdk}}
+          actions-cache-folder: emsdk-cache
       - uses: ilammy/msvc-dev-cmd@v1
         if: contains(matrix.platform, 'msvc')
         with:
           arch: ${{matrix.vcarch}}
           #toolset: 14.16
           uwp: ${{contains(matrix.platform, 'winrt')}}
-      - uses: actions/cache@v1
+      - name: actions/cache qt
+        uses: actions/cache@v1
         id: cache
         with:
           path: qt-cache
