@@ -91,6 +91,8 @@ public:
 
 // ------------- Generic Implementation classes -------------
 
+namespace Implementations {
+
 template <template<typename> class TContainer, typename TClass>
 class SequentialWriterImpl final : public SequentialWriter
 {
@@ -246,20 +248,20 @@ private:
 	QVariantHash *_data;
 };
 
-
+}
 
 template<template<typename> class TContainer, typename TClass>
 void SequentialWriter::registerWriter()
 {
 	registerWriter(qMetaTypeId<TContainer<TClass>>(),
-				   new SequentialWriterFactoryImpl<TContainer, TClass>{});
+				   new Implementations::SequentialWriterFactoryImpl<TContainer, TClass>{});
 }
 
 template<template<typename, typename> class TContainer, typename TKey, typename TValue>
 void AssociativeWriter::registerWriter()
 {
 	registerWriter(qMetaTypeId<TContainer<TKey, TValue>>(),
-				   new AssociativeWriterFactoryImpl<TContainer, TKey, TValue>{});
+				   new Implementations::AssociativeWriterFactoryImpl<TContainer, TKey, TValue>{});
 }
 
 }

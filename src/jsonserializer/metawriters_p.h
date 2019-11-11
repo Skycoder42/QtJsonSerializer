@@ -27,6 +27,8 @@ Q_DECLARE_LOGGING_CATEGORY(logAsocWriter)
 
 
 
+namespace Implementations {
+
 class SequentialWriterFactoryQStringList : public SequentialWriterFactory
 {
 public:
@@ -68,6 +70,8 @@ public:
 		return QSharedPointer<AssociativeWriterImpl<QHash, QString, QVariant>>::create(reinterpret_cast<QVariantHash*>(data));
 	}
 };
+
+}
 
 }
 

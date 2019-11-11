@@ -965,7 +965,7 @@ EXCLUDE_PATTERNS       = moc_* \
 # exclude all test directories use the pattern */test/*
 
 EXCLUDE_SYMBOLS        = QtJsonSerializer::__private \
-						 QtJsonSerializer::MetaWriters \
+						 QtJsonSerializer::MetaWriters::Implementations \
 						 QtJsonSerializer::TypeExtractors \
 						 type \
 						 \

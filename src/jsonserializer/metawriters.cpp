@@ -4,6 +4,7 @@
 #include <QtCore/QRegularExpression>
 using namespace QtJsonSerializer;
 using namespace QtJsonSerializer::MetaWriters;
+using namespace QtJsonSerializer::MetaWriters::Implementations;
 
 Q_LOGGING_CATEGORY(QtJsonSerializer::MetaWriters::logSeqWriter, "qt.jsonserializer.metawriters.sequential")
 Q_LOGGING_CATEGORY(QtJsonSerializer::MetaWriters::logAsocWriter, "qt.jsonserializer.metawriters.associative")
