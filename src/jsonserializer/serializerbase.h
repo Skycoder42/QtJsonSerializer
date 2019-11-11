@@ -35,22 +35,25 @@ class Q_JSONSERIALIZER_EXPORT SerializerBase : public QObject, protected TypeCon
 {
 	Q_OBJECT
 
-	//! Specifies, whether null for value types is allowed or not
+	//! Specifies whether null for value types is allowed or not
 	Q_PROPERTY(bool allowDefaultNull READ allowDefaultNull WRITE setAllowDefaultNull NOTIFY allowDefaultNullChanged)
-	//! Specifies, whether the `objectName` property of QObjects should be serialized
+	//! Specifies whether the `objectName` property of QObjects should be serialized
 	Q_PROPERTY(bool keepObjectName READ keepObjectName WRITE setKeepObjectName NOTIFY keepObjectNameChanged)
-	//! Specifies, whether enums should be serialized as integer or as string
+	//! Specifies whether enums should be serialized as integer or as string
 	Q_PROPERTY(bool enumAsString READ enumAsString WRITE setEnumAsString NOTIFY enumAsStringChanged)
+	//! Specifies whether enums should be serialized as array of integers or as string
 	Q_PROPERTY(bool versionAsString READ versionAsString WRITE setVersionAsString NOTIFY versionAsStringChanged)
+	//! Specifies whether datetimes should be serialized as datetime string or as unix timestamp
 	Q_PROPERTY(bool dateAsTimeStamp READ dateAsTimeStamp WRITE setDateAsTimeStamp NOTIFY dateAsTimeStampChanged)
-	//! Specify whether serializing a QLocale should use the bcp47 format
+	//! Specifies whether serializing a QLocale should use the bcp47 format
 	Q_PROPERTY(bool useBcp47Locale READ useBcp47Locale WRITE setUseBcp47Locale NOTIFY useBcp47LocaleChanged)
-	//! Specify how strictly the serializer should verify data when deserializing
+	//! Specifies how strictly the serializer should verify data when deserializing
 	Q_PROPERTY(ValidationFlags validationFlags READ validationFlags WRITE setValidationFlags NOTIFY validationFlagsChanged)
-	//! Specify how the serializer should treat polymorphism for QObject classes
+	//! Specifies how the serializer should treat polymorphism for QObject classes
 	Q_PROPERTY(Polymorphing polymorphing READ polymorphing WRITE setPolymorphing NOTIFY polymorphingChanged)
-	//! Specify how multi maps and sets should be serialized
+	//! Specifies how multi maps and sets should be serialized
 	Q_PROPERTY(MultiMapMode multiMapMode READ multiMapMode WRITE setMultiMapMode NOTIFY multiMapModeChanged)
+	//! Specifies whether the STORED attribute on properties has any effect
 	Q_PROPERTY(bool ignoreStoredAttribute READ ignoresStoredAttribute WRITE setIgnoreStoredAttribute NOTIFY ignoreStoredAttributeChanged)
 
 public:
@@ -62,9 +65,7 @@ public:
 		StrictBasicTypes = 0x04, //!< Make shure basic types (string, int, ...) are actually of those types, instead of accepting all that are convertible
 
 		FullPropertyValidation = (NoExtraProperties | AllProperties), //!< Validate properties are exactly the same as declared
-		FullValidation2 = (FullPropertyValidation | StrictBasicTypes), //!< Validate everything
-
-		FullValidation Q_DECL_ENUMERATOR_DEPRECATED_X("Use QJsonSerializer::FullValidation2 or QJsonSerializer::FullPropertyValidation instead") = (NoExtraProperties | AllProperties)
+		FullValidation = (FullPropertyValidation | StrictBasicTypes), //!< Validate everything
 	};
 	Q_DECLARE_FLAGS(ValidationFlags, ValidationFlag)
 	Q_FLAG(ValidationFlags)
@@ -80,13 +81,15 @@ public:
 	//! Enum to specify how multi maps and sets should be serialized
 	enum class MultiMapMode {
 		Map, //!< Store them as json object, with each element beeing a json array containing the actual values
-		List,  //!< Store a list of pairs, where for each pair the first element is the key and the second the value
-		DenseMap
+		List, //!< Store a list of pairs, where for each pair the first element is the key and the second the value
+		DenseMap //!< Just like Map, but entries with just one value are stored as that value, instead of an array with one element
 	};
 	Q_ENUM(MultiMapMode)
 
+	//! Registers a custom extractor for the given type
 	template<typename TType, typename TExtractor>
 	static void registerExtractor();
+	//! @copybrief SerializerBase::registerExtractor
 	static void registerExtractor(int metaTypeId, const QSharedPointer<TypeExtractor> &extractor);
 
 	//! Registers a custom type for list converisons
@@ -117,7 +120,9 @@ public:
 	template<typename... TArgs>
 	static inline void registerVariantConverters();
 
+	//! Serializes a given variant to either CBOR or JSON, depending on the actual instance
 	virtual std::variant<QCborValue, QJsonValue> serializeGeneric(const QVariant &value) const = 0;
+	//! Deserializes CBOR or JSON, depending on the actual instance, to variant
 	virtual QVariant deserializeGeneric(const std::variant<QCborValue, QJsonValue> &value, int metaTypeId, QObject *parent = nullptr) const = 0;
 
 	//! @readAcFn{QJsonSerializer::allowDefaultNull}
@@ -144,13 +149,13 @@ public:
 	//! Globally registers a converter factory to provide converters for all QJsonSerializer instances
 	template <typename TConverter, int Priority = TypeConverter::Priority::Standard>
 	static void addJsonTypeConverterFactory();
-	//! @copybrief QJsonSerializer::addJsonTypeConverterFactory()
+	//! @copybrief SerializerBase::addJsonTypeConverterFactory()
 	static void addJsonTypeConverterFactory(TypeConverterFactory *factory);
 
 	//! Adds a custom type converter to this serializer
 	template <typename TConverter>
 	void addJsonTypeConverter();
-	//! @copybrief QJsonSerializer::addJsonTypeConverter()
+	//! @copybrief SerializerBase::addJsonTypeConverter()
 	void addJsonTypeConverter(const QSharedPointer<TypeConverter> &converter);
 
 public Q_SLOTS:
@@ -198,7 +203,9 @@ Q_SIGNALS:
 	void ignoreStoredAttributeChanged(bool ignoreStoredAttribute, QPrivateSignal);
 
 protected:
+	//! Default constructor
 	explicit SerializerBase(QObject *parent = nullptr);
+	//! @private
 	explicit SerializerBase(SerializerBasePrivate &dd, QObject *parent);
 
 	virtual QList<int> typesForTag(QCborTag tag) const = 0;
@@ -211,7 +218,9 @@ protected:
 	QVariant deserializeSubtype(const QMetaProperty &property, const QCborValue &value, QObject *parent) const override;
 	QVariant deserializeSubtype(int propertyType, const QCborValue &value, QObject *parent, const QByteArray &traceHint) const override;
 
+	//! @private
 	QCborValue serializeVariant(int propertyType, const QVariant &value) const;
+	//! @private
 	QVariant deserializeVariant(int propertyType, const QCborValue &value, QObject *parent, bool skipConversion = false) const;
 
 private:
@@ -331,5 +340,5 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(QtJsonSerializer::SerializerBase::ValidationFlags)
 Q_DECLARE_ASSOCIATIVE_CONTAINER_METATYPE(QMultiMap)
 Q_DECLARE_ASSOCIATIVE_CONTAINER_METATYPE(QMultiHash)
 
-//! @file qjsonserializerbase.h The QJsonSerializerBase header file
+//! @file serializerbase.h The SerializerBase header file
 #endif // QTJSONSERIALIZER_SERIALIZERBASE_H

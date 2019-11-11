@@ -13,8 +13,8 @@ win32:!ReleaseBuild:!DebugBuild {
 		runtarget.target = run-tests
 		!compat_test: runtarget.depends += $(DESTDIR_TARGET)
 		runtarget.commands += set PATH=$$shell_path($$shadowed($$dirname(_QMAKE_CONF_))/bin);$$shell_path($$[QT_INSTALL_BINS]);$(PATH)
-		runtarget.commands += $$escape_expand(\\n\\t)set QT_PLUGIN_PATH=$$shadowed($$dirname(_QMAKE_CONF_))/plugins;$$shell_path($$[QT_INSTALL_PLUGINS]);$(QT_PLUGIN_PATH)
-		runtarget.commands += $$escape_expand(\\n\\t)set QML2_IMPORT_PATH=$$shadowed($$dirname(_QMAKE_CONF_))/qml;$$shell_path($$[QT_INSTALL_QML]);$(QML2_IMPORT_PATH)
+		runtarget.commands += $$escape_expand(\\n\\t)set QT_PLUGIN_PATH=$$shadowed($$dirname(_QMAKE_CONF_))/plugins;$$[QT_INSTALL_PLUGINS];$(QT_PLUGIN_PATH)
+		runtarget.commands += $$escape_expand(\\n\\t)set QML2_IMPORT_PATH=$$shadowed($$dirname(_QMAKE_CONF_))/qml;$$[QT_INSTALL_QML];$(QML2_IMPORT_PATH)
 		!isEmpty(LOGGING_RULES): runtarget.commands += $$escape_expand(\\n\\t)set \"QT_LOGGING_RULES=$$LOGGING_RULES\"
 		runtarget.commands += $$escape_expand(\\n\\t)if exist $${outdir_helper}\\fail del $${outdir_helper}\\fail
 		runtarget.commands += $$escape_expand(\\n\\t)start /w call $(DESTDIR_TARGET) ^> $${outdir_helper}\\test.log ^|^| echo FAIL ^> $${outdir_helper}\\fail ^& exit 0
@@ -24,8 +24,8 @@ win32:!ReleaseBuild:!DebugBuild {
 	} else {
 		win32-g++: QMAKE_DIRLIST_SEP = ";"
 		runtarget.commands += export PATH=\"$$shell_path($$shadowed($$dirname(_QMAKE_CONF_))/bin):$$shell_path($$[QT_INSTALL_BINS]):$${LITERAL_DOLLAR}$${LITERAL_DOLLAR}PATH\"
-		runtarget.commands += $$escape_expand(\\n\\t)export QT_PLUGIN_PATH=\"$$shadowed($$dirname(_QMAKE_CONF_))/plugins$${QMAKE_DIRLIST_SEP}$$shell_path($$[QT_INSTALL_PLUGINS])$${QMAKE_DIRLIST_SEP}$(QT_PLUGIN_PATH)\"
-		runtarget.commands += $$escape_expand(\\n\\t)export QML2_IMPORT_PATH=\"$$shadowed($$dirname(_QMAKE_CONF_))/qml$${QMAKE_DIRLIST_SEP}$$shell_path($$[QT_INSTALL_QML])$${QMAKE_DIRLIST_SEP}$(QML2_IMPORT_PATH)\"
+		runtarget.commands += $$escape_expand(\\n\\t)export QT_PLUGIN_PATH=\"$$shadowed($$dirname(_QMAKE_CONF_))/plugins$${QMAKE_DIRLIST_SEP}$$[QT_INSTALL_PLUGINS]$${QMAKE_DIRLIST_SEP}$(QT_PLUGIN_PATH)\"
+		runtarget.commands += $$escape_expand(\\n\\t)export QML2_IMPORT_PATH=\"$$shadowed($$dirname(_QMAKE_CONF_))/qml$${QMAKE_DIRLIST_SEP}$$[QT_INSTALL_QML]$${QMAKE_DIRLIST_SEP}$(QML2_IMPORT_PATH)\"
 		!isEmpty(LOGGING_RULES): runtarget.commands += $$escape_expand(\\n\\t)export QT_LOGGING_RULES=\"$$LOGGING_RULES\"
 		win32-g++: QMAKE_DIRLIST_SEP = ":"
 

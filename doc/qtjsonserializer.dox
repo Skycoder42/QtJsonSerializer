@@ -1,0 +1,73 @@
+/*!
+@namespace QtJsonSerializer
+
+@brief The QtJsonSerializer namespace holds all classes of the module
+
+The primary two classes you are going to use are
+- JsonSerializer
+- CborSerializer
+
+Others are mostly helperclasses or only relevant when creating your own converters
+*/
+
+/*!
+@fn QtJsonSerializer::registerTypes()
+
+This method is called automatically by the library when loaded, to register converters for all
+types supported by default. When build the library as a static library, you have to call it
+yourself instead.
+
+The types and converters that are registerd with this method are:
+
+The following types are already registered by default:
+
+ Type				| List-Converters	| Map-Converters	| Set-Converters
+--------------------|-------------------|-------------------|----------------
+ bool				| yes				| yes				| yes
+ char				| yes				| yes				| yes
+ signed char		| yes				| yes				| yes
+ unsigned char		| yes				| yes				| yes
+ short				| yes				| yes				| yes
+ unsigned short		| yes				| yes				| yes
+ int				| yes				| yes				| yes
+ unsigned int		| yes				| yes				| yes
+ long				| yes				| yes				| yes
+ unsigned long		| yes				| yes				| yes
+ long long			| yes				| yes				| yes
+ unsigned long long	| yes				| yes				| yes
+ float				| yes				| yes				| yes
+ double				| yes				| yes				| yes
+ QObject *			| yes				| yes				| yes
+ QChar				| yes				| yes				| yes
+ QString			| yes				| yes				| yes
+ QDate				| yes				| yes				| yes
+ QTime				| yes				| yes				| yes
+ QDateTime			| yes				| yes				| yes
+ QUrl				| yes				| yes				| yes
+ QUuid				| yes				| yes				| yes
+ QCborValue			| yes				| yes				| yes
+ QCborMap			| yes				| yes				| yes
+ QCborArray			| yes				| yes				| yes
+ QJsonValue			| yes				| yes				| yes
+ QJsonObject		| yes				| yes				| yes
+ QJsonArray			| yes				| yes				| yes
+ QMimeType			| yes				| yes				| yes
+ QVersionNumber		| yes				| yes				| yes
+ QLocale			| yes				| yes				| yes5
+ QRegularExpression	| yes				| yes				| yes
+ QSize				| yes				| no				| no
+ QPoint				| yes				| no				| no
+ QLine				| yes				| no				| no
+ QRect				| yes				| no				| no
+ QSizeF				| yes				| no				| no
+ QPointF			| yes				| no				| no
+ QLineF				| yes				| no				| no
+ QRectF				| yes				| no				| no
+ QByteArray			| no				| yes				| yes
+
+@sa SerializerBase::registerListConverters, SerializerBase::registerSetConverters,
+SerializerBase::registerMapConverters, SerializerBase::registerBasicConverters,
+SerializerBase::registerPointerConverters, SerializerBase::registerPairConverters,
+SerializerBase::registerTupleConverters, SerializerBase::registerOptionalConverters,
+SerializerBase::registerVariantConverters
+*/

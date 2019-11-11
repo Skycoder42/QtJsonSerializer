@@ -3,19 +3,19 @@ DISTFILES += \
 
 JSON_TYPES = \
 	bool \
-	int \
-	uint \
-	qlonglong \
-	qulonglong \
-	double \
-	long \
-	short \
 	char \
 	"signed char" \
-	ulong \
-	ushort \
 	uchar \
+	short \
+	ushort \
+	int \
+	uint \
+	long \
+	ulong \
+	qlonglong \
+	qulonglong \
 	float \
+	double \
 	QObject* \
 	QChar \
 	QString \

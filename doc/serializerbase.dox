@@ -1,0 +1,565 @@
+/*!
+@class QtJsonSerializer::SerializerBase
+
+This class serves as a base class to the JSON and CBOR serializers. It handles all special
+type and converter registrations and provides most properties that control how data is
+de/serialized. For more details on how to use the serializers, check the concrete
+documentations
+
+@sa JsonSerializer, CborSerializer
+*/
+
+/*!
+@property QtJsonSerializer::SerializerBase::allowDefaultNull
+
+@default{`false`}
+
+Applies to deserialization only.<br/>
+If set to `false`, a `null` json value can only be converted to a QObject (`nullptr`)! For value
+types (including Q_GADGETs!), the conversion will fail instead. This is a strict mode, since for
+value types, there is no null value.<br/>
+If set to `true`, `null` is allowed for all types. If it's not a QObject, a default
+constructed value will be used.
+
+@note If you are deserializing json from external sources, it's possible they don't follow this
+approach, and in order to get a working deserialization, you will have to enable this property.
+
+@accessors{
+	@readAc{allowDefaultNull()}
+	@writeAc{setAllowDefaultNull()}
+	@notifyAc{allowDefaultNullChanged()}
+}
+*/
+
+/*!
+@property QtJsonSerializer::SerializerBase::keepObjectName
+
+@default{`false`}
+
+Applies to serialization only.<br/>
+By default, the QObject::objectName property will not be serialized for QObjects! If you need to
+keep this information, set the property to `true`
+
+@note If the `objectName` is contained in json, a deserialization will use that value, independent
+of this property.
+
+@accessors{
+	@readAc{keepObjectName()}
+	@writeAc{setKeepObjectName()}
+	@notifyAc{keepObjectNameChanged()}
+}
+
+@sa QObject::objectName
+*/
+
+/*!
+@property QtJsonSerializer::SerializerBase::enumAsString
+
+@default{`false`}
+
+Applies to serialization only.<br/>
+By default, enums and flags are serialized as an integer, representing their value. If you want
+to serialize them as a string, the "name" of each value, enable this propterty.
+
+@note For deserialization, both int and string are always correctly deserialized.
+
+@accessors{
+	@readAc{enumAsString()}
+	@writeAc{setEnumAsString()}
+	@notifyAc{enumAsStringChanged()}
+}
+
+@sa QMetaEnum
+*/
+
+/*!
+@property QtJsonSerializer::SerializerBase::versionAsString
+
+@default{`false`}
+
+Applies to serialization only.<br/>
+By default, QVersionNumber is serialized as an array of integers, representing the different
+segments. If you want to serialize them as a string, containing the segments seperated by dots,
+enable this propterty.
+
+@note For deserialization, both arrays of integers and strings are always correctly
+deserialized.
+
+@accessors{
+	@readAc{versionAsString()}
+	@writeAc{setVersionAsString()}
+	@notifyAc{versionAsStringChanged()}
+}
+
+@sa QVersionNumber
+*/
+
+/*!
+@property QtJsonSerializer::SerializerBase::dateAsTimeStamp
+
+@default{`false`}
+
+Applies to serialization only.<br/>
+By default, QDateTime is serialized as an ISO date string, including milliseconds. If you want
+to serialize them as an integer representing a unix timestamp (seconds since epoche), enable
+this propterty.
+
+@note For deserialization, both strings and timestamps are always correctly deserialized.
+
+@accessors{
+	@readAc{dateAsTimeStamp()}
+	@writeAc{setDateAsTimeStamp()}
+	@notifyAc{dateAsTimeStampChanged()}
+}
+
+@sa QDateTime
+*/
+
+/*!
+@property QtJsonSerializer::SerializerBase::useBcp47Locale
+
+@default{`true`}
+
+Applies to serialization only.<br/>
+The property can be used to change how QLocale is serialized. If active, a bcp47 local string is created (See QLocale::bcp47Name()).
+That string is able to encode all information contained in the locale, but is not as wide spread as the "simple name format". That one
+is used if set to false (See QLocale::name())
+
+Both formats are accepted for deserialization
+
+@accessors{
+	@readAc{useBcp47Locale()}
+	@writeAc{setUseBcp47Locale()}
+	@notifyAc{useBcp47LocaleChanged()}
+}
+
+@sa QLocale::bcp47Name, QLocale::name
+*/
+
+/*!
+@property QtJsonSerializer::SerializerBase::validationFlags
+
+@default{`SerializerBase::StandardValidation`}
+
+Applies to deserialization only.<br/>
+By specifying those flags, you can set which additional attributes the serializer should check when deserializing.
+In those stricter modes, the serializer will fail with an exception if the conditions are not met instead of simply
+using defaults values etc.
+
+@accessors{
+	@readAc{validationFlags()}
+	@writeAc{setValidationFlags()}
+	@notifyAc{validationFlagsChanged()}
+}
+
+@sa SerializerBase::ValidationFlag
+*/
+
+/*!
+@property QtJsonSerializer::SerializerBase::polymorphing
+
+@default{`SerializerBase::Enabled`}
+
+@attention Only applicable for QObject deriving classes
+
+Depending on the set mode QObject deriving classes are de/serialized differently. Polymorphing in this
+context can be easily described with a simple example:
+
+@code{.cpp}
+class Foo : public QObject {
+//...
+	Q_PROPERTY(int foo MEMBER foo)
+//...
+};
+
+class Bar : public Foo {
+//...
+	Q_PROPERTY(int bar MEMBER bar)
+	Q_CLASSINFO("polymorphic", "true")
+//...
+};
+@endcode
+
+Assuming you are de/serializing `Foo*`, but it actually is a `Bar*` object, for example: `serialize<Foo*>(new Bar());`
+
+<b>For Serialization:</b><br/>
+With polymorphing `QJsonSerialzer::Disabled`, any additional information about a type is ignored. `Bar` is serialized as `Foo`, and
+the json would only contain the `foo` property. With it beeing `QJsonSerialzer::Enabled`, by default no polymorphic information
+is stored. However, if the type "declares" polymorphism (as in this example Bar does) it is stored. So here `Bar` is actually serialized
+as `Bar`. In order to make deserialization possible, an additional json value, @@class is created containing the actual class name, `Bar`.
+The json contains this property, the `foo` and the `bar` property. If polymorphism is `QJsonSerialzer::Forced`, any type is treated like `Bar`
+in the previous case, even if no polymorphism is specified. For all types, even simple QObjects, the @@class is added and the actual typed serialized.
+
+<b>For Deserialization:</b><br/>
+With polymorphing `QJsonSerialzer::Disabled`, the @@class json property is ignored, and a value always deserialized as the given
+property type. So even if `@@class` is set to `Bar`, only a `Foo` object is created, and the `bar` property ignored. By using
+`QJsonSerialzer::Enabled`, if the json does contain the @@class property, the serializer creates an instance of the class named by
+this property. Here, a `Bar` object is created, with both the `foo` and the `bar` property correctly read. When set to `QJsonSerialzer::Forced`,
+every json object to be deserialized as QObject must have the @@class property, or otherwise an exception is thrown.
+
+<b>Declare objects polymorphic:</b><br/>
+There are to ways to make objects polymorphic. The first is static and uses `Q_CLASSINFO`. Simply add the macro to the class
+that should be polymorphic as `Q_CLASSINFO("polymorphic", "true")`. You can also set it to false, to disable polymorphism in
+case the class you inherit has this already set to true.
+
+The second way is to use a dynamic property. The property overrides the classinfo, but has to be set on an actual instance of
+the object to be serialized. Set the property by calling `setProperty("__qt_json_serializer_polymorphic", true);`. Just like with class info, you can set it
+to false to disable it.
+
+@note This is only required for serialization. When deserializing, Polymorphism is determined by the @@class property. If it
+is present, the data is treated polymorphic.
+
+@accessors{
+	@readAc{polymorphing()}
+	@writeAc{setPolymorphing()}
+	@notifyAc{polymorphingChanged()}
+}
+*/
+
+/*!
+@property QtJsonSerializer::SerializerBase::multiMapMode
+
+@default{`SerializerBase::MultiMapMode::Map`}
+
+Applies to serialization only.<br/>
+Selects how QMultiMap and QMultiHash are serialized. There are two options. Assuimg you have the
+following multi map:
+
+@code{.cpp}
+QMultiMap<QString, int> map;
+map.insert("a", 1);
+map.insert("a", 2);
+map.insert("b", 3);
+@endcode
+
+When in map mode, the following json is generated:
+@code{.json}
+{
+	"a": [1, 2],
+	"b": [3]
+}
+@endcode
+
+When in list mode, the following is generated instead:
+@code{.json}
+[
+	["a", 1],
+	["a", 2],
+	["b", 3],
+]
+@endcode
+
+When in dense map mode, the following json is generated:
+@code{.json}
+{
+	"a": [1, 2],
+	"b": 3
+}
+@endcode
+
+For deserialization, both formats are always supported.
+
+@accessors{
+	@readAc{multiMapMode()}
+	@writeAc{setMultiMapMode()}
+	@notifyAc{multiMapModeChanged()}
+}
+
+@sa SerializerBase::MultiMapMode
+*/
+
+/*!
+@fn QtJsonSerializer::SerializerBase::registerExtractor()
+
+@tparam TType The type to register the extractor for
+@tparam TExtractor The extractor class to be registered
+
+@note This method is only needed when creating custom serializers
+
+Use this method to register custom extractors, as used by some custom converters. You can
+obtain extractors for a certain type via TypeConverter::SerializationHelper::extractor from
+within the converter.
+
+Check the TypeExtractor documentation for more details on how to use extractors.
+
+@sa TypeExtractor, TypeConverter::SerializationHelper::extractor
+*/
+
+/*!
+@fn QtJsonSerializer::SerializerBase::registerExtractor(int, const QSharedPointer<TypeExtractor> &)
+
+@param metaTypeId The type id to register the extractor for
+@param extractor The extractor instance to be registered
+
+@note This method is only needed when creating custom serializers
+
+Use this method to register custom extractors, as used by some custom converters. You can
+obtain extractors for a certain type via TypeConverter::SerializationHelper::extractor from
+within the converter.
+
+Check the TypeExtractor documentation for more details on how to use extractors.
+
+@sa TypeExtractor, TypeConverter::SerializationHelper::extractor
+*/
+
+/*!
+@fn QtJsonSerializer::SerializerBase::registerListConverters
+
+@tparam T The type to register converters for
+
+Performs the registration of converters for list-like Qt containers. This conversion is a
+requirement for the serializer, if you want to be able to serialize lists of a type.
+The function calls the following methods for the given type:
+
+- `MetaWriters::SequentialWriter::registerWriter<QList, T>()`
+- `MetaWriters::SequentialWriter::registerWriter<QLinkedList, T>()`
+- `MetaWriters::SequentialWriter::registerWriter<QVector, T>()`
+- `MetaWriters::SequentialWriter::registerWriter<QStack, T>()`
+- `MetaWriters::SequentialWriter::registerWriter<QQueue, T>()`
+
+@sa SerializerBase::registerBasicConverters, SerializerBase::registerSetConverters,
+SerializerBase::registerMapConverters, SerializerBase::registerPointerConverters,
+SerializerBase::registerPairConverters, SerializerBase::registerTupleConverter,
+SerializerBase::registerOptionalConverters, SerializerBase::registerVariantConverters,
+registerTypes()
+*/
+
+/*!
+@fn QtJsonSerializer::SerializerBase::registerSetConverters
+
+@tparam T The type to register converters for
+
+Performs the registration of converters for set-like Qt containers. This conversion is a
+requirement for the serializer, if you want to be able to serialize sets of a type. The
+function calls the following methods for the given type:
+- `MetaWriters::SequentialWriter::registerWriter<QSet, T>()`
+
+@sa SerializerBase::registerBasicConverters, SerializerBase::registerListConverters,
+SerializerBase::registerMapConverters, SerializerBase::registerPointerConverters,
+SerializerBase::registerPairConverters, SerializerBase::registerTupleConverter,
+SerializerBase::registerOptionalConverters, SerializerBase::registerVariantConverters,
+registerTypes()
+*/
+
+/*!
+@fn QtJsonSerializer::SerializerBase::registerMapConverters
+
+@tparam TKey The map key type to register converters for
+@tparam TValue The map value type to register converters for
+@tparam mapTypes Statically enables registration for QMap based containers
+@tparam hashTypes Statically enables registration for QHash based containers
+
+Performs the registration of converters for map-like Qt containers. This conversion is a
+requirement for the serializer, if you want to be able to serialize maps of a type. The
+function calls the following methods for the given type:
+
+- If `mapTypes` is true (the default):
+	- `MetaWriters::AssociativeWriter::registerWriter<QMap, TKey, TValue>()`
+	- `MetaWriters::AssociativeWriter::registerWriter<QMultiMap, TKey, TValue>()`
+- If `hashTypes` is true (the default):
+	- `MetaWriters::AssociativeWriter::registerWriter<QHash, TKey, TValue>()`
+	- `MetaWriters::AssociativeWriter::registerWriter<QMultiHash, TKey, TValue>()`
+
+@sa SerializerBase::registerBasicConverters, SerializerBase::registerListConverters,
+SerializerBase::registerSetConverters, SerializerBase::registerPointerConverters,
+SerializerBase::registerPairConverters, SerializerBase::registerTupleConverter,
+SerializerBase::registerOptionalConverters, SerializerBase::registerVariantConverters,
+registerTypes()
+*/
+
+/*!
+@fn QtJsonSerializer::SerializerBase::registerPointerConverters
+
+@tparam T The type to register converters for
+
+Performs the registration of converters for `QSharedPointer<T> <--> T*`
+and `QPointer<T> <--> T*` (If T is a QObject class). This conversion is a requirement for the
+serializer, if you want to be able to serialize QSharedPointers or QPointers of a type. The
+function calls the following methods for the given type:
+
+- `SerializerBase::registerExtractor<QSharedPointer<T>, TypeExtractors::SmartPointerExtractor<QSharedPointer, T>>()`
+- If T extends QObject
+	- `SerializerBase::registerExtractor<QPointer<T>, TypeExtractors::SmartPointerExtractor<QPointer, T>>()`
+
+@sa SerializerBase::registerBasicConverters, SerializerBase::registerListConverters,
+SerializerBase::registerSetConverters, SerializerBase::registerMapConverters,
+SerializerBase::registerPairConverters, SerializerBase::registerTupleConverter,
+SerializerBase::registerOptionalConverters, SerializerBase::registerVariantConverters,
+registerTypes()
+*/
+
+/*!
+@fn QtJsonSerializer::SerializerBase::registerBasicConverters
+
+@tparam T The type to register converters for
+
+A shortcut for all the container registrations SerializerBase provides. For any class that
+does **not** inherit QObject, the method internally calls:
+
+- `SerializerBase::registerListConverters<T>()`
+- `SerializerBase::registerSetConverters<T>()`
+- `SerializerBase::registerMapConverters<QString, T>()`
+
+For a T that extends QObject, it instead calls the following. Please not that you have to
+register such a type *without* the pointer-star, e.g.
+SerializerBase::registerBasicConverters<QFile>:
+
+- `SerializerBase::registerBasicConverters<T*>()`
+- `SerializerBase::registerPointerConverters<T>()`
+- `SerializerBase::registerBasicConverters<QSharedPointer<T>>()`
+- `SerializerBase::registerBasicConverters<QPointer<T>>()`
+
+@sa SerializerBase::registerListConverters, SerializerBase::registerSetConverters,
+SerializerBase::registerMapConverters, SerializerBase::registerPointerConverters,
+SerializerBase::registerPairConverters, SerializerBase::registerTupleConverter,
+SerializerBase::registerOptionalConverters, SerializerBase::registerVariantConverters,
+registerTypes()
+*/
+
+/*!
+@fn QtJsonSerializer::SerializerBase::registerPairConverters
+
+@tparam T1 The first type to register converters for
+@tparam T2 The second type to register converters for
+
+Performs the registration of an extractor for `QPair<T1, T2>` and `std::pair<T1, T2>`.
+This extractor is a requirement for the serializer, if you want to be able to serialize
+pairs with the given two types. The function calls the following methods for the given type:
+
+- `SerializerBase::registerExtractor<QPair<T1, T2>, TypeExtractors::PairExtractor<QPair, T1, T2>>()`
+- `SerializerBase::registerExtractor<std::pair<T1, T2>, TypeExtractors::PairExtractor<std::pair, T1, T2>>()`
+
+@attention Only this very specific combination in this specific order is registered. If you
+change one type to another, or swap the two types, you need to call this method again with this
+different pair.
+
+@sa SerializerBase::registerBasicConverters, SerializerBase::registerListConverters,
+SerializerBase::registerSetConverters, SerializerBase::registerMapConverters,
+SerializerBase::registerPointerConverters, SerializerBase::registerTupleConverter,
+SerializerBase::registerOptionalConverters, SerializerBase::registerVariantConverters
+*/
+
+/*!
+@fn QtJsonSerializer::SerializerBase::registerTupleConverters
+
+@tparam TArgs The types that make up the tuple to register converters for
+
+Performs the registration of an extractor for `std::tuple<TArgs...>`.
+This extractor is a requirement for the serializer, if you want to be able to serialize
+tuples with the given types. The function calls the following methods for the given type:
+
+- `SerializerBase::registerExtractor<std::tuple<TArgs...>, TypeExtractors::TupleExtractor<TArgs...>>()`
+
+@attention Only this very specific combination in this specific order is registered. If you
+change one type to another, or swap the types, you need to call this method again with this
+different type set.
+
+@sa SerializerBase::registerBasicConverters, SerializerBase::registerListConverters,
+SerializerBase::registerSetConverters, SerializerBase::registerMapConverters,
+SerializerBase::registerPointerConverters, SerializerBase::registerPairConverters,
+SerializerBase::registerOptionalConverters, SerializerBase::registerVariantConverters
+*/
+
+/*!
+@fn QtJsonSerializer::SerializerBase::registerOptionalConverters
+
+@tparam T The type that the std::optional wraps
+
+Performs the registration of an extractor for `std::optional<T>`.
+This extractor is a requirement for the serializer, if you want to be able to serialize
+optionals with the given type. The function calls the following methods for the given type:
+
+- `SerializerBase::registerExtractor<std::optional<T>, TypeExtractors::OptionalExtractor<T>>()`
+
+@sa SerializerBase::registerBasicConverters, SerializerBase::registerListConverters,
+SerializerBase::registerSetConverters, SerializerBase::registerMapConverters,
+SerializerBase::registerPointerConverters, SerializerBase::registerPairConverters,
+SerializerBase::registerTupleConverters, SerializerBase::registerVariantConverters
+*/
+
+/*!
+@fn QtJsonSerializer::SerializerBase::registerVariantConverters
+
+@tparam TArgs The types that make up the variant to register converters for
+
+Performs the registration of an extractor for `std::variant<TArgs...>`.
+This extractor is a requirement for the serializer, if you want to be able to serialize
+variants with the given types. The function calls the following methods for the given type:
+
+- `SerializerBase::registerExtractor<std::variant<TArgs...>, TypeExtractors::VariantExtractor<TArgs...>>()`
+
+@attention Only this very specific combination in this specific order is registered. If you
+change one type to another, you need to call this method again with this different type set.
+
+@sa SerializerBase::registerBasicConverters, SerializerBase::registerListConverters,
+SerializerBase::registerSetConverters, SerializerBase::registerMapConverters,
+SerializerBase::registerPointerConverters, SerializerBase::registerPairConverters,
+SerializerBase::registerTupleConverters, SerializerBase::registerOptionalConverters
+*/
+
+/*!
+@fn QtJsonSerializer::SerializerBase::serializeGeneric
+
+@param value The data to be serialized
+@returns The serialized value
+@throws SerializationException Thrown if the serialization fails
+
+@sa SerializerBase::deserializeGeneric, JsonSerializer::serialize, CborSerializer::serialize
+*/
+
+/*!
+@fn QtJsonSerializer::SerializerBase::deserializeGeneric
+
+@param value The CBOR/JSON data to be deserialized
+@param metaTypeId The target type of the deserialization
+@param parent The parent object of the result. Only used if the returend value is a QObject*
+@returns The deserialized value, wrapped in QVariant
+@throws DeserializationException Thrown if the deserialization fails
+
+@sa SerializerBase::serializeGeneric, JsonSerializer::deserialize, CborSerializer::deserialize
+*/
+
+/*!
+@fn QtJsonSerializer::SerializerBase::addJsonTypeConverterFactory()
+
+@tparam T The converter-class to add
+@tparam Priority The priority all the created converters should have
+
+Creates an instance of a QJsonTypeConverterStandardFactory for the given converter type and
+registeres it.
+
+@sa TypeConverterFactory, SerializerBase::addJsonTypeConverter
+*/
+
+/*!
+@fn QtJsonSerializer::SerializerBase::addJsonTypeConverterFactory(TypeConverterFactory *)
+
+@param factory The factory to add
+
+Adds a custom converter factory class that can provide a certain converter for all serializer
+instances globally.
+
+@sa TypeConverterFactory, SerializerBase::addJsonTypeConverterFactory
+*/
+
+/*!
+@fn QtJsonSerializer::SerializerBase::addJsonTypeConverter()
+
+@tparam T The converter-class to add
+
+Adds a custom converter class to add additional serialization capabilities. Check
+the QJsonTypeConverter documentation for details.
+
+@sa TypeConverter, SerializerBase::addJsonTypeConverterFactory
+*/
+
+/*!
+@fn QtJsonSerializer::SerializerBase::addJsonTypeConverter(const QSharedPointer<TypeConverter> &)
+
+@param converter The converter to add
+
+Adds a custom converter class to add additional serialization capabilities. Check
+the QJsonTypeConverter documentation for details.
+
+@sa TypeConverter, SerializerBase::addJsonTypeConverterFactory
+*/
