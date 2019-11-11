@@ -72,9 +72,9 @@ QByteArray CborSerializer::serializeTo(const QVariant &data, QCborValue::Encodin
 	return serializeVariant(data.userType(), data).toCbor(options);
 }
 
-QVariant CborSerializer::deserialize(const QCborValue &json, int metaTypeId, QObject *parent) const
+QVariant CborSerializer::deserialize(const QCborValue &cbor, int metaTypeId, QObject *parent) const
 {
-	return deserializeVariant(metaTypeId, json, parent);
+	return deserializeVariant(metaTypeId, cbor, parent);
 }
 
 QVariant CborSerializer::deserializeFrom(QIODevice *device, int metaTypeId, QObject *parent) const

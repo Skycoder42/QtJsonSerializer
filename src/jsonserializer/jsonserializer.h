@@ -11,22 +11,26 @@
 namespace QtJsonSerializer {
 
 class JsonSerializerPrivate;
+//! A class to serialize and deserialize c++ classes to and from JSON
 class Q_JSONSERIALIZER_EXPORT JsonSerializer : public SerializerBase
 {
 	Q_OBJECT
 
+	//! Specifies the format, in which bytearray should be converter to a JSON string
 	Q_PROPERTY(ByteArrayFormat byteArrayFormat READ byteArrayFormat WRITE setByteArrayFormat NOTIFY byteArrayFormatChanged)
 	//! Specify whether deserializing a QByteArray should verify the data as base64 instead of silent discarding
 	Q_PROPERTY(bool validateBase64 READ validateBase64 WRITE setValidateBase64 NOTIFY validateBase64Changed)
 
 public:
+	//! Defines the different supported bytearray formats
 	enum class ByteArrayFormat {
-		Base64,
-		Base64url,
-		Base16
+		Base64, //!< Data is encoded as base64 string with padding
+		Base64url, //!< Data is encoded as base64url string, without padding
+		Base16  //!< Data is encoded as hexadecimal string (any case)
 	};
 	Q_ENUM(ByteArrayFormat)
 
+	//! Default constructor
 	explicit JsonSerializer(QObject *parent = nullptr);
 
 	//! Serializers a QVariant value to a QJsonValue
@@ -36,7 +40,7 @@ public:
 	//! Serializers a QVariant value to a byte array
 	QByteArray serializeTo(const QVariant &data, QJsonDocument::JsonFormat format = QJsonDocument::Indented) const;
 
-	//! Serializers a QObject, Q_GADGET or a list of one of those to json
+	//! Serializers a generic c++ type to json
 	template <typename T>
 	typename QtJsonSerializer::__private::json_type<T>::type serialize(const T &data) const;
 	//! Serializers a QObject, Q_GADGET or a list of one of those to a device

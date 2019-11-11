@@ -4,6 +4,13 @@
 #include <QtCore/qglobal.h>
 #include <QtCore/qobject.h>
 #include <QtCore/qlist.h>
+#include <QtCore/qvector.h>
+#include <QtCore/qlinkedlist.h>
+#include <QtCore/qstack.h>
+#include <QtCore/qqueue.h>
+#include <QtCore/qset.h>
+#include <QtCore/qmap.h>
+#include <QtCore/qhash.h>
 #include <QtCore/qvariant.h>
 #include <QtCore/qsharedpointer.h>
 #include <QtCore/qpointer.h>
@@ -16,6 +23,8 @@
 
 #include <type_traits>
 #include <tuple>
+#include <optional>
+#include <variant>
 
 namespace QtJsonSerializer::__private {
 
@@ -26,9 +35,6 @@ struct gadget_helper
 	static inline QJsonValue convert(const QJsonValue &jsonValue) {
 		return jsonValue;
 	}
-	static inline QCborValue convert(const QCborValue &cborValue) {
-		return cborValue;
-	}
 };
 
 template <class T>
@@ -38,18 +44,15 @@ struct gadget_helper<T, typename T::QtGadgetHelper>
 	static inline QJsonObject convert(const QJsonValue &jsonValue) {
 		return jsonValue.toObject();
 	}
-	static inline QCborMap convert(const QCborValue &cborValue) {
-		return cborValue.toMap();
-	}
 };
 
 
 
 template <typename T>
-struct is_serializable : public std::integral_constant<bool, !std::is_pointer<T>::value> {}; //C++17 negation
+struct is_serializable : public std::negation<std::is_pointer<T>> {};
 
 template <typename T>
-struct is_serializable<T*> : public std::conditional<std::is_base_of<QObject, T>::value || gadget_helper<T>::value, std::true_type, std::false_type>::type {}; //C++17 disjunction
+struct is_serializable<T*> : public std::disjunction<std::is_base_of<QObject, T>, gadget_helper<T>> {};
 
 template <typename T>
 struct is_serializable<QSharedPointer<T>> : public std::is_base_of<QObject, T> {};
@@ -61,41 +64,55 @@ template <typename T>
 struct is_serializable<QList<T>> : public is_serializable<T> {};
 
 template <typename T>
-struct is_serializable<QMap<QString, T>> : public is_serializable<T> {};
+struct is_serializable<QVector<T>> : public is_serializable<T> {};
+
+template <typename T>
+struct is_serializable<QLinkedList<T>> : public is_serializable<T> {};
+
+template <typename T>
+struct is_serializable<QStack<T>> : public is_serializable<T> {};
+
+template <typename T>
+struct is_serializable<QQueue<T>> : public is_serializable<T> {};
+
+template <typename TKey, typename TValue>
+struct is_serializable<QMap<TKey, TValue>> : public std::conjunction<is_serializable<TKey>, is_serializable<TValue>> {};
+
+template <typename TKey, typename TValue>
+struct is_serializable<QMultiMap<TKey, TValue>> : public std::conjunction<is_serializable<TKey>, is_serializable<TValue>> {};
+
+template <typename TKey, typename TValue>
+struct is_serializable<QHash<TKey, TValue>> : public std::conjunction<is_serializable<TKey>, is_serializable<TValue>> {};
+
+template <typename TKey, typename TValue>
+struct is_serializable<QMultiHash<TKey, TValue>> : public std::conjunction<is_serializable<TKey>, is_serializable<TValue>> {};
 
 template <typename T1, typename T2>
-struct is_serializable<QPair<T1, T2>> : public std::conditional<is_serializable<T1>::value && is_serializable<T2>::value, std::true_type, std::false_type>::type {}; //C++17 conjunction
+struct is_serializable<QPair<T1, T2>> : public std::conjunction<is_serializable<T1>, is_serializable<T2>> {};
 
 template <typename T1, typename T2>
-struct is_serializable<std::pair<T1, T2>> : public std::conditional<is_serializable<T1>::value && is_serializable<T2>::value, std::true_type, std::false_type>::type {}; //C++17 conjunction
+struct is_serializable<std::pair<T1, T2>> : public std::conjunction<is_serializable<T1>, is_serializable<T2>> {};
+
+template <typename... TArgs>
+struct is_serializable<std::tuple<TArgs...>> : public std::conjunction<is_serializable<TArgs>...> {};
 
 template <typename T>
-struct is_serializable<std::tuple<T>> : public is_serializable<T> {};
+struct is_serializable<std::optional<T>> : public is_serializable<T> {};
 
-template <typename T1, typename T2, typename... TArgs>
-struct is_serializable<std::tuple<T1, T2, TArgs...>> : public std::conditional<is_serializable<T1>::value && is_serializable<std::tuple<T2, TArgs...>>::value, std::true_type, std::false_type>::type {}; //C++17 conjunction
+template <typename... TArgs>
+struct is_serializable<std::variant<TArgs...>> : public std::conjunction<is_serializable<TArgs>...> {};
 
 
-
-template <typename T>
-struct json_type_raw :
-		public std::conditional<gadget_helper<T>::value,
-			QJsonObject,
-			QJsonValue> {
-	using cborType = typename std::conditional<gadget_helper<T>::value,
-											   QCborMap,
-											   QCborValue>::type;
-};
 
 template <typename T>
-struct json_type : json_type_raw<T> {
-	static_assert(is_serializable<T>::value, "Only QObject deriving classes or gadget pointers can be serialized as pointer");
+struct json_type_raw : public std::conditional<gadget_helper<T>::value, QJsonObject, QJsonValue> {};
+
+template <typename T>
+struct json_type : public json_type_raw<T> {
+	static_assert(is_serializable<T>::value, "Type T must be serializable to be used in a generic expression");
 
 	static inline typename json_type_raw<T>::type convert(const QJsonValue &jsonValue) {
 		return gadget_helper<T>::convert(jsonValue);
-	}
-	static inline typename json_type_raw<T>::cborType convert(const QCborValue &cborValue) {
-		return gadget_helper<T>::convert(cborValue);
 	}
 };
 
@@ -108,9 +125,6 @@ struct json_type<T*> {
 	static inline type convert(const QJsonValue &jsonValue) {
 		return jsonValue.toObject();
 	}
-	static inline cborType convert(const QCborValue &cborValue) {
-		return cborValue.toMap();
-	}
 };
 
 template <typename T>
@@ -121,9 +135,6 @@ struct json_type<QSharedPointer<T>> {
 
 	static inline type convert(const QJsonValue &jsonValue) {
 		return jsonValue.toObject();
-	}
-	static inline cborType convert(const QCborValue &cborValue) {
-		return cborValue.toMap();
 	}
 };
 
@@ -136,9 +147,6 @@ struct json_type<QPointer<T>> {
 	static inline type convert(const QJsonValue &jsonValue) {
 		return jsonValue.toObject();
 	}
-	static inline cborType convert(const QCborValue &cborValue) {
-		return cborValue.toMap();
-	}
 };
 
 template <typename T>
@@ -150,22 +158,93 @@ struct json_type<QList<T>> {
 	static inline type convert(const QJsonValue &jsonValue) {
 		return jsonValue.toArray();
 	}
-	static inline cborType convert(const QCborValue &cborValue) {
-		return cborValue.toArray();
+};
+
+template <typename T>
+struct json_type<QVector<T>> {
+	static_assert(is_serializable<QVector<T>>::value, "The value type of a QVector must be serializable for it to also be serializable");
+	using type = QJsonArray;
+	using cborType = QCborArray;
+
+	static inline type convert(const QJsonValue &jsonValue) {
+		return jsonValue.toArray();
 	}
 };
 
 template <typename T>
-struct json_type<QMap<QString, T>> {
-	static_assert(is_serializable<QMap<QString, T>>::value, "The value type of a QMap must be serializable for it to also be serializable");
+struct json_type<QLinkedList<T>> {
+	static_assert(is_serializable<QLinkedList<T>>::value, "The value type of a QLinkedList must be serializable for it to also be serializable");
+	using type = QJsonArray;
+	using cborType = QCborArray;
+
+	static inline type convert(const QJsonValue &jsonValue) {
+		return jsonValue.toArray();
+	}
+};
+
+template <typename T>
+struct json_type<QStack<T>> {
+	static_assert(is_serializable<QStack<T>>::value, "The value type of a QStack must be serializable for it to also be serializable");
+	using type = QJsonArray;
+	using cborType = QCborArray;
+
+	static inline type convert(const QJsonValue &jsonValue) {
+		return jsonValue.toArray();
+	}
+};
+
+template <typename T>
+struct json_type<QQueue<T>> {
+	static_assert(is_serializable<QQueue<T>>::value, "The value type of a QQueue must be serializable for it to also be serializable");
+	using type = QJsonArray;
+	using cborType = QCborArray;
+
+	static inline type convert(const QJsonValue &jsonValue) {
+		return jsonValue.toArray();
+	}
+};
+
+template <typename TKey, typename TValue>
+struct json_type<QMap<TKey, TValue>> {
+	static_assert(is_serializable<QMap<TKey, TValue>>::value, "The key and value types of a QMap must be serializable for it to also be serializable");
 	using type = QJsonObject;
 	using cborType = QCborMap;
 
 	static inline type convert(const QJsonValue &jsonValue) {
 		return jsonValue.toObject();
 	}
-	static inline cborType convert(const QCborValue &cborValue) {
-		return cborValue.toMap();
+};
+
+template <typename TKey, typename TValue>
+struct json_type<QMultiMap<TKey, TValue>> {
+	static_assert(is_serializable<QMultiMap<TKey, TValue>>::value, "The key and value types of a QMultiMap must be serializable for it to also be serializable");
+	using type = QJsonObject;
+	using cborType = QCborMap;
+
+	static inline type convert(const QJsonValue &jsonValue) {
+		return jsonValue.toObject();
+	}
+};
+
+template <typename TKey, typename TValue>
+struct json_type<QHash<TKey, TValue>> {
+	static_assert(is_serializable<QHash<TKey, TValue>>::value, "The key and value types of a QHash must be serializable for it to also be serializable");
+	using type = QJsonObject;
+	using cborType = QCborMap;
+
+	static inline type convert(const QJsonValue &jsonValue) {
+		return jsonValue.toObject();
+	}
+};
+
+template <typename TKey, typename TValue>
+struct json_type<QMultiHash<TKey, TValue>> {
+	static_assert(is_serializable<QMultiHash<TKey, TValue>>::value, "The key and value types of a QMultiHash must be serializable for it to also be serializable");
+	using type = QJsonObject;
+	using cborType = QCborMap;
+
+	static inline type convert(const QJsonValue &jsonValue) {
+		return jsonValue.toObject();
 	}
 };
 
@@ -178,9 +257,6 @@ struct json_type<QPair<T1, T2>> {
 	static inline type convert(const QJsonValue &jsonValue) {
 		return jsonValue.toArray();
 	}
-	static inline cborType convert(const QCborValue &cborValue) {
-		return cborValue.toArray();
-	}
 };
 
 template <typename T1, typename T2>
@@ -191,9 +267,6 @@ struct json_type<std::pair<T1, T2>> {
 
 	static inline type convert(const QJsonValue &jsonValue) {
 		return jsonValue.toArray();
-	}
-	static inline cborType convert(const QCborValue &cborValue) {
-		return cborValue.toArray();
 	}
 };
 
@@ -206,8 +279,16 @@ struct json_type<std::tuple<TArgs...>> {
 	static inline type convert(const QJsonValue &jsonValue) {
 		return jsonValue.toArray();
 	}
-	static inline cborType convert(const QCborValue &cborValue) {
-		return cborValue.toArray();
+};
+
+template <typename... TArgs>
+struct json_type<std::variant<TArgs...>> {
+	static_assert(is_serializable<std::variant<TArgs...>>::value, "All elements of a std::variant must be serializable for it to also be serializable");
+	using type = QJsonArray;
+	using cborType = QCborArray;
+
+	static inline type convert(const QJsonValue &jsonValue) {
+		return jsonValue.toArray();
 	}
 };
 

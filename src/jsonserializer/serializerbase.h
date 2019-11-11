@@ -30,7 +30,7 @@
 namespace QtJsonSerializer {
 
 class SerializerBasePrivate;
-//! A class to serializer and deserializer c++ classes to and from JSON
+//! A base class for the CBOR/JSON serializers
 class Q_JSONSERIALIZER_EXPORT SerializerBase : public QObject, protected TypeConverter::SerializationHelper
 {
 	Q_OBJECT

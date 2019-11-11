@@ -965,9 +965,9 @@ static void test_type() {
 	Type v;
 	QIODevice *d = nullptr;
 
-	Cbor c;
 	CborSerializer cs;
-	static_assert(std::is_same<Cbor, decltype(cs.serialize(v))>::value, "Wrong CBOR value returned by expression");
+	static_assert(std::is_same<QCborValue, decltype(cs.serialize(v))>::value, "Wrong CBOR value returned by expression");
+	Cbor c;
 	cs.serializeTo(d, v);
 	cs.serializeTo(v);
 	cs.deserialize(QCborValue{}, qMetaTypeId<Type>());
