@@ -7,6 +7,8 @@ With this small library, you are able to serialize any C++ datatype to JSON or C
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/3f69dd82640e4e3b8526f1a54bec2264)](https://www.codacy.com/app/Skycoder42/QtJsonSerializer)
 [![AUR](https://img.shields.io/aur/version/qt5-jsonserializer.svg)](https://aur.archlinux.org/packages/qt5-jsonserializer/)
 
+> The library was recently update to 4.0.0. Have a look at the [Porting section](#porting) to learn how to migrate your project from 3.* to 4.0.0
+
 ## Features
 - Serialize QObjects, Q_GADGETS, lists, maps, etc. to JSON/CBOR, in a generic matter
 - ... and of course deserialize JSON/CBOR back as well
@@ -60,7 +62,7 @@ The serializer is provided as a Qt module. Thus, all you have to do is install t
 Both serialization and desertialization are rather simple. Create an object, and then use the serializer as follows:
 
 The following is an example for a serializable object. *Note:* The usage of `MEMBER` Properties is not required, and simply done to make this example more readable.
-```cpp
+```.cpp
 class TestObject : public QObject
 {
 	Q_OBJECT
@@ -81,7 +83,7 @@ public:
 ```
 
 You can serialize (and deserialize) the object with:
-```cpp
+```.cpp
 auto serializer = new QJsonSerializer(this);
 
 try {
@@ -111,7 +113,7 @@ try {
 ```
 
 For the serialization, the created json would look like this:
-```json
+```.json
 {
 	"stringProperty": "test",
 	"simpleList": [1, 2, 3],
@@ -181,3 +183,46 @@ While the default Qt containers, like `QList`, `QVector` and `QMap` are all supp
 ## Documentation
 The documentation is available on [github pages](https://skycoder42.github.io/QtJsonSerializer/). It was created using [doxygen](http://www.doxygen.org/). The HTML-documentation and Qt-Help files are shipped
 together with the module for both the custom repository and the package on the release page. Please note that doxygen docs do not perfectly integrate with QtCreator/QtAssistant.
+
+## Porting
+Most changes to the library have been of additive nature. The following list summarizes the most important changes:
+
+- Support for CBOR de/serialization
+- Support for generic sequential and associative containers
+- Improved type safety via extraxtors
+- More converters (including bitarrays, smart pointers and enums)
+- All types have been renamed and moved into the QtJsonSerializer namespace
+
+The next sections will talk about specific changes and how to adjust your project. Also, if you have any questions or need help porting your project, I am always happy to help. Just create a new Issue asking for help, and it shall be given.
+
+### Rename refactoring
+One big part of the 4.0.0 release was to move all types into a namespace and get rid of the `QJson` prefix. The following table shows how types have been renamed. If you do not want to change all usages in your code, simply use `using` declarations for the types, i.e. `using QJsonSerializer = QtJsonSerializer::JsonSerializer;`.
+
+ Old name						| New name
+--------------------------------|----------
+ QJsonSerializerException		| QtJsonSerializer::Exception
+ QJsonDeserializationException	| QtJsonSerializer::DeserializationException
+ QJsonSerializationException	| QtJsonSerializer::SerializationException
+ QJsonSerializer				| QtJsonSerializer::JsonSerializer (split into that class and the base class QtJsonSerializer::SerializerBase)
+ QJsonTypeConverter				| QtJsonSerializer::TypeConverter
+
+### Changes in type registrations
+With the new system, `typedefs` are no longer a problem, as now, an advanced type registration system is used to get types instead of parsing class names. Thus, all related methods have been removed. Furthermore, the old system of converting various datatypes from and to a non-generic `QVariant` representation via `QMetaType` has been superseeded by the `QtJsonSerializer::TypeExtracor` system. For most usecases this changes nothing, as the `QtJsonSerializer::SerializerBase::register*` methods still exist. However, if you made use of the old system in custom converters, you should consider migrating to using either the `QtJsonSerializer::MetaWriter` mechanism for containers, or the `QtJsonSerializer::TypeExtracor` for other types. Check the documentation on how to use these classes.
+
+#### Support for more containers
+One additional advantage of the new system is, that now theoretically any sequential or associative container can be supported by the serializer without the need of a custom converter. Alls that is needed is a simple registration of a custom container class within the `QtJsonSerializer::MetaWriter` classes as well as the type declaration (See [Support for alternative Containers](#support-for-alternative-containers)). The following shows a simple example for `std::vector`
+
+```.cpp
+Q_DECLARE_SEQUENTIAL_CONTAINER_METATYPE(std::vector)
+// ...
+QtJsonSerializer::SequentialWriter::registerWriter<std::vector, int>();
+QtJsonSerializer::SequentialWriter::registerWriter<std::vector, double>();
+QtJsonSerializer::SequentialWriter::registerWriter<std::vector, QString>();
+// ...
+```
+
+### CBOR support
+The biggest feature however is support for de/serialization of CBOR data. Usage is the same as for JSON, simply use `QtJsonSerializer::CborSerializer` instead of the `QtJsonSerializer::JsonSerializer` class. Nothing more to say here - simply try it out!
+
+### Changes for TypeConverters
+If you previously had your own `QJsonTypeConverter` (now called `QtJsonSerializer::TypeConverter`), the changes are slightly more complex. The primary change was, that all these converter now operate on CBOR data, not JSON, as CBOR can be easily converted to JSON, but not the other way around. Check the QtJsonSerializer::TypeConverter documentation for more details on how to use these new converters.
