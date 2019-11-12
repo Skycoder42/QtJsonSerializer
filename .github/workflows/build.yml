@@ -91,7 +91,7 @@ jobs:
         uses: actions/cache@v1
         id: cache
         with:
-          path: qt-${{matrix.version}}-${{matrix.platform}}
+          path: qt/${{matrix.version}}/${{matrix.platform}}
           key: qt-${{matrix.version}}-${{matrix.platform}}
       - uses: Skycoder42/action-setup-qt@master
         id: qt
@@ -99,7 +99,7 @@ jobs:
           version: ${{matrix.version}}
           platform: ${{matrix.platform}}
           install-args: --verbose
-          cachedir: qt-${{matrix.version}}-${{matrix.platform}}
+          cachedir: qt/${{matrix.version}}/${{matrix.platform}}
       - name: qmake
         run: |
           qmake CONFIG+=install_ok QT_PLATFORM=${{matrix.platform}}
@@ -188,7 +188,7 @@ jobs:
       - uses: actions/cache@v1
         id: cache
         with:
-          path: qt-${{matrix.version}}-${{matrix.platform}}
+          path: qt/${{matrix.version}}/${{matrix.platform}}
           key: qt-${{matrix.version}}-${{matrix.platform}}
       - uses: Skycoder42/action-setup-qt@master
         id: qt
@@ -196,7 +196,7 @@ jobs:
           version: ${{matrix.version}}
           platform: ${{matrix.platform}}
           install-args: --verbose
-          cachedir: qt-${{matrix.version}}-${{matrix.platform}}
+          cachedir: qt/${{matrix.version}}/${{matrix.platform}}
       - name: qmake
         run: |
           qmake CONFIG+=no_register_json_converters QT_PLATFORM=${{matrix.platform}}
