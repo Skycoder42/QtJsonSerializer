@@ -81,7 +81,7 @@ jobs:
         with:
           version: ${{matrix.emsdk}}
           actions-cache-folder: emsdk-cache
-      - uses: install msvc 2017
+      - name: install msvc 2017
         if: contains(matrix.platform, 'msvc')
         run: vs_enterprise.exe --add Microsoft.VisualStudio.Component.VC.v141.x86.x64
       - uses: ilammy/msvc-dev-cmd@v1
