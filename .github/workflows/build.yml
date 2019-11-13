@@ -41,19 +41,19 @@ jobs:
             os: ubuntu-latest
             emsdk: sdk-1.38.27-64bit
           - platform: msvc2017_64
-            os: windows-latest
+            os: windows-2016
             vcarch: x64
           - platform: msvc2017
-            os: windows-latest
+            os: windows-2016
             vcarch: x64_x86
           - platform: winrt_x64_msvc2017
-            os: windows-latest
+            os: windows-2016
             vcarch: x64
           - platform: winrt_x86_msvc2017
-            os: windows-latest
+            os: windows-2016
             vcarch: x64_x86
           - platform: winrt_armv7_msvc2017
-            os: windows-latest
+            os: windows-2016
             vcarch: x64_arm
           - platform: mingw73_64
             os: windows-latest
@@ -167,7 +167,7 @@ jobs:
           - platform: gcc_64
             os: ubuntu-latest
           - platform: msvc2017_64
-            os: windows-latest
+            os: windows-2016
             vcarch: x64
           - platform: mingw73_64
             os: windows-latest
