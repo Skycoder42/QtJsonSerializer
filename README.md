@@ -7,7 +7,7 @@ With this small library, you are able to serialize any C++ datatype to JSON or C
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/3f69dd82640e4e3b8526f1a54bec2264)](https://www.codacy.com/app/Skycoder42/QtJsonSerializer)
 [![AUR](https://img.shields.io/aur/version/qt5-jsonserializer.svg)](https://aur.archlinux.org/packages/qt5-jsonserializer/)
 
-> The library was recently update to 4.0.0. Have a look at the [Porting section](#porting) to learn how to migrate your project from 3.* to 4.0.0
+> The library was recently update to 4.0.0. Have a look at the [Porting section](#porting) to learn how to migrate your project from 3.* to 4.0.0. Don't be afraid, as for most existing projects, only class names will have changed.
 
 ## Features
 - Serialize QObjects, Q_GADGETS, lists, maps, etc. to JSON/CBOR, in a generic matter
