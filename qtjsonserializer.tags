@@ -1,707 +1,1884 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
 <tagfile>
   <compound kind="file">
-    <name>qjsonserializer.h</name>
+    <name>qtjsonserializer_global.h</name>
     <path>/home/sky/Programming/QtLibraries/QtJsonSerializer/src/jsonserializer/</path>
-    <filename>qjsonserializer_8h</filename>
-    <class kind="class">QJsonSerializer</class>
+    <filename>qtjsonserializer__global_8h</filename>
+    <namespace>QtJsonSerializer</namespace>
+    <member kind="function">
+      <type>Q_JSONSERIALIZER_EXPORT void</type>
+      <name>registerTypes</name>
+      <anchorfile>namespace_qt_json_serializer.html</anchorfile>
+      <anchor>a895bfd295b71417456448a00f7d587f5</anchor>
+      <arglist>()</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>serializerbase.h</name>
+    <path>/home/sky/Programming/QtLibraries/QtJsonSerializer/src/jsonserializer/</path>
+    <filename>serializerbase_8h</filename>
+    <class kind="class">QtJsonSerializer::SerializerBase</class>
+    <namespace>QtJsonSerializer</namespace>
     <member kind="define">
       <type>#define</type>
       <name>Q_JSON_POLYMORPHIC</name>
-      <anchorfile>qjsonserializer_8h.html</anchorfile>
+      <anchorfile>serializerbase_8h.html</anchorfile>
       <anchor>ae7850cd06e039d9ba8993dd5bfa2f2b3</anchor>
       <arglist>(x)</arglist>
     </member>
   </compound>
-  <compound kind="class">
-    <name>QJsonDeserializationException</name>
-    <filename>class_q_json_deserialization_exception.html</filename>
-    <base>QJsonSerializerException</base>
-    <member kind="function">
-      <type></type>
-      <name>QJsonDeserializationException</name>
-      <anchorfile>class_q_json_deserialization_exception.html</anchorfile>
-      <anchor>ad37e36ebc35f0812018106e1a65895b1</anchor>
-      <arglist>(const QByteArray &amp;what)</arglist>
+  <compound kind="struct">
+    <name>QtJsonSerializer::MetaWriters::AssociativeWriter::AssociationInfo</name>
+    <filename>class_qt_json_serializer_1_1_meta_writers_1_1_associative_writer.html</filename>
+    <anchor>struct_qt_json_serializer_1_1_meta_writers_1_1_associative_writer_1_1_association_info</anchor>
+    <member kind="variable">
+      <type>int</type>
+      <name>keyType</name>
+      <anchorfile>class_qt_json_serializer_1_1_meta_writers_1_1_associative_writer.html</anchorfile>
+      <anchor>a8c4ee185f7071e6f110e3c041cb1ba12</anchor>
+      <arglist></arglist>
     </member>
-    <member kind="function">
-      <type>void</type>
-      <name>raise</name>
-      <anchorfile>class_q_json_deserialization_exception.html</anchorfile>
-      <anchor>a48291abca66222ed578833a1c1c169c0</anchor>
-      <arglist>() const override</arglist>
-    </member>
-    <member kind="function">
-      <type>QException *</type>
-      <name>clone</name>
-      <anchorfile>class_q_json_deserialization_exception.html</anchorfile>
-      <anchor>a069e07e1e91403acde35c2ce70566069</anchor>
-      <arglist>() const override</arglist>
+    <member kind="variable">
+      <type>int</type>
+      <name>valueType</name>
+      <anchorfile>class_qt_json_serializer_1_1_meta_writers_1_1_associative_writer.html</anchorfile>
+      <anchor>a3c879119282a6595a836a62e28ae7308</anchor>
+      <arglist></arglist>
     </member>
   </compound>
   <compound kind="class">
-    <name>QJsonSerializationException</name>
-    <filename>class_q_json_serialization_exception.html</filename>
-    <base>QJsonSerializerException</base>
-    <member kind="function">
-      <type></type>
-      <name>QJsonSerializationException</name>
-      <anchorfile>class_q_json_serialization_exception.html</anchorfile>
-      <anchor>aebbceb6fd83077b2b7aa2413d326e994</anchor>
-      <arglist>(const QByteArray &amp;what)</arglist>
+    <name>QtJsonSerializer::MetaWriters::AssociativeWriter</name>
+    <filename>class_qt_json_serializer_1_1_meta_writers_1_1_associative_writer.html</filename>
+    <member kind="function" virtualness="pure">
+      <type>virtual AssociationInfo</type>
+      <name>info</name>
+      <anchorfile>class_qt_json_serializer_1_1_meta_writers_1_1_associative_writer.html</anchorfile>
+      <anchor>ac966d776b5f1ca4f0e9ce8da272d93ed</anchor>
+      <arglist>() const =0</arglist>
     </member>
-    <member kind="function">
-      <type>void</type>
-      <name>raise</name>
-      <anchorfile>class_q_json_serialization_exception.html</anchorfile>
-      <anchor>a1f2c5dc5b525da2d02c51fbb093fad2c</anchor>
-      <arglist>() const override</arglist>
+    <member kind="function" virtualness="pure">
+      <type>virtual void</type>
+      <name>add</name>
+      <anchorfile>class_qt_json_serializer_1_1_meta_writers_1_1_associative_writer.html</anchorfile>
+      <anchor>a83d5888f6ba7bece205f570909478266</anchor>
+      <arglist>(const QVariant &amp;key, const QVariant &amp;value)=0</arglist>
     </member>
-    <member kind="function">
-      <type>QException *</type>
-      <name>clone</name>
-      <anchorfile>class_q_json_serialization_exception.html</anchorfile>
-      <anchor>a71fe42f32a5102faa57ca86ebbf57e3b</anchor>
-      <arglist>() const override</arglist>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>registerWriter</name>
+      <anchorfile>class_qt_json_serializer_1_1_meta_writers_1_1_associative_writer.html</anchorfile>
+      <anchor>ab614079d01e86f3f87312cf1f0331c41</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>registerWriter</name>
+      <anchorfile>class_qt_json_serializer_1_1_meta_writers_1_1_associative_writer.html</anchorfile>
+      <anchor>a9183c8ccdf1a96b6276b2dfb5c53f795</anchor>
+      <arglist>(int metaTypeId, AssociativeWriterFactory *factory)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static bool</type>
+      <name>canWrite</name>
+      <anchorfile>class_qt_json_serializer_1_1_meta_writers_1_1_associative_writer.html</anchorfile>
+      <anchor>a6c033667e8566a0ba46ef4c55a716fd5</anchor>
+      <arglist>(int metaTypeId)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static QSharedPointer&lt; AssociativeWriter &gt;</type>
+      <name>getWriter</name>
+      <anchorfile>class_qt_json_serializer_1_1_meta_writers_1_1_associative_writer.html</anchorfile>
+      <anchor>a193f4c453239588ad78ab74ada4c0539</anchor>
+      <arglist>(QVariant &amp;data)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static AssociationInfo</type>
+      <name>getInfo</name>
+      <anchorfile>class_qt_json_serializer_1_1_meta_writers_1_1_associative_writer.html</anchorfile>
+      <anchor>acfb2337ec23941ac465e8283e24f068b</anchor>
+      <arglist>(int metaTypeId)</arglist>
     </member>
   </compound>
   <compound kind="class">
-    <name>QJsonSerializer</name>
-    <filename>class_q_json_serializer.html</filename>
-    <base>QObject</base>
-    <base protection="protected">QJsonTypeConverter::SerializationHelper</base>
+    <name>QtJsonSerializer::MetaWriters::AssociativeWriterFactory</name>
+    <filename>class_qt_json_serializer_1_1_meta_writers_1_1_associative_writer_factory.html</filename>
+    <member kind="function" virtualness="pure">
+      <type>virtual QSharedPointer&lt; AssociativeWriter &gt;</type>
+      <name>create</name>
+      <anchorfile>class_qt_json_serializer_1_1_meta_writers_1_1_associative_writer_factory.html</anchorfile>
+      <anchor>ade944e6d38c2ee82696034a26d431f33</anchor>
+      <arglist>(void *data) const =0</arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>QtJsonSerializer::CborSerializer</name>
+    <filename>class_qt_json_serializer_1_1_cbor_serializer.html</filename>
+    <base>QtJsonSerializer::SerializerBase</base>
     <member kind="enumeration">
       <type></type>
-      <name>ValidationFlag</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a0fb6dc294c5f0c2279e1e60c8bf19b37</anchor>
+      <name>ExtendedTags</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>af4564875f7ef9a1ff8b6838d0c6f93bc</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
-      <name>StandardValidation</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a0fb6dc294c5f0c2279e1e60c8bf19b37a3afc20b935753249378a0c00a884c995</anchor>
+      <name>GenericObject</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>af4564875f7ef9a1ff8b6838d0c6f93bcacb5f6ecb059850b329609b12bf404917</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
-      <name>NoExtraProperties</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a0fb6dc294c5f0c2279e1e60c8bf19b37ac8cb0e946f61b483209cb2484259bcf0</anchor>
+      <name>RationaleNumber</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>af4564875f7ef9a1ff8b6838d0c6f93bcad69e712b6f870373efd3b2279c6db50c</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
-      <name>AllProperties</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a0fb6dc294c5f0c2279e1e60c8bf19b37aa598894025ccd81d3ed66d3e379c9f7e</anchor>
+      <name>Identifier</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>af4564875f7ef9a1ff8b6838d0c6f93bca035a902e094741ceda14b7e329ab7feb</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
-      <name>FullValidation</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a0fb6dc294c5f0c2279e1e60c8bf19b37a78d3cfb1306be19cd4099429483dfd8f</anchor>
+      <name>Homogeneous</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>af4564875f7ef9a1ff8b6838d0c6f93bca01f28cb6075f283b25919b95ee0d9ffe</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>Set</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>af4564875f7ef9a1ff8b6838d0c6f93bcae88a571dc6bce01864b2142d25fb32e8</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ExplicitMap</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>af4564875f7ef9a1ff8b6838d0c6f93bca4a5b4bf6b4eef674840e04c2e6b773ce</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>NetworkAddress</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>af4564875f7ef9a1ff8b6838d0c6f93bca0d441e8b546c298c829788d0e28d8c49</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>NetworkAddressPrefix</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>af4564875f7ef9a1ff8b6838d0c6f93bca12febcdc4a14c0083edd52b7a0233158</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumeration">
       <type></type>
-      <name>Polymorphing</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>aaf1235d174ee19e269d85a9a0d909e72</anchor>
+      <name>CustomTags</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eac</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
-      <name>Disabled</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>aaf1235d174ee19e269d85a9a0d909e72a22919891b604cb7b35cfe91a463f5864</anchor>
+      <name>Color</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eaca73490d734deffe57483c2975f41b05bd</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
-      <name>Enabled</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>aaf1235d174ee19e269d85a9a0d909e72a176639071fbd8ac569fa3883a4ca3336</anchor>
+      <name>Font</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eaca92596f9129f42db8f15aeb9e4af080a8</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
-      <name>Forced</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>aaf1235d174ee19e269d85a9a0d909e72a24bfa9c0fdee3169ad224163356af85a</anchor>
+      <name>Enum</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eaca7b52eb969157160e7071edca3079ef89</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
-      <name>StandardValidation</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a0fb6dc294c5f0c2279e1e60c8bf19b37a3afc20b935753249378a0c00a884c995</anchor>
+      <name>Flags</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eaca9dd5f35221853d5b7318fee95fef978f</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
-      <name>NoExtraProperties</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a0fb6dc294c5f0c2279e1e60c8bf19b37ac8cb0e946f61b483209cb2484259bcf0</anchor>
+      <name>ConstructedObject</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eacacd105f3de7b3a83d8ddd24bdf8e1fbd6</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
-      <name>AllProperties</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a0fb6dc294c5f0c2279e1e60c8bf19b37aa598894025ccd81d3ed66d3e379c9f7e</anchor>
+      <name>Pair</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eaca1d6b3cd29ce4d9ca5ed5c9df576f8614</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
-      <name>FullValidation</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a0fb6dc294c5f0c2279e1e60c8bf19b37a78d3cfb1306be19cd4099429483dfd8f</anchor>
+      <name>MultiMap</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eacab905b2590239548c4d140072ea46231f</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
-      <name>Disabled</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>aaf1235d174ee19e269d85a9a0d909e72a22919891b604cb7b35cfe91a463f5864</anchor>
+      <name>VersionNumber</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eaca2c326325212c92f0dd41f57fd5895aab</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
-      <name>Enabled</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>aaf1235d174ee19e269d85a9a0d909e72a176639071fbd8ac569fa3883a4ca3336</anchor>
+      <name>Tuple</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eaca65c66b210d5d233592d92c2d24ee9dc6</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
-      <name>Forced</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>aaf1235d174ee19e269d85a9a0d909e72a24bfa9c0fdee3169ad224163356af85a</anchor>
+      <name>BitArray</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eaca0b5e16da3dec09223034a13a42a03f6f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>Date</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eacae4123653f0b2532bb8fe52af0401b4c0</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>Time</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eaca70b52126b89e3e386b53fb7469cec1d6</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>LocaleISO</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eacabc84b990c22ac1835494d9e4624c1fce</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>LocaleBCP47</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eacaceac43cb5c0dd2e3f155a5d71b2fb145</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>GeomSize</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eaca110b9d532e48bf15c3b0ee9c0e30e3c8</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>GeomPoint</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eaca4c778d500dfc60ab9d3ccaec0dc1fecd</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>GeomLine</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eacab4e92b7838321c76f0b51657356da4bc</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>GeomRect</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eaca3e1507b38e8acba8f310422543c2a91c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ChronoNanoSeconds</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eaca226cd896c009838de361af90dfbcbf46</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ChronoMicroSeconds</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eaca104dc43aba164e7dd8b0e3123ec9bfff</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ChronoMilliSeconds</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eaca8fa9540be697fba8b7fe679e7e571ed4</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ChronoSeconds</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eaca6b72c7d745e5bdbba6f49e6bafad97c5</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ChronoMinutes</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eaca9cb0574b2ef6853078ed3ac93ecccbc5</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ChronoHours</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eaca76809a2162ee86450a7c19d4f8301975</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>GenericObject</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>af4564875f7ef9a1ff8b6838d0c6f93bcacb5f6ecb059850b329609b12bf404917</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>RationaleNumber</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>af4564875f7ef9a1ff8b6838d0c6f93bcad69e712b6f870373efd3b2279c6db50c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>Identifier</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>af4564875f7ef9a1ff8b6838d0c6f93bca035a902e094741ceda14b7e329ab7feb</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>Homogeneous</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>af4564875f7ef9a1ff8b6838d0c6f93bca01f28cb6075f283b25919b95ee0d9ffe</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>Set</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>af4564875f7ef9a1ff8b6838d0c6f93bcae88a571dc6bce01864b2142d25fb32e8</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ExplicitMap</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>af4564875f7ef9a1ff8b6838d0c6f93bca4a5b4bf6b4eef674840e04c2e6b773ce</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>NetworkAddress</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>af4564875f7ef9a1ff8b6838d0c6f93bca0d441e8b546c298c829788d0e28d8c49</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>NetworkAddressPrefix</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>af4564875f7ef9a1ff8b6838d0c6f93bca12febcdc4a14c0083edd52b7a0233158</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>Color</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eaca73490d734deffe57483c2975f41b05bd</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>Font</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eaca92596f9129f42db8f15aeb9e4af080a8</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>Enum</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eaca7b52eb969157160e7071edca3079ef89</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>Flags</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eaca9dd5f35221853d5b7318fee95fef978f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ConstructedObject</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eacacd105f3de7b3a83d8ddd24bdf8e1fbd6</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>Pair</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eaca1d6b3cd29ce4d9ca5ed5c9df576f8614</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>MultiMap</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eacab905b2590239548c4d140072ea46231f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>VersionNumber</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eaca2c326325212c92f0dd41f57fd5895aab</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>Tuple</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eaca65c66b210d5d233592d92c2d24ee9dc6</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>BitArray</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eaca0b5e16da3dec09223034a13a42a03f6f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>Date</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eacae4123653f0b2532bb8fe52af0401b4c0</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>Time</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eaca70b52126b89e3e386b53fb7469cec1d6</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>LocaleISO</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eacabc84b990c22ac1835494d9e4624c1fce</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>LocaleBCP47</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eacaceac43cb5c0dd2e3f155a5d71b2fb145</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>GeomSize</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eaca110b9d532e48bf15c3b0ee9c0e30e3c8</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>GeomPoint</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eaca4c778d500dfc60ab9d3ccaec0dc1fecd</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>GeomLine</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eacab4e92b7838321c76f0b51657356da4bc</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>GeomRect</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eaca3e1507b38e8acba8f310422543c2a91c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ChronoNanoSeconds</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eaca226cd896c009838de361af90dfbcbf46</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ChronoMicroSeconds</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eaca104dc43aba164e7dd8b0e3123ec9bfff</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ChronoMilliSeconds</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eaca8fa9540be697fba8b7fe679e7e571ed4</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ChronoSeconds</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eaca6b72c7d745e5bdbba6f49e6bafad97c5</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ChronoMinutes</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eaca9cb0574b2ef6853078ed3ac93ecccbc5</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ChronoHours</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a5b1b6bd02576cff0fca24197faba8eaca76809a2162ee86450a7c19d4f8301975</anchor>
       <arglist></arglist>
     </member>
     <member kind="slot">
       <type>void</type>
-      <name>setAllowDefaultNull</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>ad807b89a053e8aac9930b2b6d8cf8cc4</anchor>
-      <arglist>(bool allowDefaultNull)</arglist>
+      <name>setHandleSpecialNumbers</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a67404d3a34379dd2a7afb3749c89cf02</anchor>
+      <arglist>(bool handleSpecialNumbers)</arglist>
     </member>
-    <member kind="slot">
+    <member kind="signal">
       <type>void</type>
-      <name>setKeepObjectName</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>af4d083e88a88bec52b4951b2d8395767</anchor>
-      <arglist>(bool keepObjectName)</arglist>
-    </member>
-    <member kind="slot">
-      <type>void</type>
-      <name>setEnumAsString</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a46a707a369bfd1beb45e7506cb36b783</anchor>
-      <arglist>(bool enumAsString)</arglist>
-    </member>
-    <member kind="slot">
-      <type>void</type>
-      <name>setValidateBase64</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>aacb94bc9fc1274fff206e6882297956d</anchor>
-      <arglist>(bool validateBase64)</arglist>
-    </member>
-    <member kind="slot">
-      <type>void</type>
-      <name>setUseBcp47Locale</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>aff15d8d380247b1f77f761b1a831b02a</anchor>
-      <arglist>(bool useBcp47Locale)</arglist>
-    </member>
-    <member kind="slot">
-      <type>void</type>
-      <name>setValidationFlags</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a3441ff7a583a30f3f6d38bfc8b7bee39</anchor>
-      <arglist>(ValidationFlags validationFlags)</arglist>
-    </member>
-    <member kind="slot">
-      <type>void</type>
-      <name>setPolymorphing</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a567a75ad4496ac2fade39cbb1a4cec74</anchor>
-      <arglist>(Polymorphing polymorphing)</arglist>
+      <name>handleSpecialNumbersChanged</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>ae0cc6d62f39d4d1cdd4890bf367833f1</anchor>
+      <arglist>(bool handleSpecialNumbers, QPrivateSignal)</arglist>
     </member>
     <member kind="function">
       <type></type>
-      <name>QJsonSerializer</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>ae0d46bea68e7abc4f0a7444a40c03017</anchor>
+      <name>CborSerializer</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a9ca35e16292f8b9b216d65adcb8b05c0</anchor>
       <arglist>(QObject *parent=nullptr)</arglist>
     </member>
     <member kind="function">
       <type>bool</type>
-      <name>allowDefaultNull</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a194c09466f37e35a189c3e67df74f0b9</anchor>
+      <name>handleSpecialNumbers</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a8920841fd21448fd188a2945713ef565</anchor>
       <arglist>() const</arglist>
     </member>
     <member kind="function">
-      <type>bool</type>
-      <name>keepObjectName</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>afd4632ae8b3725d2c3d1568edd08a8f5</anchor>
+      <type>void</type>
+      <name>setTypeTag</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>ab7eae8c6c43c0d4e2033a04dd6f687d0</anchor>
+      <arglist>(QCborTag tag=static_cast&lt; QCborTag &gt;(NoTag))</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>setTypeTag</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a027cd12f411e327a24aaaa9c74a6142a</anchor>
+      <arglist>(int metaTypeId, QCborTag tag=static_cast&lt; QCborTag &gt;(NoTag))</arglist>
+    </member>
+    <member kind="function">
+      <type>QCborTag</type>
+      <name>typeTag</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>aee25037bf87c55532d05912862466ac5</anchor>
       <arglist>() const</arglist>
     </member>
     <member kind="function">
-      <type>bool</type>
-      <name>enumAsString</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a3c26e7a387e04a367813e10cb6b716f2</anchor>
-      <arglist>() const</arglist>
+      <type>QCborTag</type>
+      <name>typeTag</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>add307065a8927336919be53d9786b323</anchor>
+      <arglist>(int metaTypeId) const override</arglist>
     </member>
     <member kind="function">
-      <type>bool</type>
-      <name>validateBase64</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>aef3827c288808f1ce1bd98ce26fb5b81</anchor>
-      <arglist>() const</arglist>
-    </member>
-    <member kind="function">
-      <type>bool</type>
-      <name>useBcp47Locale</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a291ac1cf0ea66a66ee222223d5d0ffe5</anchor>
-      <arglist>() const</arglist>
-    </member>
-    <member kind="function">
-      <type>ValidationFlags</type>
-      <name>validationFlags</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a9d8a8113d3f0b32eb6821dbb6fc5a89a</anchor>
-      <arglist>() const</arglist>
-    </member>
-    <member kind="function">
-      <type>Polymorphing</type>
-      <name>polymorphing</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a7343ad9f15992eb0b5fe3f2defc61649</anchor>
-      <arglist>() const</arglist>
-    </member>
-    <member kind="function">
-      <type>QJsonValue</type>
+      <type>QCborValue</type>
       <name>serialize</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>ab68cf3a3dc0b5d8fecf85b729d0be0a9</anchor>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a1223c5a54c584b82ac7a86a5e1da143a</anchor>
       <arglist>(const QVariant &amp;data) const</arglist>
     </member>
     <member kind="function">
       <type>void</type>
       <name>serializeTo</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a163d6f5b77e0b8b874d49a2cd546c88d</anchor>
-      <arglist>(QIODevice *device, const QVariant &amp;data) const</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>serializeTo</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>af11992fb722f5e85c0e6fbb660dc96f3</anchor>
-      <arglist>(QIODevice *device, const QVariant &amp;data, QJsonDocument::JsonFormat format) const</arglist>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>af5879c9072657a3ae58c6a85236450bd</anchor>
+      <arglist>(QIODevice *device, const QVariant &amp;data, QCborValue::EncodingOptions options=QCborValue::NoTransformation) const</arglist>
     </member>
     <member kind="function">
       <type>QByteArray</type>
       <name>serializeTo</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a1a7c606d60801923008752f43a16e0aa</anchor>
-      <arglist>(const QVariant &amp;data) const</arglist>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a426ab5a1dbd00ad1dd80fdddc79a082d</anchor>
+      <arglist>(const QVariant &amp;data, QCborValue::EncodingOptions options=QCborValue::NoTransformation) const</arglist>
     </member>
     <member kind="function">
-      <type>QByteArray</type>
-      <name>serializeTo</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a66303f64edafb7b1e214e393b07af1f9</anchor>
-      <arglist>(const QVariant &amp;data, QJsonDocument::JsonFormat format) const</arglist>
-    </member>
-    <member kind="function">
-      <type>_qjsonserializer_helpertypes::json_type&lt; T &gt;::type</type>
+      <type>QCborValue</type>
       <name>serialize</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a36711cc64a6398add8d1d490f8e07cba</anchor>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a2d37d2eeea6556c1115fe104c0d0bb29</anchor>
       <arglist>(const T &amp;data) const</arglist>
     </member>
     <member kind="function">
       <type>void</type>
       <name>serializeTo</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>aa4d9eb8bc4600c5f976bd6d5f1c2ff60</anchor>
-      <arglist>(QIODevice *device, const T &amp;data, QJsonDocument::JsonFormat format=QJsonDocument::Indented) const</arglist>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a96244c3ed4bf03b40cbee9ae404346a8</anchor>
+      <arglist>(QIODevice *device, const T &amp;data, QCborValue::EncodingOptions options=QCborValue::NoTransformation) const</arglist>
     </member>
     <member kind="function">
       <type>QByteArray</type>
       <name>serializeTo</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a43b93348b2f15f6b0791823fb7b27cd0</anchor>
-      <arglist>(const T &amp;data, QJsonDocument::JsonFormat format=QJsonDocument::Indented) const</arglist>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>ac830cc615732682d9d4c4f30913cd989</anchor>
+      <arglist>(const T &amp;data, QCborValue::EncodingOptions options=QCborValue::NoTransformation) const</arglist>
     </member>
     <member kind="function">
       <type>QVariant</type>
       <name>deserialize</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>ac2abe7502e5082e9e77ddc08e224840a</anchor>
-      <arglist>(const QJsonValue &amp;json, int metaTypeId, QObject *parent=nullptr) const</arglist>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a09da70d627b05614189b2f32826e216a</anchor>
+      <arglist>(const QCborValue &amp;cbor, int metaTypeId, QObject *parent=nullptr) const</arglist>
     </member>
     <member kind="function">
       <type>QVariant</type>
       <name>deserializeFrom</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>aafa3d1873bf297dca6a60ccc380415cc</anchor>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>afbd36b1a5b9ec4efa726ac2736ae7fe0</anchor>
       <arglist>(QIODevice *device, int metaTypeId, QObject *parent=nullptr) const</arglist>
     </member>
     <member kind="function">
       <type>QVariant</type>
       <name>deserializeFrom</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a9a7ef54e33560eeb3dccb3054cb4d872</anchor>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a8a11208b9320ce0af6acbda5f9a16adb</anchor>
       <arglist>(const QByteArray &amp;data, int metaTypeId, QObject *parent=nullptr) const</arglist>
     </member>
     <member kind="function">
       <type>T</type>
       <name>deserialize</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>aab838a93725225e6504c6e3f1f903095</anchor>
-      <arglist>(const typename _qjsonserializer_helpertypes::json_type&lt; T &gt;::type &amp;json, QObject *parent=nullptr) const</arglist>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>ab5276af382a16a0e65d8cf5bdc9386d1</anchor>
+      <arglist>(const QCborValue &amp;cbor, QObject *parent=nullptr) const</arglist>
     </member>
     <member kind="function">
       <type>T</type>
       <name>deserializeFrom</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a34800d922f12b1af0a016a5b06ecfb1b</anchor>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>ad23a9f9518f471a5e8b1008f32735cb0</anchor>
       <arglist>(QIODevice *device, QObject *parent=nullptr) const</arglist>
     </member>
     <member kind="function">
       <type>T</type>
       <name>deserializeFrom</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>afbca1b7d26866f48db10656e0284bbd6</anchor>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a1b0315e9ea7ad8d29599f42f19841ee5</anchor>
       <arglist>(const QByteArray &amp;data, QObject *parent=nullptr) const</arglist>
     </member>
     <member kind="function">
-      <type>void</type>
-      <name>addJsonTypeConverter</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a812d2ba38850dc750a31a451bcbb8781</anchor>
-      <arglist>()</arglist>
+      <type>std::variant&lt; QCborValue, QJsonValue &gt;</type>
+      <name>serializeGeneric</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a83d118b4d3626a4407f19393f8d9c8a0</anchor>
+      <arglist>(const QVariant &amp;value) const override</arglist>
+    </member>
+    <member kind="function">
+      <type>QVariant</type>
+      <name>deserializeGeneric</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>af3873499044dfa2e4945508cf4a2bb9e</anchor>
+      <arglist>(const std::variant&lt; QCborValue, QJsonValue &gt; &amp;value, int metaTypeId, QObject *parent) const override</arglist>
+    </member>
+    <member kind="function" protection="protected">
+      <type>bool</type>
+      <name>jsonMode</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a0806b105e4b9ed33897c696f6c6bd080</anchor>
+      <arglist>() const override</arglist>
+    </member>
+    <member kind="property">
+      <type>bool</type>
+      <name>handleSpecialNumbers</name>
+      <anchorfile>class_qt_json_serializer_1_1_cbor_serializer.html</anchorfile>
+      <anchor>a21aceacdf800f5d82ffc50feb02ded3c</anchor>
+      <arglist></arglist>
+    </member>
+    <docanchor file="class_qt_json_serializer_1_1_cbor_serializer" title="Supported types">cbor_supported</docanchor>
+    <docanchor file="class_qt_json_serializer_1_1_cbor_serializer" title="Extending the serializer">cbor_extending</docanchor>
+  </compound>
+  <compound kind="class">
+    <name>QtJsonSerializer::DeserializationException</name>
+    <filename>class_qt_json_serializer_1_1_deserialization_exception.html</filename>
+    <base>QtJsonSerializer::Exception</base>
+    <member kind="function">
+      <type></type>
+      <name>DeserializationException</name>
+      <anchorfile>class_qt_json_serializer_1_1_deserialization_exception.html</anchorfile>
+      <anchor>a3f9e15d83601a2f0d4248bf45672243d</anchor>
+      <arglist>(const QByteArray &amp;what)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
-      <name>addJsonTypeConverter</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a9b8d0f4bd6b64a7ac72a5a5bf6d79e98</anchor>
-      <arglist>(QSharedPointer&lt; QJsonTypeConverter &gt; converter)</arglist>
+      <name>raise</name>
+      <anchorfile>class_qt_json_serializer_1_1_deserialization_exception.html</anchorfile>
+      <anchor>ad8b239ea05df9daf53b4be4730fefb9f</anchor>
+      <arglist>() const override</arglist>
     </member>
-    <member kind="function" static="yes">
-      <type>static void</type>
-      <name>registerInverseTypedef</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a2929476a559a5d85a29f4033a767f19b</anchor>
-      <arglist>(const char *typeName)</arglist>
+    <member kind="function">
+      <type>ExceptionBase *</type>
+      <name>clone</name>
+      <anchorfile>class_qt_json_serializer_1_1_deserialization_exception.html</anchorfile>
+      <anchor>a7edb50f976606891343f0784c0d9a099</anchor>
+      <arglist>() const override</arglist>
     </member>
-    <member kind="function" static="yes">
-      <type>static bool</type>
-      <name>registerListConverters</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a98b3e1ea1e844e2f3806dbf3566d9972</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static bool</type>
-      <name>registerMapConverters</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a99a740629458388670ee7978e029ee33</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static bool</type>
-      <name>registerAllConverters</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a1c0222392bf3ebacbf170521fdd2f08a</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static bool</type>
-      <name>registerPointerConverters</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a760ee7fa357f7090d82ad6974a7fe08b</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static bool</type>
-      <name>registerPointerListConverters</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a679800b03b46bcd83ed8e021314f7928</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static bool</type>
-      <name>registerPairConverters</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a9a388df04a7feabc539aa96c695632c3</anchor>
-      <arglist>(const char *originalTypeName=nullptr)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static bool</type>
-      <name>registerTupleConverters</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a6a42c90ba8c539310799f5aaf8a367db</anchor>
-      <arglist>(const char *originalTypeName=nullptr)</arglist>
-    </member>
-    <member kind="function" protection="protected">
-      <type>QVariant</type>
-      <name>getProperty</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a2cba821c864602adb41c3c8b1325510e</anchor>
-      <arglist>(const char *name) const override</arglist>
-    </member>
-    <member kind="function" protection="protected">
-      <type>QJsonValue</type>
-      <name>serializeSubtype</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a4c04b5da13864d0bb4e4a9236fcc1335</anchor>
-      <arglist>(QMetaProperty property, const QVariant &amp;value) const override</arglist>
-    </member>
-    <member kind="function" protection="protected">
-      <type>QVariant</type>
-      <name>deserializeSubtype</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>aff36277293105f9560d3d4db0a38cdb2</anchor>
-      <arglist>(QMetaProperty property, const QJsonValue &amp;value, QObject *parent) const override</arglist>
-    </member>
-    <member kind="function" protection="protected">
-      <type>QJsonValue</type>
-      <name>serializeSubtype</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>ae87d7195f7d2b6af7b2260c9f7c13b0c</anchor>
-      <arglist>(int propertyType, const QVariant &amp;value, const QByteArray &amp;traceHint) const override</arglist>
-    </member>
-    <member kind="function" protection="protected">
-      <type>QVariant</type>
-      <name>deserializeSubtype</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a5e5fd0757466bed07bcbcc49f475d93e</anchor>
-      <arglist>(int propertyType, const QJsonValue &amp;value, QObject *parent, const QByteArray &amp;traceHint) const override</arglist>
-    </member>
-    <member kind="property">
-      <type>bool</type>
-      <name>allowDefaultNull</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>acc7b17076756d1acd0d95e955614b289</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="property">
-      <type>bool</type>
-      <name>keepObjectName</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a6c0d933bd43f30870c9379fb04f65f00</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="property">
-      <type>bool</type>
-      <name>enumAsString</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>ac430c1962106cc1d0efcbef4a11b03f3</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="property">
-      <type>bool</type>
-      <name>validateBase64</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a8de334ab602be6a05d70146222978ca9</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="property">
-      <type>bool</type>
-      <name>useBcp47Locale</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a692f59d493de527e5373db2975a46cc2</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="property">
-      <type>ValidationFlags</type>
-      <name>validationFlags</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>a6baa7de9acfd41c1780ea90464b696e3</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="property">
-      <type>Polymorphing</type>
-      <name>polymorphing</name>
-      <anchorfile>class_q_json_serializer.html</anchorfile>
-      <anchor>ab3bf93ba232658e79a2a007d1f3d5239</anchor>
-      <arglist></arglist>
-    </member>
-    <docanchor file="class_q_json_serializer" title="Supported types">supported</docanchor>
-    <docanchor file="class_q_json_serializer" title="Extending the serializer">extending</docanchor>
   </compound>
   <compound kind="class">
-    <name>QJsonSerializerException</name>
-    <filename>class_q_json_serializer_exception.html</filename>
+    <name>QtJsonSerializer::Exception</name>
+    <filename>class_qt_json_serializer_1_1_exception.html</filename>
     <base>QException</base>
     <member kind="typedef">
       <type>QStack&lt; QPair&lt; QByteArray, QByteArray &gt; &gt;</type>
       <name>PropertyTrace</name>
-      <anchorfile>class_q_json_serializer_exception.html</anchorfile>
-      <anchor>a1ffa5287297555aeb1244bfdecb792c2</anchor>
+      <anchorfile>class_qt_json_serializer_1_1_exception.html</anchorfile>
+      <anchor>ad5e9256176489be7882ec21bdff6b473</anchor>
       <arglist></arglist>
     </member>
     <member kind="function">
       <type></type>
-      <name>QJsonSerializerException</name>
-      <anchorfile>class_q_json_serializer_exception.html</anchorfile>
-      <anchor>a5b40d9f001682cd43de78ec06b21b9a6</anchor>
+      <name>Exception</name>
+      <anchorfile>class_qt_json_serializer_1_1_exception.html</anchorfile>
+      <anchor>a1c2690ec79bf75bdb10b82c38c0fedd2</anchor>
       <arglist>(const QByteArray &amp;what)</arglist>
     </member>
     <member kind="function">
       <type>const char *</type>
       <name>what</name>
-      <anchorfile>class_q_json_serializer_exception.html</anchorfile>
-      <anchor>aa0c888addeffaf1c683a18876fc44c57</anchor>
+      <anchorfile>class_qt_json_serializer_1_1_exception.html</anchorfile>
+      <anchor>a288fb1bbd8123f6635c636d38a0ed5b6</anchor>
       <arglist>() const noexcept final</arglist>
     </member>
     <member kind="function">
       <type>QByteArray</type>
       <name>message</name>
-      <anchorfile>class_q_json_serializer_exception.html</anchorfile>
-      <anchor>ab62a3950ba92a61ae4a77b4b4d6c119a</anchor>
+      <anchorfile>class_qt_json_serializer_1_1_exception.html</anchorfile>
+      <anchor>a79748c07a93b48d7fae4250f13b36458</anchor>
       <arglist>() const</arglist>
     </member>
     <member kind="function">
       <type>PropertyTrace</type>
       <name>propertyTrace</name>
-      <anchorfile>class_q_json_serializer_exception.html</anchorfile>
-      <anchor>a05006fd8c00f771834fe07a231d1de7e</anchor>
+      <anchorfile>class_qt_json_serializer_1_1_exception.html</anchorfile>
+      <anchor>a968473f7f7cdc63881a92cece889e76f</anchor>
       <arglist>() const</arglist>
+    </member>
+    <member kind="function" virtualness="virtual">
+      <type>virtual void</type>
+      <name>raise</name>
+      <anchorfile>class_qt_json_serializer_1_1_exception.html</anchorfile>
+      <anchor>abe5d42271a5dd8465ab6adaa445e72d4</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function" virtualness="virtual">
+      <type>virtual ExceptionBase *</type>
+      <name>clone</name>
+      <anchorfile>class_qt_json_serializer_1_1_exception.html</anchorfile>
+      <anchor>a403bca0278b9b2f9635a2eeb871d7dd1</anchor>
+      <arglist>() const</arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>QtJsonSerializer::JsonSerializer</name>
+    <filename>class_qt_json_serializer_1_1_json_serializer.html</filename>
+    <base>QtJsonSerializer::SerializerBase</base>
+    <member kind="enumeration">
+      <type></type>
+      <name>ByteArrayFormat</name>
+      <anchorfile>class_qt_json_serializer_1_1_json_serializer.html</anchorfile>
+      <anchor>afae5305294bb7c23a8d8dbeb29d5e497</anchor>
+      <arglist></arglist>
+      <enumvalue file="class_qt_json_serializer_1_1_json_serializer.html" anchor="afae5305294bb7c23a8d8dbeb29d5e497a1eb445fa6bd078346bf63ecac35fa77c">Base64</enumvalue>
+      <enumvalue file="class_qt_json_serializer_1_1_json_serializer.html" anchor="afae5305294bb7c23a8d8dbeb29d5e497adde86a082d1a286963891b75365f06e5">Base64url</enumvalue>
+      <enumvalue file="class_qt_json_serializer_1_1_json_serializer.html" anchor="afae5305294bb7c23a8d8dbeb29d5e497a1d9a64645e4ea1fe9970e3eea0400fe5">Base16</enumvalue>
+    </member>
+    <member kind="slot">
+      <type>void</type>
+      <name>setByteArrayFormat</name>
+      <anchorfile>class_qt_json_serializer_1_1_json_serializer.html</anchorfile>
+      <anchor>ac4193fb525f50a6c19b7c5031d8df317</anchor>
+      <arglist>(ByteArrayFormat byteArrayFormat)</arglist>
+    </member>
+    <member kind="slot">
+      <type>void</type>
+      <name>setValidateBase64</name>
+      <anchorfile>class_qt_json_serializer_1_1_json_serializer.html</anchorfile>
+      <anchor>ada7e03e7f40d6eddac3d00155961312c</anchor>
+      <arglist>(bool validateBase64)</arglist>
+    </member>
+    <member kind="signal">
+      <type>void</type>
+      <name>byteArrayFormatChanged</name>
+      <anchorfile>class_qt_json_serializer_1_1_json_serializer.html</anchorfile>
+      <anchor>ae4f62e1201a4738c6d299d555d73ba8c</anchor>
+      <arglist>(ByteArrayFormat byteArrayFormat, QPrivateSignal)</arglist>
+    </member>
+    <member kind="signal">
+      <type>void</type>
+      <name>validateBase64Changed</name>
+      <anchorfile>class_qt_json_serializer_1_1_json_serializer.html</anchorfile>
+      <anchor>a5314f315a17bbf580a29af3c7035e5c3</anchor>
+      <arglist>(bool validateBase64, QPrivateSignal)</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>JsonSerializer</name>
+      <anchorfile>class_qt_json_serializer_1_1_json_serializer.html</anchorfile>
+      <anchor>ac995f5b9183fe3b0633025c32fd94485</anchor>
+      <arglist>(QObject *parent=nullptr)</arglist>
+    </member>
+    <member kind="function">
+      <type>QJsonValue</type>
+      <name>serialize</name>
+      <anchorfile>class_qt_json_serializer_1_1_json_serializer.html</anchorfile>
+      <anchor>a035246ebb97dcdba87c4d68830b97c52</anchor>
+      <arglist>(const QVariant &amp;data) const</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>serializeTo</name>
+      <anchorfile>class_qt_json_serializer_1_1_json_serializer.html</anchorfile>
+      <anchor>add528f0609f96a0e3224efc17110f588</anchor>
+      <arglist>(QIODevice *device, const QVariant &amp;data, QJsonDocument::JsonFormat format=QJsonDocument::Compact) const</arglist>
+    </member>
+    <member kind="function">
+      <type>QByteArray</type>
+      <name>serializeTo</name>
+      <anchorfile>class_qt_json_serializer_1_1_json_serializer.html</anchorfile>
+      <anchor>a123aff71b0f346c71509c3276538f49d</anchor>
+      <arglist>(const QVariant &amp;data, QJsonDocument::JsonFormat format=QJsonDocument::Compact) const</arglist>
+    </member>
+    <member kind="function">
+      <type>QtJsonSerializer::__private::json_type&lt; T &gt;::type</type>
+      <name>serialize</name>
+      <anchorfile>class_qt_json_serializer_1_1_json_serializer.html</anchorfile>
+      <anchor>a06c3f0ed10561decd753e75a3de1d8d9</anchor>
+      <arglist>(const T &amp;data) const</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>serializeTo</name>
+      <anchorfile>class_qt_json_serializer_1_1_json_serializer.html</anchorfile>
+      <anchor>ad287ac7ff08c7f485578d5a239c492b3</anchor>
+      <arglist>(QIODevice *device, const T &amp;data, QJsonDocument::JsonFormat format=QJsonDocument::Compact) const</arglist>
+    </member>
+    <member kind="function">
+      <type>QByteArray</type>
+      <name>serializeTo</name>
+      <anchorfile>class_qt_json_serializer_1_1_json_serializer.html</anchorfile>
+      <anchor>acf18f88abc85398ac939b9caf448fd75</anchor>
+      <arglist>(const T &amp;data, QJsonDocument::JsonFormat format=QJsonDocument::Compact) const</arglist>
+    </member>
+    <member kind="function">
+      <type>QVariant</type>
+      <name>deserialize</name>
+      <anchorfile>class_qt_json_serializer_1_1_json_serializer.html</anchorfile>
+      <anchor>adde044d01cf8e1705ee672562495ad6f</anchor>
+      <arglist>(const QJsonValue &amp;json, int metaTypeId, QObject *parent=nullptr) const</arglist>
+    </member>
+    <member kind="function">
+      <type>QVariant</type>
+      <name>deserializeFrom</name>
+      <anchorfile>class_qt_json_serializer_1_1_json_serializer.html</anchorfile>
+      <anchor>a87846f3182da738d3d2dda5ec1dc47c0</anchor>
+      <arglist>(QIODevice *device, int metaTypeId, QObject *parent=nullptr) const</arglist>
+    </member>
+    <member kind="function">
+      <type>QVariant</type>
+      <name>deserializeFrom</name>
+      <anchorfile>class_qt_json_serializer_1_1_json_serializer.html</anchorfile>
+      <anchor>af48ce966a86d442b1a52320c8497e7de</anchor>
+      <arglist>(const QByteArray &amp;data, int metaTypeId, QObject *parent=nullptr) const</arglist>
+    </member>
+    <member kind="function">
+      <type>T</type>
+      <name>deserialize</name>
+      <anchorfile>class_qt_json_serializer_1_1_json_serializer.html</anchorfile>
+      <anchor>ad25ead80e34060f97856e50da6c3fe47</anchor>
+      <arglist>(const typename QtJsonSerializer::__private::json_type&lt; T &gt;::type &amp;json, QObject *parent=nullptr) const</arglist>
+    </member>
+    <member kind="function">
+      <type>T</type>
+      <name>deserializeFrom</name>
+      <anchorfile>class_qt_json_serializer_1_1_json_serializer.html</anchorfile>
+      <anchor>aec81af37ef4fbf027871553569fcae79</anchor>
+      <arglist>(QIODevice *device, QObject *parent=nullptr) const</arglist>
+    </member>
+    <member kind="function">
+      <type>T</type>
+      <name>deserializeFrom</name>
+      <anchorfile>class_qt_json_serializer_1_1_json_serializer.html</anchorfile>
+      <anchor>a8e43e7fdc47a5b9f9f9b4c9c71a482a9</anchor>
+      <arglist>(const QByteArray &amp;data, QObject *parent=nullptr) const</arglist>
+    </member>
+    <member kind="function">
+      <type>ByteArrayFormat</type>
+      <name>byteArrayFormat</name>
+      <anchorfile>class_qt_json_serializer_1_1_json_serializer.html</anchorfile>
+      <anchor>a0f6ce7adffe3e464ff28198b1004a2ab</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>validateBase64</name>
+      <anchorfile>class_qt_json_serializer_1_1_json_serializer.html</anchorfile>
+      <anchor>a9cd3cb9e524558b340a9ffde208fa583</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function">
+      <type>std::variant&lt; QCborValue, QJsonValue &gt;</type>
+      <name>serializeGeneric</name>
+      <anchorfile>class_qt_json_serializer_1_1_json_serializer.html</anchorfile>
+      <anchor>adcf3634d014613df45b62ad4e024ea17</anchor>
+      <arglist>(const QVariant &amp;value) const override</arglist>
+    </member>
+    <member kind="function">
+      <type>QVariant</type>
+      <name>deserializeGeneric</name>
+      <anchorfile>class_qt_json_serializer_1_1_json_serializer.html</anchorfile>
+      <anchor>ae80efce6a8b8f90dcdc2ccbd4eeb5b6c</anchor>
+      <arglist>(const std::variant&lt; QCborValue, QJsonValue &gt; &amp;value, int metaTypeId, QObject *parent) const override</arglist>
+    </member>
+    <member kind="function" protection="protected">
+      <type>bool</type>
+      <name>jsonMode</name>
+      <anchorfile>class_qt_json_serializer_1_1_json_serializer.html</anchorfile>
+      <anchor>ae59f2567690c0629e74f407b9192cebf</anchor>
+      <arglist>() const override</arglist>
+    </member>
+    <member kind="function" protection="protected">
+      <type>QCborTag</type>
+      <name>typeTag</name>
+      <anchorfile>class_qt_json_serializer_1_1_json_serializer.html</anchorfile>
+      <anchor>a2f0a8cb7e1895014a24e3551d96c9a66</anchor>
+      <arglist>(int metaTypeId) const override</arglist>
+    </member>
+    <member kind="property">
+      <type>ByteArrayFormat</type>
+      <name>byteArrayFormat</name>
+      <anchorfile>class_qt_json_serializer_1_1_json_serializer.html</anchorfile>
+      <anchor>ab1a26ea47f0f9591196602c6e9544ed9</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="property">
+      <type>bool</type>
+      <name>validateBase64</name>
+      <anchorfile>class_qt_json_serializer_1_1_json_serializer.html</anchorfile>
+      <anchor>ad377b2173dd28f9f7e54e2e176f8429e</anchor>
+      <arglist></arglist>
+    </member>
+    <docanchor file="class_qt_json_serializer_1_1_json_serializer" title="Supported types">json_supported</docanchor>
+    <docanchor file="class_qt_json_serializer_1_1_json_serializer" title="Extending the serializer">json_extending</docanchor>
+  </compound>
+  <compound kind="struct">
+    <name>QtJsonSerializer::MetaWriters::SequentialWriter::SequenceInfo</name>
+    <filename>class_qt_json_serializer_1_1_meta_writers_1_1_sequential_writer.html</filename>
+    <anchor>struct_qt_json_serializer_1_1_meta_writers_1_1_sequential_writer_1_1_sequence_info</anchor>
+    <member kind="variable">
+      <type>bool</type>
+      <name>isSet</name>
+      <anchorfile>class_qt_json_serializer_1_1_meta_writers_1_1_sequential_writer.html</anchorfile>
+      <anchor>ac2caa9ea8f0273c5dcb9751d2546b530</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>QtJsonSerializer::MetaWriters::SequentialWriter</name>
+    <filename>class_qt_json_serializer_1_1_meta_writers_1_1_sequential_writer.html</filename>
+    <member kind="function" virtualness="pure">
+      <type>virtual SequenceInfo</type>
+      <name>info</name>
+      <anchorfile>class_qt_json_serializer_1_1_meta_writers_1_1_sequential_writer.html</anchorfile>
+      <anchor>a54b1e53a1593987d98c63bcd30b7ea0d</anchor>
+      <arglist>() const =0</arglist>
+    </member>
+    <member kind="function" virtualness="pure">
+      <type>virtual void</type>
+      <name>reserve</name>
+      <anchorfile>class_qt_json_serializer_1_1_meta_writers_1_1_sequential_writer.html</anchorfile>
+      <anchor>adb8cd16152ce0135919e1886e8577d99</anchor>
+      <arglist>(int size)=0</arglist>
+    </member>
+    <member kind="function" virtualness="pure">
+      <type>virtual void</type>
+      <name>add</name>
+      <anchorfile>class_qt_json_serializer_1_1_meta_writers_1_1_sequential_writer.html</anchorfile>
+      <anchor>a2333c8dfabbb5a0c6f9e52c308f56816</anchor>
+      <arglist>(const QVariant &amp;value)=0</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>registerWriter</name>
+      <anchorfile>class_qt_json_serializer_1_1_meta_writers_1_1_sequential_writer.html</anchorfile>
+      <anchor>aecb8fffc30dac01a3635099b37fcaef2</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>registerWriter</name>
+      <anchorfile>class_qt_json_serializer_1_1_meta_writers_1_1_sequential_writer.html</anchorfile>
+      <anchor>a8a963f58ab086fc88f55159d7ae16cdb</anchor>
+      <arglist>(int metaTypeId, SequentialWriterFactory *factory)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static bool</type>
+      <name>canWrite</name>
+      <anchorfile>class_qt_json_serializer_1_1_meta_writers_1_1_sequential_writer.html</anchorfile>
+      <anchor>a7902ad4e2f9562172cb9174a50d9d7a4</anchor>
+      <arglist>(int metaTypeId)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static QSharedPointer&lt; SequentialWriter &gt;</type>
+      <name>getWriter</name>
+      <anchorfile>class_qt_json_serializer_1_1_meta_writers_1_1_sequential_writer.html</anchorfile>
+      <anchor>a80a09e4fd619e25cd8d43fd47f24e506</anchor>
+      <arglist>(QVariant &amp;data)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static SequenceInfo</type>
+      <name>getInfo</name>
+      <anchorfile>class_qt_json_serializer_1_1_meta_writers_1_1_sequential_writer.html</anchorfile>
+      <anchor>aeaf425e3dbc4c03ab82ce50e712a1994</anchor>
+      <arglist>(int metaTypeId)</arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>QtJsonSerializer::MetaWriters::SequentialWriterFactory</name>
+    <filename>class_qt_json_serializer_1_1_meta_writers_1_1_sequential_writer_factory.html</filename>
+    <member kind="function" virtualness="pure">
+      <type>virtual QSharedPointer&lt; SequentialWriter &gt;</type>
+      <name>create</name>
+      <anchorfile>class_qt_json_serializer_1_1_meta_writers_1_1_sequential_writer_factory.html</anchorfile>
+      <anchor>afec5c1ff08db7423dbfffc4a8747a157</anchor>
+      <arglist>(void *data) const =0</arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>QtJsonSerializer::SerializationException</name>
+    <filename>class_qt_json_serializer_1_1_serialization_exception.html</filename>
+    <base>QtJsonSerializer::Exception</base>
+    <member kind="function">
+      <type></type>
+      <name>SerializationException</name>
+      <anchorfile>class_qt_json_serializer_1_1_serialization_exception.html</anchorfile>
+      <anchor>a64d60981cc48fdaffc8cf3014699e4ae</anchor>
+      <arglist>(const QByteArray &amp;what)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
       <name>raise</name>
-      <anchorfile>class_q_json_serializer_exception.html</anchorfile>
-      <anchor>a89e25e81483b7f0712a99a11c2fe1f9e</anchor>
+      <anchorfile>class_qt_json_serializer_1_1_serialization_exception.html</anchorfile>
+      <anchor>a276d9e79dad43fcbd3888c3cea547143</anchor>
       <arglist>() const override</arglist>
     </member>
     <member kind="function">
-      <type>QException *</type>
+      <type>ExceptionBase *</type>
       <name>clone</name>
-      <anchorfile>class_q_json_serializer_exception.html</anchorfile>
-      <anchor>a04905f904440a1edeaef240a3e5b0970</anchor>
+      <anchorfile>class_qt_json_serializer_1_1_serialization_exception.html</anchorfile>
+      <anchor>ac6a9d28d2a5067e28f501bc4d748a2fd</anchor>
       <arglist>() const override</arglist>
     </member>
   </compound>
   <compound kind="class">
-    <name>QJsonTypeConverter</name>
-    <filename>class_q_json_type_converter.html</filename>
-    <class kind="class">QJsonTypeConverter::SerializationHelper</class>
-    <member kind="enumeration">
-      <type></type>
-      <name>Priority</name>
-      <anchorfile>class_q_json_type_converter.html</anchorfile>
-      <anchor>a32bc149f8f339a09e95cf15748cbe2e1</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="function">
-      <type></type>
-      <name>QJsonTypeConverter</name>
-      <anchorfile>class_q_json_type_converter.html</anchorfile>
-      <anchor>a786af064dd2def05075386acf16d7bf6</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function" virtualness="virtual">
-      <type>virtual</type>
-      <name>~QJsonTypeConverter</name>
-      <anchorfile>class_q_json_type_converter.html</anchorfile>
-      <anchor>adda9592006fdf93fe5ba3efed1b46e59</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function">
-      <type>int</type>
-      <name>priority</name>
-      <anchorfile>class_q_json_type_converter.html</anchorfile>
-      <anchor>ac40884acbfba06f74ce210de7aedf6ea</anchor>
-      <arglist>() const</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>setPriority</name>
-      <anchorfile>class_q_json_type_converter.html</anchorfile>
-      <anchor>a7ec07ecf9eddf8ab115735455c671def</anchor>
-      <arglist>(int priority)</arglist>
-    </member>
+    <name>QtJsonSerializer::TypeConverter::SerializationHelper</name>
+    <filename>class_qt_json_serializer_1_1_type_converter_1_1_serialization_helper.html</filename>
     <member kind="function" virtualness="pure">
       <type>virtual bool</type>
-      <name>canConvert</name>
-      <anchorfile>class_q_json_type_converter.html</anchorfile>
-      <anchor>a63168cc2f7e185f79cac9208a2e6d5e8</anchor>
-      <arglist>(int metaTypeId) const =0</arglist>
-    </member>
-    <member kind="function" virtualness="pure">
-      <type>virtual QList&lt; QJsonValue::Type &gt;</type>
-      <name>jsonTypes</name>
-      <anchorfile>class_q_json_type_converter.html</anchorfile>
-      <anchor>a1fd5c728302100b50b49bf47a3d213d5</anchor>
+      <name>jsonMode</name>
+      <anchorfile>class_qt_json_serializer_1_1_type_converter_1_1_serialization_helper.html</anchorfile>
+      <anchor>a6306d3676adadd651071a5fa0371b913</anchor>
       <arglist>() const =0</arglist>
     </member>
     <member kind="function" virtualness="pure">
-      <type>virtual QJsonValue</type>
-      <name>serialize</name>
-      <anchorfile>class_q_json_type_converter.html</anchorfile>
-      <anchor>abeeba52f509cec3eb4c80b5b7dc07604</anchor>
-      <arglist>(int propertyType, const QVariant &amp;value, const SerializationHelper *helper) const =0</arglist>
-    </member>
-    <member kind="function" virtualness="pure">
-      <type>virtual QVariant</type>
-      <name>deserialize</name>
-      <anchorfile>class_q_json_type_converter.html</anchorfile>
-      <anchor>af162ac051c8a5c9d168a1deecf5e0ae7</anchor>
-      <arglist>(int propertyType, const QJsonValue &amp;value, QObject *parent, const SerializationHelper *helper) const =0</arglist>
-    </member>
-    <member kind="function" protection="protected">
-      <type>QByteArray</type>
-      <name>getCanonicalTypeName</name>
-      <anchorfile>class_q_json_type_converter.html</anchorfile>
-      <anchor>a4f7a148b1156f59d4be5cc39c32f2738</anchor>
-      <arglist>(int propertyType) const</arglist>
-    </member>
-    <docanchor file="class_q_json_type_converter" title="Example">example</docanchor>
-    <docanchor file="class_q_json_type_converter" title="Setup">setup</docanchor>
-    <docanchor file="class_q_json_type_converter" title="The Converter class">class</docanchor>
-    <docanchor file="class_q_json_type_converter" title="The `canConvert` method">class_canConvert</docanchor>
-    <docanchor file="class_q_json_type_converter" title="The `jsonTypes` method">class_jsonTypes</docanchor>
-    <docanchor file="class_q_json_type_converter" title="The `serialize` method">class_serialize</docanchor>
-    <docanchor file="class_q_json_type_converter" title="The `deserialize` method">class_deserialize</docanchor>
-  </compound>
-  <compound kind="class">
-    <name>QJsonTypeConverter::SerializationHelper</name>
-    <filename>class_q_json_type_converter_1_1_serialization_helper.html</filename>
-    <member kind="function" virtualness="pure">
       <type>virtual QVariant</type>
       <name>getProperty</name>
-      <anchorfile>class_q_json_type_converter_1_1_serialization_helper.html</anchorfile>
-      <anchor>ac96e469c2d5390ac700c9ac616f6d513</anchor>
+      <anchorfile>class_qt_json_serializer_1_1_type_converter_1_1_serialization_helper.html</anchorfile>
+      <anchor>af253c792d67697cc5f4968cc5ba30f78</anchor>
       <arglist>(const char *name) const =0</arglist>
     </member>
     <member kind="function" virtualness="pure">
-      <type>virtual QJsonValue</type>
-      <name>serializeSubtype</name>
-      <anchorfile>class_q_json_type_converter_1_1_serialization_helper.html</anchorfile>
-      <anchor>abdb0a1c4e75c057e9b836ee220742a6a</anchor>
-      <arglist>(QMetaProperty property, const QVariant &amp;value) const =0</arglist>
+      <type>virtual QCborTag</type>
+      <name>typeTag</name>
+      <anchorfile>class_qt_json_serializer_1_1_type_converter_1_1_serialization_helper.html</anchorfile>
+      <anchor>a3a4cfdb0981ae91c7caae96cef349cb7</anchor>
+      <arglist>(int metaTypeId) const =0</arglist>
     </member>
     <member kind="function" virtualness="pure">
-      <type>virtual QJsonValue</type>
+      <type>virtual QSharedPointer&lt; const TypeExtractor &gt;</type>
+      <name>extractor</name>
+      <anchorfile>class_qt_json_serializer_1_1_type_converter_1_1_serialization_helper.html</anchorfile>
+      <anchor>ab422132876052bbfef47eb3f8a95c006</anchor>
+      <arglist>(int metaTypeId) const =0</arglist>
+    </member>
+    <member kind="function" virtualness="pure">
+      <type>virtual QCborValue</type>
       <name>serializeSubtype</name>
-      <anchorfile>class_q_json_type_converter_1_1_serialization_helper.html</anchorfile>
-      <anchor>aadc05a33b997e0a68fd10888df6ab4c7</anchor>
+      <anchorfile>class_qt_json_serializer_1_1_type_converter_1_1_serialization_helper.html</anchorfile>
+      <anchor>a0d19b99951e10580b0cf857d9e0852bd</anchor>
+      <arglist>(const QMetaProperty &amp;property, const QVariant &amp;value) const =0</arglist>
+    </member>
+    <member kind="function" virtualness="pure">
+      <type>virtual QCborValue</type>
+      <name>serializeSubtype</name>
+      <anchorfile>class_qt_json_serializer_1_1_type_converter_1_1_serialization_helper.html</anchorfile>
+      <anchor>a1ceaaef78c6d23d21a1c75487dede42a</anchor>
       <arglist>(int propertyType, const QVariant &amp;value, const QByteArray &amp;traceHint={}) const =0</arglist>
     </member>
     <member kind="function" virtualness="pure">
       <type>virtual QVariant</type>
       <name>deserializeSubtype</name>
-      <anchorfile>class_q_json_type_converter_1_1_serialization_helper.html</anchorfile>
-      <anchor>ac6afd3cac07e7c59adacf8d39f9eee81</anchor>
-      <arglist>(QMetaProperty property, const QJsonValue &amp;value, QObject *parent) const =0</arglist>
+      <anchorfile>class_qt_json_serializer_1_1_type_converter_1_1_serialization_helper.html</anchorfile>
+      <anchor>aa7ea70938fe067366e822be068ebd43d</anchor>
+      <arglist>(const QMetaProperty &amp;property, const QCborValue &amp;value, QObject *parent) const =0</arglist>
     </member>
     <member kind="function" virtualness="pure">
       <type>virtual QVariant</type>
       <name>deserializeSubtype</name>
-      <anchorfile>class_q_json_type_converter_1_1_serialization_helper.html</anchorfile>
-      <anchor>a02b0b416e329ab219dbb83b1e69ef2e4</anchor>
-      <arglist>(int propertyType, const QJsonValue &amp;value, QObject *parent, const QByteArray &amp;traceHint={}) const =0</arglist>
+      <anchorfile>class_qt_json_serializer_1_1_type_converter_1_1_serialization_helper.html</anchorfile>
+      <anchor>adfebefe5cefb4b087acb22601245e73c</anchor>
+      <arglist>(int propertyType, const QCborValue &amp;value, QObject *parent, const QByteArray &amp;traceHint={}) const =0</arglist>
     </member>
+  </compound>
+  <compound kind="class">
+    <name>QtJsonSerializer::SerializerBase</name>
+    <filename>class_qt_json_serializer_1_1_serializer_base.html</filename>
+    <base>QObject</base>
+    <base protection="protected">QtJsonSerializer::TypeConverter::SerializationHelper</base>
+    <member kind="enumeration">
+      <type></type>
+      <name>ValidationFlag</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>a9372aff6ead907690d38a372c5da66cf</anchor>
+      <arglist></arglist>
+      <enumvalue file="class_qt_json_serializer_1_1_serializer_base.html" anchor="a9372aff6ead907690d38a372c5da66cfa18744d8018008a7df12e93db16cbbc07">StandardValidation</enumvalue>
+      <enumvalue file="class_qt_json_serializer_1_1_serializer_base.html" anchor="a9372aff6ead907690d38a372c5da66cfadb6142a47091071351ba224e23e0a7e8">NoExtraProperties</enumvalue>
+      <enumvalue file="class_qt_json_serializer_1_1_serializer_base.html" anchor="a9372aff6ead907690d38a372c5da66cfaf7d78bc1297c851f7fc800bda6502f19">AllProperties</enumvalue>
+      <enumvalue file="class_qt_json_serializer_1_1_serializer_base.html" anchor="a9372aff6ead907690d38a372c5da66cfa9f2bcc058a45271cabe4c7adf42e8344">StrictBasicTypes</enumvalue>
+      <enumvalue file="class_qt_json_serializer_1_1_serializer_base.html" anchor="a9372aff6ead907690d38a372c5da66cfa969ac3542c132d9dc33033f29321acc2">FullPropertyValidation</enumvalue>
+      <enumvalue file="class_qt_json_serializer_1_1_serializer_base.html" anchor="a9372aff6ead907690d38a372c5da66cfa0e1dbfb505af4476385263a37c27f0a3">FullValidation</enumvalue>
+    </member>
+    <member kind="enumeration">
+      <type></type>
+      <name>Polymorphing</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>ad29c6fbb5d3cd1dc7850d1ea9ab12130</anchor>
+      <arglist></arglist>
+      <enumvalue file="class_qt_json_serializer_1_1_serializer_base.html" anchor="ad29c6fbb5d3cd1dc7850d1ea9ab12130ab9f5c797ebbf55adccdd8539a65a0241">Disabled</enumvalue>
+      <enumvalue file="class_qt_json_serializer_1_1_serializer_base.html" anchor="ad29c6fbb5d3cd1dc7850d1ea9ab12130a00d23a76e43b46dae9ec7aa9dcbebb32">Enabled</enumvalue>
+      <enumvalue file="class_qt_json_serializer_1_1_serializer_base.html" anchor="ad29c6fbb5d3cd1dc7850d1ea9ab12130adc2eb84d1f952ad0e6b58014aabd616a">Forced</enumvalue>
+    </member>
+    <member kind="enumeration">
+      <type></type>
+      <name>MultiMapMode</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>a4890e4a4c4e3c81d741d1a94bfc713ab</anchor>
+      <arglist></arglist>
+      <enumvalue file="class_qt_json_serializer_1_1_serializer_base.html" anchor="a4890e4a4c4e3c81d741d1a94bfc713aba46f3ea056caa3126b91f3f70beea068c">Map</enumvalue>
+      <enumvalue file="class_qt_json_serializer_1_1_serializer_base.html" anchor="a4890e4a4c4e3c81d741d1a94bfc713aba4ee29ca12c7d126654bd0e5275de6135">List</enumvalue>
+      <enumvalue file="class_qt_json_serializer_1_1_serializer_base.html" anchor="a4890e4a4c4e3c81d741d1a94bfc713aba1234308b5ad395e9b6da2f06d3efeff2">DenseMap</enumvalue>
+    </member>
+    <member kind="slot">
+      <type>void</type>
+      <name>setAllowDefaultNull</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>afe43c7288f7b6820ce37f274f47061a3</anchor>
+      <arglist>(bool allowDefaultNull)</arglist>
+    </member>
+    <member kind="slot">
+      <type>void</type>
+      <name>setKeepObjectName</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>aeb304fb95aa8bbe88a097480651d6140</anchor>
+      <arglist>(bool keepObjectName)</arglist>
+    </member>
+    <member kind="slot">
+      <type>void</type>
+      <name>setEnumAsString</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>a34774a6ad1368662f7e7d39a8fdeae26</anchor>
+      <arglist>(bool enumAsString)</arglist>
+    </member>
+    <member kind="slot">
+      <type>void</type>
+      <name>setVersionAsString</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>afb379e81523a8047e790eafc6c42c515</anchor>
+      <arglist>(bool versionAsString)</arglist>
+    </member>
+    <member kind="slot">
+      <type>void</type>
+      <name>setDateAsTimeStamp</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>a5ab17375325142999b242c4ed8aae13c</anchor>
+      <arglist>(bool dateAsTimeStamp)</arglist>
+    </member>
+    <member kind="slot">
+      <type>void</type>
+      <name>setUseBcp47Locale</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>a6a7895d9bac158af5e95125b0a5ed658</anchor>
+      <arglist>(bool useBcp47Locale)</arglist>
+    </member>
+    <member kind="slot">
+      <type>void</type>
+      <name>setValidationFlags</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>ada3936a5d3de1da0da6373201b2c33ef</anchor>
+      <arglist>(ValidationFlags validationFlags)</arglist>
+    </member>
+    <member kind="slot">
+      <type>void</type>
+      <name>setPolymorphing</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>a4a988c7abed830bf7f7802dac9850465</anchor>
+      <arglist>(Polymorphing polymorphing)</arglist>
+    </member>
+    <member kind="slot">
+      <type>void</type>
+      <name>setMultiMapMode</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>a3f50431bf1a5a55702b0fdc91c416665</anchor>
+      <arglist>(MultiMapMode multiMapMode)</arglist>
+    </member>
+    <member kind="slot">
+      <type>void</type>
+      <name>setIgnoreStoredAttribute</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>aafd37abdceaa09e6df259b03deab0f9b</anchor>
+      <arglist>(bool ignoreStoredAttribute)</arglist>
+    </member>
+    <member kind="signal">
+      <type>void</type>
+      <name>allowDefaultNullChanged</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>ab3eaff74b5da65c4d98ad3e4339c1f59</anchor>
+      <arglist>(bool allowDefaultNull, QPrivateSignal)</arglist>
+    </member>
+    <member kind="signal">
+      <type>void</type>
+      <name>keepObjectNameChanged</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>a967bbf4f2e27ae54dcf3bdaa58f15ea0</anchor>
+      <arglist>(bool keepObjectName, QPrivateSignal)</arglist>
+    </member>
+    <member kind="signal">
+      <type>void</type>
+      <name>enumAsStringChanged</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>a24cdd92ddbe59a4e5e1de5c73dea704b</anchor>
+      <arglist>(bool enumAsString, QPrivateSignal)</arglist>
+    </member>
+    <member kind="signal">
+      <type>void</type>
+      <name>versionAsStringChanged</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>a2a00bf9dd2d26bd829f873f988d367ce</anchor>
+      <arglist>(bool versionAsString, QPrivateSignal)</arglist>
+    </member>
+    <member kind="signal">
+      <type>void</type>
+      <name>dateAsTimeStampChanged</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>ac8a68c6c4420a9bf06fd9674b4378218</anchor>
+      <arglist>(bool dateAsTimeStamp, QPrivateSignal)</arglist>
+    </member>
+    <member kind="signal">
+      <type>void</type>
+      <name>useBcp47LocaleChanged</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>aaa2267f2cd9ba0d3167466ffa19d4e75</anchor>
+      <arglist>(bool useBcp47Locale, QPrivateSignal)</arglist>
+    </member>
+    <member kind="signal">
+      <type>void</type>
+      <name>validationFlagsChanged</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>aef0d53c6c1ccf01678e93274588d79a6</anchor>
+      <arglist>(ValidationFlags validationFlags, QPrivateSignal)</arglist>
+    </member>
+    <member kind="signal">
+      <type>void</type>
+      <name>polymorphingChanged</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>a5697270b44847180c55f0a3d86844a1c</anchor>
+      <arglist>(Polymorphing polymorphing, QPrivateSignal)</arglist>
+    </member>
+    <member kind="signal">
+      <type>void</type>
+      <name>multiMapModeChanged</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>a144375716ed2d4c5eda954a4d79369c2</anchor>
+      <arglist>(MultiMapMode multiMapMode, QPrivateSignal)</arglist>
+    </member>
+    <member kind="signal">
+      <type>void</type>
+      <name>ignoreStoredAttributeChanged</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>abf9b49e521701a9ff6b3e3eee2b78666</anchor>
+      <arglist>(bool ignoreStoredAttribute, QPrivateSignal)</arglist>
+    </member>
+    <member kind="function" virtualness="pure">
+      <type>virtual std::variant&lt; QCborValue, QJsonValue &gt;</type>
+      <name>serializeGeneric</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>ac6363c057e99f1023ae6d7ebf7ebd350</anchor>
+      <arglist>(const QVariant &amp;value) const =0</arglist>
+    </member>
+    <member kind="function" virtualness="pure">
+      <type>virtual QVariant</type>
+      <name>deserializeGeneric</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>aa32612cc31094cd81545848739197802</anchor>
+      <arglist>(const std::variant&lt; QCborValue, QJsonValue &gt; &amp;value, int metaTypeId, QObject *parent=nullptr) const =0</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>allowDefaultNull</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>a511a6e2454bfcb7aae159e91ba451aca</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>keepObjectName</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>a73ed38a288958da1bee96be7657a16ee</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>enumAsString</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>a05fdb65c45fe783a4c810071aa13597b</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>versionAsString</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>a4b82e16a28fe9af05f3ec871423c085f</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>dateAsTimeStamp</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>a1c41c66120fb028731ad4116925e4130</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>useBcp47Locale</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>ad804faa0b055c6b6e265711a70dfed76</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function">
+      <type>ValidationFlags</type>
+      <name>validationFlags</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>a39709080bffe1f10f7315c81f59b48b9</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function">
+      <type>Polymorphing</type>
+      <name>polymorphing</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>a4d7f0dcffcf780db933b82e3c1dcbd74</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function">
+      <type>MultiMapMode</type>
+      <name>multiMapMode</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>a05340237e95073f1d6b3d2db263c4932</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>ignoresStoredAttribute</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>a9ccd93c2a6121a492423e6e2f0f1c071</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>addJsonTypeConverter</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>afe1db4f491754658ea8577d24569db24</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>addJsonTypeConverter</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>a0bba02147c56b4b5f3ba3e7d507305c1</anchor>
+      <arglist>(const QSharedPointer&lt; TypeConverter &gt; &amp;converter)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>registerExtractor</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>aab234e2c08d2741c0dc5fb7cc333f9b1</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>registerExtractor</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>a4a1a84dbea0a3eeee27a774afb281c32</anchor>
+      <arglist>(int metaTypeId, const QSharedPointer&lt; TypeExtractor &gt; &amp;extractor)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>registerListConverters</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>af422e64371d52bb9df09f5150ef83f2c</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>registerSetConverters</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>a961d7a47d3eba54e3cd2a7cf1b18a646</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>registerMapConverters</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>a08b6f02084eb68c9007c03ddcb270372</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>registerPointerConverters</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>a1139f1730fa90adef5910b68c3a38c17</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>registerBasicConverters</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>af7df691af0fa66996a47ef57c5743f9e</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>registerPairConverters</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>a25a0546fc42ac20e8271f9045d9fd173</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>registerTupleConverters</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>a8a1fe9847b3e71fa4744c90d322f1ee0</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>registerOptionalConverters</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>a931c469423c45bdce42ecd21f5ce5356</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>registerVariantConverters</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>a69f31143349b0faaf52fccd55682ad9d</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>addJsonTypeConverterFactory</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>a33814055a32f355360382157d187598c</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>addJsonTypeConverterFactory</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>a0bda20a793c279f7b53cc4f581d5f967</anchor>
+      <arglist>(TypeConverterFactory *factory)</arglist>
+    </member>
+    <member kind="function" protection="protected">
+      <type></type>
+      <name>SerializerBase</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>aed6b340b1ed110529e24a0a90d73facf</anchor>
+      <arglist>(QObject *parent=nullptr)</arglist>
+    </member>
+    <member kind="function" protection="protected">
+      <type>QVariant</type>
+      <name>getProperty</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>a19f4f2aadb738321afd6dbbfc92d42f2</anchor>
+      <arglist>(const char *name) const override</arglist>
+    </member>
+    <member kind="function" protection="protected">
+      <type>QSharedPointer&lt; const TypeExtractor &gt;</type>
+      <name>extractor</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>a3517f8a985c1a4dbcc7ae89039e9d8cc</anchor>
+      <arglist>(int metaTypeId) const override</arglist>
+    </member>
+    <member kind="function" protection="protected">
+      <type>QCborValue</type>
+      <name>serializeSubtype</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>ae31de17478b40344dc7e00a60742efe3</anchor>
+      <arglist>(const QMetaProperty &amp;property, const QVariant &amp;value) const override</arglist>
+    </member>
+    <member kind="function" protection="protected">
+      <type>QCborValue</type>
+      <name>serializeSubtype</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>aa19b43841a6e50a218fbeeb1ce7071ca</anchor>
+      <arglist>(int propertyType, const QVariant &amp;value, const QByteArray &amp;traceHint) const override</arglist>
+    </member>
+    <member kind="function" protection="protected">
+      <type>QVariant</type>
+      <name>deserializeSubtype</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>ab4dfd9a30385bf53623b98414fff3ec5</anchor>
+      <arglist>(const QMetaProperty &amp;property, const QCborValue &amp;value, QObject *parent) const override</arglist>
+    </member>
+    <member kind="function" protection="protected">
+      <type>QVariant</type>
+      <name>deserializeSubtype</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>a957c1ee414f16915a455c8c87f4f1df1</anchor>
+      <arglist>(int propertyType, const QCborValue &amp;value, QObject *parent, const QByteArray &amp;traceHint) const override</arglist>
+    </member>
+    <member kind="property">
+      <type>bool</type>
+      <name>allowDefaultNull</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>a8f3edc8fdc97782e5575a77ecddbca9e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="property">
+      <type>bool</type>
+      <name>keepObjectName</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>ad76990997f9e393b634ee82618d8ee69</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="property">
+      <type>bool</type>
+      <name>enumAsString</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>aefd1877f527460bca62ecffa517c81be</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="property">
+      <type>bool</type>
+      <name>versionAsString</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>a4a7d0e9c497e9212a9d77498660ed502</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="property">
+      <type>bool</type>
+      <name>dateAsTimeStamp</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>a68809a9ecd059c6793490938ef862a72</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="property">
+      <type>bool</type>
+      <name>useBcp47Locale</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>a2adc16ce2e7498bd2724ec376047212f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="property">
+      <type>ValidationFlags</type>
+      <name>validationFlags</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>aed497093eb5e1fd304d65061363f9cd1</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="property">
+      <type>Polymorphing</type>
+      <name>polymorphing</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>a18d5fc879178e3d3ab9094de4f3277e2</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="property">
+      <type>MultiMapMode</type>
+      <name>multiMapMode</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>a35e042ff87b6e96d85b59cef99fa6789</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="property">
+      <type>bool</type>
+      <name>ignoreStoredAttribute</name>
+      <anchorfile>class_qt_json_serializer_1_1_serializer_base.html</anchorfile>
+      <anchor>acb8ef0f9e48fa423475983e80c7bc1f4</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>QtJsonSerializer::TypeConverter</name>
+    <filename>class_qt_json_serializer_1_1_type_converter.html</filename>
+    <class kind="class">QtJsonSerializer::TypeConverter::SerializationHelper</class>
+    <member kind="enumeration">
+      <type></type>
+      <name>Priority</name>
+      <anchorfile>class_qt_json_serializer_1_1_type_converter.html</anchorfile>
+      <anchor>a5c9d6edfed3a2c0242e3c6fea4dc6925</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumeration">
+      <type></type>
+      <name>DeserializationCapabilityResult</name>
+      <anchorfile>class_qt_json_serializer_1_1_type_converter.html</anchorfile>
+      <anchor>a475349c4aee769bbc629d78154e56c0e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>Positive</name>
+      <anchorfile>class_qt_json_serializer_1_1_type_converter.html</anchorfile>
+      <anchor>a475349c4aee769bbc629d78154e56c0eaa5d8d7310d14dc21933be6ae48c54635</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>Guessed</name>
+      <anchorfile>class_qt_json_serializer_1_1_type_converter.html</anchorfile>
+      <anchor>a475349c4aee769bbc629d78154e56c0ea3a5aa4cd7c67d3b7a26b890082fdcf9a</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>Negative</name>
+      <anchorfile>class_qt_json_serializer_1_1_type_converter.html</anchorfile>
+      <anchor>a475349c4aee769bbc629d78154e56c0ea79f976b4b243e7f2655710ead61ae897</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>WrongTag</name>
+      <anchorfile>class_qt_json_serializer_1_1_type_converter.html</anchorfile>
+      <anchor>a475349c4aee769bbc629d78154e56c0ea68a5cf009c04a3afaee6d5ac7c874e24</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>Positive</name>
+      <anchorfile>class_qt_json_serializer_1_1_type_converter.html</anchorfile>
+      <anchor>a475349c4aee769bbc629d78154e56c0eaa5d8d7310d14dc21933be6ae48c54635</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>Guessed</name>
+      <anchorfile>class_qt_json_serializer_1_1_type_converter.html</anchorfile>
+      <anchor>a475349c4aee769bbc629d78154e56c0ea3a5aa4cd7c67d3b7a26b890082fdcf9a</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>Negative</name>
+      <anchorfile>class_qt_json_serializer_1_1_type_converter.html</anchorfile>
+      <anchor>a475349c4aee769bbc629d78154e56c0ea79f976b4b243e7f2655710ead61ae897</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>WrongTag</name>
+      <anchorfile>class_qt_json_serializer_1_1_type_converter.html</anchorfile>
+      <anchor>a475349c4aee769bbc629d78154e56c0ea68a5cf009c04a3afaee6d5ac7c874e24</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>TypeConverter</name>
+      <anchorfile>class_qt_json_serializer_1_1_type_converter.html</anchorfile>
+      <anchor>a1872400c72343feeeaae75fc87f21611</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function" virtualness="virtual">
+      <type>virtual</type>
+      <name>~TypeConverter</name>
+      <anchorfile>class_qt_json_serializer_1_1_type_converter.html</anchorfile>
+      <anchor>a7a744f7017d53b8125619a4064213156</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function" virtualness="pure">
+      <type>virtual QByteArray</type>
+      <name>name</name>
+      <anchorfile>class_qt_json_serializer_1_1_type_converter.html</anchorfile>
+      <anchor>a1377cb0deb09a18c5656d6ba689bdaec</anchor>
+      <arglist>() const =0</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>priority</name>
+      <anchorfile>class_qt_json_serializer_1_1_type_converter.html</anchorfile>
+      <anchor>a80df4cfcf686d0b00e80f016be3f8f36</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>setPriority</name>
+      <anchorfile>class_qt_json_serializer_1_1_type_converter.html</anchorfile>
+      <anchor>ab5db46a931a094585abe75d4d381e761</anchor>
+      <arglist>(int priority)</arglist>
+    </member>
+    <member kind="function">
+      <type>const SerializationHelper *</type>
+      <name>helper</name>
+      <anchorfile>class_qt_json_serializer_1_1_type_converter.html</anchorfile>
+      <anchor>a5375b3f3aafd577711f774ebc6082c52</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function" virtualness="pure">
+      <type>virtual bool</type>
+      <name>canConvert</name>
+      <anchorfile>class_qt_json_serializer_1_1_type_converter.html</anchorfile>
+      <anchor>a868c3e8868335815ff0d7c21126e788c</anchor>
+      <arglist>(int metaTypeId) const =0</arglist>
+    </member>
+    <member kind="function" virtualness="virtual">
+      <type>virtual QList&lt; QCborTag &gt;</type>
+      <name>allowedCborTags</name>
+      <anchorfile>class_qt_json_serializer_1_1_type_converter.html</anchorfile>
+      <anchor>a28655c893eca64f06e317fb89c5b7485</anchor>
+      <arglist>(int metaTypeId) const</arglist>
+    </member>
+    <member kind="function" virtualness="pure">
+      <type>virtual QList&lt; QCborValue::Type &gt;</type>
+      <name>allowedCborTypes</name>
+      <anchorfile>class_qt_json_serializer_1_1_type_converter.html</anchorfile>
+      <anchor>a067756e0e42dcf431abc2ed56b3ee8c4</anchor>
+      <arglist>(int metaTypeId, QCborTag tag) const =0</arglist>
+    </member>
+    <member kind="function" virtualness="virtual">
+      <type>virtual int</type>
+      <name>guessType</name>
+      <anchorfile>class_qt_json_serializer_1_1_type_converter.html</anchorfile>
+      <anchor>a510c10cf16762fb82970a6bfd6cd439c</anchor>
+      <arglist>(QCborTag tag, QCborValue::Type dataType) const</arglist>
+    </member>
+    <member kind="function" virtualness="pure">
+      <type>virtual QCborValue</type>
+      <name>serialize</name>
+      <anchorfile>class_qt_json_serializer_1_1_type_converter.html</anchorfile>
+      <anchor>ad68e3290c5f958d9c14772d140d8e4ef</anchor>
+      <arglist>(int propertyType, const QVariant &amp;value) const =0</arglist>
+    </member>
+    <member kind="function" virtualness="pure">
+      <type>virtual QVariant</type>
+      <name>deserializeCbor</name>
+      <anchorfile>class_qt_json_serializer_1_1_type_converter.html</anchorfile>
+      <anchor>a88435c1978acdea7a2fc2df2e313bb03</anchor>
+      <arglist>(int propertyType, const QCborValue &amp;value, QObject *parent) const =0</arglist>
+    </member>
+    <member kind="function" virtualness="virtual">
+      <type>virtual QVariant</type>
+      <name>deserializeJson</name>
+      <anchorfile>class_qt_json_serializer_1_1_type_converter.html</anchorfile>
+      <anchor>a53ace8a7d36716ff7223f6ecea19d71b</anchor>
+      <arglist>(int propertyType, const QCborValue &amp;value, QObject *parent) const</arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static constexpr auto</type>
+      <name>NoTag</name>
+      <anchorfile>class_qt_json_serializer_1_1_type_converter.html</anchorfile>
+      <anchor>a27b3172e357c12759fd8693a2c7011be</anchor>
+      <arglist></arglist>
+    </member>
+    <docanchor file="class_qt_json_serializer_1_1_type_converter" title="Example">example</docanchor>
+    <docanchor file="class_qt_json_serializer_1_1_type_converter" title="Setup">setup</docanchor>
+    <docanchor file="class_qt_json_serializer_1_1_type_converter" title="The Converter class">class</docanchor>
+    <docanchor file="class_qt_json_serializer_1_1_type_converter" title="The &lt;tt&gt;canConvert&lt;/tt&gt; method">class_canConvert</docanchor>
+    <docanchor file="class_qt_json_serializer_1_1_type_converter" title="The &lt;tt&gt;allowedCborTypes&lt;/tt&gt; method">class_cborTypes</docanchor>
+    <docanchor file="class_qt_json_serializer_1_1_type_converter" title="The &lt;tt&gt;serialize&lt;/tt&gt; method">class_serialize</docanchor>
+    <docanchor file="class_qt_json_serializer_1_1_type_converter" title="The &lt;tt&gt;deserializeCbor&lt;/tt&gt; method">class_deserialize_cbor</docanchor>
+    <docanchor file="class_qt_json_serializer_1_1_type_converter" title="The &lt;tt&gt;allowedCborTags&lt;/tt&gt; method">class_cborTags</docanchor>
+    <docanchor file="class_qt_json_serializer_1_1_type_converter" title="The &lt;tt&gt;guessType&lt;/tt&gt; method">class_guessType</docanchor>
+    <docanchor file="class_qt_json_serializer_1_1_type_converter" title="The &lt;tt&gt;deserializeJson&lt;/tt&gt; method">class_deserialize_json</docanchor>
+  </compound>
+  <compound kind="class">
+    <name>QtJsonSerializer::TypeConverterFactory</name>
+    <filename>class_qt_json_serializer_1_1_type_converter_factory.html</filename>
+    <member kind="function" virtualness="pure">
+      <type>virtual QSharedPointer&lt; TypeConverter &gt;</type>
+      <name>createConverter</name>
+      <anchorfile>class_qt_json_serializer_1_1_type_converter_factory.html</anchorfile>
+      <anchor>af6287e61ce576c04d14d9b7377534bb0</anchor>
+      <arglist>() const =0</arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>QtJsonSerializer::TypeConverterStandardFactory</name>
+    <filename>class_qt_json_serializer_1_1_type_converter_standard_factory.html</filename>
+    <templarg></templarg>
+    <templarg>OverwritePriority</templarg>
+    <base>QtJsonSerializer::TypeConverterFactory</base>
+    <member kind="function">
+      <type>QSharedPointer&lt; TypeConverter &gt;</type>
+      <name>createConverter</name>
+      <anchorfile>class_qt_json_serializer_1_1_type_converter_standard_factory.html</anchorfile>
+      <anchor>a669ee1e396175a7a5b1619f075d2e45d</anchor>
+      <arglist>() const override</arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>QtJsonSerializer::TypeExtractor</name>
+    <filename>class_qt_json_serializer_1_1_type_extractor.html</filename>
+    <member kind="function" virtualness="pure">
+      <type>virtual QByteArray</type>
+      <name>baseType</name>
+      <anchorfile>class_qt_json_serializer_1_1_type_extractor.html</anchorfile>
+      <anchor>a89cfc5c4a114896267aad32e1142ef50</anchor>
+      <arglist>() const =0</arglist>
+    </member>
+    <member kind="function" virtualness="pure">
+      <type>virtual QList&lt; int &gt;</type>
+      <name>subtypes</name>
+      <anchorfile>class_qt_json_serializer_1_1_type_extractor.html</anchorfile>
+      <anchor>a15149ce8b25fdad8ef99f94e8a948153</anchor>
+      <arglist>() const =0</arglist>
+    </member>
+    <member kind="function" virtualness="pure">
+      <type>virtual QVariant</type>
+      <name>extract</name>
+      <anchorfile>class_qt_json_serializer_1_1_type_extractor.html</anchorfile>
+      <anchor>a0456b4083afb72fa756d1a45e08f772e</anchor>
+      <arglist>(const QVariant &amp;value, int index=-1) const =0</arglist>
+    </member>
+    <member kind="function" virtualness="pure">
+      <type>virtual void</type>
+      <name>emplace</name>
+      <anchorfile>class_qt_json_serializer_1_1_type_extractor.html</anchorfile>
+      <anchor>acb37a96482f98fbcbb66ab0d6765d968</anchor>
+      <arglist>(QVariant &amp;target, const QVariant &amp;value, int index=-1) const =0</arglist>
+    </member>
+  </compound>
+  <compound kind="namespace">
+    <name>QtJsonSerializer</name>
+    <filename>namespace_qt_json_serializer.html</filename>
+    <namespace>QtJsonSerializer::MetaWriters</namespace>
+    <class kind="class">QtJsonSerializer::CborSerializer</class>
+    <class kind="class">QtJsonSerializer::DeserializationException</class>
+    <class kind="class">QtJsonSerializer::Exception</class>
+    <class kind="class">QtJsonSerializer::JsonSerializer</class>
+    <class kind="class">QtJsonSerializer::SerializationException</class>
+    <class kind="class">QtJsonSerializer::SerializerBase</class>
+    <class kind="class">QtJsonSerializer::TypeConverter</class>
+    <class kind="class">QtJsonSerializer::TypeConverterFactory</class>
+    <class kind="class">QtJsonSerializer::TypeConverterStandardFactory</class>
+    <class kind="class">QtJsonSerializer::TypeExtractor</class>
+    <member kind="typedef">
+      <type>QException</type>
+      <name>ExceptionBase</name>
+      <anchorfile>namespace_qt_json_serializer.html</anchorfile>
+      <anchor>a92793bf06f610cd0acd19edc56cb8643</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>Q_JSONSERIALIZER_EXPORT void</type>
+      <name>registerTypes</name>
+      <anchorfile>namespace_qt_json_serializer.html</anchorfile>
+      <anchor>a895bfd295b71417456448a00f7d587f5</anchor>
+      <arglist>()</arglist>
+    </member>
+  </compound>
+  <compound kind="namespace">
+    <name>QtJsonSerializer::MetaWriters</name>
+    <filename>namespace_qt_json_serializer_1_1_meta_writers.html</filename>
+    <class kind="class">QtJsonSerializer::MetaWriters::AssociativeWriter</class>
+    <class kind="class">QtJsonSerializer::MetaWriters::AssociativeWriterFactory</class>
+    <class kind="class">QtJsonSerializer::MetaWriters::SequentialWriter</class>
+    <class kind="class">QtJsonSerializer::MetaWriters::SequentialWriterFactory</class>
   </compound>
   <compound kind="page">
     <name>index</name>
@@ -709,13 +1886,17 @@
     <filename>index</filename>
     <docanchor file="index" title="Features">qtjsonserializer_readme_label_0</docanchor>
     <docanchor file="index" title="Download/Installation">qtjsonserializer_readme_label_1</docanchor>
-    <docanchor file="index" title="Usage">qtjsonserializer_readme_label_2</docanchor>
-    <docanchor file="index" title="Example">qtjsonserializer_readme_label_3</docanchor>
-    <docanchor file="index" title="Important Usage Hints">qtjsonserializer_readme_label_4</docanchor>
-    <docanchor file="index" title="Support for using and typedef">qtjsonserializer_readme_label_5</docanchor>
-    <docanchor file="index" title="Implicit typedef support">qtjsonserializer_readme_label_6</docanchor>
-    <docanchor file="index" title="Explicit typedef support">qtjsonserializer_readme_label_7</docanchor>
-    <docanchor file="index" title="Support for alternative Containers">qtjsonserializer_readme_label_8</docanchor>
-    <docanchor file="index" title="Documentation">qtjsonserializer_readme_label_9</docanchor>
+    <docanchor file="index" title="Building without converter registration">qtjsonserializer_readme_label_2</docanchor>
+    <docanchor file="index" title="Usage">qtjsonserializer_readme_label_3</docanchor>
+    <docanchor file="index" title="Example">qtjsonserializer_readme_label_4</docanchor>
+    <docanchor file="index" title="Important Usage Hints">qtjsonserializer_readme_label_5</docanchor>
+    <docanchor file="index" title="Support for alternative Containers">qtjsonserializer_readme_label_6</docanchor>
+    <docanchor file="index" title="Documentation">qtjsonserializer_readme_label_7</docanchor>
+    <docanchor file="index" title="Porting">qtjsonserializer_readme_label_8</docanchor>
+    <docanchor file="index" title="Rename refactoring">qtjsonserializer_readme_label_9</docanchor>
+    <docanchor file="index" title="Changes in type registrations">qtjsonserializer_readme_label_10</docanchor>
+    <docanchor file="index" title="Support for more containers">qtjsonserializer_readme_label_11</docanchor>
+    <docanchor file="index" title="CBOR support">qtjsonserializer_readme_label_12</docanchor>
+    <docanchor file="index" title="Changes for TypeConverters">qtjsonserializer_readme_label_13</docanchor>
   </compound>
 </tagfile>

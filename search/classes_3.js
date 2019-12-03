@@ -1,22 +1,7 @@
 var searchData=
 [
-  ['data',['Data',['https://doc.qt.io/qt-5/qvariant-private-data.html',0,'QVariant::Private']]],
-  ['databaseref',['DatabaseRef',['https://doc.qt.io/qt-5/class_qt_data_sync_1_1_database_ref.html',0,'QtDataSync']]],
-  ['datastore',['DataStore',['https://doc.qt.io/qt-5/class_qt_data_sync_1_1_data_store.html',0,'QtDataSync']]],
-  ['datastoreexception',['DataStoreException',['https://doc.qt.io/qt-5/class_qt_data_sync_1_1_data_store_exception.html',0,'QtDataSync']]],
-  ['datastoremodel',['DataStoreModel',['https://doc.qt.io/qt-5/class_qt_data_sync_1_1_data_store_model.html',0,'QtDataSync']]],
-  ['datasyncsettingsaccessor',['DataSyncSettingsAccessor',['https://doc.qt.io/qt-5/class_qt_mvvm_1_1_data_sync_settings_accessor.html',0,'QtMvvm']]],
-  ['datasyncsettingsentry',['DataSyncSettingsEntry',['https://doc.qt.io/qt-5/struct_qt_mvvm_1_1_data_sync_settings_entry.html',0,'QtMvvm']]],
-  ['datasyncsettingsviewmodel',['DataSyncSettingsViewModel',['https://doc.qt.io/qt-5/class_qt_mvvm_1_1_data_sync_settings_view_model.html',0,'QtMvvm']]],
-  ['datasyncview',['DataSyncView',['https://doc.qt.io/qt-5/classde_1_1skycoder42_1_1_qt_mvvm_1_1_data_sync_1_1_quick_1_1_data_sync_view.html',0,'de::skycoder42::QtMvvm::DataSync::Quick']]],
-  ['datasyncviewmodel',['DataSyncViewModel',['https://doc.qt.io/qt-5/class_qt_mvvm_1_1_data_sync_view_model.html',0,'QtMvvm']]],
-  ['datasyncwindow',['DataSyncWindow',['https://doc.qt.io/qt-5/class_qt_mvvm_1_1_data_sync_window.html',0,'QtMvvm']]],
-  ['datatypestore',['DataTypeStore',['https://doc.qt.io/qt-5/class_qt_data_sync_1_1_data_type_store.html',0,'QtDataSync']]],
-  ['datatypestorebase',['DataTypeStoreBase',['https://doc.qt.io/qt-5/class_qt_data_sync_1_1_data_type_store_base.html',0,'QtDataSync']]],
-  ['dateedit',['DateEdit',['https://doc.qt.io/qt-5/classde_1_1skycoder42_1_1_qt_mvvm_1_1_quick_1_1_date_edit.html',0,'de::skycoder42::QtMvvm::Quick']]],
-  ['decorlabel',['DecorLabel',['https://doc.qt.io/qt-5/classde_1_1skycoder42_1_1_qt_mvvm_1_1_quick_1_1_decor_label.html',0,'de::skycoder42::QtMvvm::Quick']]],
-  ['defaults',['Defaults',['https://doc.qt.io/qt-5/class_qt_data_sync_1_1_defaults.html',0,'QtDataSync']]],
-  ['deferred',['Deferred',['https://doc.qt.io/qt-5/class_qt_mvvm_1_1_settings_list_node_1_1_deferred.html',0,'QtMvvm::SettingsListNode']]],
-  ['deviceinfo',['DeviceInfo',['https://doc.qt.io/qt-5/class_qt_data_sync_1_1_device_info.html',0,'QtDataSync']]],
-  ['dialogpresenter',['DialogPresenter',['https://doc.qt.io/qt-5/classde_1_1skycoder42_1_1_qt_mvvm_1_1_quick_1_1_dialog_presenter.html',0,'de::skycoder42::QtMvvm::Quick']]]
+  ['delegatechoice_14349',['DelegateChoice',['https://doc.qt.io/qt-5/qml-delegatechoice.html',0,'']]],
+  ['delegatechooser_14350',['DelegateChooser',['https://doc.qt.io/qt-5/qml-delegatechooser.html',0,'']]],
+  ['deserializationexception_14351',['DeserializationException',['../class_qt_json_serializer_1_1_deserialization_exception.html',1,'QtJsonSerializer']]],
+  ['dialogbase_14352',['DialogBase',['https://doc.qt.io/qt-5/classde_1_1skycoder42_1_1_qt_auto_updater_1_1_quick_1_1_dialog_base.html',0,'de::skycoder42::QtAutoUpdater::Quick']]]
 ];

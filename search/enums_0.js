@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['bindingdirectionflag',['BindingDirectionFlag',['https://doc.qt.io/qt-5/class_qt_mvvm_1_1_binding.html#a6a03a1d2ac1775e202aa7ae65fb76315',0,'QtMvvm::Binding::BindingDirectionFlag()'],['https://doc.qt.io/qt-5/classde_1_1skycoder42_1_1_qt_mvvm_1_1_core_1_1_mvvm_binding.html#a0b01dfe1a8b4a7c6b2d888fd561ed7ee',0,'de::skycoder42::QtMvvm::Core::MvvmBinding::BindingDirectionFlag()']]]
+  ['blockmode_29684',['BlockMode',['https://doc.qt.io/qt-5/class_qt_service_1_1_service_control.html#aa2ce5f9226d19d61555de0ae0a692e32',0,'QtService::ServiceControl']]],
+  ['bytearrayformat_29685',['ByteArrayFormat',['../class_qt_json_serializer_1_1_json_serializer.html#afae5305294bb7c23a8d8dbeb29d5e497',1,'QtJsonSerializer::JsonSerializer']]]
 ];

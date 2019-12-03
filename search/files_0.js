@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['coreapp_2eh',['coreapp.h',['https://doc.qt.io/qt-5/coreapp_8h.html',0,'']]]
+  ['qtjsonserializer_5fglobal_2eh_16527',['qtjsonserializer_global.h',['../qtjsonserializer__global_8h.html',1,'']]]
 ];

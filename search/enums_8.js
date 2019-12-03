@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['terminalmode',['TerminalMode',['https://doc.qt.io/qt-5/class_qt_service_1_1_service.html#a4d4e2022cf06e670e6ae4159809c5df2',0,'QtService::Service']]]
+  ['roles_29699',['Roles',['https://doc.qt.io/qt-5/classde_1_1skycoder42_1_1_qt_auto_updater_1_1_quick_1_1_update_info_model.html#ac5602d2e19391e2548a28d526a157e2d',0,'de::skycoder42::QtAutoUpdater::Quick::UpdateInfoModel']]]
 ];

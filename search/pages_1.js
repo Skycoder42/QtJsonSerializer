@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['qdsapp_20documentation',['qdsapp Documentation',['https://doc.qt.io/qt-5/datasync_appserver.html',0,'']]]
+  ['image_20page_30937',['Image Page',['https://doc.qt.io/qt-5/qtautoupdater_image_page.html',0,'']]]
 ];
