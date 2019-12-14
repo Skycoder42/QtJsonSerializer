@@ -85,7 +85,7 @@ jobs:
           cachedir: qt/${{matrix.version}}/${{matrix.platform}}
       - name: qmake
         run: |
-          qmake CONFIG+=install_ok QT_PLATFORM=${{matrix.platform}} CONFIG+=$${{matrix.converters}}
+          qmake CONFIG+=install_ok QT_PLATFORM=${{matrix.platform}} CONFIG+=${{matrix.converters}}
           ${{steps.qt.outputs.make}} qmake_all
       - name: make module
         run: |
