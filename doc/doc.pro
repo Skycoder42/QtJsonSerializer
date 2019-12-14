@@ -8,7 +8,8 @@ OTHER_FILES += Doxyfile \
 	snippets/*.cpp \
 	images/*
 
-system($$QMAKE_MKDIR $$shell_quote($$shell_path($$OUT_PWD/qtjsonserializer)))
+mkpath($$OUT_PWD/qtjsonserializer)
+!exists($$OUT_PWD/qtjsonserializer.qch):write_file($$OUT_PWD/qtjsonserializer.qch, __NOTHING)
 
 docTarget.target = doxygen
 docTarget.commands = $$PWD/makedoc.sh "$$PWD" "$$MODULE_VERSION" "$$[QT_INSTALL_BINS]" "$$[QT_INSTALL_HEADERS]" "$$[QT_INSTALL_DOCS]"
@@ -22,4 +23,4 @@ docInst2.files = $$OUT_PWD/qtjsonserializer
 INSTALLS += docInst1 docInst2
 
 DISTFILES += \
-    qjsontypeconverter.dox
+	qjsontypeconverter.dox
