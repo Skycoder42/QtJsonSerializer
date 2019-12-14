@@ -213,6 +213,7 @@ private:
 	QSet<TClass> *_data;
 };
 
+#ifndef QT_NO_LINKED_LIST
 template <typename TClass>
 class SequentialWriterImpl<QLinkedList, TClass> final : public SequentialWriter
 {
@@ -234,6 +235,7 @@ public:
 private:
 	QLinkedList<TClass> *_data;
 };
+#endif
 
 template <>
 class SequentialWriterImpl<QList, QVariant> final : public SequentialWriter

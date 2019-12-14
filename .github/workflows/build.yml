@@ -1,6 +1,6 @@
 name: Build, test and upload the module
 
-on: [push, check_run]
+on: [push]
 
 jobs:
   build:
@@ -8,13 +8,10 @@ jobs:
       fail-fast: false
       matrix:
         version:
-          - 5.13.2
+          - 5.14.0
         platform:
           - gcc_64
-          - android_arm64_v8a
-          - android_x86_64
-          - android_armv7
-          - android_x86
+          - android
           - wasm_32
           - msvc2017_64
           - msvc2017
@@ -25,36 +22,28 @@ jobs:
           - mingw73_32
           - clang_64
           - ios
+        converters:
+          - __qtjsac
+          - no_register_json_converters
 
         include:
           - platform: gcc_64
             os: ubuntu-latest
-          - platform: android_arm64_v8a
-            os: ubuntu-latest
-          - platform: android_x86_64
-            os: ubuntu-latest
-          - platform: android_armv7
-            os: ubuntu-latest
-          - platform: android_x86
+          - platform: android
             os: ubuntu-latest
           - platform: wasm_32
             os: ubuntu-latest
-            emsdk: sdk-1.38.27-64bit
+            emsdk: sdk-fastcomp-1.38.27-64bit
           - platform: msvc2017_64
             os: windows-2016
-            vcarch: x64
           - platform: msvc2017
             os: windows-2016
-            vcarch: x64_x86
           - platform: winrt_x64_msvc2017
             os: windows-2016
-            vcarch: x64
           - platform: winrt_x86_msvc2017
             os: windows-2016
-            vcarch: x64_x86
           - platform: winrt_armv7_msvc2017
             os: windows-2016
-            vcarch: x64_arm
           - platform: mingw73_64
             os: windows-latest
           - platform: mingw73_32
@@ -81,12 +70,6 @@ jobs:
         with:
           version: ${{matrix.emsdk}}
           actions-cache-folder: emsdk-cache
-      - uses: ilammy/msvc-dev-cmd@v1
-        if: contains(matrix.platform, 'msvc')
-        with:
-          arch: ${{matrix.vcarch}}
-          #toolset: 14.16
-          uwp: ${{contains(matrix.platform, 'winrt')}}
       - name: actions/cache qt
         uses: actions/cache@v1
         id: cache
@@ -102,30 +85,30 @@ jobs:
           cachedir: qt/${{matrix.version}}/${{matrix.platform}}
       - name: qmake
         run: |
-          qmake CONFIG+=install_ok QT_PLATFORM=${{matrix.platform}}
+          qmake CONFIG+=install_ok QT_PLATFORM=${{matrix.platform}} CONFIG+=$${{matrix.converters}}
           ${{steps.qt.outputs.make}} qmake_all
       - name: make module
         run: |
           ${{steps.qt.outputs.make}}
           ${{steps.qt.outputs.make}} INSTALL_ROOT="${{steps.qt.outputs.installdir}}" install
       - name: make tests
-        if: steps.qt.outputs.tests == 'true'
+        if: matrix.converters == '__qtjsac' && steps.qt.outputs.tests == 'true'
         run: |
           ${{steps.qt.outputs.make}} all
           ${{steps.qt.outputs.make}} ${{steps.qt.outputs.testflags}} run-tests
       - name: make examples
-        if: matrix.platform == 'gcc_64'
+        if: matrix.converters == '__qtjsac' && matrix.platform == 'gcc_64'
         run: |
           ${{steps.qt.outputs.make}} sub-examples
           cd examples && ${{steps.qt.outputs.make}} INSTALL_ROOT="${{steps.qt.outputs.installdir}}" install
       - name: make doc
-        if: matrix.platform == 'gcc_64'
+        if: matrix.converters == '__qtjsac' && matrix.platform == 'gcc_64'
         run: |
           ${{steps.qt.outputs.make}} doxygen
           cd doc && ${{steps.qt.outputs.make}} INSTALL_ROOT="${{steps.qt.outputs.installdir}}" install
       - name: upload module to releases
         uses: Skycoder42/action-upload-release@master
-        if: startsWith(github.ref, 'refs/tags/')
+        if: matrix.converters == '__qtjsac' && startsWith(github.ref, 'refs/tags/')
         with:
           repo_token: ${{secrets.GITHUB_TOKEN}}
           directory: ${{steps.qt.outputs.outdir}}/${{matrix.version}}
@@ -134,7 +117,7 @@ jobs:
           overwrite: true
       - name: upload examples to releases
         uses: Skycoder42/action-upload-release@master
-        if: matrix.platform == 'gcc_64' && startsWith(github.ref, 'refs/tags/')
+        if: matrix.converters == '__qtjsac' && matrix.platform == 'gcc_64' && startsWith(github.ref, 'refs/tags/')
         with:
           repo_token: ${{secrets.GITHUB_TOKEN}}
           directory: ${{steps.qt.outputs.outdir}}/Examples
@@ -143,7 +126,7 @@ jobs:
           overwrite: true
       - name: upload doc to releases
         uses: Skycoder42/action-upload-release@master
-        if: matrix.platform == 'gcc_64' && startsWith(github.ref, 'refs/tags/')
+        if: matrix.converters == '__qtjsac' && matrix.platform == 'gcc_64' && startsWith(github.ref, 'refs/tags/')
         with:
           repo_token: ${{secrets.GITHUB_TOKEN}}
           directory: ${{steps.qt.outputs.outdir}}/Docs
@@ -151,55 +134,16 @@ jobs:
           tag: ${{github.ref}}
           overwrite: true
 
-  build-no-converters:
-    strategy:
-      fail-fast: false
-      matrix:
-        version:
-          - 5.13.2
-        platform:
-          - gcc_64
-          - msvc2017_64
-          - mingw73_64
-          - clang_64
-
-        include:
-          - platform: gcc_64
-            os: ubuntu-latest
-          - platform: msvc2017_64
-            os: windows-2016
-            vcarch: x64
-          - platform: mingw73_64
-            os: windows-latest
-          - platform: clang_64
-            os: macos-latest
-
-    runs-on: ${{matrix.os}}
+  deploy:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [build]
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
-        with:
-          submodules: recursive
       - uses: actions/setup-python@v1
-      - uses: ilammy/msvc-dev-cmd@v1
-        if: contains(matrix.platform, 'msvc')
+      - uses: Skycoder42/action-deploy-qt@master
         with:
-          arch: ${{matrix.vcarch}}
-          #toolset: 14.16
-      - uses: actions/cache@v1
-        id: cache
-        with:
-          path: qt/${{matrix.version}}/${{matrix.platform}}
-          key: qt-${{matrix.version}}-${{matrix.platform}}
-      - uses: Skycoder42/action-setup-qt@master
-        id: qt
-        with:
-          version: ${{matrix.version}}
-          platform: ${{matrix.platform}}
-          install-args: --verbose
-          cachedir: qt/${{matrix.version}}/${{matrix.platform}}
-      - name: qmake
-        run: |
-          qmake CONFIG+=no_register_json_converters QT_PLATFORM=${{matrix.platform}}
-          ${{steps.qt.outputs.make}} qmake_all
-      - name: make module
-        run: ${{steps.qt.outputs.make}}
+          token: ${{secrets.GITHUB_TOKEN}}
+          version: 5.14.0
+          host: ${{secrets.SSHFS_HOST}}
+          key: ${{secrets.SSHFS_KEY}}
+          port: ${{secrets.SSHFS_PORT}}

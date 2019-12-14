@@ -35,12 +35,6 @@ win32:!ReleaseBuild:!DebugBuild {
 		} else:mac {
 			runtarget.commands += $$escape_expand(\\n\\t)export DYLD_LIBRARY_PATH=\"$$shadowed($$dirname(_QMAKE_CONF_))/lib:$$[QT_INSTALL_LIBS]:$(DYLD_LIBRARY_PATH)\"
 			runtarget.commands += $$escape_expand(\\n\\t)export DYLD_FRAMEWORK_PATH=\"$$shadowed($$dirname(_QMAKE_CONF_))/lib:$$[QT_INSTALL_LIBS]:$(DYLD_FRAMEWORK_PATH)\"
-
-			# write rpath as extra dep target
-			#rpathtarget.target = .add_rpath
-			#rpathtarget.commands = install_name_tool -add_rpath $$shell_quote($$shadowed($$dirname(_QMAKE_CONF_))/lib) $(TARGET) && touch .add_rpath
-			#runtarget.depends += .add_rpath
-			#QMAKE_EXTRA_TARGETS += rpathtarget
 		}
 
 		runtarget.target = run-tests

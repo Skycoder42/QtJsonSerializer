@@ -66,8 +66,10 @@ struct is_serializable<QList<T>> : public is_serializable<T> {};
 template <typename T>
 struct is_serializable<QVector<T>> : public is_serializable<T> {};
 
+#ifndef QT_NO_LINKED_LIST
 template <typename T>
 struct is_serializable<QLinkedList<T>> : public is_serializable<T> {};
+#endif
 
 template <typename T>
 struct is_serializable<QStack<T>> : public is_serializable<T> {};
@@ -171,6 +173,7 @@ struct json_type<QVector<T>> {
 	}
 };
 
+#ifndef QT_NO_LINKED_LIST
 template <typename T>
 struct json_type<QLinkedList<T>> {
 	static_assert(is_serializable<QLinkedList<T>>::value, "The value type of a QLinkedList must be serializable for it to also be serializable");
@@ -181,6 +184,7 @@ struct json_type<QLinkedList<T>> {
 		return jsonValue.toArray();
 	}
 };
+#endif
 
 template <typename T>
 struct json_type<QStack<T>> {

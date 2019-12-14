@@ -310,6 +310,6 @@ void ObjectConverter::deserializeProperties(const QMetaObject *metaObject, QObje
 		throw DeserializationException(QByteArray("Not all properties for ") +
 											metaObject->className() +
 											QByteArray(" are present in the json object Missing properties: ") +
-											reqProps.toList().join(", "));
+											reqProps.values().join(", "));
 	}
 }

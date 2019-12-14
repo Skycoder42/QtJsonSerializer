@@ -29,7 +29,9 @@ void ListConverterTest::initTest()
 	SerializerBase::registerListConverters<QPair<int, bool>>();
 
 	QMetaType::registerEqualsComparator<QList<int>>();
+#ifndef QT_NO_LINKED_LIST
 	QMetaType::registerEqualsComparator<QLinkedList<int>>();
+#endif
 	QMetaType::registerEqualsComparator<QVector<int>>();
 	QMetaType::registerEqualsComparator<QStack<int>>();
 	QMetaType::registerEqualsComparator<QQueue<int>>();
@@ -89,11 +91,13 @@ void ListConverterTest::addMetaData()
 							 << false
 							 << TypeConverter::DeserializationCapabilityResult::Negative;
 
+#ifndef QT_NO_LINKED_LIST
 	QTest::newRow("linkedList") << qMetaTypeId<QLinkedList<int>>()
 								<< static_cast<QCborTag>(CborSerializer::Homogeneous)
 								<< QCborValue::Array
 								<< true
 								<< TypeConverter::DeserializationCapabilityResult::Positive;
+#endif
 	QTest::newRow("vector") << qMetaTypeId<QVector<int>>()
 							<< static_cast<QCborTag>(CborSerializer::Homogeneous)
 							<< QCborValue::Array
@@ -159,6 +163,7 @@ void ListConverterTest::addCommonSerData()
 							 << QCborValue{QCborArray{false}}
 							 << QJsonValue{QJsonArray{false}};
 
+#ifndef QT_NO_LINKED_LIST
 	QTest::newRow("linkedList") << QVariantHash{}
 								<< TestQ{{QMetaType::Int, 1, 2}, {QMetaType::Int, 3, 4}, {QMetaType::Int, 5, 6}}
 								<< static_cast<QObject*>(this)
@@ -166,6 +171,7 @@ void ListConverterTest::addCommonSerData()
 								<< QVariant::fromValue(QLinkedList<int>{1, 3, 5})
 								<< QCborValue{QCborArray{2, 4, 6}}
 								<< QJsonValue{QJsonArray{2, 4, 6}};
+#endif
 	QTest::newRow("vector") << QVariantHash{}
 							<< TestQ{{QMetaType::Int, 1, 2}, {QMetaType::Int, 3, 4}, {QMetaType::Int, 5, 6}}
 							<< static_cast<QObject*>(this)

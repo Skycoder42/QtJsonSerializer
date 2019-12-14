@@ -132,7 +132,7 @@ QVariant GadgetConverter::deserializeCbor(int propertyType, const QCborValue &va
 		throw DeserializationException(QByteArray("Not all properties for ") +
 											metaObject->className() +
 											QByteArray(" are present in the json object. Missing properties: ") +
-											reqProps.toList().join(", "));
+											reqProps.values().join(", "));
 	}
 
 	return gadget;

@@ -246,7 +246,9 @@ template<typename T>
 void SerializerBase::registerListConverters()
 {
 	MetaWriters::SequentialWriter::registerWriter<QList, T>();
+#ifndef QT_NO_LINKED_LIST
 	MetaWriters::SequentialWriter::registerWriter<QLinkedList, T>();
+#endif
 	MetaWriters::SequentialWriter::registerWriter<QVector, T>();
 	MetaWriters::SequentialWriter::registerWriter<QStack, T>();
 	MetaWriters::SequentialWriter::registerWriter<QQueue, T>();
