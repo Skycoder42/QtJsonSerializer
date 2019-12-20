@@ -115,10 +115,15 @@ QVariant TypeConverter::deserializeJson(int propertyType, const QCborValue &valu
 
 void TypeConverter::mapTypesToJson(QList<QCborValue::Type> &typeList) const
 {
+	auto hasDouble = false;
+	auto hasInt = false;
 	for (auto &type : typeList) {
 		switch (type) {
+		case QCborValue::Double:
+			hasDouble = true;
+			break;
 		case QCborValue::Integer:
-			type = QCborValue::Double;
+			hasInt = true;
 			break;
 		case QCborValue::ByteArray:
 		case QCborValue::DateTime:
@@ -131,6 +136,11 @@ void TypeConverter::mapTypesToJson(QList<QCborValue::Type> &typeList) const
 			break;
 		}
 	}
+
+	if (hasInt && !hasDouble)
+		typeList.append(QCborValue::Double);
+	if (hasDouble && !hasInt)
+		typeList.append(QCborValue::Integer);
 }
 
 

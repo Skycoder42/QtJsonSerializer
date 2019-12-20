@@ -75,7 +75,7 @@ void CborConverterTest::addMetaData()
 								<< TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("json.value.invalid") << static_cast<int>(QMetaType::QJsonValue)
 										<< static_cast<QCborTag>(CborSerializer::NoTag)
-										<< QCborValue::Integer
+										<< QCborValue::DateTime
 										<< true
 										<< TypeConverter::DeserializationCapabilityResult::Negative;
 	QTest::newRow("json.obj") << static_cast<int>(QMetaType::QJsonObject)

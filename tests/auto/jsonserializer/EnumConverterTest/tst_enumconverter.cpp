@@ -57,7 +57,7 @@ void EnumConverterTest::addMetaData()
 									 << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("enum.int.untagged") << qMetaTypeId<TestClass::TestEnum>()
 									   << static_cast<QCborTag>(CborSerializer::NoTag)
-									   << QCborValue::Double
+									   << QCborValue::Integer
 									   << true
 									   << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("enum.int.invalid") << qMetaTypeId<TestClass::TestEnum>()
@@ -88,7 +88,7 @@ void EnumConverterTest::addMetaData()
 									  << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("flags.int.untagged") << qMetaTypeId<TestClass::TestFlags>()
 										<< static_cast<QCborTag>(CborSerializer::NoTag)
-										<< QCborValue::Double
+										<< QCborValue::Integer
 										<< true
 										<< TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("flags.int.invalid") << qMetaTypeId<TestClass::TestFlags>()

@@ -88,7 +88,7 @@ void ChronoDurationConverterTest::addMetaData()
 									   << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("nano.untagged") << qMetaTypeId<nanoseconds>()
 								   << static_cast<QCborTag>(CborSerializer::NoTag)
-								   << QCborValue::Double
+								   << QCborValue::Integer
 								   << true
 								   << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("nano.guessed") << static_cast<int>(QMetaType::UnknownType)
@@ -129,7 +129,7 @@ void ChronoDurationConverterTest::addMetaData()
 										<< TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("micro.untagged") << qMetaTypeId<microseconds>()
 									<< static_cast<QCborTag>(CborSerializer::NoTag)
-									<< QCborValue::Double
+									<< QCborValue::Integer
 									<< true
 									<< TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("micro.guessed") << static_cast<int>(QMetaType::UnknownType)
@@ -170,7 +170,7 @@ void ChronoDurationConverterTest::addMetaData()
 										<< TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("milli.untagged") << qMetaTypeId<milliseconds>()
 									<< static_cast<QCborTag>(CborSerializer::NoTag)
-									<< QCborValue::Double
+									<< QCborValue::Integer
 									<< true
 									<< TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("milli.guessed") << static_cast<int>(QMetaType::UnknownType)
@@ -211,7 +211,7 @@ void ChronoDurationConverterTest::addMetaData()
 									   << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("secs.untagged") << qMetaTypeId<seconds>()
 								   << static_cast<QCborTag>(CborSerializer::NoTag)
-								   << QCborValue::Double
+								   << QCborValue::Integer
 								   << true
 								   << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("secs.guessed") << static_cast<int>(QMetaType::UnknownType)
@@ -252,7 +252,7 @@ void ChronoDurationConverterTest::addMetaData()
 									   << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("mins.untagged") << qMetaTypeId<minutes>()
 								   << static_cast<QCborTag>(CborSerializer::NoTag)
-								   << QCborValue::Double
+								   << QCborValue::Integer
 								   << true
 								   << TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("mins.guessed") << static_cast<int>(QMetaType::UnknownType)
@@ -293,7 +293,7 @@ void ChronoDurationConverterTest::addMetaData()
 										<< TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("hours.untagged") << qMetaTypeId<hours>()
 									<< static_cast<QCborTag>(CborSerializer::NoTag)
-									<< QCborValue::Double
+									<< QCborValue::Integer
 									<< true
 									<< TypeConverter::DeserializationCapabilityResult::Positive;
 	QTest::newRow("hours.guessed") << static_cast<int>(QMetaType::UnknownType)
