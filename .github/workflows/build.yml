@@ -8,7 +8,7 @@ jobs:
       fail-fast: false
       matrix:
         version:
-          - 5.14.0
+          - 5.14.1
         platform:
           - gcc_64
           - android
@@ -35,15 +35,15 @@ jobs:
             os: ubuntu-latest
             emsdk: sdk-fastcomp-1.38.27-64bit
           - platform: msvc2017_64
-            os: windows-2016
+            os: windows-latest
           - platform: msvc2017
-            os: windows-2016
+            os: windows-latest
           - platform: winrt_x64_msvc2017
-            os: windows-2016
+            os: windows-latest
           - platform: winrt_x86_msvc2017
-            os: windows-2016
+            os: windows-latest
           - platform: winrt_armv7_msvc2017
-            os: windows-2016
+            os: windows-latest
           - platform: mingw73_64
             os: windows-latest
           - platform: mingw73_32
@@ -143,7 +143,7 @@ jobs:
       - uses: Skycoder42/action-deploy-qt@master
         with:
           token: ${{secrets.GITHUB_TOKEN}}
-          version: 5.14.0
+          version: 5.14.1
           host: ${{secrets.SSHFS_HOST}}
           key: ${{secrets.SSHFS_KEY}}
           port: ${{secrets.SSHFS_PORT}}
