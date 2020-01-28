@@ -171,7 +171,7 @@ void DateTimeConverterTest::addCommonSerData()
 									 << static_cast<int>(QMetaType::QDateTime)
 									 << QVariant{QDateTime{{2019, 1, 3}, {13, 42, 15}, Qt::UTC}}
 									 << QCborValue{QCborKnownTags::UnixTime_t, 1546522935ll}
-									 << QJsonValue{1546522935ll};
+									 << QJsonValue{QJsonValue::Undefined};
 
 	QTest::newRow("date.datestr") << QVariantHash{}
 								  << TestQ{}
@@ -212,7 +212,7 @@ void DateTimeConverterTest::addSerData()
 										   << static_cast<int>(QMetaType::QDateTime)
 										   << QVariant{QDateTime{}}
 										   << QCborValue{QCborKnownTags::UnixTime_t, 0ll}
-										   << QJsonValue{0ll};
+										   << QJsonValue{QJsonValue::Undefined};
 }
 
 void DateTimeConverterTest::addDeserData()
@@ -223,7 +223,7 @@ void DateTimeConverterTest::addDeserData()
 										   << static_cast<int>(QMetaType::QDateTime)
 										   << QVariant{QDateTime::fromMSecsSinceEpoch(0, Qt::UTC).toLocalTime()}
 										   << QCborValue{QCborKnownTags::UnixTime_t, 0ll}
-										   << QJsonValue{0ll};
+										   << QJsonValue{QJsonValue::Undefined};
 
 	QTest::newRow("date.dtstr") << QVariantHash{}
 								<< TestQ{}

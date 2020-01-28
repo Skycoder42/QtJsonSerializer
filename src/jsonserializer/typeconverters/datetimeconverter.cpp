@@ -97,24 +97,17 @@ QVariant DateTimeConverter::deserializeCbor(int propertyType, const QCborValue &
 {
 	Q_UNUSED(parent)
 	const auto cValue = (value.isTag() ? value.taggedValue() : value);
-	// WORKAROUND for QTBUG-79196
-	const auto dtValue = value.tag() == QCborKnownTags::DateTimeString && !value.isDateTime() ?
-							 QDateTime::fromString(cValue.toString(), Qt::ISODateWithMs) :
-							 value.toDateTime();
 	switch (propertyType) {
 	case QMetaType::QDateTime:
-		if (value.tag() == QCborKnownTags::UnixTime_t || cValue.isInteger())
-			return QDateTime::fromSecsSinceEpoch(cValue.toInteger(), Qt::UTC);
-		else
-			return dtValue;
+		return value.toDateTime();
 	case QMetaType::QDate:
 		if (value.tag() == QCborKnownTags::DateTimeString)
-			return dtValue.date();
+			return value.toDateTime().date();
 		else
 			return QDate::fromString(cValue.toString(), Qt::ISODate);
 	case QMetaType::QTime:
 		if (value.tag() == QCborKnownTags::DateTimeString)
-			return dtValue.time();
+			return value.toDateTime().time();
 		else
 			return QTime::fromString(cValue.toString(), Qt::ISODateWithMs);
 	default:

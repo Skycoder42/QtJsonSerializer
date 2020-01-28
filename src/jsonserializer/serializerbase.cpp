@@ -707,16 +707,7 @@ QVariant SerializerBasePrivate::deserializeCborValue(int propertyType, const QCb
 		}
 	}
 
-	const auto res = value.toVariant();
-	// WORKAROUND for QTBUG-79196
-	if (value.tag() == QCborKnownTags::Uuid &&
-		res.userType() != QMetaType::QUuid)
-		return QUuid::fromRfc4122(res.toByteArray());
-	else if (value.tag() == QCborKnownTags::RegularExpression &&
-			 res.userType() != QMetaType::QRegularExpression)
-		return QRegularExpression{res.toString()};
-	else
-		return res;
+	return value.toVariant();
 }
 
 QVariant SerializerBasePrivate::deserializeJsonValue(int propertyType, const QCborValue &value) const

@@ -1,4 +1,4 @@
-name: Build, test and upload the module
+name: CI build
 
 on: [push]
 
@@ -43,7 +43,7 @@ jobs:
           - platform: winrt_x86_msvc2017
             os: windows-latest
           - platform: winrt_armv7_msvc2017
-            os: windows-latest
+            os: windows-2016  # not working with latest yet...
           - platform: mingw73_64
             os: windows-latest
           - platform: mingw73_32
