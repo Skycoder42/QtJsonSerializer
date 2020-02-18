@@ -88,31 +88,31 @@ jobs:
       - name: qmake
         shell: ${{steps.qt.outputs.shell}}
         run: |
-          qmake CONFIG+=install_ok QT_PLATFORM=${{matrix.platform}} CONFIG+=${{matrix.config}}
-          ${{steps.qt.outputs.make}} qmake_all
+          qmake CONFIG+=install_ok QT_PLATFORM=${{matrix.platform}} CONFIG+=${{matrix.config}} || exit 1
+          ${{steps.qt.outputs.make}} qmake_all || exit 1
       - name: make module
         shell: ${{steps.qt.outputs.shell}}
         run: |
-          ${{steps.qt.outputs.make}}
-          ${{steps.qt.outputs.make}} INSTALL_ROOT="${{steps.qt.outputs.installdir}}" install
+          ${{steps.qt.outputs.make}} || exit 1
+          ${{steps.qt.outputs.make}} INSTALL_ROOT="${{steps.qt.outputs.installdir}}" install || exit 1
       - name: make tests
         if: matrix.converters == 'enabled' && steps.qt.outputs.tests == 'true'
         shell: ${{steps.qt.outputs.shell}}
         run: |
-          ${{steps.qt.outputs.make}} all
-          ${{steps.qt.outputs.make}} ${{steps.qt.outputs.testflags}} run-tests
+          ${{steps.qt.outputs.make}} all || exit 1
+          ${{steps.qt.outputs.make}} ${{steps.qt.outputs.testflags}} run-tests || exit 1
       - name: make examples
         if: matrix.converters == 'enabled' && matrix.platform == 'gcc_64'
         shell: ${{steps.qt.outputs.shell}}
         run: |
-          ${{steps.qt.outputs.make}} sub-examples
-          cd examples && ${{steps.qt.outputs.make}} INSTALL_ROOT="${{steps.qt.outputs.installdir}}" install
+          ${{steps.qt.outputs.make}} sub-examples || exit 1
+          cd examples && ${{steps.qt.outputs.make}} INSTALL_ROOT="${{steps.qt.outputs.installdir}}" install || exit 1
       - name: make doc
         if: matrix.converters == 'enabled' && matrix.platform == 'gcc_64'
         shell: ${{steps.qt.outputs.shell}}
         run: |
-          ${{steps.qt.outputs.make}} doxygen
-          cd doc && ${{steps.qt.outputs.make}} INSTALL_ROOT="${{steps.qt.outputs.installdir}}" install
+          ${{steps.qt.outputs.make}} doxygen || exit 1
+          cd doc && ${{steps.qt.outputs.make}} INSTALL_ROOT="${{steps.qt.outputs.installdir}}" install || exit 1
       - name: upload module to releases
         uses: Skycoder42/action-upload-release@master
         if: matrix.converters == 'enabled' && startsWith(github.ref, 'refs/tags/')
