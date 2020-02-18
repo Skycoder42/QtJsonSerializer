@@ -86,18 +86,21 @@ jobs:
           platform: ${{matrix.platform}}
           cachedir: qt/${{matrix.version}}/${{matrix.platform}}
       - name: qmake
+        shell: bash
         run: |
-          qmake CONFIG+=install_ok QT_PLATFORM=${{matrix.platform}} CONFIG+=${{matrix.config}} || exit 1
-          ${{steps.qt.outputs.make}} qmake_all || exit 1
+          qmake CONFIG+=install_ok QT_PLATFORM=${{matrix.platform}} CONFIG+=${{matrix.config}}
+          ${{steps.qt.outputs.make}} qmake_all
       - name: make module
+        shell: bash
         run: |
-          ${{steps.qt.outputs.make}} || exit 1
-          ${{steps.qt.outputs.make}} INSTALL_ROOT="${{steps.qt.outputs.installdir}}" install || exit 1
+          ${{steps.qt.outputs.make}}
+          ${{steps.qt.outputs.make}} INSTALL_ROOT="${{steps.qt.outputs.installdir}}" install
       - name: make tests
         if: matrix.converters == 'enabled' && steps.qt.outputs.tests == 'true'
+        shell: bash
         run: |
-          ${{steps.qt.outputs.make}} all || exit 1
-          ${{steps.qt.outputs.make}} ${{steps.qt.outputs.testflags}} run-tests || exit 1
+          ${{steps.qt.outputs.make}} all
+          ${{steps.qt.outputs.make}} ${{steps.qt.outputs.testflags}} run-tests
       - name: make examples
         if: matrix.converters == 'enabled' && matrix.platform == 'gcc_64'
         run: |
