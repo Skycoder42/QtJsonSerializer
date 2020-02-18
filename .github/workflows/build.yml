@@ -23,8 +23,8 @@ jobs:
           - clang_64
           - ios
         converters:
-          - __qtjsac
-          - no_register_json_converters
+          - enabled
+          - disabled
 
         include:
           - platform: gcc_64
@@ -52,6 +52,9 @@ jobs:
             os: macos-latest
           - platform: ios
             os: macos-latest
+            
+          - converters: disabled
+            config: no_register_json_converters
 
     runs-on: ${{matrix.os}}
     steps:
@@ -84,30 +87,30 @@ jobs:
           cachedir: qt/${{matrix.version}}/${{matrix.platform}}
       - name: qmake
         run: |
-          qmake CONFIG+=install_ok QT_PLATFORM=${{matrix.platform}} CONFIG+=${{matrix.converters}}
-          ${{steps.qt.outputs.make}} qmake_all
+          qmake CONFIG+=install_ok QT_PLATFORM=${{matrix.platform}} CONFIG+=${{matrix.config}} || exit 1
+          ${{steps.qt.outputs.make}} qmake_all || exit 1
       - name: make module
         run: |
-          ${{steps.qt.outputs.make}}
-          ${{steps.qt.outputs.make}} INSTALL_ROOT="${{steps.qt.outputs.installdir}}" install
+          ${{steps.qt.outputs.make}} || exit 1
+          ${{steps.qt.outputs.make}} INSTALL_ROOT="${{steps.qt.outputs.installdir}}" install || exit 1
       - name: make tests
-        if: matrix.converters == '__qtjsac' && steps.qt.outputs.tests == 'true'
+        if: matrix.converters == 'enabled' && steps.qt.outputs.tests == 'true'
         run: |
-          ${{steps.qt.outputs.make}} all
-          ${{steps.qt.outputs.make}} ${{steps.qt.outputs.testflags}} run-tests
+          ${{steps.qt.outputs.make}} all || exit 1
+          ${{steps.qt.outputs.make}} ${{steps.qt.outputs.testflags}} run-tests || exit 1
       - name: make examples
-        if: matrix.converters == '__qtjsac' && matrix.platform == 'gcc_64'
+        if: matrix.converters == 'enabled' && matrix.platform == 'gcc_64'
         run: |
           ${{steps.qt.outputs.make}} sub-examples
           cd examples && ${{steps.qt.outputs.make}} INSTALL_ROOT="${{steps.qt.outputs.installdir}}" install
       - name: make doc
-        if: matrix.converters == '__qtjsac' && matrix.platform == 'gcc_64'
+        if: matrix.converters == 'enabled' && matrix.platform == 'gcc_64'
         run: |
           ${{steps.qt.outputs.make}} doxygen
           cd doc && ${{steps.qt.outputs.make}} INSTALL_ROOT="${{steps.qt.outputs.installdir}}" install
       - name: upload module to releases
         uses: Skycoder42/action-upload-release@master
-        if: matrix.converters == '__qtjsac' && startsWith(github.ref, 'refs/tags/')
+        if: matrix.converters == 'enabled' && startsWith(github.ref, 'refs/tags/')
         with:
           repo_token: ${{secrets.GITHUB_TOKEN}}
           directory: ${{steps.qt.outputs.outdir}}/${{matrix.version}}
@@ -116,7 +119,7 @@ jobs:
           overwrite: true
       - name: upload examples to releases
         uses: Skycoder42/action-upload-release@master
-        if: matrix.converters == '__qtjsac' && matrix.platform == 'gcc_64' && startsWith(github.ref, 'refs/tags/')
+        if: matrix.converters == 'enabled' && matrix.platform == 'gcc_64' && startsWith(github.ref, 'refs/tags/')
         with:
           repo_token: ${{secrets.GITHUB_TOKEN}}
           directory: ${{steps.qt.outputs.outdir}}/Examples
@@ -125,7 +128,7 @@ jobs:
           overwrite: true
       - name: upload doc to releases
         uses: Skycoder42/action-upload-release@master
-        if: matrix.converters == '__qtjsac' && matrix.platform == 'gcc_64' && startsWith(github.ref, 'refs/tags/')
+        if: matrix.converters == 'enabled' && matrix.platform == 'gcc_64' && startsWith(github.ref, 'refs/tags/')
         with:
           repo_token: ${{secrets.GITHUB_TOKEN}}
           directory: ${{steps.qt.outputs.outdir}}/Docs
