@@ -75,13 +75,12 @@ jobs:
         id: cache
         with:
           path: qt/${{matrix.version}}/${{matrix.platform}}
-          key: qt-${{matrix.version}}-${{matrix.platform}}
+          key: qt-${{matrix.version}}-${{matrix.platform}}-direct
       - uses: Skycoder42/action-setup-qt@master
         id: qt
         with:
           version: ${{matrix.version}}
           platform: ${{matrix.platform}}
-          install-args: --verbose
           cachedir: qt/${{matrix.version}}/${{matrix.platform}}
       - name: qmake
         run: |
