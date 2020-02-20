@@ -1,4 +1,6 @@
-win32:!ReleaseBuild:!DebugBuild {
+contains(debug_and_release, CONFIG): message(debug_and_release)
+
+debug_and_release:!ReleaseBuild:!DebugBuild {
 	runtarget.target = run-tests
 	runtarget.CONFIG = recursive
 	runtarget.recurse_target = run-tests
