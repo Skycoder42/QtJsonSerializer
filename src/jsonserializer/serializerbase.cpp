@@ -398,7 +398,7 @@ QVariant SerializerBase::deserializeVariant(int propertyType, const QCborValue &
 		if(allowConvert && variant.canConvert(propertyType) && variant.convert(propertyType))
 			return variant;
 		else if(d->allowNull && value.isNull())
-			return QVariant{propertyType, nullptr};
+            return QVariant{static_cast<QMetaType>(propertyType), nullptr};
 		else {
 			throw DeserializationException(QByteArray("Failed to convert deserialized variant of type ") +
 										   (vType ? vType : "<unknown>") +
@@ -569,7 +569,7 @@ void SerializerBasePrivate::updateConverterStore() const
 	QReadLocker fLocker{&typeConverterFactoryLock};
 	if (typeConverterFactories.size() > typeConverters.factoryOffset.loadAcquire()) {
 		QWriteLocker cLocker{&typeConverters.lock};
-		for (auto i = typeConverters.factoryOffset.loadAcquire(), max = typeConverterFactories.size(); i < max; ++i) {
+        for (int i = typeConverters.factoryOffset.loadAcquire(), max = typeConverterFactories.size(); i < max; ++i) {
 			auto converter = typeConverterFactories[i]->createConverter();
 			if (converter) {
 				converter->setHelper(q);

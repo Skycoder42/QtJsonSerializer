@@ -19,7 +19,7 @@
 #include <QtCore/qsharedpointer.h>
 #include <QtCore/qpointer.h>
 #include <QtCore/qlist.h>
-#include <QtCore/qlinkedlist.h>
+
 #include <QtCore/qvector.h>
 #include <QtCore/qset.h>
 #include <QtCore/qqueue.h>

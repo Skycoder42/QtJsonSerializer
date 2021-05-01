@@ -58,7 +58,7 @@ QVariant PairConverter::deserializeCbor(int propertyType, const QCborValue &valu
 		throw DeserializationException("CBOR/JSON array must have exactly 2 elements to be read as a pair");
 
 	const auto subTypes = extractor->subtypes();
-	QVariant resPair{propertyType, nullptr};
+    QVariant resPair{static_cast<QMetaType>(propertyType), nullptr};
 	extractor->emplace(resPair, helper()->deserializeSubtype(subTypes[0], array[0], parent, "first"), 0);
 	extractor->emplace(resPair, helper()->deserializeSubtype(subTypes[1], array[1], parent, "second"), 1);
 	return resPair;

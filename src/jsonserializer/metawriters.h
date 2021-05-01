@@ -10,7 +10,7 @@
 #include <QtCore/qreadwritelock.h>
 
 #include <QtCore/qset.h>
-#include <QtCore/qlinkedlist.h>
+
 
 namespace QtJsonSerializer::MetaWriters {
 
@@ -213,29 +213,6 @@ private:
 	QSet<TClass> *_data;
 };
 
-#ifndef QT_NO_LINKED_LIST
-template <typename TClass>
-class SequentialWriterImpl<QLinkedList, TClass> final : public SequentialWriter
-{
-public:
-	SequentialWriterImpl(QLinkedList<TClass> *data)
-		: _data{data}
-	{}
-
-	SequenceInfo info() const final {
-		return {qMetaTypeId<TClass>(), false};
-	}
-
-	void reserve(int) final {}
-
-	void add(const QVariant &value) final {
-		_data->append(value.template value<TClass>());
-	}
-
-private:
-	QLinkedList<TClass> *_data;
-};
-#endif
 
 template <>
 class SequentialWriterImpl<QList, QVariant> final : public SequentialWriter

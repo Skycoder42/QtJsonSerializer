@@ -10,7 +10,7 @@ using namespace QtJsonSerializer::MetaWriters;
 
 bool MapConverter::canConvert(int metaTypeId) const
 {
-	const QVariant tValue{metaTypeId, nullptr};
+    const QVariant tValue{static_cast<QMetaType>(metaTypeId), nullptr};
 	return (tValue.canConvert(QMetaType::QVariantMap) ||
 			tValue.canConvert(QMetaType::QVariantHash)) &&
 		   AssociativeWriter::canWrite(metaTypeId);
@@ -55,7 +55,7 @@ QCborValue MapConverter::serialize(int propertyType, const QVariant &value) cons
 QVariant MapConverter::deserializeCbor(int propertyType, const QCborValue &value, QObject *parent) const
 {
 	//generate the map
-	QVariant map{propertyType, nullptr};
+    QVariant map{static_cast<QMetaType>(propertyType), nullptr};
 	auto writer = AssociativeWriter::getWriter(map);
 	if (!writer) {
 		throw DeserializationException(QByteArray("Given type ") +

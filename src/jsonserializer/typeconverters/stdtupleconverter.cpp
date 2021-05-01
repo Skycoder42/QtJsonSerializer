@@ -36,7 +36,7 @@ QCborValue StdTupleConverter::serialize(int propertyType, const QVariant &value)
 
 	const auto metaTypes = extractor->subtypes();
 	QCborArray array;
-	for(auto i = 0, max = metaTypes.size(); i < max; ++i)
+    for(int i = 0, max = metaTypes.size(); i < max; ++i)
 		array.append(helper()->serializeSubtype(metaTypes[i], extractor->extract(value, i), "<" + QByteArray::number(i) + ">"));
 	return {static_cast<QCborTag>(CborSerializer::Tuple), array};
 }
@@ -56,8 +56,8 @@ QVariant StdTupleConverter::deserializeCbor(int propertyType, const QCborValue &
 		throw DeserializationException{"Expected array with " + QByteArray::number(metaTypes.size()) +
 											" elements, but got " + QByteArray::number(cArray.size()) + " instead"};
 
-	QVariant tuple{propertyType, nullptr};
-	for(auto i = 0, max = metaTypes.size(); i < max; ++i)
+    QVariant tuple{static_cast<QMetaType>(propertyType), nullptr};
+    for(int i = 0, max = metaTypes.size(); i < max; ++i)
 		extractor->emplace(tuple, helper()->deserializeSubtype(metaTypes[i], cArray[i], parent, "<" + QByteArray::number(i) + ">"), i);
 	return tuple;
 }
