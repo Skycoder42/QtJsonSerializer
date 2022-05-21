@@ -19,7 +19,7 @@ ExceptionContext::ExceptionContext(int propertyType, const QByteArray &hint)
 {
 	contextStore.localData().push({
 									  hint.isNull() ? QByteArray("<unnamed>") : hint,
-									  QMetaType::typeName(propertyType)
+									  QMetaTypeName(propertyType)
 								  });
 }
 

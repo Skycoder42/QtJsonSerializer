@@ -18,7 +18,8 @@ bool GadgetConverter::canConvert(int metaTypeId) const
 	if(gadgetExceptions.contains(metaTypeId))
 		return false;
 
-	const auto flags = QMetaType::typeFlags(metaTypeId);
+
+	const auto flags = QMetaType(metaTypeId).flags();
 	return flags.testFlag(QMetaType::IsGadget) ||
 			flags.testFlag(QMetaType::PointerToGadget);
 }
@@ -26,7 +27,7 @@ bool GadgetConverter::canConvert(int metaTypeId) const
 QList<QCborValue::Type> GadgetConverter::allowedCborTypes(int metaTypeId, QCborTag tag) const
 {
 	Q_UNUSED(tag)
-	if (QMetaType::typeFlags(metaTypeId).testFlag(QMetaType::PointerToGadget))
+	if (QMetaType(metaTypeId).flags().testFlag(QMetaType::PointerToGadget))
 		return {QCborValue::Map, QCborValue::Null};
 	else
 		return {QCborValue::Map};
@@ -34,14 +35,24 @@ QList<QCborValue::Type> GadgetConverter::allowedCborTypes(int metaTypeId, QCborT
 
 QCborValue GadgetConverter::serialize(int propertyType, const QVariant &value) const
 {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 	const auto metaObject = QMetaType::metaObjectForType(propertyType);
+#else
+	auto metaType = QMetaType(propertyType);
+	const auto metaObject = metaType.metaObject();
+#endif
+
 	if (!metaObject)
-		throw SerializationException(QByteArray("Unable to get metaobject for type ") + QMetaType::typeName(propertyType));
-	const auto isPtr = QMetaType::typeFlags(propertyType).testFlag(QMetaType::PointerToGadget);
+		throw SerializationException(QByteArray("Unable to get metaobject for type ") + QMetaTypeName(propertyType));
+	const auto isPtr = QMetaType(propertyType).flags().testFlag(QMetaType::PointerToGadget);
 
 	auto gValue = value;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 	if (!gValue.convert(propertyType))
-		throw SerializationException(QByteArray("Data is not of the required gadget type ") + QMetaType::typeName(propertyType));
+#else
+	if (!gValue.convert(metaType))
+#endif
+		throw SerializationException(QByteArray("Data is not of the required gadget type ") + QMetaTypeName(propertyType));
 	const void *gadget = nullptr;
 	if (isPtr) {
 		// with pointers, null gadgets are allowed
@@ -51,7 +62,7 @@ QCborValue GadgetConverter::serialize(int propertyType, const QVariant &value) c
 	} else
 		gadget = gValue.constData();
 	if (!gadget)
-		throw SerializationException(QByteArray("Unable to get address of gadget ") + QMetaType::typeName(propertyType));
+		throw SerializationException(QByteArray("Unable to get address of gadget ") + QMetaTypeName(propertyType));
 
 	QCborMap cborMap;
 	//go through all properties and try to serialize them
@@ -68,11 +79,17 @@ QCborValue GadgetConverter::serialize(int propertyType, const QVariant &value) c
 QVariant GadgetConverter::deserializeCbor(int propertyType, const QCborValue &value, QObject *parent) const
 {
 	Q_UNUSED(parent)  // gadgets neither have nor serve as parent
-	const auto isPtr = QMetaType::typeFlags(propertyType).testFlag(QMetaType::PointerToGadget);
+	const auto isPtr = QMetaType(propertyType).flags().testFlag(QMetaType::PointerToGadget);
 
-	auto metaObject = QMetaType::metaObjectForType(propertyType);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+        const auto metaObject = QMetaType::metaObjectForType(propertyType);
+#else
+        auto metaType = QMetaType(propertyType);
+        const auto metaObject = metaType.metaObject();
+#endif
+	
 	if (!metaObject)
-		throw DeserializationException(QByteArray("Unable to get metaobject for gadget type") + QMetaType::typeName(propertyType));
+		throw DeserializationException(QByteArray("Unable to get metaobject for gadget type") + QMetaTypeName(propertyType));
 
 	auto cValue = value.isTag() ? value.taggedValue() : value;
 	QVariant gadget;
@@ -81,17 +98,18 @@ QVariant GadgetConverter::deserializeCbor(int propertyType, const QCborValue &va
 		if (cValue.isNull())
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 			return QVariant{propertyType, nullptr};  // initialize an empty (nullptr) variant
-#else
-			return QVariant{QMetaType(propertyType), nullptr};  // initialize an empty (nullptr) variant
-#endif
 		const auto gadgetType = QMetaType::type(metaObject->className());
 		if (gadgetType == QMetaType::UnknownType)
-			throw DeserializationException(QByteArray("Unable to get type of gadget from gadget-pointer type") + QMetaType::typeName(propertyType));
+			throw DeserializationException(QByteArray("Unable to get type of gadget from gadget-pointer type") + QMetaTypeName(propertyType));
 		gadgetPtr = QMetaType::create(gadgetType);
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 		gadget = QVariant{propertyType, &gadgetPtr};
 #else
-		gadget = QVariant{QMetaType(propertyType), &gadgetPtr};
+			return QVariant{metaType, nullptr};  // initialize an empty (nullptr) variant
+		auto gadgetMetaType = QMetaType::fromName(metaObject->className());
+		if (!gadgetMetaType.isValid())
+			throw DeserializationException(QByteArray("Unable to get type of gadget from gadget-pointer type") + QMetaTypeName(propertyType));
+		gadgetPtr = gadgetMetaType.create();
+		gadget = QVariant{metaType, &gadgetPtr};
 #endif
 	} else {
 		if (cValue.isNull())
@@ -99,14 +117,14 @@ QVariant GadgetConverter::deserializeCbor(int propertyType, const QCborValue &va
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 		gadget = QVariant{propertyType, nullptr};
 #else
-		gadget = QVariant{QMetaType(propertyType), nullptr};
+		gadget = QVariant{metaType, nullptr};
 #endif
 		gadgetPtr = gadget.data();
 	}
 
 	if (!gadgetPtr) {
 		throw DeserializationException(QByteArray("Failed to construct gadget of type ") +
-											QMetaType::typeName(propertyType) +
+											QMetaTypeName(propertyType) +
 											QByteArray(". Does it have a default constructor?"));
 	}
 

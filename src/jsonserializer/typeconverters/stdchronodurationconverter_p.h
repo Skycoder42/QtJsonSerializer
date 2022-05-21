@@ -43,9 +43,9 @@ private:
 				return std::chrono::duration_cast<TDuration>(dur);
 			else {
 				throw DeserializationException{QByteArray{"Unable to upcast from deserialized "} +
-													QMetaType::typeName(qMetaTypeId<std::decay_t<decltype(dur)>>()) +
+													QMetaTypeName(qMetaTypeId<std::decay_t<decltype(dur)>>()) +
 													QByteArray{" to the requested "} +
-													QMetaType::typeName(qMetaTypeId<TDuration>())};
+													QMetaTypeName(qMetaTypeId<TDuration>())};
 			}
 		}, duration);
 	}

@@ -30,7 +30,7 @@ QCborValue StdTupleConverter::serialize(int propertyType, const QVariant &value)
 	const auto extractor = helper()->extractor(propertyType);
 	if (!extractor) {
 		throw SerializationException(QByteArray("Failed to get extractor for type ") +
-										  QMetaType::typeName(propertyType) +
+										  QMetaTypeName(propertyType) +
 										  QByteArray(". Make shure to register std::tuple types via QJsonSerializer::registerTupleConverters"));
 	}
 
@@ -47,7 +47,7 @@ QVariant StdTupleConverter::deserializeCbor(int propertyType, const QCborValue &
 	const auto extractor = helper()->extractor(propertyType);
 	if (!extractor) {
 		throw DeserializationException(QByteArray("Failed to get extractor for type ") +
-											QMetaType::typeName(propertyType) +
+											QMetaTypeName(propertyType) +
 											QByteArray(". Make shure to register std::tuple types via QJsonSerializer::registerTupleConverters"));
 	}
 

@@ -14,7 +14,7 @@ bool ListConverter::canConvert(int metaTypeId) const
 	return QVariant{metaTypeId, nullptr}.canConvert(QMetaType::QVariantList) &&
 		   SequentialWriter::canWrite(metaTypeId);
 #else
-	return QVariant{QMetaType(metaTypeId), nullptr}.canConvert(QMetaType::QVariantList) &&
+	return QVariant{QMetaType(metaTypeId), nullptr}.canConvert(QMetaType(QMetaType::QVariantList)) &&
 		   SequentialWriter::canWrite(metaTypeId);
 #endif
 }
@@ -42,9 +42,13 @@ QCborValue ListConverter::serialize(int propertyType, const QVariant &value) con
 {
 	const auto info = SequentialWriter::getInfo(propertyType);
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 	if (!value.canConvert(QMetaType::QVariantList)) {
+#else
+	if (!value.canConvert(QMetaType(QMetaType::QVariantList))) {
+#endif
 		throw SerializationException(QByteArray("Given type ") +
-										  QMetaType::typeName(propertyType) +
+										  QMetaTypeName(propertyType) +
 										  QByteArray(" cannot be processed via QSequentialIterable - make shure to register the container type via Q_DECLARE_SEQUENTIAL_CONTAINER_METATYPE"));
 	}
 
@@ -69,7 +73,7 @@ QVariant ListConverter::deserializeCbor(int propertyType, const QCborValue &valu
 	auto writer = SequentialWriter::getWriter(list);
 	if (!writer) {
 		throw DeserializationException(QByteArray("Given type ") +
-											QMetaType::typeName(propertyType) +
+											QMetaTypeName(propertyType) +
 											QByteArray(" cannot be accessed via QSequentialWriter - make shure to register it via QJsonSerializerBase::registerListConverters or QJsonSerializerBase::registerSetConverters"));
 	}
 

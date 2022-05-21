@@ -18,6 +18,12 @@ namespace QtJsonSerializer {
 //! Method to register all type converters for basic Qt types
 Q_JSONSERIALIZER_EXPORT void registerTypes();
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+#define QMetaTypeName(X) QMetaType::typeName(X)
+#else
+#define QMetaTypeName(X) QMetaType(X).name()
+#endif
+
 }
 
 //! @file qtjsonserializer_global.h The QtJsonSerializer library header file

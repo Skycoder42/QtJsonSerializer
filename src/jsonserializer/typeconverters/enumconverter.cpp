@@ -25,7 +25,7 @@ EnumConverter::EnumConverter()
 
 bool EnumConverter::canConvert(int metaTypeId) const
 {
-	return QMetaType::typeFlags(metaTypeId).testFlag(QMetaType::IsEnumeration) ||
+	return QMetaType(metaTypeId).flags().testFlag(QMetaType::IsEnumeration) ||
 			testForEnum(metaTypeId);  // NOTE check once in a while if still needed
 }
 
@@ -114,17 +114,21 @@ bool EnumConverter::testForEnum(int metaTypeId) const
 
 QMetaEnum EnumConverter::getEnum(int metaTypeId, bool ser) const
 {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 	const auto mo = QMetaType::metaObjectForType(metaTypeId);
+#else
+	const auto mo = QMetaType(metaTypeId).metaObject();
+#endif
 	if (!mo)
-		throwSer(QByteArray{"Unable to get metaobject for type "} + QMetaType::typeName(metaTypeId), ser);
-	const auto enumName = QString::fromUtf8(QMetaType::typeName(metaTypeId))
+		throwSer(QByteArray{"Unable to get metaobject for type "} + QMetaTypeName(metaTypeId), ser);
+	const auto enumName = QString::fromUtf8(QMetaTypeName(metaTypeId))
 							  .split(QStringLiteral("::"))
 							  .last()
 							  .toUtf8();
 	auto mIndex = mo->indexOfEnumerator(enumName.data());
 	if (mIndex < 0) {
 		throwSer(QByteArray{"Unable to get QMetaEnum for type "} +
-					 QMetaType::typeName(metaTypeId) +
+					 QMetaTypeName(metaTypeId) +
 					 QByteArray{" using the owning meta object "} +
 					 mo->className(),
 				 ser);

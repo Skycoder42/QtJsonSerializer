@@ -29,7 +29,7 @@ QCborValue SmartPointerConverter::serialize(int propertyType, const QVariant &va
 	const auto extractor = helper()->extractor(propertyType);
 	if (!extractor) {
 		throw SerializationException(QByteArray("Failed to get extractor for type ") +
-										  QMetaType::typeName(propertyType) +
+										  QMetaTypeName(propertyType) +
 										  QByteArray(". Make shure to register std::optional types via QJsonSerializer::registerPointerConverters"));
 	}
 
@@ -43,7 +43,7 @@ QVariant SmartPointerConverter::deserializeCbor(int propertyType, const QCborVal
 	const auto extractor = helper()->extractor(propertyType);
 	if (!extractor) {
 		throw DeserializationException(QByteArray("Failed to get extractor for type ") +
-											QMetaType::typeName(propertyType) +
+											QMetaTypeName(propertyType) +
 											QByteArray(". Make shure to register std::optional types via QJsonSerializer::registerPointerConverters"));
 	}
 

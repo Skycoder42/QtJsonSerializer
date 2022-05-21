@@ -12,12 +12,17 @@ bool MapConverter::canConvert(int metaTypeId) const
 {
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 	const QVariant tValue{metaTypeId, nullptr};
-#else
-	const QVariant tValue{QMetaType(metaTypeId), nullptr};
-#endif
 	return (tValue.canConvert(QMetaType::QVariantMap) ||
 			tValue.canConvert(QMetaType::QVariantHash)) &&
 		   AssociativeWriter::canWrite(metaTypeId);
+
+#else
+	const QVariant tValue{QMetaType(metaTypeId), nullptr};
+	return (tValue.canConvert(QMetaType(QMetaType::QVariantMap)) ||
+			tValue.canConvert(QMetaType(QMetaType::QVariantHash))) &&
+		   AssociativeWriter::canWrite(metaTypeId);
+
+#endif
 }
 
 QList<QCborTag> MapConverter::allowedCborTags(int metaTypeId) const
@@ -38,10 +43,15 @@ QCborValue MapConverter::serialize(int propertyType, const QVariant &value) cons
 	const auto info = AssociativeWriter::getInfo(propertyType);
 
 	// verify is readable
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 	if (!value.canConvert(QMetaType::QVariantMap) &&
 		!value.canConvert(QMetaType::QVariantHash)) {
+#else
+	if (!value.canConvert(QMetaType(QMetaType::QVariantMap)) &&
+		!value.canConvert(QMetaType(QMetaType::QVariantHash))) {
+#endif
 		throw SerializationException(QByteArray("Given type ") +
-										  QMetaType::typeName(propertyType) +
+										  QMetaTypeName(propertyType) +
 										  QByteArray(" cannot be processed via QAssociativeIterable - make shure to register the container type via Q_DECLARE_ASSOCIATIVE_CONTAINER_METATYPE"));
 	}
 
@@ -67,7 +77,7 @@ QVariant MapConverter::deserializeCbor(int propertyType, const QCborValue &value
 	auto writer = AssociativeWriter::getWriter(map);
 	if (!writer) {
 		throw DeserializationException(QByteArray("Given type ") +
-											QMetaType::typeName(propertyType) +
+											QMetaTypeName(propertyType) +
 											QByteArray(" cannot be accessed via QAssociativeWriter - make shure to register it via QJsonSerializerBase::registerMapConverters"));
 	}
 
