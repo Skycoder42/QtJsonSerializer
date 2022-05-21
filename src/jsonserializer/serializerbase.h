@@ -19,7 +19,11 @@
 #include <QtCore/qsharedpointer.h>
 #include <QtCore/qpointer.h>
 #include <QtCore/qlist.h>
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #include <QtCore/qlinkedlist.h>
+#endif
+
 #include <QtCore/qvector.h>
 #include <QtCore/qset.h>
 #include <QtCore/qqueue.h>
@@ -246,7 +250,7 @@ template<typename T>
 void SerializerBase::registerListConverters()
 {
 	MetaWriters::SequentialWriter::registerWriter<QList, T>();
-#ifndef QT_NO_LINKED_LIST
+#if !defined(QT_NO_LINKED_LIST) && (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
 	MetaWriters::SequentialWriter::registerWriter<QLinkedList, T>();
 #endif
 	MetaWriters::SequentialWriter::registerWriter<QVector, T>();

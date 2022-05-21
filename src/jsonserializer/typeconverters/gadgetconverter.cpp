@@ -79,16 +79,28 @@ QVariant GadgetConverter::deserializeCbor(int propertyType, const QCborValue &va
 	void *gadgetPtr = nullptr;
 	if (isPtr) {
 		if (cValue.isNull())
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 			return QVariant{propertyType, nullptr};  // initialize an empty (nullptr) variant
+#else
+			return QVariant{QMetaType(propertyType), nullptr};  // initialize an empty (nullptr) variant
+#endif
 		const auto gadgetType = QMetaType::type(metaObject->className());
 		if (gadgetType == QMetaType::UnknownType)
 			throw DeserializationException(QByteArray("Unable to get type of gadget from gadget-pointer type") + QMetaType::typeName(propertyType));
 		gadgetPtr = QMetaType::create(gadgetType);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 		gadget = QVariant{propertyType, &gadgetPtr};
+#else
+		gadget = QVariant{QMetaType(propertyType), &gadgetPtr};
+#endif
 	} else {
 		if (cValue.isNull())
 			return QVariant{};  // return to allow default null for gadgets. If not allowed, this will fail, as a null variant cannot be converted to a gadget
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 		gadget = QVariant{propertyType, nullptr};
+#else
+		gadget = QVariant{QMetaType(propertyType), nullptr};
+#endif
 		gadgetPtr = gadget.data();
 	}
 

@@ -10,7 +10,10 @@
 #include <QtCore/qreadwritelock.h>
 
 #include <QtCore/qset.h>
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #include <QtCore/qlinkedlist.h>
+#endif
 
 namespace QtJsonSerializer::MetaWriters {
 
@@ -213,7 +216,7 @@ private:
 	QSet<TClass> *_data;
 };
 
-#ifndef QT_NO_LINKED_LIST
+#if !defined(QT_NO_LINKED_LIST) && (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
 template <typename TClass>
 class SequentialWriterImpl<QLinkedList, TClass> final : public SequentialWriter
 {

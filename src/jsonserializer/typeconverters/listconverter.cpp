@@ -10,8 +10,13 @@ using namespace QtJsonSerializer::MetaWriters;
 
 bool ListConverter::canConvert(int metaTypeId) const
 {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 	return QVariant{metaTypeId, nullptr}.canConvert(QMetaType::QVariantList) &&
 		   SequentialWriter::canWrite(metaTypeId);
+#else
+	return QVariant{QMetaType(metaTypeId), nullptr}.canConvert(QMetaType::QVariantList) &&
+		   SequentialWriter::canWrite(metaTypeId);
+#endif
 }
 
 QList<QCborTag> ListConverter::allowedCborTags(int metaTypeId) const
@@ -56,7 +61,11 @@ QCborValue ListConverter::serialize(int propertyType, const QVariant &value) con
 QVariant ListConverter::deserializeCbor(int propertyType, const QCborValue &value, QObject *parent) const
 {
 	//generate the list
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 	QVariant list{propertyType, nullptr};
+#else
+	QVariant list{QMetaType(propertyType), nullptr};
+#endif
 	auto writer = SequentialWriter::getWriter(list);
 	if (!writer) {
 		throw DeserializationException(QByteArray("Given type ") +
