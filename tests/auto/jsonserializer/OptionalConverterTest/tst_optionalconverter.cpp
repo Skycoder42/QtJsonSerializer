@@ -37,7 +37,9 @@ void OptionalConverterTest::initTest()
 	JsonSerializer::registerOptionalConverters<std::pair<int, bool>>();
 	JsonSerializer::registerOptionalConverters<OpaqueDummy>();
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 	QMetaType::registerEqualsComparator<std::optional<int>>();
+#endif
 }
 
 TypeConverter *OptionalConverterTest::converter()

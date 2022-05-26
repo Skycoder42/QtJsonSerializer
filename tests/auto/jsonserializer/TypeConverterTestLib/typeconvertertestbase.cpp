@@ -129,10 +129,18 @@ void TypeConverterTestBase::testSerialization()
 		if(cResult.isUndefined() && jResult.isUndefined()) {
 			helper->json = false;
 			helper->serData = serData;
+#if QT_VERSION < QT_VERSION_CHECK(6, 3, 0)
 			QVERIFY_EXCEPTION_THROWN(converter()->serialize(type, data), SerializationException);
+#else
+			QVERIFY_THROWS_EXCEPTION(SerializationException, converter()->serialize(type, data));
+#endif
 			helper->json = true;
 			helper->serData = serData;
+#if QT_VERSION < QT_VERSION_CHECK(6, 3, 0)
 			QVERIFY_EXCEPTION_THROWN(converter()->serialize(type, data), SerializationException);
+#else
+			QVERIFY_THROWS_EXCEPTION(SerializationException, converter()->serialize(type, data));
+#endif
 		} else {
 			if (!cResult.isUndefined()) {
 				helper->json = false;
@@ -188,26 +196,42 @@ void TypeConverterTestBase::testDeserialization()
 			if (!cData.isUndefined()) {
 				helper->json = false;
 				helper->deserData = deserData;
+#if QT_VERSION < QT_VERSION_CHECK(6, 3, 0)
 				QVERIFY_EXCEPTION_THROWN(converter()->deserializeCbor(type, cData, this), DeserializationException);
+#else
+				QVERIFY_THROWS_EXCEPTION(DeserializationException, converter()->deserializeCbor(type, cData, this));
+#endif
 			}
 			if (!jData.isUndefined()) {
 				helper->json = true;
 				helper->deserData = deserData;
+#if QT_VERSION < QT_VERSION_CHECK(6, 3, 0)
 				QVERIFY_EXCEPTION_THROWN(converter()->deserializeJson(type, QCborValue::fromJsonValue(jData), this), DeserializationException);
+#else
+				QVERIFY_THROWS_EXCEPTION(DeserializationException, converter()->deserializeJson(type, QCborValue::fromJsonValue(jData), this));
+#endif
 			}
 		} else {
 			if (!cData.isUndefined()) {
 				helper->json = false;
 				helper->deserData = deserData;
 				auto res = converter()->deserializeCbor(type, cData, this);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 				QVERIFY(res.convert(type));
+#else
+				QVERIFY(res.convert(QMetaType(type)));
+#endif
 				SELF_COMPARE(type, res, result);
 			}
 			if (!jData.isUndefined()) {
 				helper->json = true;
 				helper->deserData = deserData;
 				auto res = converter()->deserializeJson(type, QCborValue::fromJsonValue(jData), this);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 				QVERIFY(res.convert(type));
+#else
+				QVERIFY(res.convert(QMetaType(type)));
+#endif
 				SELF_COMPARE(type, res, result);
 			}
 		}

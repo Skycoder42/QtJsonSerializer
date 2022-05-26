@@ -65,6 +65,7 @@ void SerializerTest::initTestCase()
 	JsonSerializer::registerVariantConverters<bool, int, double>();
 
 	//register list comparators, needed for test only!
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 	QMetaType::registerEqualsComparator<QList<bool>>();
 	QMetaType::registerEqualsComparator<QList<int>>();
 	QMetaType::registerEqualsComparator<QList<TestObject*>>();
@@ -84,6 +85,7 @@ void SerializerTest::initTestCase()
 	QMetaType::registerEqualsComparator<TestPair>();
 	QMetaType::registerEqualsComparator<std::optional<int>>();
 	QMetaType::registerEqualsComparator<std::variant<bool, int, double>>();
+#endif
 
 	jsonSerializer = new JsonSerializer{this};
 	jsonSerializer->addJsonTypeConverter<TestEnumConverter>();
@@ -281,28 +283,48 @@ void SerializerTest::testVariantConversions_data()
 	QVariant optv{42};
 	QTest::newRow("std::optional<int>") << QVariant::fromValue<std::optional<int>>(42)
 										<< static_cast<int>(QMetaType::QVariant)
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 										<< QVariant{QMetaType::QVariant, &optv}
+#else
+										<< QVariant(QMetaType::fromType<QVariant>(), &optv)
+#endif
 										<< false;
 	optv = QVariant::fromValue(nullptr);
 	QTest::newRow("std::nullopt") << QVariant::fromValue<std::optional<int>>(std::nullopt)
 								  << static_cast<int>(QMetaType::QVariant)
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 								  << QVariant{QMetaType::QVariant, &optv}
+#else
+								  << QVariant(QMetaType::fromType<QVariant>(), &optv)
+#endif
 								  << false;
 
 	QVariant varv1{true};
 	QTest::newRow("std::variant<bool>") << QVariant::fromValue<TestVariant>(true)
 										<< static_cast<int>(QMetaType::QVariant)
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 										<< QVariant{QMetaType::QVariant, &varv1}
+#else
+										<< QVariant(QMetaType::fromType<QVariant>(), &varv1)
+#endif
 										<< false;
 	QVariant varv2{42};
 	QTest::newRow("std::variant<int>") << QVariant::fromValue<TestVariant>(42)
 									   << static_cast<int>(QMetaType::QVariant)
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 									   << QVariant{QMetaType::QVariant, &varv2}
+#else
+									   << QVariant(QMetaType::fromType<QVariant>(), &varv2)
+#endif
 									   << false;
 	QVariant varv3{4.2};
 	QTest::newRow("std::variant<double>") << QVariant::fromValue<TestVariant>(4.2)
 										  << qMetaTypeId<QVariant>()
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 										  << QVariant{QMetaType::QVariant, &varv3}
+#else
+										  << QVariant(QMetaType::fromType<QVariant>(), &varv3)
+#endif
 										  << false;
 }
 
@@ -316,7 +338,11 @@ void SerializerTest::testVariantConversions()
 	auto origType = data.userType();
 	auto convData = data;
 	if (iterable) {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 		QVERIFY(convData.canConvert(targetType));
+#else
+		QVERIFY(convData.canConvert(QMetaType(targetType)));
+#endif
 		if (targetType == QMetaType::QVariantList) {
 			const auto variantList = variantData.toList();
 			auto seqIt = convData.value<QSequentialIterable>();
@@ -325,7 +351,11 @@ void SerializerTest::testVariantConversions()
 			for (const auto &itData : seqIt)
 				QCOMPARE(itData, variantList[i++]);
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 			QVariant res{data.userType(), nullptr};
+#else
+			QVariant res{QMetaType(data.userType()), nullptr};
+#endif
 			auto writer = SequentialWriter::getWriter(res);
 			QVERIFY(writer);
 			writer->reserve(variantList.size());
@@ -343,7 +373,11 @@ void SerializerTest::testVariantConversions()
 				QCOMPARE(it.value(), variantMap.value(key));
 			}
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 			QVariant res{data.userType(), nullptr};
+#else
+			QVariant res{QMetaType(data.userType()), nullptr};
+#endif
 			auto writer = AssociativeWriter::getWriter(res);
 			QVERIFY(writer);
 			for (auto it = variantMap.begin(), end = variantMap.end(); it != end; ++it)
@@ -388,14 +422,22 @@ void SerializerTest::testSerialization()
 				auto res = cborSerializer->serialize(data);
 				QCOMPARE(res, cResult);
 			} else
+#if QT_VERSION < QT_VERSION_CHECK(6, 3, 0)
 				QVERIFY_EXCEPTION_THROWN(cborSerializer->serialize(data), SerializationException);
+#else
+				QVERIFY_THROWS_EXCEPTION(SerializationException, cborSerializer->serialize(data));
+#endif
 		}
 		if (!jResult.isUndefined()) {
 			if(works) {
 				auto res = jsonSerializer->serialize(data);
 				QCOMPARE(res, jResult);
 			} else
+#if QT_VERSION < QT_VERSION_CHECK(6, 3, 0)
 				QVERIFY_EXCEPTION_THROWN(jsonSerializer->serialize(data), SerializationException);
+#else
+				QVERIFY_THROWS_EXCEPTION(SerializationException, jsonSerializer->serialize(data));
+#endif
 		}
 	} catch(std::exception &e) {
 		QFAIL(e.what());
@@ -413,7 +455,11 @@ void SerializerTest::testDeserialization_data()
 	addCommonData();
 
 	QVariant fontVariant{QStringLiteral("MyScript Sans")};
+#if QT_VERSION < QT_VERSION_CHECK(6, 3, 0)
 	QVERIFY(fontVariant.convert(QMetaType::QFont));
+#else
+	QVERIFY(fontVariant.convert(QMetaType::fromType<QFont>()));
+#endif
 	QTest::newRow("font.short") << fontVariant
 								<< QCborValue{static_cast<QCborTag>(CborSerializer::Font), QStringLiteral("MyScript Sans")}
 								<< QJsonValue{QStringLiteral("MyScript Sans")}
@@ -749,14 +795,22 @@ void SerializerTest::testDeserialization()
 				auto res = cborSerializer->deserialize(cData, result.userType(), this);
 				QCOMPARE(res, result);
 			} else
+#if QT_VERSION < QT_VERSION_CHECK(6, 3, 0)
 				QVERIFY_EXCEPTION_THROWN(cborSerializer->deserialize(cData, result.userType(), this), DeserializationException);
+#else
+				QVERIFY_THROWS_EXCEPTION(DeserializationException, cborSerializer->deserialize(cData, result.userType(), this));
+#endif
 		}
 		if (!jData.isUndefined()) {
 			if(works) {
 				auto res = jsonSerializer->deserialize(jData, result.userType(), this);
 				QCOMPARE(res, result);
 			} else
+#if QT_VERSION < QT_VERSION_CHECK(6, 3, 0)
 				QVERIFY_EXCEPTION_THROWN(jsonSerializer->deserialize(jData, result.userType(), this), DeserializationException);
+#else
+				QVERIFY_THROWS_EXCEPTION(DeserializationException, jsonSerializer->deserialize(jData, result.userType(), this));
+#endif
 		}
 	} catch(std::exception &e) {
 		QFAIL(e.what());

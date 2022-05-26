@@ -759,7 +759,11 @@ void ObjectConverterTest::addDeserData()
 
 bool ObjectConverterTest::compare(int type, QVariant &actual, QVariant &expected, const char *aName, const char *eName, const char *file, int line)
 {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 	const auto flags = QMetaType::typeFlags(type);
+#else
+	const auto flags = QMetaType(type).flags();
+#endif
 	if(flags.testFlag(QMetaType::PointerToQObject) ||
 	   flags.testFlag(QMetaType::TrackingPointerToQObject) ||
 	   flags.testFlag(QMetaType::SharedPointerToQObject)) {

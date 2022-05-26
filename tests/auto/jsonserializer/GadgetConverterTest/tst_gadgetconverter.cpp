@@ -29,7 +29,9 @@ private:
 
 void GadgetConverterTest::initTest()
 {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 	QMetaType::registerEqualsComparator<TestGadget>();
+#endif
 }
 
 TypeConverter *GadgetConverterTest::converter()
@@ -254,7 +256,11 @@ void GadgetConverterTest::addDeserData()
 
 bool GadgetConverterTest::compare(int type, QVariant &actual, QVariant &expected, const char *aName, const char *eName, const char *file, int line)
 {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 	if (QMetaType::typeFlags(type).testFlag(QMetaType::PointerToGadget)) {
+#else
+	if (QMetaType(type).flags().testFlag(QMetaType::PointerToGadget)) {
+#endif
 		const auto ptr1 = reinterpret_cast<const TestGadget* const *>(actual.constData());
 		const auto ptr2 = reinterpret_cast<const TestGadget* const *>(expected.constData());
 		if (ptr1 != ptr2) { // same object is automatically equal

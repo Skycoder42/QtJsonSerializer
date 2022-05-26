@@ -58,8 +58,10 @@ void MultiMapConverterTest::initTest()
 	SerializerBase::registerMapConverters<QString, QList<bool>>();
 	SerializerBase::registerMapConverters<int, QPair<int, bool>>();
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 	QMetaType::registerEqualsComparator<QMultiMap<QString, int>>();
 	QMetaType::registerEqualsComparator<QMultiHash<QString, int>>();
+#endif
 }
 
 bool MultiMapConverterTest::compare(int type, QVariant &actual, QVariant &expected, const char *aName, const char *eName, const char *file, int line)
