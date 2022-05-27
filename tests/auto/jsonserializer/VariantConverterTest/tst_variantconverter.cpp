@@ -42,7 +42,9 @@ void VariantConverterTest::initTest()
 	JsonSerializer::registerVariantConverters<QList<int>, QPair<bool, bool>, QMap<QString, double>>();
 	JsonSerializer::registerVariantConverters<OpaqueDummy>();
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 	QMetaType::registerEqualsComparator<TestVar1>();
+#endif
 }
 
 TypeConverter *VariantConverterTest::converter()

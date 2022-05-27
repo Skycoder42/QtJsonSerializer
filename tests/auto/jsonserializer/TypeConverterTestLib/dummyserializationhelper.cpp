@@ -61,7 +61,7 @@ QCborValue DummySerializationHelper::serializeSubtype(int propertyType, const QV
 			throw SerializationException{"Data comparison failed"};
 	}
 
-	throw SerializationException{QByteArrayLiteral("Unable to find data of type ") + QMetaType::typeName(propertyType) + QByteArrayLiteral(" in serData")};
+	throw SerializationException{QByteArrayLiteral("Unable to find data of type ") + QMetaTypeName(propertyType) + QByteArrayLiteral(" in serData")};
 }
 
 QVariant DummySerializationHelper::deserializeSubtype(const QMetaProperty &property, const QCborValue &value, QObject *parent) const
@@ -93,5 +93,5 @@ QVariant DummySerializationHelper::deserializeSubtype(int propertyType, const QC
 			throw DeserializationException{"Data comparison failed"};
 	}
 
-	throw DeserializationException{QByteArrayLiteral("Unable to find data of type ") + QMetaType::typeName(propertyType) + QByteArrayLiteral(" in deserData")};
+	throw DeserializationException{QByteArrayLiteral("Unable to find data of type ") + QMetaTypeName(propertyType) + QByteArrayLiteral(" in deserData")};
 }

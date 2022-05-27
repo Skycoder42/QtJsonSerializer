@@ -32,7 +32,7 @@ QCborValue StdOptionalConverter::serialize(int propertyType, const QVariant &val
 	const auto extractor = helper()->extractor(propertyType);
 	if (!extractor) {
 		throw SerializationException(QByteArray("Failed to get extractor for type ") +
-										  QMetaType::typeName(propertyType) +
+										  QMetaTypeName(propertyType) +
 										  QByteArray(". Make shure to register std::optional types via QJsonSerializer::registerOptionalConverters"));
 	}
 
@@ -48,7 +48,7 @@ QVariant StdOptionalConverter::deserializeCbor(int propertyType, const QCborValu
 	const auto extractor = helper()->extractor(propertyType);
 	if (!extractor) {
 		throw DeserializationException(QByteArray("Failed to get extractor for type ") +
-											QMetaType::typeName(propertyType) +
+											QMetaTypeName(propertyType) +
 											QByteArray(". Make shure to register std::optional types via QJsonSerializer::registerOptionalConverters"));
 	}
 

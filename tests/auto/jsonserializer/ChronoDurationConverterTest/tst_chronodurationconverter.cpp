@@ -36,12 +36,14 @@ private:
 
 void ChronoDurationConverterTest::initTest()
 {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 	QMetaType::registerEqualsComparator<nanoseconds>();
 	QMetaType::registerEqualsComparator<microseconds>();
 	QMetaType::registerEqualsComparator<milliseconds>();
 	QMetaType::registerEqualsComparator<seconds>();
 	QMetaType::registerEqualsComparator<minutes>();
 	QMetaType::registerEqualsComparator<hours>();
+#endif
 }
 
 TypeConverter *ChronoDurationConverterTest::converter()

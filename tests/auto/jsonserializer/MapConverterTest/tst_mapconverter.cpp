@@ -30,11 +30,13 @@ void MapConverterTest::initTest()
 	SerializerBase::registerMapConverters<QString, QList<int>>();
 	SerializerBase::registerMapConverters<QPair<int, int>, QPair<int, bool>>();
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 	QMetaType::registerEqualsComparator<QMap<QString, int>>();
 	QMetaType::registerEqualsComparator<QHash<QString, bool>>();
 	QMetaType::registerEqualsComparator<QMap<int, double>>();
 	QMetaType::registerEqualsComparator<QHash<int, double>>();
 	QMetaType::registerEqualsComparator<QMap<QPair<int, int>, double>>();
+#endif
 }
 
 TypeConverter *MapConverterTest::converter()

@@ -5,7 +5,11 @@
 #include <QtCore/qobject.h>
 #include <QtCore/qlist.h>
 #include <QtCore/qvector.h>
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #include <QtCore/qlinkedlist.h>
+#endif
+
 #include <QtCore/qstack.h>
 #include <QtCore/qqueue.h>
 #include <QtCore/qset.h>
@@ -63,10 +67,13 @@ struct is_serializable<QPointer<T>> : public std::is_base_of<QObject, T> {};
 template <typename T>
 struct is_serializable<QList<T>> : public is_serializable<T> {};
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 template <typename T>
 struct is_serializable<QVector<T>> : public is_serializable<T> {};
+#endif
 
-#ifndef QT_NO_LINKED_LIST
+
+#if !defined(QT_NO_LINKED_LIST) && (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
 template <typename T>
 struct is_serializable<QLinkedList<T>> : public is_serializable<T> {};
 #endif
@@ -89,8 +96,10 @@ struct is_serializable<QHash<TKey, TValue>> : public std::conjunction<is_seriali
 template <typename TKey, typename TValue>
 struct is_serializable<QMultiHash<TKey, TValue>> : public std::conjunction<is_serializable<TKey>, is_serializable<TValue>> {};
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 template <typename T1, typename T2>
 struct is_serializable<QPair<T1, T2>> : public std::conjunction<is_serializable<T1>, is_serializable<T2>> {};
+#endif
 
 template <typename T1, typename T2>
 struct is_serializable<std::pair<T1, T2>> : public std::conjunction<is_serializable<T1>, is_serializable<T2>> {};
@@ -162,6 +171,7 @@ struct json_type<QList<T>> {
 	}
 };
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 template <typename T>
 struct json_type<QVector<T>> {
 	static_assert(is_serializable<QVector<T>>::value, "The value type of a QVector must be serializable for it to also be serializable");
@@ -172,8 +182,9 @@ struct json_type<QVector<T>> {
 		return jsonValue.toArray();
 	}
 };
+#endif
 
-#ifndef QT_NO_LINKED_LIST
+#if !defined(QT_NO_LINKED_LIST) && (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
 template <typename T>
 struct json_type<QLinkedList<T>> {
 	static_assert(is_serializable<QLinkedList<T>>::value, "The value type of a QLinkedList must be serializable for it to also be serializable");
@@ -252,6 +263,7 @@ struct json_type<QMultiHash<TKey, TValue>> {
 	}
 };
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 template <typename T1, typename T2>
 struct json_type<QPair<T1, T2>> {
 	static_assert(is_serializable<QPair<T1, T2>>::value, "All elements of a QPair must be serializable for it to also be serializable");
@@ -262,6 +274,7 @@ struct json_type<QPair<T1, T2>> {
 		return jsonValue.toArray();
 	}
 };
+#endif
 
 template <typename T1, typename T2>
 struct json_type<std::pair<T1, T2>> {
@@ -273,6 +286,7 @@ struct json_type<std::pair<T1, T2>> {
 		return jsonValue.toArray();
 	}
 };
+
 
 template <typename... TArgs>
 struct json_type<std::tuple<TArgs...>> {

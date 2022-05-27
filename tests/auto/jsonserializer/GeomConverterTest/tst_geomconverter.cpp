@@ -177,12 +177,19 @@ void GeomConverterTest::addMetaData()
 									  << QCborValue::Map
 									  << true
 									  << TypeConverter::DeserializationCapabilityResult::WrongTag;
-
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 	QTest::newRow("invalid.type") << static_cast<int>(QMetaType::QMatrix)
 								  << static_cast<QCborTag>(CborSerializer::NoTag)
 								  << QCborValue::Array
 								  << false
 								  << TypeConverter::DeserializationCapabilityResult::Negative;
+#else
+	QTest::newRow("invalid.type") << static_cast<int>(QMetaType::QTransform)
+								  << static_cast<QCborTag>(CborSerializer::NoTag)
+								  << QCborValue::Array
+								  << false
+								  << TypeConverter::DeserializationCapabilityResult::Negative;
+#endif
 }
 
 void GeomConverterTest::addCommonSerData()

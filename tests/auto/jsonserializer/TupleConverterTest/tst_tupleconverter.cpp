@@ -38,7 +38,9 @@ void TupleConverterTest::initTest()
 	JsonSerializer::registerTupleConverters<QList<int>, QPair<bool, bool>, QMap<QString, double>>();
 	JsonSerializer::registerTupleConverters<OpaqueDummy>();
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 	QMetaType::registerEqualsComparator<TestTpl1>();
+#endif
 }
 
 TypeConverter *TupleConverterTest::converter()

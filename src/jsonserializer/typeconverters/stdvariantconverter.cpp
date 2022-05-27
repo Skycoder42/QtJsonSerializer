@@ -28,7 +28,7 @@ QCborValue StdVariantConverter::serialize(int propertyType, const QVariant &valu
 	const auto extractor = helper()->extractor(propertyType);
 	if (!extractor) {
 		throw SerializationException(QByteArray("Failed to get extractor for type ") +
-										  QMetaType::typeName(propertyType) +
+										  QMetaTypeName(propertyType) +
 										  QByteArray(". Make shure to register std::variant types via QJsonSerializer::registerVariantConverters"));
 	}
 
@@ -37,12 +37,12 @@ QCborValue StdVariantConverter::serialize(int propertyType, const QVariant &valu
 	const auto mIndex = metaTypes.indexOf(cValue.userType());
 	if (mIndex == -1) {
 		throw SerializationException(QByteArray("Invalid value given for type ") +
-										  QMetaType::typeName(propertyType) +
+										  QMetaTypeName(propertyType) +
 										  QByteArray(" - was ") +
 										  value.typeName() +
 										  QByteArray(", which is not a type of the given variant"));
 	}
-	return helper()->serializeSubtype(metaTypes[mIndex], cValue, QByteArray{"<"} + QMetaType::typeName(metaTypes[mIndex]) + QByteArray{">"});
+	return helper()->serializeSubtype(metaTypes[mIndex], cValue, QByteArray{"<"} + QMetaTypeName(metaTypes[mIndex]) + QByteArray{">"});
 }
 
 QVariant StdVariantConverter::deserializeCbor(int propertyType, const QCborValue &value, QObject *parent) const
@@ -50,7 +50,7 @@ QVariant StdVariantConverter::deserializeCbor(int propertyType, const QCborValue
 	const auto extractor = helper()->extractor(propertyType);
 	if (!extractor) {
 		throw DeserializationException(QByteArray("Failed to get extractor for type ") +
-											QMetaType::typeName(propertyType) +
+											QMetaTypeName(propertyType) +
 											QByteArray(". Make shure to register std::variant types via QJsonSerializer::registerVariantConverters"));
 	}
 
@@ -58,13 +58,13 @@ QVariant StdVariantConverter::deserializeCbor(int propertyType, const QCborValue
 	for (auto metaType : extractor->subtypes()) {
 		// ignore exceptions and try with the next type
 		try {
-			auto result = helper()->deserializeSubtype(metaType, value, parent, QByteArray{"<"} + QMetaType::typeName(metaType) + QByteArray{">"});
+			auto result = helper()->deserializeSubtype(metaType, value, parent, QByteArray{"<"} + QMetaTypeName(metaType) + QByteArray{">"});
 			extractor->emplace(result, result);
 			return result;
 		} catch (DeserializationException &) {}
 	}
 
 	throw DeserializationException(QByteArray("Failed to deserialze value to ") +
-										QMetaType::typeName(propertyType) +
+										QMetaTypeName(propertyType) +
 										QByteArray(" because all possible sub-type converters rejected the passed value."));
 }

@@ -74,7 +74,7 @@ SerializerBase::SerializerBase(SerializerBasePrivate &dd, QObject *parent) :
 void SerializerBase::registerExtractor(int metaTypeId, const QSharedPointer<TypeExtractor> &extractor)
 {
 	SerializerBasePrivate::extractors.add(metaTypeId, extractor);
-	qCDebug(logSerializerExtractor) << "Added extractor for type:" << QMetaType::typeName(metaTypeId);
+	qCDebug(logSerializerExtractor) << "Added extractor for type:" << QMetaTypeName(metaTypeId);
 }
 
 bool SerializerBase::allowDefaultNull() const
@@ -264,9 +264,9 @@ QSharedPointer<const TypeExtractor> SerializerBase::extractor(int metaTypeId) co
 {
 	const auto extractor = SerializerBasePrivate::extractors.get(metaTypeId);
 	if (extractor)
-		qCDebug(logSerializerExtractor) << "Found extractor for type:" << QMetaType::typeName(metaTypeId);
+		qCDebug(logSerializerExtractor) << "Found extractor for type:" << QMetaTypeName(metaTypeId);
 	else
-		qCDebug(logSerializerExtractor) << "Unable to find extractor for type:" << QMetaType::typeName(metaTypeId);
+		qCDebug(logSerializerExtractor) << "Unable to find extractor for type:" << QMetaTypeName(metaTypeId);
 	return extractor;
 }
 
@@ -282,12 +282,12 @@ QCborValue SerializerBase::serializeSubtype(const QMetaProperty &property, const
 		const auto enumId = d->getEnumId(property.enumerator(), true);
 		qCDebug(logSerializer) << QByteArray{">"}.repeated(ExceptionContext::currentDepth()).constData()
 							   << "Serializing subtype property" << property.name()
-							   << "of enum type" << QMetaType::typeName(enumId);
+							   << "of enum type" << QMetaTypeName(enumId);
 		return serializeVariant(enumId, value);
 	} else {
 		qCDebug(logSerializer) << QByteArray{">"}.repeated(ExceptionContext::currentDepth()).constData()
 							   << "Serializing subtype property" << property.name()
-							   << "of type" << QMetaType::typeName(property.userType());
+							   << "of type" << QMetaTypeName(property.userType());
 		return serializeVariant(property.userType(), value);
 	}
 }
@@ -301,7 +301,7 @@ QCborValue SerializerBase::serializeSubtype(int propertyType, const QVariant &va
 	});
 	qCDebug(logSerializer) << QByteArray{">"}.repeated(ExceptionContext::currentDepth()).constData()
 						   << "Serializing subtype property" << traceHint
-						   << "of type" << QMetaType::typeName(propertyType);
+						   << "of type" << QMetaTypeName(propertyType);
 	return serializeVariant(propertyType, value);
 }
 
@@ -317,12 +317,12 @@ QVariant SerializerBase::deserializeSubtype(const QMetaProperty &property, const
 		const auto enumId = d->getEnumId(property.enumerator(), false);
 		qCDebug(logSerializer) << QByteArray{">"}.repeated(ExceptionContext::currentDepth()).constData()
 							   << "Deserializing subtype property" << property.name()
-							   << "of enum type" << QMetaType::typeName(enumId);
+							   << "of enum type" << QMetaTypeName(enumId);
 		return deserializeVariant(enumId, value, parent, true);
 	} else {
 		qCDebug(logSerializer) << QByteArray{">"}.repeated(ExceptionContext::currentDepth()).constData()
 							   << "Deserializing subtype property" << property.name()
-							   << "of type" << QMetaType::typeName(property.userType());
+							   << "of type" << QMetaTypeName(property.userType());
 		return deserializeVariant(property.userType(), value, parent);
 	}
 }
@@ -336,7 +336,7 @@ QVariant SerializerBase::deserializeSubtype(int propertyType, const QCborValue &
 	});
 	qCDebug(logSerializer) << QByteArray{">"}.repeated(ExceptionContext::currentDepth()).constData()
 						   << "Deserializing subtype property" << traceHint
-						   << "of type" << QMetaType::typeName(propertyType);
+						   << "of type" << QMetaTypeName(propertyType);
 	return deserializeVariant(propertyType, value, parent);
 }
 
@@ -395,15 +395,23 @@ QVariant SerializerBase::deserializeVariant(int propertyType, const QCborValue &
 			break;
 		}
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 		if(allowConvert && variant.canConvert(propertyType) && variant.convert(propertyType))
+#else
+		if(allowConvert && variant.canConvert(QMetaType(propertyType)) && variant.convert(QMetaType(propertyType)))
+#endif
 			return variant;
 		else if(d->allowNull && value.isNull())
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 			return QVariant{propertyType, nullptr};
+#else
+			return QVariant{QMetaType(propertyType), nullptr};
+#endif
 		else {
 			throw DeserializationException(QByteArray("Failed to convert deserialized variant of type ") +
 										   (vType ? vType : "<unknown>") +
 										   QByteArray(" to property type ") +
-										   QMetaType::typeName(propertyType) +
+										   QMetaTypeName(propertyType) +
 										   QByteArray(". Make shure to register converters with the QJsonSerializer::register* methods"));
 		}
 	} else
@@ -446,7 +454,7 @@ QSharedPointer<TypeConverter> SerializerBasePrivate::findSerConverter(int proper
 	// second: check if already cached
 	if (auto converter = serCache.get(propertyType); converter) {
 		qCDebug(logSerializer) << "Found cached serialization converter" << converter->name()
-							   << "for type:" <<  QMetaType::typeName(propertyType);
+							   << "for type:" <<  QMetaTypeName(propertyType);
 		return converter;
 	}
 
@@ -455,7 +463,7 @@ QSharedPointer<TypeConverter> SerializerBasePrivate::findSerConverter(int proper
 	for (const auto &converter : qAsConst(typeConverters.store)) {
 		if (converter && converter->canConvert(propertyType)) {
 			qCDebug(logSerializer) << "Found and cached serialization converter" << converter->name()
-								   << "for type:" <<  QMetaType::typeName(propertyType);
+								   << "for type:" <<  QMetaTypeName(propertyType);
 			// add converter to cache and return it
 			serCache.add(propertyType, converter);
 			return converter;
@@ -463,7 +471,7 @@ QSharedPointer<TypeConverter> SerializerBasePrivate::findSerConverter(int proper
 	}
 
 	// fourth: no converter found: return default converter
-	qCDebug(logSerializer) << "Unable to find serialization converte for type:" <<  QMetaType::typeName(propertyType)
+	qCDebug(logSerializer) << "Unable to find serialization converte for type:" <<  QMetaTypeName(propertyType)
 						   << "- falling back to default QVariant to CBOR conversion";
 	return nullptr;
 }
@@ -491,7 +499,7 @@ QSharedPointer<TypeConverter> SerializerBasePrivate::findDeserConverter(int &pro
 	if (auto converter = deserCache.get(propertyType);
 		converter && converter->canDeserialize(propertyType, tag, type) > 0) {
 		qCDebug(logSerializer) << "Found cached deserialization converter" << converter->name()
-							   << "for type" <<  QMetaType::typeName(propertyType)
+							   << "for type" <<  QMetaTypeName(propertyType)
 							   << LogTag{tag}
 							   << "and CBOR-type" << type;
 		return converter;
@@ -521,7 +529,7 @@ QSharedPointer<TypeConverter> SerializerBasePrivate::findDeserConverter(int &pro
 			// add converter to cache (only happens for positive cases)
 			deserCache.add(propertyType, converter);
 			qCDebug(logSerializer) << "Found and cached deserialization converter" << converter->name()
-								   << "for type" <<  QMetaType::typeName(propertyType)
+								   << "for type" <<  QMetaTypeName(propertyType)
 								   << LogTag{tag}
 								   << "and CBOR-type" << type;
 			return converter;
@@ -541,7 +549,7 @@ QSharedPointer<TypeConverter> SerializerBasePrivate::findDeserConverter(int &pro
 			qCDebug(logSerializer) << "Found and cached deserialization converter" << converter->name()
 								   << "by guessing the data with CBOR-tag" << tag
 								   << "and CBOR-type" << type
-								   << "is of type" << QMetaType::typeName(propertyType);
+								   << "is of type" << QMetaTypeName(propertyType);
 			return converter;
 		}
 	}
@@ -549,14 +557,14 @@ QSharedPointer<TypeConverter> SerializerBasePrivate::findDeserConverter(int &pro
 	// sixth: if a wrong tag mark was set, throw an expection
 	if (throwWrongTag) {
 		throw DeserializationException{QByteArray{"Found converter able to handle data of type "} +
-									   QMetaType::typeName(propertyType) +
+									   QMetaTypeName(propertyType) +
 									   ", but the given CBOR tag " +
 									   QByteArray::number(static_cast<quint64>(tag)) +
 									   " is not convertible to that type."};
 	}
 
 	// seventh: no converter found: return default converter
-	qCDebug(logSerializer) << "Unable to find deserialization converte for type" <<  QMetaType::typeName(propertyType)
+	qCDebug(logSerializer) << "Unable to find deserialization converte for type" <<  QMetaTypeName(propertyType)
 						   << LogTag{tag}
 						   << "and CBOR-type" << type
 						   << "- falling back to default CBOR to QVariant conversion";
@@ -569,7 +577,8 @@ void SerializerBasePrivate::updateConverterStore() const
 	QReadLocker fLocker{&typeConverterFactoryLock};
 	if (typeConverterFactories.size() > typeConverters.factoryOffset.loadAcquire()) {
 		QWriteLocker cLocker{&typeConverters.lock};
-		for (auto i = typeConverters.factoryOffset.loadAcquire(), max = typeConverterFactories.size(); i < max; ++i) {
+		auto max = typeConverterFactories.size();
+		for (auto i = typeConverters.factoryOffset.loadAcquire(); i < max; ++i) {
 			auto converter = typeConverterFactories[i]->createConverter();
 			if (converter) {
 				converter->setHelper(q);
@@ -588,7 +597,11 @@ int SerializerBasePrivate::getEnumId(QMetaEnum metaEnum, bool ser) const
 	QByteArray eName = metaEnum.name();
 	if (const QByteArray scope = metaEnum.scope(); !scope.isEmpty())
 		eName = scope + "::" + eName;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 	const auto eTypeId = QMetaType::type(eName);
+#else
+	const auto eTypeId = QMetaType::fromName(eName).id();
+#endif
 	if (eTypeId == QMetaType::UnknownType) {
 		if (ser)
 			throw SerializationException{"Unable to determine typeid of meta enum " + eName};
@@ -702,7 +715,7 @@ QVariant SerializerBasePrivate::deserializeCborValue(int propertyType, const QCb
 
 		if (doThrow) {
 			throw DeserializationException(QByteArray("Failed to deserialze CBOR-value to type ") +
-										   QMetaType::typeName(propertyType) +
+										   QMetaTypeName(propertyType) +
 										   QByteArray(" because the given CBOR-value failed strict validation"));
 		}
 	}
@@ -761,7 +774,7 @@ QVariant SerializerBasePrivate::deserializeJsonValue(int propertyType, const QCb
 
 		if (doThrow) {
 			throw DeserializationException(QByteArray("Failed to deserialze JSON-value to type ") +
-										   QMetaType::typeName(propertyType) +
+										   QMetaTypeName(propertyType) +
 										   QByteArray("because the given JSON-value failed strict validation"));
 		}
 	}

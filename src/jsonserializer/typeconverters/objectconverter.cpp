@@ -10,7 +10,7 @@ Q_LOGGING_CATEGORY(QtJsonSerializer::TypeConverters::logObjConverter, "qt.jsonse
 
 bool ObjectConverter::canConvert(int metaTypeId) const
 {
-	auto flags = QMetaType::typeFlags(metaTypeId);
+	auto flags = QMetaType(metaTypeId).flags();
 	return flags.testFlag(QMetaType::PointerToQObject);
 }
 
@@ -80,9 +80,9 @@ QCborValue ObjectConverter::serialize(int propertyType, const QVariant &value) c
 		//first: pass the class name
 		cborMap[QStringLiteral("@class")] = QString::fromUtf8(metaObject->className());
 	} else
-		metaObject = QMetaType::metaObjectForType(propertyType);
+		metaObject = QMetaType(propertyType).metaObject();
 	if (!metaObject)
-		throw SerializationException(QByteArray("Unable to get metaobject for type ") + QMetaType::typeName(propertyType));
+		throw SerializationException(QByteArray("Unable to get metaobject for type ") + QMetaTypeName(propertyType));
 
 	//go through all properties and try to serialize them
 	const auto keepObjectName = helper()->getProperty("keepObjectName").toBool();
@@ -117,9 +117,9 @@ QVariant ObjectConverter::deserializeCbor(int propertyType, const QCborValue &va
 
 	auto poly = static_cast<SerializerBase::Polymorphing>(helper()->getProperty("polymorphing").toInt());
 
-	auto metaObject = QMetaType::metaObjectForType(propertyType);
+	auto metaObject = QMetaType(propertyType).metaObject();
 	if (!metaObject)
-		throw DeserializationException(QByteArray("Unable to get metaobject for type ") + QMetaType::typeName(propertyType));
+		throw DeserializationException(QByteArray("Unable to get metaobject for type ") + QMetaTypeName(propertyType));
 
 	// try to get the polymorphic metatype (if allowed)
 	auto isPoly = false;
@@ -127,15 +127,20 @@ QVariant ObjectConverter::deserializeCbor(int propertyType, const QCborValue &va
 		if (cborMap.contains(QStringLiteral("@class"))) {
 			isPoly = true;
 			QByteArray classField = cborMap[QStringLiteral("@class")].toString().toUtf8() + "*";  // add the star
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 			auto typeId = QMetaType::type(classField.constData());
-			auto nMeta = QMetaType::metaObjectForType(typeId);
+			auto nMeta = QMetaType(typeId).metaObject();
+#else
+			auto metaType = QMetaType::fromName(classField.constData());
+			auto nMeta = metaType.metaObject();
+#endif
 			if (!nMeta)
 				throw DeserializationException("Unable to find class requested from json \"@class\" property: " + classField);
 			if (!nMeta->inherits(metaObject)) {
 				throw DeserializationException("Requested class from \"@class\" field, " +
 													classField +
 													QByteArray(", does not inhert the property type ") +
-													QMetaType::typeName(propertyType));
+													QMetaTypeName(propertyType));
 			}
 			metaObject = nMeta;
 		} else if (poly == SerializerBase::Polymorphing::Forced)
@@ -187,8 +192,13 @@ QObject *ObjectConverter::deserializeGenericObject(const QCborArray &value, QObj
 
 	// find a meta object
 	QByteArray className = value.first().toString().toUtf8() + "*";  // add the star
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 	auto typeId = QMetaType::type(className.constData());
-	auto metaObject = QMetaType::metaObjectForType(typeId);
+	auto metaObject = QMetaType(typeId).metaObject();
+#else
+	auto metaType = QMetaType::fromName(className.constData());
+	auto metaObject = metaType.metaObject();
+#endif
 	if (!metaObject)
 		throw DeserializationException("Unable to find class requested from GenericObject tagged array: " + className);
 
@@ -216,7 +226,11 @@ QObject *ObjectConverter::deserializeGenericObject(const QCborArray &value, QObj
 		auto allOk = true;
 		for (auto pIdx = 0; pIdx < argCopy.size(); ++pIdx) {
 			const auto pType = constructor.parameterType(pIdx);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 			if (!argCopy[pIdx].canConvert(pType) || !argCopy[pIdx].convert(pType)) {
+#else
+			if (!argCopy[pIdx].canConvert(QMetaType(pType)) || !argCopy[pIdx].convert(QMetaType(pType))) {
+#endif
 				allOk = false;
 				break;
 			}

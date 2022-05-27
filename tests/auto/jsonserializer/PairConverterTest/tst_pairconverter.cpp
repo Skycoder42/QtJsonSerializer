@@ -33,11 +33,13 @@ void PairConverterTest::initTest()
 	JsonSerializer::registerPairConverters<QPair<int, int>, QPair<bool, bool>>();
 	JsonSerializer::registerPairConverters<QMap<int, int>, QList<int>>();
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 	QMetaType::registerEqualsComparator<QPair<bool, int>>();
 	QMetaType::registerEqualsComparator<std::pair<bool, int>>();
 	QMetaType::registerEqualsComparator<QPair<QMap<int, int>, QList<int>>>();
 	QMetaType::registerEqualsComparator<QMap<int, int>>();
 	QMetaType::registerEqualsComparator<QList<int>>();
+#endif
 }
 
 TypeConverter *PairConverterTest::converter()
